@@ -1,3 +1,9 @@
+//---------------------------------------------------------------------
+// Implementation objects for the LabVIEW implementation of the
+// gRPC QueryServer
+//---------------------------------------------------------------------
+#pragma once
+
 #ifdef __WIN32__
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -12,6 +18,8 @@ using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
+using grpc::ServerWriter;
+using namespace queryserver;
 
 #ifdef _WIN32
     #define LIBRARY_EXPORT extern "C" __declspec(dllexport)
@@ -20,17 +28,21 @@ using grpc::Status;
 #endif
 
 //---------------------------------------------------------------------
+// LabVIEW definitions
 //---------------------------------------------------------------------
 typedef __int32 MagicCookie;
 typedef MagicCookie LVRefNum;
 typedef MagicCookie LVUserEventRef;
 
-typedef void* LVgRPCid;
-
 typedef struct {
 	__int32 cnt; /* number of bytes that follow */
 	char str[1]; /* cnt bytes */
 } LStr, * LStrPtr, ** LStrHandle;
+
+//---------------------------------------------------------------------
+// QueryServer LabVIEW definitions
+//---------------------------------------------------------------------
+typedef void* LVgRPCid;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -53,12 +65,13 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class QueryServerImpl final : public queryserver::QueryServer::Service
+class LabVIEWQueryServer final : public queryserver::QueryServer::Service
 {
 public:
-    Status Invoke(ServerContext* context, const queryserver::InvokeRequest* request, queryserver::InvokeResponse* response) override;
-    Status Query(ServerContext* context, const ::queryserver::QueryRequest* request, ::queryserver::QueryResponse* response) override; 
-    Status Register(ServerContext*context, const ::queryserver::RegistrationRequest* request, ::grpc::ServerWriter<queryserver::ServerEvent>* writer) override;
+    // Overrides
+    Status Invoke(ServerContext* context, const InvokeRequest* request, InvokeResponse* response) override;
+    Status Query(ServerContext* context, const QueryRequest* request, QueryResponse* response) override; 
+    Status Register(ServerContext*context, const RegistrationRequest* request, ServerWriter<ServerEvent>* writer) override;
 };
 
 //---------------------------------------------------------------------
@@ -66,11 +79,11 @@ public:
 class InvokeData : public EventData
 {
 public:
-    InvokeData(ServerContext* context, const queryserver::InvokeRequest* request, queryserver::InvokeResponse* response);
+    InvokeData(ServerContext* context, const InvokeRequest* request, InvokeResponse* response);
 
 public:
-	const queryserver::InvokeRequest* request;
-	queryserver::InvokeResponse* response;
+	const InvokeRequest* request;
+	InvokeResponse* response;
 };
 
 //---------------------------------------------------------------------
@@ -78,11 +91,11 @@ public:
 class QueryData : public EventData
 {
 public:
-    QueryData(ServerContext* context, const ::queryserver::QueryRequest* request, ::queryserver::QueryResponse* response);
+    QueryData(ServerContext* context, const QueryRequest* request, QueryResponse* response);
 
 public:
-	const queryserver::QueryRequest* request;
-	queryserver::QueryResponse* response;
+	const QueryRequest* request;
+	QueryResponse* response;
 };
 
 
@@ -91,7 +104,7 @@ public:
 class RegistrationRequestData : public EventData
 {
 public:
-    RegistrationRequestData(ServerContext* context, const ::queryserver::RegistrationRequest* request, ::grpc::ServerWriter<queryserver::ServerEvent>* writer);
+    RegistrationRequestData(ServerContext* context, const RegistrationRequest* request, ServerWriter<queryserver::ServerEvent>* writer);
 
 public:
     const queryserver::RegistrationRequest* request;

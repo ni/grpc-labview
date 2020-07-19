@@ -10,78 +10,93 @@
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
+using namespace std;
+using namespace queryserver;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 class QueryClient
 {
 public:
-    QueryClient(std::shared_ptr<Channel> channel)
-        : stub_(queryserver::QueryServer::NewStub(channel))
-    {        
-    }
+    QueryClient(shared_ptr<Channel> channel);
 
-    void Invoke(const std::string& command, const std::string& parameters)
-    {
-        queryserver::InvokeRequest request;
-        request.set_command(command);
-        request.set_parameter(parameters);
-
-        ClientContext context;
-        queryserver::InvokeResponse reply;
-        Status status = stub_->Invoke(&context, request, &reply);
-    }
-
-    std::string Query(const std::string &command)
-    {
-        // Data we are sending to the server.
-        queryserver::QueryRequest request;
-        request.set_query(command);
-
-        // Container for the data we expect from the server.
-        queryserver::QueryResponse reply;
-
-        // Context for the client. It could be used to convey extra information to
-        // the server and/or tweak certain RPC behaviors.
-        ClientContext context;
-
-        // The actual RPC.
-        Status status = stub_->Query(&context, request, &reply);
-
-        // Act upon its status.
-        if (status.ok())
-        {
-            return reply.message();
-        }
-        else
-        {
-            std::cout << status.error_code() << ": " << status.error_message() << std::endl;
-            return "RPC failed";
-        }
-    }
-
-    std::unique_ptr<grpc::ClientReader<queryserver::ServerEvent>> Register(const std::string& eventName)
-    {
-        queryserver::RegistrationRequest request;
-        request.set_eventname(eventName);
-
-        return stub_->Register(&_context, request);
-    }
+public:
+    void Invoke(const string& command, const string& parameters);
+    string Query(const string &command);
+    unique_ptr<grpc::ClientReader<ServerEvent>> Register(const string& eventName);
 
 private:
-    ClientContext _context;
-    std::unique_ptr<queryserver::QueryServer::Stub> stub_;
+    ClientContext m_context;
+    unique_ptr<QueryServer::Stub> m_Stub;
 };
 
-std::string GetServerAddress(int argc, char** argv)
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+QueryClient::QueryClient(shared_ptr<Channel> channel)
+    : m_Stub(QueryServer::NewStub(channel))
+{        
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void QueryClient::Invoke(const string& command, const string& parameters)
 {
-    std::string target_str;
-    std::string arg_str("--target");
+    InvokeRequest request;
+    request.set_command(command);
+    request.set_parameter(parameters);
+
+    ClientContext context;
+    InvokeResponse reply;
+    Status status = m_Stub->Invoke(&context, request, &reply);
+    if (!status.ok())
+    {
+        cout << status.error_code() << ": " << status.error_message() << endl;
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+string QueryClient::Query(const string &command)
+{
+    QueryRequest request;
+    request.set_query(command);
+    QueryResponse reply;
+    ClientContext context;
+
+    Status status = m_Stub->Query(&context, request, &reply);
+
+    if (status.ok())
+    {
+        return reply.message();
+    }
+    else
+    {
+        cout << status.error_code() << ": " << status.error_message() << endl;
+        return "RPC failed";
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+unique_ptr<grpc::ClientReader<ServerEvent>> QueryClient::Register(const string& eventName)
+{
+    RegistrationRequest request;
+    request.set_eventname(eventName);
+
+    return m_Stub->Register(&m_context, request);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+string GetServerAddress(int argc, char** argv)
+{
+    string target_str;
+    string arg_str("--target");
     if (argc > 1)
     {
-        std::string arg_val = argv[1];
+        string arg_val = argv[1];
         size_t start_pos = arg_val.find(arg_str);
-        if (start_pos != std::string::npos)
+        if (start_pos != string::npos)
         {
             start_pos += arg_str.size();
             if (arg_val[start_pos] == '=')
@@ -90,13 +105,13 @@ std::string GetServerAddress(int argc, char** argv)
             }
             else
             {
-                std::cout << "The only correct argument syntax is --target=" << std::endl;
+                cout << "The only correct argument syntax is --target=" << endl;
                 return 0;
             }
         }
         else
         {
-            std::cout << "The only acceptable argument is --target=" << std::endl;
+            cout << "The only acceptable argument is --target=" << endl;
             return 0;
         }
     }
@@ -115,14 +130,14 @@ int main(int argc, char **argv)
     QueryClient client(grpc::CreateChannel(target_str, grpc::InsecureChannelCredentials()));
 
     auto result = client.Query("Uptime");
-    std::cout << "Server uptime: " << result << "\n";
+    cout << "Server uptime: " << result << endl;
 
     auto reader = client.Register("Heartbeat");
     int count = 0;
-    queryserver::ServerEvent event;
+    ServerEvent event;
     while (reader->Read(&event))
     {
-        std::cout << "Server Event: " << event.eventdata() << "\n";
+        cout << "Server Event: " << event.eventdata() << endl;
         count += 1;
         if (count == 10)
         {
@@ -130,5 +145,5 @@ int main(int argc, char **argv)
         }
     }
     Status status = reader->Finish();
-    std::cout << "Server notifications complete\n";
+    cout << "Server notifications complete" << endl;
 }

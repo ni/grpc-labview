@@ -1,3 +1,4 @@
+//---------------------------------------------------------------------
 // Copyright 2020 National Instruments
 //
 // Licensed under the MIT License;
@@ -11,18 +12,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//---------------------------------------------------------------------
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 syntax = "proto3";
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 option java_multiple_files = true;
 option java_package = "labview.queryserver";
 option java_outer_classname = "QueryServer";
 option objc_class_prefix = "LVQ";
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 package queryserver;
 
+//---------------------------------------------------------------------
 // The QueryServer service definition.
+//---------------------------------------------------------------------
 service QueryServer {
+  
   rpc Invoke (InvokeRequest) returns (InvokeResponse) {}
   
   rpc Query (QueryRequest) returns (QueryResponse) {}
@@ -30,28 +41,40 @@ service QueryServer {
   rpc Register (RegistrationRequest) returns (stream ServerEvent) {}
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 message InvokeRequest {
   string command = 1;
   string parameter = 2;
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 message InvokeResponse {
   int32 status = 1;
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 message QueryRequest {
   string query = 1;
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 message QueryResponse {
   string message = 1;
   int32 status = 2;
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 message RegistrationRequest {
   string eventName = 1;
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 message ServerEvent {
   string eventData = 1;
   int32 serverId = 2;

@@ -4,14 +4,17 @@ using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
-
+using grpc::ServerWriter;
 using namespace std;
-
-static std::unique_ptr<Server> server;
+using namespace queryserver;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-Status QueryServerImpl::Invoke(ServerContext* context, const queryserver::InvokeRequest* request, queryserver::InvokeResponse* response)
+static std::unique_ptr<Server> s_Server;
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+Status LabVIEWQueryServer::Invoke(ServerContext* context, const InvokeRequest* request, InvokeResponse* response)
 {
     auto data = new InvokeData(context, request, response);
     OccurServerEvent("QueryServer_Invoke", data);
@@ -22,7 +25,7 @@ Status QueryServerImpl::Invoke(ServerContext* context, const queryserver::Invoke
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-Status  QueryServerImpl::Query(ServerContext* context, const ::queryserver::QueryRequest* request, ::queryserver::QueryResponse* response) 
+Status LabVIEWQueryServer::Query(ServerContext* context, const QueryRequest* request, QueryResponse* response) 
 {
     auto data = new QueryData(context, request, response);
     OccurServerEvent("QueryServer_Query", data);
@@ -33,7 +36,7 @@ Status  QueryServerImpl::Query(ServerContext* context, const ::queryserver::Quer
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-Status  QueryServerImpl::Register(ServerContext* context, const ::queryserver::RegistrationRequest* request, ::grpc::ServerWriter<queryserver::ServerEvent>* writer)
+Status LabVIEWQueryServer::Register(ServerContext* context, const RegistrationRequest* request, ServerWriter<ServerEvent>* writer)
 {
     auto data = new RegistrationRequestData(context, request, writer);
     OccurServerEvent("QueryServer_Register", data);
@@ -56,7 +59,7 @@ void RunServer(const char* address)
         server_address = "0.0.0.0:50051";
     }
 
-	QueryServerImpl service;
+	LabVIEWQueryServer service;
 	grpc::EnableDefaultHealthCheckService(true);
 	grpc::reflection::InitProtoReflectionServerBuilderPlugin();
 	ServerBuilder builder;
@@ -66,19 +69,19 @@ void RunServer(const char* address)
 	// clients. In this case it corresponds to an *synchronous* service.
 	builder.RegisterService(&service);
 	// Finally assemble the server.
-	server = builder.BuildAndStart();
+	s_Server = builder.BuildAndStart();
 	std::cout << "Server listening on " << server_address << std::endl;
-	server->Wait();
+	s_Server->Wait();
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 void StopServer()
 {
-	if (server != NULL)
+	if (s_Server != NULL)
 	{
-		server->Shutdown();
-		server->Wait();
-		server = NULL;
+		s_Server->Shutdown();
+		s_Server->Wait();
+		s_Server = NULL;
 	}
 }

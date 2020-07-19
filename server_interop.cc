@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 using namespace std;
+using namespace queryserver;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -23,7 +24,7 @@ static PostLVUserEvent_T PostLVUserEvent;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-std::map<string, LVUserEventRef> _registeredServerMethods;
+std::map<string, LVUserEventRef> s_RegisteredServerMethods;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -50,7 +51,7 @@ void EventData::NotifyComplete()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-InvokeData::InvokeData(ServerContext* _context, const queryserver::InvokeRequest* _request, queryserver::InvokeResponse* _response)
+InvokeData::InvokeData(ServerContext* _context, const InvokeRequest* _request, InvokeResponse* _response)
     : EventData(_context)
 {
     request = _request;
@@ -59,7 +60,7 @@ InvokeData::InvokeData(ServerContext* _context, const queryserver::InvokeRequest
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-QueryData::QueryData(ServerContext* _context, const ::queryserver::QueryRequest* _request, ::queryserver::QueryResponse* _response)
+QueryData::QueryData(ServerContext* _context, const QueryRequest* _request, QueryResponse* _response)
     : EventData(_context)
 {    
     request = _request;
@@ -68,7 +69,7 @@ QueryData::QueryData(ServerContext* _context, const ::queryserver::QueryRequest*
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-RegistrationRequestData::RegistrationRequestData(ServerContext* _context, const ::queryserver::RegistrationRequest* _request, ::grpc::ServerWriter<queryserver::ServerEvent>* _writer)
+RegistrationRequestData::RegistrationRequestData(ServerContext* _context, const RegistrationRequest* _request, ::grpc::ServerWriter<ServerEvent>* _writer)
     : EventData(_context)
 {
     request = _request;
@@ -101,8 +102,8 @@ static void InitCallbacks()
 //---------------------------------------------------------------------
 void OccurServerEvent(const char* name, EventData* data)
 {
-	auto occurrence = _registeredServerMethods.find(name);
-	if (occurrence != _registeredServerMethods.end())
+	auto occurrence = s_RegisteredServerMethods.find(name);
+	if (occurrence != s_RegisteredServerMethods.end())
 	{
 		auto error = PostLVUserEvent(occurrence->second, &data);
 	}
@@ -110,28 +111,27 @@ void OccurServerEvent(const char* name, EventData* data)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LStrHandle SetLVString(LStrHandle lvString, std::string str)
+void SetLVString(LStrHandle* lvString, string str)
 {
     auto length = str.length();    
-	auto error = NumericArrayResize(0x01, 1, &lvString, length);
-	memcpy((*lvString)->str, str.c_str(), length);
-	(*lvString)->cnt = (int)length;
-    return lvString;
+	auto error = NumericArrayResize(0x01, 1, lvString, length);
+	memcpy((**lvString)->str, str.c_str(), length);
+	(**lvString)->cnt = (int)length;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-std::string GetLVString(LStrHandle lvString)
+string GetLVString(LStrHandle lvString)
 {    
     if (lvString == NULL || *lvString == NULL)
     {
-        return std::string();
+        return string();
     }
 
 	auto count = (*lvString)->cnt;
 	auto chars = (*lvString)->str;
 
-	std::string result(chars, count);
+	string result(chars, count);
     return result;
 }
 
@@ -140,7 +140,7 @@ std::string GetLVString(LStrHandle lvString)
 LIBRARY_EXPORT __int32 LVStartServer(char* address)
 {   
 	InitCallbacks();
-	auto thread = new std::thread(RunServer, address);
+	new thread(RunServer, address);
 	return 0;
 }
 
@@ -156,7 +156,7 @@ LIBRARY_EXPORT __int32 LVStopServer()
 //---------------------------------------------------------------------
 LIBRARY_EXPORT __int32 RegisterServerEvent(const char* name, LVUserEventRef* item)
 {
-	_registeredServerMethods.insert(pair<string,LVUserEventRef>(string(name), *item));
+	s_RegisteredServerMethods.insert(pair<string,LVUserEventRef>(string(name), *item));
 	return 0;
 }
 
@@ -165,8 +165,8 @@ LIBRARY_EXPORT __int32 RegisterServerEvent(const char* name, LVUserEventRef* ite
 LIBRARY_EXPORT __int32 InvokeGetRequest(LVgRPCid id, LVInvokeRequest* request)
 {
 	InvokeData* data = *(InvokeData**)id;
-    request->command = SetLVString(request->command, data->request->command());
-    request->parameter = SetLVString(request->parameter, data->request->parameter());
+    SetLVString(&request->command, data->request->command());
+    SetLVString(&request->parameter, data->request->parameter());
 	return 0;
 }
 
@@ -185,7 +185,7 @@ LIBRARY_EXPORT __int32 InvokeSetResponse(LVgRPCid id, LVInvokeResponse* response
 LIBRARY_EXPORT __int32 QueryGetRequest(LVgRPCid id, LVQueryRequest* request)
 {
 	QueryData* data = *(QueryData**)id;
-    request->query = SetLVString(request->query, data->request->query());
+    SetLVString(&request->query, data->request->query());
     return 0;
 }
 
@@ -205,7 +205,7 @@ LIBRARY_EXPORT __int32 QuerySetResponse(LVgRPCid id, LVQueryResponse* response)
 LIBRARY_EXPORT __int32 RegisterGetRequest(LVgRPCid id, LVRegistrationRequest* request)
 {
 	RegistrationRequestData* data = *(RegistrationRequestData**)id;
-    request->eventName = SetLVString(request->eventName, data->request->eventname());
+    SetLVString(&request->eventName, data->request->eventname());
     return 0;
 }
 

@@ -7,11 +7,10 @@ if(NOT MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 else()
   add_definitions(-D_WIN32_WINNT=0x600)
+  set(Protobuf_DIR "C:\\Program Files (x86)\\grpc\\cmake")
 endif()
 
 find_package(Threads REQUIRED)
-
-set(Protobuf_DIR "C:\\Program Files (x86)\\grpc\\cmake")
 
 if(GRPC_AS_SUBMODULE)
   # One way to build a projects that uses gRPC is to just include the
