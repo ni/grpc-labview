@@ -8,7 +8,9 @@
 #include <mutex>
 #include <thread>
 
+#ifndef _WIN32
 #include <dlfcn.h>
+#endif
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -17,7 +19,7 @@ using namespace queryserver;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-typedef int (*NumericArrayResize_T)(__int32_t, __int32_t, void* handle, size_t size);
+typedef int (*NumericArrayResize_T)(int32_t, int32_t, void* handle, size_t size);
 typedef int (*PostLVUserEvent_T)(LVUserEventRef ref, void *data);
 
 //---------------------------------------------------------------------
@@ -79,8 +81,7 @@ RegistrationRequestData::RegistrationRequestData(ServerContext* _context, const 
     eventWriter = _writer;
 }
 
-#ifdef __WIN32__
-
+#ifdef _WIN32
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 static void InitCallbacks()
@@ -116,11 +117,7 @@ static void InitCallbacks()
 	auto lvModule = dlopen("labview", RTLD_NOLOAD);
 	if (lvModule == NULL)
 	{
-		lvModule = dlopen("liblvffrt.so", RTLD_NOLOAD);
-	}
-	if (lvModule == NULL)
-	{
-		lvModule = dlopen("liblvrt.so", RTLD_NOLOAD);
+		lvModule = dlopen("liblvrt.so", RTLD_NOW);
 	}
 	NumericArrayResize = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
 	PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
@@ -167,7 +164,7 @@ string GetLVString(LStrHandle lvString)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT __int32_t LVStartServer(char* address)
+LIBRARY_EXPORT int32_t LVStartServer(char* address)
 {   
 	InitCallbacks();
 	new thread(RunServer, address);
@@ -176,7 +173,7 @@ LIBRARY_EXPORT __int32_t LVStartServer(char* address)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT __int32_t LVStopServer()
+LIBRARY_EXPORT int32_t LVStopServer()
 {
 	StopServer();
 	return 0;
@@ -184,7 +181,7 @@ LIBRARY_EXPORT __int32_t LVStopServer()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT __int32_t RegisterServerEvent(const char* name, LVUserEventRef* item)
+LIBRARY_EXPORT int32_t RegisterServerEvent(const char* name, LVUserEventRef* item)
 {
 	s_RegisteredServerMethods.insert(pair<string,LVUserEventRef>(string(name), *item));
 	return 0;
@@ -192,7 +189,7 @@ LIBRARY_EXPORT __int32_t RegisterServerEvent(const char* name, LVUserEventRef* i
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT __int32_t InvokeGetRequest(LVgRPCid id, LVInvokeRequest* request)
+LIBRARY_EXPORT int32_t InvokeGetRequest(LVgRPCid id, LVInvokeRequest* request)
 {
 	InvokeData* data = *(InvokeData**)id;
     SetLVString(&request->command, data->request->command());
@@ -202,7 +199,7 @@ LIBRARY_EXPORT __int32_t InvokeGetRequest(LVgRPCid id, LVInvokeRequest* request)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT __int32_t InvokeSetResponse(LVgRPCid id, LVInvokeResponse* response)
+LIBRARY_EXPORT int32_t InvokeSetResponse(LVgRPCid id, LVInvokeResponse* response)
 {
 	InvokeData* data = *(InvokeData**)id;
     data->response->set_status(response->status);
@@ -212,7 +209,7 @@ LIBRARY_EXPORT __int32_t InvokeSetResponse(LVgRPCid id, LVInvokeResponse* respon
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT __int32_t QueryGetRequest(LVgRPCid id, LVQueryRequest* request)
+LIBRARY_EXPORT int32_t QueryGetRequest(LVgRPCid id, LVQueryRequest* request)
 {
 	QueryData* data = *(QueryData**)id;
     SetLVString(&request->query, data->request->query());
@@ -221,7 +218,7 @@ LIBRARY_EXPORT __int32_t QueryGetRequest(LVgRPCid id, LVQueryRequest* request)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT __int32_t QuerySetResponse(LVgRPCid id, LVQueryResponse* response)
+LIBRARY_EXPORT int32_t QuerySetResponse(LVgRPCid id, LVQueryResponse* response)
 {
 	QueryData* data = *(QueryData**)id;
     data->response->set_message(GetLVString(response->message));
@@ -232,7 +229,7 @@ LIBRARY_EXPORT __int32_t QuerySetResponse(LVgRPCid id, LVQueryResponse* response
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT __int32_t RegisterGetRequest(LVgRPCid id, LVRegistrationRequest* request)
+LIBRARY_EXPORT int32_t RegisterGetRequest(LVgRPCid id, LVRegistrationRequest* request)
 {
 	RegistrationRequestData* data = *(RegistrationRequestData**)id;
     SetLVString(&request->eventName, data->request->eventname());
@@ -241,7 +238,7 @@ LIBRARY_EXPORT __int32_t RegisterGetRequest(LVgRPCid id, LVRegistrationRequest* 
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT __int32_t NotifyServerEvent(LVgRPCid id, LVServerEvent* event)
+LIBRARY_EXPORT int32_t NotifyServerEvent(LVgRPCid id, LVServerEvent* event)
 {
 	RegistrationRequestData* data = *(RegistrationRequestData**)id;
     queryserver::ServerEvent e;
@@ -254,7 +251,7 @@ LIBRARY_EXPORT __int32_t NotifyServerEvent(LVgRPCid id, LVServerEvent* event)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT __int32_t CloseServerEvent(LVgRPCid id)
+LIBRARY_EXPORT int32_t CloseServerEvent(LVgRPCid id)
 {
 	RegistrationRequestData* data = *(RegistrationRequestData**)id;
     data->NotifyComplete();

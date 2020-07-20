@@ -31,12 +31,12 @@ using namespace queryserver;
 //---------------------------------------------------------------------
 // LabVIEW definitions
 //---------------------------------------------------------------------
-typedef __int32_t MagicCookie;
+typedef int32_t MagicCookie;
 typedef MagicCookie LVRefNum;
 typedef MagicCookie LVUserEventRef;
 
 typedef struct {
-	__int32_t cnt; /* number of bytes that follow */
+	int32_t cnt; /* number of bytes that follow */
 	char str[1]; /* cnt bytes */
 } LStr, * LStrPtr, ** LStrHandle;
 
@@ -124,7 +124,7 @@ struct LVInvokeRequest
 //---------------------------------------------------------------------
 struct LVInvokeResponse
 {
-    __int32_t status;
+    int32_t status;
 };
 
 //---------------------------------------------------------------------
@@ -139,7 +139,7 @@ struct LVQueryRequest
 struct LVQueryResponse
 {
     LStrHandle message;
-    __int32_t status;
+    int32_t status;
 };
 
 //---------------------------------------------------------------------
@@ -154,8 +154,8 @@ struct LVRegistrationRequest
 struct LVServerEvent
 {
     LStrHandle eventData;
-    __int32_t serverId;
-    __int32_t status;
+    int32_t serverId;
+    int32_t status;
 };
 
 //---------------------------------------------------------------------
