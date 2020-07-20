@@ -20,3 +20,8 @@ x64
 
 *.pb.cc
 *.pb.h
+
+example_client
+query.json
+liblabview_query_client.so
+liblabview_query_server.so

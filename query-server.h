@@ -13,6 +13,7 @@
 #include <grpcpp/health_check_service_interface.h>
 #include <grpcpp/ext/proto_server_reflection_plugin.h>
 #include <query-server.grpc.pb.h>
+#include <condition_variable>
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -24,18 +25,18 @@ using namespace queryserver;
 #ifdef _WIN32
     #define LIBRARY_EXPORT extern "C" __declspec(dllexport)
 #else
-    #define LIBRARY_EXPORT
+    #define LIBRARY_EXPORT extern "C"
 #endif
 
 //---------------------------------------------------------------------
 // LabVIEW definitions
 //---------------------------------------------------------------------
-typedef __int32 MagicCookie;
+typedef __int32_t MagicCookie;
 typedef MagicCookie LVRefNum;
 typedef MagicCookie LVUserEventRef;
 
 typedef struct {
-	__int32 cnt; /* number of bytes that follow */
+	__int32_t cnt; /* number of bytes that follow */
 	char str[1]; /* cnt bytes */
 } LStr, * LStrPtr, ** LStrHandle;
 
@@ -123,7 +124,7 @@ struct LVInvokeRequest
 //---------------------------------------------------------------------
 struct LVInvokeResponse
 {
-    __int32 status;
+    __int32_t status;
 };
 
 //---------------------------------------------------------------------
@@ -138,7 +139,7 @@ struct LVQueryRequest
 struct LVQueryResponse
 {
     LStrHandle message;
-    __int32 status;
+    __int32_t status;
 };
 
 //---------------------------------------------------------------------
@@ -153,8 +154,8 @@ struct LVRegistrationRequest
 struct LVServerEvent
 {
     LStrHandle eventData;
-    __int32 serverId;
-    __int32 status;
+    __int32_t serverId;
+    __int32_t status;
 };
 
 //---------------------------------------------------------------------
