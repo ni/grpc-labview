@@ -2,13 +2,15 @@
 
 ## Building on Windows
 
-### Prequisits
+### Prerequisites
 To prepare for cmake + Microsoft Visual C++ compiler build
 - Install Visual Studio 2015, 2017, or 2019 (Visual C++ compiler will be used).
 - Install [Git](https://git-scm.com/).
 - Install gRPC for C++
 - Install [CMake](https://cmake.org/download/).
+- Install LabVIEW 2019
 - (Optional) Install [Ninja](https://ninja-build.org/) (`choco install ninja`)
+
 
 ### Building
 - Launch "x64 Native Tools Command Prompt for Visual Studio"
