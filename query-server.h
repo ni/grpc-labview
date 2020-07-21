@@ -21,6 +21,7 @@ using grpc::ServerContext;
 using grpc::Status;
 using grpc::ServerWriter;
 using namespace queryserver;
+using namespace std;
 
 #ifdef _WIN32
     #define LIBRARY_EXPORT extern "C" __declspec(dllexport)
@@ -44,6 +45,7 @@ typedef struct {
 // QueryServer LabVIEW definitions
 //---------------------------------------------------------------------
 typedef void* LVgRPCid;
+typedef void* LVgRPCServerid;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -53,8 +55,8 @@ public:
     EventData(ServerContext* context);
 
 private:
-	std::mutex lockMutex;
-	std::condition_variable lock;
+	mutex lockMutex;
+	condition_variable lock;
 
 public:
 	ServerContext* context;
@@ -64,15 +66,42 @@ public:
     void NotifyComplete();
 };
 
+class LabVIEWQueryServerInstance;
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 class LabVIEWQueryServer final : public queryserver::QueryServer::Service
 {
 public:
+    LabVIEWQueryServer(LabVIEWQueryServerInstance* instance);
+    void SopServer();
+    void RegisterEvent(string eventName, LVUserEventRef reference);
+
     // Overrides
     Status Invoke(ServerContext* context, const InvokeRequest* request, InvokeResponse* response) override;
     Status Query(ServerContext* context, const QueryRequest* request, QueryResponse* response) override; 
     Status Register(ServerContext*context, const RegistrationRequest* request, ServerWriter<ServerEvent>* writer) override;
+
+private:
+    LabVIEWQueryServerInstance* m_Instance;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+class LabVIEWQueryServerInstance
+{
+public:
+    void Run(string address);
+    void StopServer();
+    void RegisterEvent(string eventName, LVUserEventRef reference);
+    void SendEvent(string name, EventData* data);
+
+private:
+    unique_ptr<Server> m_Server;
+    map<string, LVUserEventRef> m_RegisteredServerMethods;
+
+private:
+    static void RunServer(string address, LabVIEWQueryServerInstance* instance);
 };
 
 //---------------------------------------------------------------------
@@ -160,12 +189,4 @@ struct LVServerEvent
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void OccurServerEvent(const char* name, EventData* data);
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void RunServer(const char* address);
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void StopServer();
+void OccurServerEvent(LVUserEventRef event, EventData* data);

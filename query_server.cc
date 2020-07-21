@@ -10,14 +10,17 @@ using namespace queryserver;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-static std::unique_ptr<Server> s_Server;
+LabVIEWQueryServer::LabVIEWQueryServer(LabVIEWQueryServerInstance* instance)
+    : m_Instance(instance)
+{    
+}
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 Status LabVIEWQueryServer::Invoke(ServerContext* context, const InvokeRequest* request, InvokeResponse* response)
 {
     auto data = new InvokeData(context, request, response);
-    OccurServerEvent("QueryServer_Invoke", data);
+    m_Instance->SendEvent("QueryServer_Invoke", data);
     data->WaitForComplete();
     delete data;
     return Status::OK;
@@ -28,7 +31,7 @@ Status LabVIEWQueryServer::Invoke(ServerContext* context, const InvokeRequest* r
 Status LabVIEWQueryServer::Query(ServerContext* context, const QueryRequest* request, QueryResponse* response) 
 {
     auto data = new QueryData(context, request, response);
-    OccurServerEvent("QueryServer_Query", data);
+    m_Instance->SendEvent("QueryServer_Query", data);
     data->WaitForComplete();
     delete data;
     return Status::OK;
@@ -39,7 +42,7 @@ Status LabVIEWQueryServer::Query(ServerContext* context, const QueryRequest* req
 Status LabVIEWQueryServer::Register(ServerContext* context, const RegistrationRequest* request, ServerWriter<ServerEvent>* writer)
 {
     auto data = new RegistrationRequestData(context, request, writer);
-    OccurServerEvent("QueryServer_Register", data);
+    m_Instance->SendEvent("QueryServer_Register", data);
     data->WaitForComplete();
     delete data;
     return Status::OK;
@@ -47,10 +50,35 @@ Status LabVIEWQueryServer::Register(ServerContext* context, const RegistrationRe
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void RunServer(const char* address)
+void LabVIEWQueryServerInstance::RegisterEvent(string name, LVUserEventRef item)
+{    
+	m_RegisteredServerMethods.insert(pair<string,LVUserEventRef>(name, item));
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LabVIEWQueryServerInstance::SendEvent(string name, EventData* data)
 {
-	std::string server_address;
-    if (address != NULL)
+	auto occurrence = m_RegisteredServerMethods.find(name);
+	if (occurrence != m_RegisteredServerMethods.end())
+	{
+		OccurServerEvent(occurrence->second, data);
+	}
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LabVIEWQueryServerInstance::Run(string address)
+{
+    new thread(RunServer, address, this);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LabVIEWQueryServerInstance::RunServer(string address, LabVIEWQueryServerInstance* instance)
+{
+	string server_address;
+    if (address.length() != 0)
     {
         server_address = address;
     }
@@ -59,7 +87,7 @@ void RunServer(const char* address)
         server_address = "0.0.0.0:50051";
     }
 
-	LabVIEWQueryServer service;
+	LabVIEWQueryServer service(instance);
 	grpc::EnableDefaultHealthCheckService(true);
 	grpc::reflection::InitProtoReflectionServerBuilderPlugin();
 	ServerBuilder builder;
@@ -69,19 +97,19 @@ void RunServer(const char* address)
 	// clients. In this case it corresponds to an *synchronous* service.
 	builder.RegisterService(&service);
 	// Finally assemble the server.
-	s_Server = builder.BuildAndStart();
-	std::cout << "Server listening on " << server_address << std::endl;
-	s_Server->Wait();
+	instance->m_Server = builder.BuildAndStart();
+	cout << "Server listening on " << server_address << endl;
+	instance->m_Server->Wait();
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void StopServer()
+void LabVIEWQueryServerInstance::StopServer()
 {
-	if (s_Server != NULL)
+	if (m_Server != NULL)
 	{
-		s_Server->Shutdown();
-		s_Server->Wait();
-		s_Server = NULL;
+		m_Server->Shutdown();
+		m_Server->Wait();
+		m_Server = NULL;
 	}
 }

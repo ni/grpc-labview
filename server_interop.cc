@@ -29,10 +29,6 @@ static PostLVUserEvent_T PostLVUserEvent;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-std::map<string, LVUserEventRef> s_RegisteredServerMethods;
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 EventData::EventData(ServerContext* _context)
 {
     context = _context;    
@@ -127,13 +123,9 @@ static void InitCallbacks()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void OccurServerEvent(const char* name, EventData* data)
+void OccurServerEvent(LVUserEventRef event, EventData* data)
 {
-	auto occurrence = s_RegisteredServerMethods.find(name);
-	if (occurrence != s_RegisteredServerMethods.end())
-	{
-		auto error = PostLVUserEvent(occurrence->second, &data);
-	}
+	auto error = PostLVUserEvent(event, &data);
 }
 
 //---------------------------------------------------------------------
@@ -164,26 +156,38 @@ string GetLVString(LStrHandle lvString)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t LVStartServer(char* address)
-{   
+LIBRARY_EXPORT int32_t LVCreateServer(LVgRPCServerid* id)
+{
 	InitCallbacks();
-	new thread(RunServer, address);
+	auto server = new LabVIEWQueryServerInstance();
+	*id = server;   
 	return 0;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t LVStopServer()
-{
-	StopServer();
+LIBRARY_EXPORT int32_t LVStartServer(char* address, LVgRPCServerid* id)
+{   
+	LabVIEWQueryServerInstance* server = *(LabVIEWQueryServerInstance**)id;
+	server->Run(address);
 	return 0;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t RegisterServerEvent(const char* name, LVUserEventRef* item)
+LIBRARY_EXPORT int32_t LVStopServer(LVgRPCServerid* id)
 {
-	s_RegisteredServerMethods.insert(pair<string,LVUserEventRef>(string(name), *item));
+	LabVIEWQueryServerInstance* server = *(LabVIEWQueryServerInstance**)id;
+	server->StopServer();
+	return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t RegisterServerEvent(const char* name, LVUserEventRef* item, LVgRPCServerid* id)
+{
+	LabVIEWQueryServerInstance* server = *(LabVIEWQueryServerInstance**)id;
+	server->RegisterEvent(name, *item);
 	return 0;
 }
 
