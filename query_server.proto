@@ -23,7 +23,7 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "labview.queryserver";
 option java_outer_classname = "QueryServer";
-option objc_class_prefix = "LVQ";
+option objc_class_prefix = "LVQS";
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------

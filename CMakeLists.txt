@@ -1,7 +1,6 @@
-
 cmake_minimum_required(VERSION 3.5.1)
 
-project(LabVIEWQueryServer C CXX)
+project(labview-query-server C CXX)
 
 if(NOT MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -108,36 +107,36 @@ else()
 endif()
 
 # Proto file
-get_filename_component(hw_proto "./query-server.proto" ABSOLUTE)
-get_filename_component(hw_proto_path "${hw_proto}" PATH)
+get_filename_component(qs_proto "query_server.proto" ABSOLUTE)
+get_filename_component(qs_proto_path "${qs_proto}" PATH)
 
 # Generated sources
-set(hw_proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/query-server.pb.cc")
-set(hw_proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/query-server.pb.h")
-set(hw_grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/query-server.grpc.pb.cc")
-set(hw_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/query-server.grpc.pb.h")
+set(qs_proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/query_server.pb.cc")
+set(qs_proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/query_server.pb.h")
+set(qs_grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/query_server.grpc.pb.cc")
+set(qs_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/query_server.grpc.pb.h")
 add_custom_command(
-      OUTPUT "${hw_proto_srcs}" "${hw_proto_hdrs}" "${hw_grpc_srcs}" "${hw_grpc_hdrs}"
+      OUTPUT "${qs_proto_srcs}" "${qs_proto_hdrs}" "${qs_grpc_srcs}" "${qs_grpc_hdrs}"
       COMMAND ${_PROTOBUF_PROTOC}
       ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
         --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
-        -I "${hw_proto_path}"
+        -I "${qs_proto_path}"
         --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-        "${hw_proto}"
-      DEPENDS "${hw_proto}")
+        "${qs_proto}"
+      DEPENDS "${qs_proto}")
 
 #----------------------------------------------------------------------
 # Include generated *.pb.h files
 #----------------------------------------------------------------------
-include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src")
 
 #----------------------------------------------------------------------
 # LabVIEW client support to connect to the query server
 #----------------------------------------------------------------------
 add_library(labview_query_client SHARED
-   "query_client.cc"
-   ${hw_proto_srcs}
-   ${hw_grpc_srcs}
+   "src/query_client.cc"
+   ${qs_proto_srcs}
+   ${qs_grpc_srcs}
    )
 target_link_libraries(labview_query_client
    ${_REFLECTION}
@@ -148,10 +147,11 @@ target_link_libraries(labview_query_client
 # LabVIEW server support for implementing the query server
 #----------------------------------------------------------------------
 add_library(labview_query_server SHARED
-  "query_server.cc"
-  ${hw_proto_srcs}
-  ${hw_grpc_srcs}
-  server_interop.cc
+  src/query_server.cc
+  src/server_interop.cc
+  src/event_data.cc
+  ${qs_proto_srcs}
+  ${qs_grpc_srcs}
   )
 target_link_libraries(labview_query_server
    ${_REFLECTION}
@@ -162,9 +162,9 @@ target_link_libraries(labview_query_server
 # Example C++ application to talk to the example query server
 #----------------------------------------------------------------------
 add_executable(example_client
-  "example_client.cc"
-  ${hw_proto_srcs}
-  ${hw_grpc_srcs}
+  "src/example_client.cc"
+  ${qs_proto_srcs}
+  ${qs_grpc_srcs}
   )
 target_link_libraries(example_client
    ${_REFLECTION}

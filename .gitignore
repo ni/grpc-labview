@@ -10,18 +10,5 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
+build
 .vs
-Debug
-x64
-
-*.vcxproj
-*.vcxproj.filters
-*.sln
-
-*.pb.cc
-*.pb.h
-
-example_client
-query.json
-liblabview_query_client.so
-liblabview_query_server.so

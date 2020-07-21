@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-#include <query-server.h>
+#include <query_server.h>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -15,7 +15,6 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 using namespace std;
-using namespace queryserver;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -27,57 +26,8 @@ typedef int (*PostLVUserEvent_T)(LVUserEventRef ref, void *data);
 static NumericArrayResize_T NumericArrayResize;
 static PostLVUserEvent_T PostLVUserEvent;
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-EventData::EventData(ServerContext* _context)
-{
-    context = _context;    
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void EventData::WaitForComplete()
-{    
-    std::unique_lock<std::mutex> lck(lockMutex);
-    lock.wait(lck);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void EventData::NotifyComplete()
-{    
-	std::unique_lock<std::mutex> lck(lockMutex);
-	lock.notify_all();
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-InvokeData::InvokeData(ServerContext* _context, const InvokeRequest* _request, InvokeResponse* _response)
-    : EventData(_context)
-{
-    request = _request;
-    response = _response;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-QueryData::QueryData(ServerContext* _context, const QueryRequest* _request, QueryResponse* _response)
-    : EventData(_context)
-{    
-    request = _request;
-    response = _response;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-RegistrationRequestData::RegistrationRequestData(ServerContext* _context, const RegistrationRequest* _request, ::grpc::ServerWriter<ServerEvent>* _writer)
-    : EventData(_context)
-{
-    request = _request;
-    eventWriter = _writer;
-}
-
 #ifdef _WIN32
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 static void InitCallbacks()
@@ -99,6 +49,7 @@ static void InitCallbacks()
 	NumericArrayResize = (NumericArrayResize_T)GetProcAddress(lvModule, "NumericArrayResize");
 	PostLVUserEvent = (PostLVUserEvent_T)GetProcAddress(lvModule, "PostLVUserEvent");
 }
+
 #else
 
 //---------------------------------------------------------------------
