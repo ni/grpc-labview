@@ -9,6 +9,16 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+third_party
+gens
+grpc
 
 build
 .vs
+.vscode
+
+example_client
+liblabview_query_server.so
+liblabview_query_client.so
+*.pb.cc
+*.pb.h

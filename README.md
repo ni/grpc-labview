@@ -23,6 +23,12 @@ To prepare for cmake + Microsoft Visual C++ compiler build
 ### Building
 - Launch "x64 Native Tools Command Prompt for Visual Studio"
 
+Update submodules, this will build the gRPC components and all dependencies
+
+```
+> git submodule update --init --recursive
+```
+
 Build Debug
 ```
 > mkdir build
@@ -40,16 +46,29 @@ Build Release
 ```
 
 ## Building on Linux
+Update submodules, this will build the gRPC components and all dependencies
+
 ```
-> mkdir build
-> cd build
-> cmake ..
+> git submodule update --init --recursive
+```
+
+```
+> cmake .
 > make
 ```
 
 ## Building on Linux RT
 
-Coming soon
+Update submodules, this will build the gRPC components and all dependencies
+
+```
+> git submodule update --init --recursive
+```
+
+```
+> cmake .
+> make
+```
 
 ## Creating a LabVIEW Server
 
