@@ -23,9 +23,11 @@ To prepare for cmake + Microsoft Visual C++ compiler build
 ### Building
 - Launch "x64 Native Tools Command Prompt for Visual Studio"
 
-Update submodules, this will build the gRPC components and all dependencies
+Download the repo and update submodules, this will pull the gRPC components and all dependencies
 
 ```
+> git clone https://github.com/ni/labview-grpc-query-server.git labview-grpc-query-server
+> cd labview-grpc-query-server
 > git submodule update --init --recursive
 ```
 
@@ -46,11 +48,15 @@ Build Release
 ```
 
 ## Building on Linux
-Update submodules, this will build the gRPC components and all dependencies
+
+Download the repo and update submodules, this will pull the gRPC components and all dependencies
 
 ```
+> git clone https://github.com/ni/labview-grpc-query-server.git labview-grpc-query-server
+> cd labview-grpc-query-server
 > git submodule update --init --recursive
 ```
+Build
 
 ```
 > cmake .
@@ -59,11 +65,26 @@ Update submodules, this will build the gRPC components and all dependencies
 
 ## Building on Linux RT
 
-Update submodules, this will build the gRPC components and all dependencies
+Install required packages not installed by default
 
 ```
+> opkg update
+> opkg install git
+> opkg install git-perltools
+> opkg install cmake
+> opkg install g++
+> opkg install g++-symlinks
+```
+
+Download the repo and update submodules, this will pull the gRPC components and all dependencies
+
+```
+> git clone https://github.com/ni/labview-grpc-query-server.git labview-grpc-query-server
+> cd labview-grpc-query-server
 > git submodule update --init --recursive
 ```
+
+Build
 
 ```
 > cmake .
@@ -77,6 +98,8 @@ The template consumes all of the events and processes them in the event case.  Y
 any manner of your choosing.
 
 ## Using the LabVIEW Client API
+
+Coming Soon
 
 ## Example
 
