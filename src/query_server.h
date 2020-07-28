@@ -91,7 +91,7 @@ private:
 class LabVIEWQueryServerInstance
 {
 public:
-    void Run(string address);
+    void Run(string address, string serverCertificatePath, string serverKeyPath);
     void StopServer();
     void RegisterEvent(string eventName, LVUserEventRef reference);
     void SendEvent(string name, EventData* data);
@@ -101,7 +101,7 @@ private:
     map<string, LVUserEventRef> m_RegisteredServerMethods;
 
 private:
-    static void RunServer(string address, LabVIEWQueryServerInstance* instance);
+    static void RunServer(string address, string serverCertificatePath, string serverKeyPath, LabVIEWQueryServerInstance* instance);
 };
 
 //---------------------------------------------------------------------

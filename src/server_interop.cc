@@ -117,10 +117,10 @@ LIBRARY_EXPORT int32_t LVCreateServer(LVgRPCServerid* id)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t LVStartServer(char* address, LVgRPCServerid* id)
+LIBRARY_EXPORT int32_t LVStartServer(char* address, char* serverCertificatePath, char* serverKeyPath, LVgRPCServerid* id)
 {   
 	LabVIEWQueryServerInstance* server = *(LabVIEWQueryServerInstance**)id;
-	server->Run(address);
+	server->Run(address, serverCertificatePath, serverKeyPath);
 	return 0;
 }
 

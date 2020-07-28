@@ -2,6 +2,9 @@
 //---------------------------------------------------------------------
 #include <query_server.h>
 #include <thread>
+#include <sstream>
+#include <fstream>
+#include <iostream>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -76,14 +79,33 @@ void LabVIEWQueryServerInstance::SendEvent(string name, EventData* data)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LabVIEWQueryServerInstance::Run(string address)
+void LabVIEWQueryServerInstance::Run(string address, string serverCertificatePath, string serverKeyPath)
 {
-    new thread(RunServer, address, this);
+    new thread(RunServer, address, serverCertificatePath, serverKeyPath, this);
 }
+
+std::string read_keycert( const std::string& filename)
+{	
+	std::string data;
+	std::ifstream file(filename.c_str(), std::ios::in);
+	if (file.is_open())
+	{
+		std::stringstream ss;
+		ss << file.rdbuf();
+		file.close();
+		data = ss.str();
+	}
+	return data;
+}
+
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LabVIEWQueryServerInstance::RunServer(string address, LabVIEWQueryServerInstance* instance)
+void LabVIEWQueryServerInstance::RunServer(
+	string address, 
+	string serverCertificatePath, 
+	string serverKeyPath, 
+	LabVIEWQueryServerInstance* instance)
 {
 	string server_address;
     if (address.length() != 0)
@@ -99,8 +121,30 @@ void LabVIEWQueryServerInstance::RunServer(string address, LabVIEWQueryServerIns
 	grpc::EnableDefaultHealthCheckService(true);
 	grpc::reflection::InitProtoReflectionServerBuilderPlugin();
 	ServerBuilder builder;
+
+	std::shared_ptr<grpc::ServerCredentials> creds;
+	if (!serverCertificatePath.empty())
+	{
+		std::string servercert = read_keycert(serverCertificatePath);
+		std::string serverkey = read_keycert(serverKeyPath);
+
+		grpc::SslServerCredentialsOptions::PemKeyCertPair pkcp;
+		pkcp.private_key = serverkey;
+		pkcp.cert_chain = servercert;
+
+		grpc::SslServerCredentialsOptions ssl_opts;
+		ssl_opts.pem_root_certs="";
+		ssl_opts.pem_key_cert_pairs.push_back(pkcp);
+
+		creds = grpc::SslServerCredentials(ssl_opts);
+	}
+	else
+	{
+		creds = grpc::InsecureServerCredentials();
+	}
+
 	// Listen on the given address without any authentication mechanism.
-	builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
+	builder.AddListeningPort(server_address, creds);
 	// Register "service" as the instance through which we'll communicate with
 	// clients. In this case it corresponds to an *synchronous* service.
 	builder.RegisterService(&service);
