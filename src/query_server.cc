@@ -123,7 +123,7 @@ void LabVIEWQueryServerInstance::RunServer(
 	ServerBuilder builder;
 
 	std::shared_ptr<grpc::ServerCredentials> creds;
-	if (!serverCertificatePath.empty())
+	if (serverCertificatePath.length() > 1)
 	{
 		std::string servercert = read_keycert(serverCertificatePath);
 		std::string serverkey = read_keycert(serverKeyPath);
