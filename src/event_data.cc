@@ -32,6 +32,14 @@ void EventData::NotifyComplete()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+ServerStartEventData::ServerStartEventData()
+    : EventData(NULL)
+{
+    serverStartStatus = 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 InvokeData::InvokeData(ServerContext* _context, const InvokeRequest* _request, InvokeResponse* _response)
     : EventData(_context)
 {

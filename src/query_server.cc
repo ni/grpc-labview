@@ -79,11 +79,16 @@ void LabVIEWQueryServerInstance::SendEvent(string name, EventData* data)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LabVIEWQueryServerInstance::Run(string address, string serverCertificatePath, string serverKeyPath)
+int LabVIEWQueryServerInstance::Run(string address, string serverCertificatePath, string serverKeyPath)
 {
-    new thread(RunServer, address, serverCertificatePath, serverKeyPath, this);
+	ServerStartEventData serverStarted;
+    new thread(RunServer, address, serverCertificatePath, serverKeyPath, this, &serverStarted);
+	serverStarted.WaitForComplete();
+	return serverStarted.serverStartStatus;
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 std::string read_keycert( const std::string& filename)
 {	
 	std::string data;
@@ -105,7 +110,8 @@ void LabVIEWQueryServerInstance::RunServer(
 	string address, 
 	string serverCertificatePath, 
 	string serverKeyPath, 
-	LabVIEWQueryServerInstance* instance)
+	LabVIEWQueryServerInstance* instance,
+	ServerStartEventData* serverStarted)
 {
 	string server_address;
     if (address.length() != 0)
@@ -150,8 +156,18 @@ void LabVIEWQueryServerInstance::RunServer(
 	builder.RegisterService(&service);
 	// Finally assemble the server.
 	instance->m_Server = builder.BuildAndStart();
-	cout << "Server listening on " << server_address << endl;
-	instance->m_Server->Wait();
+
+	if (instance->m_Server != NULL)
+	{
+		cout << "Server listening on " << server_address << endl;
+		serverStarted->NotifyComplete();
+		instance->m_Server->Wait();
+	}
+	else
+	{
+		serverStarted->serverStartStatus = -1;
+		serverStarted->NotifyComplete();
+	}
 }
 
 //---------------------------------------------------------------------

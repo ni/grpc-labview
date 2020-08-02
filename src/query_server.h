@@ -88,20 +88,13 @@ private:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class LabVIEWQueryServerInstance
+class ServerStartEventData : public EventData
 {
 public:
-    void Run(string address, string serverCertificatePath, string serverKeyPath);
-    void StopServer();
-    void RegisterEvent(string eventName, LVUserEventRef reference);
-    void SendEvent(string name, EventData* data);
+    ServerStartEventData();
 
-private:
-    unique_ptr<Server> m_Server;
-    map<string, LVUserEventRef> m_RegisteredServerMethods;
-
-private:
-    static void RunServer(string address, string serverCertificatePath, string serverKeyPath, LabVIEWQueryServerInstance* instance);
+public:
+    int serverStartStatus;
 };
 
 //---------------------------------------------------------------------
@@ -139,6 +132,24 @@ public:
 public:
     const queryserver::RegistrationRequest* request;
     ::grpc::ServerWriter<::queryserver::ServerEvent>* eventWriter;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+class LabVIEWQueryServerInstance
+{
+public:
+    int Run(string address, string serverCertificatePath, string serverKeyPath);
+    void StopServer();
+    void RegisterEvent(string eventName, LVUserEventRef reference);
+    void SendEvent(string name, EventData* data);
+
+private:
+    unique_ptr<Server> m_Server;
+    map<string, LVUserEventRef> m_RegisteredServerMethods;
+
+private:
+    static void RunServer(string address, string serverCertificatePath, string serverKeyPath, LabVIEWQueryServerInstance* instance, ServerStartEventData* serverStarted);
 };
 
 //---------------------------------------------------------------------
