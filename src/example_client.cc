@@ -159,16 +159,16 @@ string GetCertPath(int argc, char** argv)
 
 std::string read_keycert( const std::string& filename)
 {	
-	std::string data;
-	std::ifstream file(filename.c_str(), std::ios::in);
-	if (file.is_open())
-	{
-		std::stringstream ss;
-		ss << file.rdbuf();
-		file.close();
-		data = ss.str();
-	}
-	return data;
+    std::string data;
+    std::ifstream file(filename.c_str(), std::ios::in);
+    if (file.is_open())
+    {
+        std::stringstream ss;
+        ss << file.rdbuf();
+        file.close();
+        data = ss.str();
+    }
+    return data;
 }
 
 //---------------------------------------------------------------------

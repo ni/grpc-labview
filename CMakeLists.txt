@@ -63,10 +63,10 @@ add_custom_command(
 include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src")
 
 #----------------------------------------------------------------------
-# LabVIEW client support to connect to the query server
+# LabVIEW client support to communicate with a gRPC server
 #----------------------------------------------------------------------
 add_library(labview_query_client SHARED
-   "src/query_client.cc"
+   "src/grpc_client.cc"
    ${qs_proto_srcs}
    ${qs_grpc_srcs}
    )
@@ -76,16 +76,30 @@ target_link_libraries(labview_query_client
    ${_PROTOBUF_LIBPROTOBUF})
 
 #----------------------------------------------------------------------
-# LabVIEW server support for implementing the query server
+# LabVIEW server support for implementing the grpc server
 #----------------------------------------------------------------------
-add_library(labview_query_server SHARED
-  src/query_server.cc
-  src/server_interop.cc
+add_library(labview_grpc_server SHARED
+  src/grpc_server.cc
+  src/grpc_interop.cc
   src/event_data.cc
+  src/lv_interop.cc
   ${qs_proto_srcs}
   ${qs_grpc_srcs}
   )
-target_link_libraries(labview_query_server
+target_link_libraries(labview_grpc_server
+   ${_REFLECTION}
+   ${_GRPC_GRPCPP}
+   ${_PROTOBUF_LIBPROTOBUF})
+
+#----------------------------------------------------------------------
+# LabVIEW code generator support library to generate client and
+# server VIs from a .proto file
+#----------------------------------------------------------------------
+add_library(labview_grpc_generator SHARED
+  src/grpc_generator.cc
+  src/lv_interop.cc
+  )
+target_link_libraries(labview_grpc_generator
    ${_REFLECTION}
    ${_GRPC_GRPCPP}
    ${_PROTOBUF_LIBPROTOBUF})
