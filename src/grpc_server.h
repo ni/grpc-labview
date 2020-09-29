@@ -76,15 +76,15 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-typedef std::list<LVMessageMetadata> LVMessageMetadataList;
+using LVMessageMetadataList = std::list<LVMessageMetadata>;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 class LVMessage : public google::protobuf::Message
 {
 public:
-    static thread_local LVMessageMetadataList* RequestMetadata;
-    static thread_local LVMessageMetadataList* ResponseMetadata;
+    // static thread_local LVMessageMetadataList* RequestMetadata;
+    // static thread_local LVMessageMetadataList* ResponseMetadata;
 
     LVMessage();
     LVMessage(const LVMessage &from);
@@ -144,23 +144,23 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class LVRpcMethodHandler : public grpc::internal::MethodHandler
-{
-public:
-    typedef std::function<::grpc::Status(LabVIEWGRPCService*, grpc_impl::ServerContext*, const LVRequestData*, LVResponseData*)> MethodFunc;
-    typedef grpc::internal::RpcMethodHandler<LabVIEWGRPCService, LVRequestData, LVResponseData> WrappedHandler;
+// class LVRpcMethodHandler : public grpc::internal::MethodHandler
+// {
+// public:
+//     typedef std::function<::grpc::Status(LabVIEWGRPCService*, grpc_impl::ServerContext*, const LVRequestData*, LVResponseData*)> MethodFunc;
+//     typedef grpc::internal::RpcMethodHandler<LabVIEWGRPCService, LVRequestData, LVResponseData> WrappedHandler;
 
-    LVRpcMethodHandler(MethodFunc func, LabVIEWGRPCService* service, LVMessageMetadataList* requestMetadats, LVMessageMetadataList* responseMetadata);
-    void RunHandler(const HandlerParameter &param) final;
-    void* Deserialize(grpc_call* call, grpc_byte_buffer* req, ::grpc::Status* status, void** /*handler_data*/) final;
+//     LVRpcMethodHandler(MethodFunc func, LabVIEWGRPCService* service, LVMessageMetadataList* requestMetadats, LVMessageMetadataList* responseMetadata);
+//     void RunHandler(const HandlerParameter &param) final;
+//     void* Deserialize(grpc_call* call, grpc_byte_buffer* req, ::grpc::Status* status, void** /*handler_data*/) final;
 
-private:
-    MethodFunc m_Func;
-    LabVIEWGRPCService* m_Service;
-    WrappedHandler* m_WrappedHandler;
-    LVMessageMetadataList* m_RequestMetadata;
-    LVMessageMetadataList* m_ResponseMetadata;
-};
+// private:
+//     MethodFunc m_Func;
+//     LabVIEWGRPCService* m_Service;
+//     WrappedHandler* m_WrappedHandler;
+//     LVMessageMetadataList* m_RequestMetadata;
+//     LVMessageMetadataList* m_ResponseMetadata;
+// };
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------

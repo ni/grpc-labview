@@ -9,8 +9,8 @@ using namespace queryserver;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-thread_local LVMessageMetadataList* LVMessage::RequestMetadata;
-thread_local LVMessageMetadataList* LVMessage::ResponseMetadata;
+// thread_local LVMessageMetadataList* LVMessage::RequestMetadata;
+// thread_local LVMessageMetadataList* LVMessage::ResponseMetadata;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
