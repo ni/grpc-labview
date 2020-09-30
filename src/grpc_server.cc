@@ -5,6 +5,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <future>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -21,53 +22,29 @@ using namespace queryserver;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-static const char *QueryServer_method_names[] = {
-    "/queryserver.QueryServer/Invoke",
-    "/queryserver.QueryServer/Query",
-    "/queryserver.QueryServer/Register",
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LabVIEWGRPCService::LabVIEWGRPCService(LabVIEWQueryServerInstance *instance)
-    : m_Instance(instance)
-{
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-Status LabVIEWGRPCService::Register(ServerContext *context, const RegistrationRequest *request, ServerWriter<ServerEvent> *writer)
-{
-    auto data = new RegistrationRequestData(context, request, writer);
-    m_Instance->SendEvent("QueryServer_Register", data);
-    data->WaitForComplete();
-    delete data;
-    return Status::OK;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LabVIEWQueryServerInstance::RegisterEvent(string name, LVUserEventRef item, std::shared_ptr<MessageMetadata> requestMetadata, std::shared_ptr<MessageMetadata> responseMetadata)
+void LabVIEWgRPCServer::RegisterEvent(string name, LVUserEventRef item, std::shared_ptr<MessageMetadata> requestMetadata, std::shared_ptr<MessageMetadata> responseMetadata)
 {
     LVEventData data = { item, requestMetadata, responseMetadata };
-    m_RegisteredServerMethods.insert(pair<string, LVEventData>(name, data));
+    _registeredServerMethods.insert(pair<string, LVEventData>(name, data));
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LabVIEWQueryServerInstance::SendEvent(string name, EventData *data)
+void LabVIEWgRPCServer::SendEvent(string name, EventData *data)
 {
-    auto eventData = m_RegisteredServerMethods.find(name);
-    if (eventData != m_RegisteredServerMethods.end())
+    auto eventData = _registeredServerMethods.find(name);
+    if (eventData != _registeredServerMethods.end())
     {
         OccurServerEvent(eventData->second.event, data);
     }
 }
 
-bool LabVIEWQueryServerInstance::FindEventData(string name, LVEventData& data)
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+bool LabVIEWgRPCServer::FindEventData(string name, LVEventData& data)
 {
-    auto eventData = m_RegisteredServerMethods.find(name);
-    if (eventData != m_RegisteredServerMethods.end())
+    auto eventData = _registeredServerMethods.find(name);
+    if (eventData != _registeredServerMethods.end())
     {
         data = eventData->second;
         return true;
@@ -75,15 +52,16 @@ bool LabVIEWQueryServerInstance::FindEventData(string name, LVEventData& data)
     return false;
 }
 
-
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-int LabVIEWQueryServerInstance::Run(string address, string serverCertificatePath, string serverKeyPath)
+int LabVIEWgRPCServer::Run(string address, string serverCertificatePath, string serverKeyPath)
 {
-    ServerStartEventData serverStarted;
-    new thread(RunServer, address, serverCertificatePath, serverKeyPath, this, &serverStarted);
-    serverStarted.WaitForComplete();
-    return serverStarted.serverStartStatus;
+    auto serverStarted = new ServerStartEventData;
+    _runFuture = std::async(std::launch::async, [=]() { RunServer(address, serverCertificatePath, serverKeyPath, serverStarted); });
+    serverStarted->WaitForComplete();
+    auto result = serverStarted->serverStartStatus;
+    delete serverStarted;
+    return result;
 }
 
 //---------------------------------------------------------------------
@@ -102,109 +80,12 @@ std::string read_keycert(const std::string &filename)
     return data;
 }
 
-grpc::AsyncGenericService *_rpcService;
-
-//---------------------------------------------------------------------
-// Take in the "service" instance (in this case representing an asynchronous
-// server) and the completion queue "cq" used for asynchronous communication
-// with the gRPC runtime.
-//---------------------------------------------------------------------
-CallData::CallData(LabVIEWQueryServerInstance *instance, grpc::AsyncGenericService *service, grpc::ServerCompletionQueue *cq)
-    : _instance(instance), _service(service), _cq(cq), _stream(&_ctx), _status(CallStatus::Create)
-{
-    Proceed();
-}
-
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-bool CallData::ParseFromByteBuffer(grpc::ByteBuffer *buffer, grpc::protobuf::Message *message)
-{
-    std::vector<grpc::Slice> slices;
-    (void)buffer->Dump(&slices);
-    std::string buf;
-    buf.reserve(buffer->Length());
-    for (auto s = slices.begin(); s != slices.end(); s++)
-    {
-        buf.append(reinterpret_cast<const char *>(s->begin()), s->size());
-    }
-    return message->ParseFromString(buf);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-std::unique_ptr<grpc::ByteBuffer> CallData::SerializeToByteBuffer(
-    grpc::protobuf::Message *message)
-{
-    std::string buf;
-    message->SerializeToString(&buf);
-    grpc::Slice slice(buf);
-    return std::unique_ptr<grpc::ByteBuffer>(new grpc::ByteBuffer(&slice, 1));
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void CallData::Proceed()
-{
-    if (_status == CallStatus::Create)
-    {
-        // As part of the initial CREATE state, we *request* that the system
-        // start processing SayHello requests. In this request, "this" acts are
-        // the tag uniquely identifying the request (so that different CallData
-        // instances can serve different requests concurrently), in this case
-        // the memory address of this CallData instance.
-        _service->RequestCall(&_ctx, &_stream, _cq, _cq, this);
-        // Make this instance progress to the PROCESS state.
-        _status = CallStatus::Read;
-    }
-    else if (_status == CallStatus::Read)
-    {
-        // Spawn a new CallData instance to serve new clients while we process
-        // the one for this CallData. The instance will deallocate itself as
-        // part of its FINISH state.
-        new CallData(_instance, _service, _cq);
-
-        _stream.Read(&_rb, this);
-        _status = CallStatus::Process;
-    }
-    else if (_status == CallStatus::Process)
-    {
-        auto name = _ctx.method();
-
-        LVEventData eventData;
-        if (_instance->FindEventData(name, eventData))
-        {
-            LVMessage request(eventData.requestMetadata->elements);
-            LVMessage response(eventData.responsetMetadata->elements);
-            ParseFromByteBuffer(&_rb, &request);
-
-            GenericMethodData methodData(&_ctx, &request, &response);
-            _instance->SendEvent(name, &methodData);
-
-            methodData.WaitForComplete();
-            
-            auto wb = SerializeToByteBuffer(&response);
-            grpc::WriteOptions options;
-            _stream.WriteAndFinish(*wb, options, grpc::Status::OK, this);
-        }
-        else
-        {
-            _stream.Finish(grpc::Status::CANCELLED, this);
-        }
-        _status = CallStatus::Finish;
-    }
-    else
-    {
-        assert(_status == CallStatus::Finish);
-        delete this;
-    }
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void HandleRpcs(LabVIEWQueryServerInstance *_instance, grpc::ServerCompletionQueue *cq_)
+void LabVIEWgRPCServer::HandleRpcs(grpc::ServerCompletionQueue *cq)
 {
     // Spawn a new CallData instance to serve new clients.
-    new CallData(_instance, _rpcService, cq_);
+    new CallData(this, _rpcService.get(), cq);
     void *tag; // uniquely identifies a request.
     bool ok;
     while (true)
@@ -212,19 +93,18 @@ void HandleRpcs(LabVIEWQueryServerInstance *_instance, grpc::ServerCompletionQue
         // Block waiting to read the next event from the completion queue. The
         // event is uniquely identified by its tag, which in this case is the
         // memory address of a CallData instance.
-        cq_->Next(&tag, &ok);
+        cq->Next(&tag, &ok);
         GPR_ASSERT(ok);
-        static_cast<CallData *>(tag)->Proceed();
+        static_cast<CallData*>(tag)->Proceed();
     }
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LabVIEWQueryServerInstance::RunServer(
+void LabVIEWgRPCServer::RunServer(
     string address,
     string serverCertificatePath,
     string serverKeyPath,
-    LabVIEWQueryServerInstance *instance,
     ServerStartEventData *serverStarted)
 {
     string server_address;
@@ -237,7 +117,6 @@ void LabVIEWQueryServerInstance::RunServer(
         server_address = "0.0.0.0:50051";
     }
 
-    LabVIEWGRPCService service(instance);
     grpc::EnableDefaultHealthCheckService(true);
     grpc::reflection::InitProtoReflectionServerBuilderPlugin();
     ServerBuilder builder;
@@ -265,23 +144,19 @@ void LabVIEWQueryServerInstance::RunServer(
 
     // Listen on the given address without any authentication mechanism.
     builder.AddListeningPort(server_address, creds);
-    // Register "service" as the instance through which we'll communicate with
-    // clients. In this case it corresponds to an *synchronous* service.
-    //builder.RegisterService(&service);
-
-    _rpcService = new grpc::AsyncGenericService();
-    builder.RegisterAsyncGenericService(_rpcService);
+    _rpcService = std::unique_ptr<grpc::AsyncGenericService>(new grpc::AsyncGenericService());
+    builder.RegisterAsyncGenericService(_rpcService.get());
     auto cq = builder.AddCompletionQueue();
     // Finally assemble the server.
-    instance->m_Server = builder.BuildAndStart();
+    _server = builder.BuildAndStart();
 
-    if (instance->m_Server != NULL)
+    if (_server != nullptr)
     {
         cout << "Server listening on " << server_address << endl;
         serverStarted->NotifyComplete();
 
-        HandleRpcs(instance, cq.get());
-        instance->m_Server->Wait();
+        HandleRpcs(cq.get());
+        _server->Wait();
     }
     else
     {
@@ -292,12 +167,13 @@ void LabVIEWQueryServerInstance::RunServer(
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LabVIEWQueryServerInstance::StopServer()
+void LabVIEWgRPCServer::StopServer()
 {
-    if (m_Server != NULL)
+    if (_server != nullptr)
     {
-        m_Server->Shutdown();
-        m_Server->Wait();
-        m_Server = NULL;
+        _server->Shutdown();
+        _server->Wait();
+        _runFuture.wait();
+        _server = nullptr;
     }
 }

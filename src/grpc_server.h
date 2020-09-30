@@ -14,6 +14,7 @@
 #include <query_server.grpc.pb.h>
 #include <lv_interop.h>
 #include <condition_variable>
+#include <future>
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -31,8 +32,7 @@ typedef void* LVgRPCServerid;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class LabVIEWQueryServerInstance;
-class LabVIEWGRPCService;
+class LabVIEWgRPCServer;
 class LVMessage;
 
 //---------------------------------------------------------------------
@@ -81,6 +81,8 @@ public:
     bool isRepeated;    
 };
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 struct LVMesageElementMetadata
 {
     LStrHandle embeddedMessageName;
@@ -110,28 +112,40 @@ struct LVMessageMetadata
     LV1DArrayHandle elements;
 };
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 class LVMessageValue
 {
 public:
     int protobufId;    
 
     virtual void* RawValue() = 0;
+    virtual size_t ByteSizeLong() = 0;
+    virtual google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const = 0;
 };
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 class LVStringMessageValue : public LVMessageValue
 {
 public:
     std::string value;
 
     void* RawValue() override { return (void*)(value.c_str()); };
+    size_t ByteSizeLong() override;
+    google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
 };
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 class LVInt32MessageValue : public LVMessageValue
 {
 public:
     int value;    
 
     void* RawValue() override { return &value; };
+    size_t ByteSizeLong() override;
+    google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
 };
 
 //---------------------------------------------------------------------
@@ -152,7 +166,7 @@ public:
     void Clear()  final;
     bool IsInitialized() const final;
 
-    const char *_InternalParse(const char *ptr, google::protobuf::internal::ParseContext *ctx)  override;
+    const char* _InternalParse(const char *ptr, google::protobuf::internal::ParseContext *ctx)  override;
     google::protobuf::uint8 *_InternalSerialize(google::protobuf::uint8 *target, google::protobuf::io::EpsCopyOutputStream *stream) const override;
     void SetCachedSize(int size) const final;
     int GetCachedSize(void) const final;
@@ -166,51 +180,11 @@ public:
     google::protobuf::Metadata GetMetadata() const final;
 
 public:
-    std::vector<LVMessageValue*> _values;
+    std::vector<shared_ptr<LVMessageValue>> _values;
     const LVMessageMetadataList& _metadata;
 
 private:
     mutable google::protobuf::internal::CachedSize _cached_size_;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class LVRequestData : public LVMessage
-{   
-public:     
-    LVRequestData(const LVMessageMetadataList& metadata);
-
-    const char* _InternalParse(const char* ptr, google::protobuf::internal::ParseContext* ctx) final;
-    google::protobuf::uint8 *_InternalSerialize(google::protobuf::uint8 *target, google::protobuf::io::EpsCopyOutputStream *stream) const final;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class LVResponseData : public LVMessage
-{   
-public: 
-    LVResponseData(const LVMessageMetadataList& metadata);
-
-    const char* _InternalParse(const char* ptr, google::protobuf::internal::ParseContext* ctx) final;
-    google::protobuf::uint8* _InternalSerialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const final;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class LabVIEWGRPCService final : public grpc::Service
-{
-public:
-    LabVIEWGRPCService(LabVIEWQueryServerInstance* instance);
-    void SopServer();
-    void RegisterEvent(string eventName, LVUserEventRef reference, std::shared_ptr<MessageMetadata> requestMetadata, std::shared_ptr<MessageMetadata> responseMetadata);
-
-    //Status GenericMethod(ServerContext* context, const google::protobuf::Message* request, google::protobuf::Message* response, const char* rpcName);
-
-    // RPC Methods
-    Status Register(ServerContext*context, const RegistrationRequest* request, ServerWriter<ServerEvent>* writer);
-
-private:
-    LabVIEWQueryServerInstance* m_Instance;
 };
 
 //---------------------------------------------------------------------
@@ -239,18 +213,6 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class InvokeData : public EventData
-{
-public:
-    InvokeData(ServerContext* context, const InvokeRequest* request, InvokeResponse* response);
-
-public:
-    const InvokeRequest* request;
-    InvokeResponse* response;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 class RegistrationRequestData : public EventData
 {
 public:
@@ -270,7 +232,7 @@ struct LVEventData
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class LabVIEWQueryServerInstance
+class LabVIEWgRPCServer
 {
 public:
     int Run(string address, string serverCertificatePath, string serverKeyPath);
@@ -281,11 +243,14 @@ public:
     bool FindEventData(string name, LVEventData& data);
 
 private:
-    unique_ptr<Server> m_Server;
-    map<string, LVEventData> m_RegisteredServerMethods;
+    unique_ptr<Server> _server;
+    map<string, LVEventData> _registeredServerMethods;
+    unique_ptr<grpc::AsyncGenericService> _rpcService;
+    std::future<void> _runFuture;
 
 private:
-    static void RunServer(string address, string serverCertificatePath, string serverKeyPath, LabVIEWQueryServerInstance* instance, ServerStartEventData* serverStarted);
+    void RunServer(string address, string serverCertificatePath, string serverKeyPath, ServerStartEventData* serverStarted);
+    void HandleRpcs(grpc::ServerCompletionQueue *cq);
 };
 
 //---------------------------------------------------------------------
@@ -293,7 +258,7 @@ private:
 class CallData
 {
 public:
-    CallData(LabVIEWQueryServerInstance *instance, grpc::AsyncGenericService *service, grpc::ServerCompletionQueue *cq);
+    CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService* service, grpc::ServerCompletionQueue* cq);
     void Proceed();
 
 private:
@@ -301,13 +266,12 @@ private:
     std::unique_ptr<grpc::ByteBuffer> SerializeToByteBuffer(grpc::protobuf::Message *message);
 
 private:
-    grpc::AsyncGenericService *_service;
-    grpc::ServerCompletionQueue *_cq;
+    LabVIEWgRPCServer* _server;
+    grpc::AsyncGenericService* _service;
+    grpc::ServerCompletionQueue* _cq;
     grpc::GenericServerContext _ctx;
     grpc::GenericServerAsyncReaderWriter _stream;
     grpc::ByteBuffer _rb;
-
-    LabVIEWQueryServerInstance *_instance;
 
     enum class CallStatus
     {
@@ -317,36 +281,6 @@ private:
         Finish
     };
     CallStatus _status;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-struct LVInvokeRequest
-{
-    LStrHandle command;
-    LStrHandle parameter;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-struct LVInvokeResponse
-{
-    int32_t status;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-struct LVQueryRequest
-{
-    LStrHandle query;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-struct LVQueryResponse
-{
-    LStrHandle message;
-    int32_t status;
 };
 
 //---------------------------------------------------------------------

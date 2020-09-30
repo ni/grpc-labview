@@ -9,6 +9,98 @@ using namespace queryserver;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+CallData::CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService *service, grpc::ServerCompletionQueue *cq)
+    : _server(server), _service(service), _cq(cq), _stream(&_ctx), _status(CallStatus::Create)
+{
+    Proceed();
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+bool CallData::ParseFromByteBuffer(grpc::ByteBuffer *buffer, grpc::protobuf::Message *message)
+{
+    std::vector<grpc::Slice> slices;
+    (void)buffer->Dump(&slices);
+    std::string buf;
+    buf.reserve(buffer->Length());
+    for (auto s = slices.begin(); s != slices.end(); s++)
+    {
+        buf.append(reinterpret_cast<const char *>(s->begin()), s->size());
+    }
+    return message->ParseFromString(buf);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+std::unique_ptr<grpc::ByteBuffer> CallData::SerializeToByteBuffer(
+    grpc::protobuf::Message *message)
+{
+    std::string buf;
+    message->SerializeToString(&buf);
+    grpc::Slice slice(buf);
+    return std::unique_ptr<grpc::ByteBuffer>(new grpc::ByteBuffer(&slice, 1));
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void CallData::Proceed()
+{
+    if (_status == CallStatus::Create)
+    {
+        // As part of the initial CREATE state, we *request* that the system
+        // start processing SayHello requests. In this request, "this" acts are
+        // the tag uniquely identifying the request (so that different CallData
+        // instances can serve different requests concurrently), in this case
+        // the memory address of this CallData instance.
+        _service->RequestCall(&_ctx, &_stream, _cq, _cq, this);
+        // Make this instance progress to the PROCESS state.
+        _status = CallStatus::Read;
+    }
+    else if (_status == CallStatus::Read)
+    {
+        // Spawn a new CallData instance to serve new clients while we process
+        // the one for this CallData. The instance will deallocate itself as
+        // part of its FINISH state.
+        new CallData(_server, _service, _cq);
+
+        _stream.Read(&_rb, this);
+        _status = CallStatus::Process;
+    }
+    else if (_status == CallStatus::Process)
+    {
+        auto name = _ctx.method();
+
+        LVEventData eventData;
+        if (_server->FindEventData(name, eventData))
+        {
+            LVMessage request(eventData.requestMetadata->elements);
+            LVMessage response(eventData.responsetMetadata->elements);
+            ParseFromByteBuffer(&_rb, &request);
+
+            GenericMethodData methodData(&_ctx, &request, &response);
+            _server->SendEvent(name, &methodData);
+
+            methodData.WaitForComplete();
+            
+            auto wb = SerializeToByteBuffer(&response);
+            grpc::WriteOptions options;
+            _stream.WriteAndFinish(*wb, options, grpc::Status::OK, this);
+        }
+        else
+        {
+            _stream.Finish(grpc::Status::CANCELLED, this);
+        }
+        _status = CallStatus::Finish;
+    }
+    else
+    {
+        assert(_status == CallStatus::Finish);
+        delete this;
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LVMessage::LVMessage(const LVMessageMetadataList &metadata) : _metadata(metadata)
 {
 }
@@ -21,7 +113,7 @@ LVMessage::~LVMessage()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-google::protobuf::Message *LVMessage::New() const
+google::protobuf::Message* LVMessage::New() const
 {
     assert(false); // not expected to be called
     return NULL;
@@ -45,6 +137,7 @@ int LVMessage::GetCachedSize(void) const
 //---------------------------------------------------------------------
 void LVMessage::Clear()
 {
+    _values.clear();
 }
 
 //---------------------------------------------------------------------
@@ -64,6 +157,11 @@ const char *LVMessage::_InternalParse(const char *ptr, google::protobuf::interna
             {
                 int32_t result;
                 ptr = google::protobuf::internal::ReadINT32(ptr, &result);
+
+                auto v = std::make_shared<LVInt32MessageValue>();
+                v->protobufId = index;
+                v->value = result;
+                _values.push_back(v);
             }
             break;
             case LVMessageMetadataType::DoubleValue:
@@ -83,7 +181,7 @@ const char *LVMessage::_InternalParse(const char *ptr, google::protobuf::interna
                 auto str = std::string();
                 ptr = google::protobuf::internal::InlineGreedyStringParser(&str, ptr, ctx);
 
-                auto v = new LVStringMessageValue();
+                auto v = std::make_shared<LVStringMessageValue>();
                 v->protobufId = index;
                 v->value = str;
                 _values.push_back(v);
@@ -98,79 +196,10 @@ const char *LVMessage::_InternalParse(const char *ptr, google::protobuf::interna
 //---------------------------------------------------------------------
 google::protobuf::uint8 *LVMessage::_InternalSerialize(google::protobuf::uint8 *target, google::protobuf::io::EpsCopyOutputStream *stream) const
 {
-    // while (!ctx->Done(&ptr))
-    // {
-    //     google::protobuf::uint32 tag;
-    //     ptr = google::protobuf::internal::ReadTag(ptr, &tag);
-    //     auto index = (tag >> 3);
-    //     auto fieldInfo = m_Metadata[index];
-    //     LVMessageMetadataType dataType = fieldInfo->dataType;
-    //     switch (dataType)
-    //     {
-    //         case Int32Value:
-    //         {
-    //             int32_t result;
-    //             stream->WriteInt32Packed
-    //             ptr = google::protobuf::internal::ReadINT32(ptr, &result);
-    //         }
-    //         case DoubleValue:
-    //         {
-    //             stream->Wr
-    //             double result;
-    //             ptr = google::protobuf::internal::ReadDOUBLE(ptr, &result);
-    //         }
-    //         case BoolValue:
-    //         {
-    //             bool result;
-    //             ptr = google::protobuf::internal::ReadBOOL(ptr, &result);
-    //         }
-    //         case StringValue:
-    //         {
-    //             auto str = new std::string();
-    //             ptr = google::protobuf::internal::InlineGreedyStringParser(str, ptr, ctx);
-    //         }
-    //     }
-    // }
-    // google::protobuf::uint32 cached_has_bits = 0;
-    // (void)cached_has_bits;
-
-    // // string command = 1;
-    // if (this->command().size() > 0)
-    // {
-    //     google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-    //         this->_internal_command().data(), static_cast<int>(this->_internal_command().length()),
-    //         google::protobuf::internal::WireFormatLite::SERIALIZE,
-    //         "queryserver.InvokeRequest.command");
-    //     target = stream->WriteStringMaybeAliased(
-    //         1, this->_internal_command(), target);
-    // }
-
     for (auto e : _values)
     {
-        auto stringValue = dynamic_cast<LVStringMessageValue*>(e);
-        if (stringValue != nullptr)
-        {
-            target = stream->WriteString(1, stringValue->value, target);
-        }
+        target = e->Serialize(target, stream);
     }
-
-
-    // // string parameter = 2;
-    // if (this->parameter().size() > 0)
-    // {
-    //     google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-    //         this->_internal_parameter().data(), static_cast<int>(this->_internal_parameter().length()),
-    //         google::protobuf::internal::WireFormatLite::SERIALIZE,
-    //         "queryserver.InvokeRequest.parameter");
-    //     target = stream->WriteStringMaybeAliased(
-    //         2, this->_internal_parameter(), target);
-    // }
-
-    // if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields()))
-    // {
-    //     target = google::protobuf::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-    //         _internal_metadata_.unknown_fields<google::protobuf::UnknownFieldSet>(google::protobuf::UnknownFieldSet::default_instance), target, stream);
-    // }
     return target;
 }
 
@@ -182,35 +211,8 @@ size_t LVMessage::ByteSizeLong() const
 
     for (auto e : _values)
     {
-        auto stringValue = dynamic_cast<LVStringMessageValue*>(e);
-        if (stringValue != nullptr)
-        {
-            totalSize += 1 + google::protobuf::internal::WireFormatLite::StringSize(stringValue->value);
-        }
+        totalSize += e->ByteSizeLong();
     }
-
-    //totalSize += 1 + google::protobuf::internal::WireFormatLite::StringSize(std::string("148.148"));
-
-    //     google::protobuf::uint32 cached_has_bits = 0;
-    //     // Prevent compiler warnings about cached_has_bits being unused
-    //     (void)cached_has_bits;
-
-    //     // string command = 1;
-    //     // if (this->command().size() > 0)
-    //     // {
-    //     //     total_size += 1 + google::protobuf::internal::WireFormatLite::StringSize(this->_internal_command());
-    //     // }
-
-    //     // // string parameter = 2;
-    //     // if (this->parameter().size() > 0)
-    //     // {
-    //     //     total_size += 1 + google::protobuf::internal::WireFormatLite::StringSize(this->_internal_parameter());
-    //     // }
-
-    //     // if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields()))
-    //     // {
-    //     //     return google::protobuf::internal::ComputeUnknownFieldsSize(_internal_metadata_, total_size, &_cached_size_);
-    //     // }
     int cachedSize = google::protobuf::internal::ToCachedSize(totalSize);
     SetCachedSize(cachedSize);
     return totalSize;
@@ -296,42 +298,31 @@ google::protobuf::Metadata LVMessage::GetMetadata() const
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LVRequestData::LVRequestData(const LVMessageMetadataList &metadata) : LVMessage(metadata)
+size_t LVStringMessageValue::ByteSizeLong()
 {
+    return 1 + google::protobuf::internal::WireFormatLite::StringSize(value);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char *LVRequestData::_InternalParse(const char *ptr, google::protobuf::internal::ParseContext *ctx)
-{
-    return LVMessage::_InternalParse(ptr, ctx);
+google::protobuf::uint8* LVStringMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+{    
+    return stream->WriteString(1, value, target);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-google::protobuf::uint8 *LVRequestData::_InternalSerialize(google::protobuf::uint8 *target, google::protobuf::io::EpsCopyOutputStream *stream) const
+size_t LVInt32MessageValue::ByteSizeLong()
 {
-    return LVMessage::_InternalSerialize(target, stream);
+    return 1 + google::protobuf::internal::WireFormatLite::Int32Size(value);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LVResponseData::LVResponseData(const LVMessageMetadataList &metadata) : LVMessage(metadata)
-{
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-const char *LVResponseData::_InternalParse(const char *ptr, google::protobuf::internal::ParseContext *ctx)
-{
-    return LVMessage::_InternalParse(ptr, ctx);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-google::protobuf::uint8 *LVResponseData::_InternalSerialize(google::protobuf::uint8 *target, google::protobuf::io::EpsCopyOutputStream *stream) const
-{
-    return LVMessage::_InternalSerialize(target, stream);
+google::protobuf::uint8* LVInt32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+{    
+    target = stream->EnsureSpace(target);
+    return google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, value, target);
 }
 
 //---------------------------------------------------------------------
@@ -372,15 +363,6 @@ ServerStartEventData::ServerStartEventData()
     : EventData(NULL)
 {
     serverStartStatus = 0;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-InvokeData::InvokeData(ServerContext *_context, const InvokeRequest *_request, InvokeResponse *_response)
-    : EventData(_context)
-{
-    request = _request;
-    response = _response;
 }
 
 //---------------------------------------------------------------------
