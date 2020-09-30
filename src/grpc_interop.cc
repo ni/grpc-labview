@@ -9,10 +9,6 @@
 #include <mutex>
 #include <thread>
 
-#ifndef _WIN32
-#include <dlfcn.h>
-#endif
-
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 using namespace std;
@@ -22,34 +18,6 @@ using namespace std;
 void OccurServerEvent(LVUserEventRef event, EventData* data)
 {
     auto error = LVPostLVUserEvent(event, &data);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t LVCreateServer(LVgRPCServerid* id)
-{
-    InitCallbacks();
-    auto server = new LabVIEWgRPCServer();
-    *id = server;   
-    return 0;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t LVStartServer(char* address, char* serverCertificatePath, char* serverKeyPath, LVgRPCServerid* id)
-{   
-    auto server = *(LabVIEWgRPCServer**)id;
-    return server->Run(address, serverCertificatePath, serverKeyPath);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t LVStopServer(LVgRPCServerid* id)
-{
-    auto server = *(LabVIEWgRPCServer**)id;
-    server->StopServer();
-    delete server;
-    return 0;
 }
 
 //---------------------------------------------------------------------
@@ -125,6 +93,34 @@ void CopyFromCluster(LVMessage& message, int8_t* cluster)
             break;
         }
     }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t LVCreateServer(LVgRPCServerid* id)
+{
+    InitCallbacks();
+    auto server = new LabVIEWgRPCServer();
+    *id = server;   
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t LVStartServer(char* address, char* serverCertificatePath, char* serverKeyPath, LVgRPCServerid* id)
+{   
+    auto server = *(LabVIEWgRPCServer**)id;
+    return server->Run(address, serverCertificatePath, serverKeyPath);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t LVStopServer(LVgRPCServerid* id)
+{
+    auto server = *(LabVIEWgRPCServer**)id;
+    server->StopServer();
+    delete server;
+    return 0;
 }
 
 //---------------------------------------------------------------------
