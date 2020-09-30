@@ -9,93 +9,22 @@ using namespace queryserver;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-// thread_local LVMessageMetadataList* LVMessage::RequestMetadata;
-// thread_local LVMessageMetadataList* LVMessage::ResponseMetadata;
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LVMessage::InitAsDefaultInstance()
+LVMessage::LVMessage(const LVMessageMetadataList &metadata) : _metadata(metadata)
 {
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LVMessage::LVMessage()
-{    
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LVMessage::LVMessage(google::protobuf::Arena *arena)
-    : google::protobuf::Message(arena)
-{
-    SharedCtor();
-    RegisterArenaDtor(arena);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LVMessage::LVMessage(const LVMessage &from)
-    : google::protobuf::Message()
-{
-    _internal_metadata_.MergeFrom<google::protobuf::UnknownFieldSet>(from._internal_metadata_);
-    // m_Command.UnsafeSetDefault(&google::protobuf::internal::GetEmptyStringAlreadyInited());
-    // if (!from._internal_command().empty())
-    // {
-    //     m_Command.Set(&google::protobuf::internal::GetEmptyStringAlreadyInited(), from._internal_command(),
-    //                  GetArena());
-    // }
-    // parameter_.UnsafeSetDefault(&google::protobuf::internal::GetEmptyStringAlreadyInited());
-    // if (!from._internal_parameter().empty())
-    // {
-    //     parameter_.Set(&google::protobuf::internal::GetEmptyStringAlreadyInited(), from._internal_parameter(),
-    //                    GetArena());
-    // }
-}
-
-google::protobuf::Message* LVMessage::New() const
-{
-    return NULL;
-} 
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LVMessage::SharedCtor()
-{
-    // google::protobuf::internal::InitSCC(&scc_info_InvokeRequest_query_5fserver_2eproto.base);
-    // command_.UnsafeSetDefault(&google::protobuf::internal::GetEmptyStringAlreadyInited());
-    // parameter_.UnsafeSetDefault(&google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LVMessage::~LVMessage()
 {
-    SharedDtor();
-    _internal_metadata_.Delete<google::protobuf::UnknownFieldSet>();
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LVMessage::SharedDtor()
+google::protobuf::Message *LVMessage::New() const
 {
-    GOOGLE_DCHECK(GetArena() == nullptr);
-    // command_.DestroyNoArena(&google::protobuf::internal::GetEmptyStringAlreadyInited());
-    // parameter_.DestroyNoArena(&google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LVMessage::ArenaDtor(void *object)
-{
-    LVMessage *_this = reinterpret_cast<LVMessage *>(object);
-    (void)_this;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LVMessage::RegisterArenaDtor(google::protobuf::Arena *)
-{
+    assert(false); // not expected to be called
+    return NULL;
 }
 
 //---------------------------------------------------------------------
@@ -109,33 +38,18 @@ void LVMessage::SetCachedSize(int size) const
 //---------------------------------------------------------------------
 int LVMessage::GetCachedSize(void) const
 {
-    return _cached_size_.Get();    
+    return _cached_size_.Get();
 }
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-// const LVMessage& LVMessage::default_instance()
-// {
-//     // google::protobuf::internal::InitSCC(&::scc_info_InvokeRequest_query_5fserver_2eproto.base);
-//     //return *internal_default_instance();
-// }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 void LVMessage::Clear()
 {
-    google::protobuf::uint32 cached_has_bits = 0;
-    // Prevent compiler warnings about cached_has_bits being unused
-    (void)cached_has_bits;
-
-    // command_.ClearToEmpty(&google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArena());
-    // parameter_.ClearToEmpty(&google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArena());
-    _internal_metadata_.Clear<google::protobuf::UnknownFieldSet>();
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char* LVMessage::_InternalParse(const char* ptr, google::protobuf::internal::ParseContext* ctx)
+const char *LVMessage::_InternalParse(const char *ptr, google::protobuf::internal::ParseContext *ctx)
 {
     while (!ctx->Done(&ptr))
     {
@@ -143,37 +57,46 @@ const char* LVMessage::_InternalParse(const char* ptr, google::protobuf::interna
         ptr = google::protobuf::internal::ReadTag(ptr, &tag);
         auto index = (tag >> 3);
         // auto fieldInfo = m_Metadata[index];
-        // LVMessageMetadataType dataType = fieldInfo->dataType;
-        // switch (dataType)
-        // {
-        //     case Int32Value:
-        //     {
-        //         int32_t result;
-        //         ptr = google::protobuf::internal::ReadINT32(ptr, &result);
-        //     }
-        //     case DoubleValue:
-        //     {
-        //         double result;
-        //         ptr = google::protobuf::internal::ReadDOUBLE(ptr, &result);
-        //     }
-        //     case BoolValue:
-        //     {
-        //         bool result;
-        //         ptr = google::protobuf::internal::ReadBOOL(ptr, &result);
-        //     }
-        //     case StringValue:
-        //     {
-        //         auto str = new std::string();
-        //         ptr = google::protobuf::internal::InlineGreedyStringParser(str, ptr, ctx); 
-        //     }               
-        // }
+        LVMessageMetadataType dataType = LVMessageMetadataType::StringValue; // fieldInfo->dataType;
+        switch (dataType)
+        {
+            case LVMessageMetadataType::Int32Value:
+            {
+                int32_t result;
+                ptr = google::protobuf::internal::ReadINT32(ptr, &result);
+            }
+            break;
+            case LVMessageMetadataType::DoubleValue:
+            {
+                double result;
+                ptr = google::protobuf::internal::ReadDOUBLE(ptr, &result);
+            }
+            break;
+            case LVMessageMetadataType::BoolValue:
+            {
+                bool result;
+                ptr = google::protobuf::internal::ReadBOOL(ptr, &result);
+            }
+            break;
+            case LVMessageMetadataType::StringValue:
+            {
+                auto str = std::string();
+                ptr = google::protobuf::internal::InlineGreedyStringParser(&str, ptr, ctx);
+
+                auto v = new LVStringMessageValue();
+                v->protobufId = index;
+                v->value = str;
+                _values.push_back(v);
+            }
+            break;
+        }
     }
     return ptr;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-google::protobuf::uint8* LVMessage::_InternalSerialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+google::protobuf::uint8 *LVMessage::_InternalSerialize(google::protobuf::uint8 *target, google::protobuf::io::EpsCopyOutputStream *stream) const
 {
     // while (!ctx->Done(&ptr))
     // {
@@ -185,7 +108,7 @@ google::protobuf::uint8* LVMessage::_InternalSerialize(google::protobuf::uint8* 
     //     switch (dataType)
     //     {
     //         case Int32Value:
-    //         {                
+    //         {
     //             int32_t result;
     //             stream->WriteInt32Packed
     //             ptr = google::protobuf::internal::ReadINT32(ptr, &result);
@@ -204,8 +127,8 @@ google::protobuf::uint8* LVMessage::_InternalSerialize(google::protobuf::uint8* 
     //         case StringValue:
     //         {
     //             auto str = new std::string();
-    //             ptr = google::protobuf::internal::InlineGreedyStringParser(str, ptr, ctx); 
-    //         }               
+    //             ptr = google::protobuf::internal::InlineGreedyStringParser(str, ptr, ctx);
+    //         }
     //     }
     // }
     // google::protobuf::uint32 cached_has_bits = 0;
@@ -221,6 +144,16 @@ google::protobuf::uint8* LVMessage::_InternalSerialize(google::protobuf::uint8* 
     //     target = stream->WriteStringMaybeAliased(
     //         1, this->_internal_command(), target);
     // }
+
+    for (auto e : _values)
+    {
+        auto stringValue = dynamic_cast<LVStringMessageValue*>(e);
+        if (stringValue != nullptr)
+        {
+            target = stream->WriteString(1, stringValue->value, target);
+        }
+    }
+
 
     // // string parameter = 2;
     // if (this->parameter().size() > 0)
@@ -245,86 +178,42 @@ google::protobuf::uint8* LVMessage::_InternalSerialize(google::protobuf::uint8* 
 //---------------------------------------------------------------------
 size_t LVMessage::ByteSizeLong() const
 {
-    size_t total_size = 0;
+    size_t totalSize = 0;
 
-    google::protobuf::uint32 cached_has_bits = 0;
-    // Prevent compiler warnings about cached_has_bits being unused
-    (void)cached_has_bits;
+    for (auto e : _values)
+    {
+        auto stringValue = dynamic_cast<LVStringMessageValue*>(e);
+        if (stringValue != nullptr)
+        {
+            totalSize += 1 + google::protobuf::internal::WireFormatLite::StringSize(stringValue->value);
+        }
+    }
 
-    // string command = 1;
-    // if (this->command().size() > 0)
-    // {
-    //     total_size += 1 + google::protobuf::internal::WireFormatLite::StringSize(this->_internal_command());
-    // }
+    //totalSize += 1 + google::protobuf::internal::WireFormatLite::StringSize(std::string("148.148"));
 
-    // // string parameter = 2;
-    // if (this->parameter().size() > 0)
-    // {
-    //     total_size += 1 + google::protobuf::internal::WireFormatLite::StringSize(this->_internal_parameter());
-    // }
+    //     google::protobuf::uint32 cached_has_bits = 0;
+    //     // Prevent compiler warnings about cached_has_bits being unused
+    //     (void)cached_has_bits;
 
-    // if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields()))
-    // {
-    //     return google::protobuf::internal::ComputeUnknownFieldsSize(_internal_metadata_, total_size, &_cached_size_);
-    // }
-    int cached_size = google::protobuf::internal::ToCachedSize(total_size);
-    SetCachedSize(cached_size);
-    return total_size;
-}
+    //     // string command = 1;
+    //     // if (this->command().size() > 0)
+    //     // {
+    //     //     total_size += 1 + google::protobuf::internal::WireFormatLite::StringSize(this->_internal_command());
+    //     // }
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LVMessage::MergeFrom(const google::protobuf::Message &from)
-{
-    // GOOGLE_DCHECK_NE(&from, this);
-    // const LVMessage *source =  dynamic_cast<LVMessage>(&from);
-    // if (source == nullptr)
-    // {
-    //     google::protobuf::internal::ReflectionOps::Merge(from, this);
-    // }
-    // else
-    // {
-    //     MergeFrom(*source);
-    // }
-}
+    //     // // string parameter = 2;
+    //     // if (this->parameter().size() > 0)
+    //     // {
+    //     //     total_size += 1 + google::protobuf::internal::WireFormatLite::StringSize(this->_internal_parameter());
+    //     // }
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LVMessage::MergeFrom(const LVMessage &from)
-{
-    GOOGLE_DCHECK_NE(&from, this);
-    _internal_metadata_.MergeFrom<google::protobuf::UnknownFieldSet>(from._internal_metadata_);
-    google::protobuf::uint32 cached_has_bits = 0;
-    (void)cached_has_bits;
-
-    // if (from.command().size() > 0)
-    // {
-    //     _internal_set_command(from._internal_command());
-    // }
-    // if (from.parameter().size() > 0)
-    // {
-    //     _internal_set_parameter(from._internal_parameter());
-    // }
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LVMessage::CopyFrom(const google::protobuf::Message &from)
-{
-    if (&from == this)
-        return;
-    Clear();
-    MergeFrom(from);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LVMessage::CopyFrom(const LVMessage &from)
-{
-    if (&from == this)
-        return;
-    Clear();
-    MergeFrom(from);
+    //     // if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields()))
+    //     // {
+    //     //     return google::protobuf::internal::ComputeUnknownFieldsSize(_internal_metadata_, total_size, &_cached_size_);
+    //     // }
+    int cachedSize = google::protobuf::internal::ToCachedSize(totalSize);
+    SetCachedSize(cachedSize);
+    return totalSize;
 }
 
 //---------------------------------------------------------------------
@@ -336,59 +225,113 @@ bool LVMessage::IsInitialized() const
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+void LVMessage::SharedCtor()
+{
+    assert(false); // not expected to be called
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LVMessage::SharedDtor()
+{
+    assert(false); // not expected to be called
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LVMessage::ArenaDtor(void *object)
+{
+    assert(false); // not expected to be called
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LVMessage::RegisterArenaDtor(google::protobuf::Arena *)
+{
+    assert(false); // not expected to be called
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LVMessage::MergeFrom(const google::protobuf::Message &from)
+{
+    assert(false); // not expected to be called
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LVMessage::MergeFrom(const LVMessage &from)
+{
+    assert(false); // not expected to be called
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LVMessage::CopyFrom(const google::protobuf::Message &from)
+{
+    assert(false); // not expected to be called
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LVMessage::CopyFrom(const LVMessage &from)
+{
+    assert(false); // not expected to be called
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void LVMessage::InternalSwap(LVMessage *other)
 {
-    using std::swap;
-    _internal_metadata_.Swap<google::protobuf::UnknownFieldSet>(&other->_internal_metadata_);
-    // command_.Swap(&other->command_, &google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArena());
-    // parameter_.Swap(&other->parameter_, &google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArena());
+    assert(false); // not expected to be called
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 google::protobuf::Metadata LVMessage::GetMetadata() const
 {
+    assert(false); // not expected to be called
     return google::protobuf::Metadata();
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LVRequestData::LVRequestData()
+LVRequestData::LVRequestData(const LVMessageMetadataList &metadata) : LVMessage(metadata)
 {
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char* LVRequestData::_InternalParse(const char *ptr, google::protobuf::internal::ParseContext *ctx)
+const char *LVRequestData::_InternalParse(const char *ptr, google::protobuf::internal::ParseContext *ctx)
 {
-    return LVMessage::_InternalParse(ptr, ctx);    
+    return LVMessage::_InternalParse(ptr, ctx);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-google::protobuf::uint8* LVRequestData::_InternalSerialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+google::protobuf::uint8 *LVRequestData::_InternalSerialize(google::protobuf::uint8 *target, google::protobuf::io::EpsCopyOutputStream *stream) const
 {
-    return LVMessage::_InternalSerialize(target, stream);    
+    return LVMessage::_InternalSerialize(target, stream);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LVResponseData::LVResponseData()
-{    
+LVResponseData::LVResponseData(const LVMessageMetadataList &metadata) : LVMessage(metadata)
+{
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char* LVResponseData::_InternalParse(const char* ptr, google::protobuf::internal::ParseContext* ctx)
+const char *LVResponseData::_InternalParse(const char *ptr, google::protobuf::internal::ParseContext *ctx)
 {
-    return LVMessage::_InternalParse(ptr, ctx);    
+    return LVMessage::_InternalParse(ptr, ctx);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-google::protobuf::uint8* LVResponseData::_InternalSerialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+google::protobuf::uint8 *LVResponseData::_InternalSerialize(google::protobuf::uint8 *target, google::protobuf::io::EpsCopyOutputStream *stream) const
 {
-    return LVMessage::_InternalSerialize(target, stream);    
+    return LVMessage::_InternalSerialize(target, stream);
 }
 
 //---------------------------------------------------------------------
@@ -416,7 +359,7 @@ void EventData::NotifyComplete()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-GenericMethodData::GenericMethodData(ServerContext *_context, const google::protobuf::Message *_request, google::protobuf::Message *_response)
+GenericMethodData::GenericMethodData(ServerContext *_context, LVMessage *_request, LVMessage *_response)
     : EventData(_context)
 {
     request = _request;
@@ -434,15 +377,6 @@ ServerStartEventData::ServerStartEventData()
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 InvokeData::InvokeData(ServerContext *_context, const InvokeRequest *_request, InvokeResponse *_response)
-    : EventData(_context)
-{
-    request = _request;
-    response = _response;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-QueryData::QueryData(ServerContext *_context, const QueryRequest *_request, QueryResponse *_response)
     : EventData(_context)
 {
     request = _request;

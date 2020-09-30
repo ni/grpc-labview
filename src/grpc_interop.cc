@@ -51,12 +51,106 @@ LIBRARY_EXPORT int32_t LVStopServer(LVgRPCServerid* id)
     return 0;
 }
 
+std::shared_ptr<MessageMetadata> CreateMessageMetadata(LVMessageMetadata* lvMetadata)
+{
+    std::shared_ptr<MessageMetadata> metadata(new MessageMetadata());
+
+    auto name = GetLVString(lvMetadata->messageName);
+    metadata->messageName = name;
+    if (lvMetadata->elements != nullptr)
+    {
+        LVMesageElementMetadata* lvElement = (LVMesageElementMetadata*)(*lvMetadata->elements)->str;
+        for (int x = 0; x < (*lvMetadata->elements)->cnt; ++x, ++lvElement)
+        {
+            MessageElementMetadata element;
+            element.embeddedMessageName = GetLVString(lvElement->embeddedMessageName);
+            element.protobufIndex = lvElement->protobufIndex;
+            element.clusterOffset = lvElement->clusterOffset;
+            element.type = (LVMessageMetadataType)lvElement->valueType;
+            element.isRepeated = lvElement->isRepeated;
+            metadata->elements.insert(std::pair<int, MessageElementMetadata>(element.protobufIndex, element));
+        }
+    }
+    return metadata;
+}
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t RegisterServerEvent(const char* name, LVUserEventRef* item, LVgRPCServerid* id)
+LIBRARY_EXPORT int32_t RegisterServerEvent(const char* name, LVUserEventRef* item, LVMessageMetadata* lvRequestMetadata, LVMessageMetadata* lvResponseMetadata, LVgRPCServerid* id)
 {
     LabVIEWQueryServerInstance* server = *(LabVIEWQueryServerInstance**)id;
-    server->RegisterEvent(name, *item);
+
+    auto requestMetadata = CreateMessageMetadata(lvRequestMetadata);
+    auto responseMetadata = CreateMessageMetadata(lvResponseMetadata);
+
+    server->RegisterEvent(name, *item, requestMetadata, responseMetadata);
+    return 0;
+}
+
+void CopyToCluster(const LVMessage& message, int8_t* cluster)
+{
+    for (auto val : message._metadata)
+    {
+        auto start = cluster + val.second.clusterOffset;
+        LVMessageValue* value = nullptr;
+        for (auto v : message._values)
+        {
+            if (v->protobufId == val.second.protobufIndex)
+            {
+                value = v;
+                break;
+            }
+        }
+        if (value != nullptr)
+        {
+            switch (val.second.type)
+            {
+                case LVMessageMetadataType::StringValue:
+                {
+                    SetLVString((LStrHandle*)start, ((LVStringMessageValue*)value)->value);
+                }
+                break;
+            }
+        }
+    }
+}
+
+void CopyFromCluster(LVMessage& message, int8_t* cluster)
+{
+    for (auto val : message._metadata)
+    {
+        auto start = cluster + val.second.clusterOffset;
+        switch (val.second.type)
+        {
+            case LVMessageMetadataType::StringValue:
+            {
+                auto stringValue = new LVStringMessageValue();
+                stringValue->value = GetLVString(*(LStrHandle*)start);
+                message._values.push_back(stringValue);
+            }
+            break;
+        }
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t GetRequestData(LVgRPCid id, int8_t* lvRequest)
+{
+    auto data = *(GenericMethodData**)id;
+    CopyToCluster(*data->request, lvRequest);
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t SetResponseData(LVgRPCid id, int8_t* lvRequest)
+{
+    auto data = *(GenericMethodData**)id;
+    CopyFromCluster(*data->response, lvRequest);
+
+    // TODO: If this is a streaming call then we do not notify here.
+    data->NotifyComplete();
     return 0;
 }
 
@@ -77,28 +171,6 @@ LIBRARY_EXPORT int32_t InvokeSetResponse(LVgRPCid id, LVInvokeResponse* lvRespon
 {
     auto data = *(GenericMethodData**)id;
     auto response = (InvokeResponse*)data->response;
-    response->set_status(lvResponse->status);
-    data->NotifyComplete();
-    return 0;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t QueryGetRequest(LVgRPCid id, LVQueryRequest* lvRequest)
-{
-    auto data = *(GenericMethodData**)id;
-    auto request = (QueryRequest*)data->request;
-    SetLVString(&lvRequest->query, request->query());
-    return 0;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t QuerySetResponse(LVgRPCid id, LVQueryResponse* lvResponse)
-{
-    auto data = *(GenericMethodData**)id;
-    auto response = (QueryResponse*)data->response;
-    response->set_message(GetLVString(lvResponse->message));
     response->set_status(lvResponse->status);
     data->NotifyComplete();
     return 0;

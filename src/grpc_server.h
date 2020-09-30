@@ -56,39 +56,90 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-enum LVMessageMetadataType
+enum class LVMessageMetadataType
 {
     Int32Value,
     DoubleValue,
     BoolValue,
-    StringValue
+    StringValue,
+    MessageValue
 };
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class LVMessageMetadata
+class MessageElementMetadata
 {
 public:
+    std::string embeddedMessageName;
+    
     int protobufIndex;
-    int LVClusterOffset;
-    LVMessageMetadataType type;
+    
+    int clusterOffset;
+
+    LVMessageMetadataType type;    
+
+    bool isRepeated;    
+};
+
+struct LVMesageElementMetadata
+{
+    LStrHandle embeddedMessageName;
+    int protobufIndex;
+    int clusterOffset;
+    int valueType;
+    bool isRepeated;
 };
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-using LVMessageMetadataList = std::list<LVMessageMetadata>;
+using LVMessageMetadataList = std::map<int, MessageElementMetadata>;
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+struct MessageMetadata
+{
+    std::string messageName;
+    LVMessageMetadataList elements;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+struct LVMessageMetadata
+{
+    LStrHandle messageName;
+    LV1DArrayHandle elements;
+};
+
+class LVMessageValue
+{
+public:
+    int protobufId;    
+
+    virtual void* RawValue() = 0;
+};
+
+class LVStringMessageValue : public LVMessageValue
+{
+public:
+    std::string value;
+
+    void* RawValue() override { return (void*)(value.c_str()); };
+};
+
+class LVInt32MessageValue : public LVMessageValue
+{
+public:
+    int value;    
+
+    void* RawValue() override { return &value; };
+};
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 class LVMessage : public google::protobuf::Message
 {
 public:
-    // static thread_local LVMessageMetadataList* RequestMetadata;
-    // static thread_local LVMessageMetadataList* ResponseMetadata;
-
-    LVMessage();
-    LVMessage(const LVMessage &from);
-    LVMessage(google::protobuf::Arena *arena);
+    LVMessage(const LVMessageMetadataList& metadata);
 
     ~LVMessage();
 
@@ -97,8 +148,6 @@ public:
     void SharedDtor();
     void ArenaDtor(void* object);
     void RegisterArenaDtor(google::protobuf::Arena*);
-    const LVMessage &default_instance();
-    void InitAsDefaultInstance();
 
     void Clear()  final;
     bool IsInitialized() const final;
@@ -116,8 +165,12 @@ public:
     void InternalSwap(LVMessage *other);
     google::protobuf::Metadata GetMetadata() const final;
 
+public:
+    std::vector<LVMessageValue*> _values;
+    const LVMessageMetadataList& _metadata;
+
 private:
-  mutable google::protobuf::internal::CachedSize _cached_size_;
+    mutable google::protobuf::internal::CachedSize _cached_size_;
 };
 
 //---------------------------------------------------------------------
@@ -125,7 +178,7 @@ private:
 class LVRequestData : public LVMessage
 {   
 public:     
-    LVRequestData();
+    LVRequestData(const LVMessageMetadataList& metadata);
 
     const char* _InternalParse(const char* ptr, google::protobuf::internal::ParseContext* ctx) final;
     google::protobuf::uint8 *_InternalSerialize(google::protobuf::uint8 *target, google::protobuf::io::EpsCopyOutputStream *stream) const final;
@@ -136,31 +189,11 @@ public:
 class LVResponseData : public LVMessage
 {   
 public: 
-    LVResponseData();
+    LVResponseData(const LVMessageMetadataList& metadata);
 
     const char* _InternalParse(const char* ptr, google::protobuf::internal::ParseContext* ctx) final;
     google::protobuf::uint8* _InternalSerialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const final;
 };
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-// class LVRpcMethodHandler : public grpc::internal::MethodHandler
-// {
-// public:
-//     typedef std::function<::grpc::Status(LabVIEWGRPCService*, grpc_impl::ServerContext*, const LVRequestData*, LVResponseData*)> MethodFunc;
-//     typedef grpc::internal::RpcMethodHandler<LabVIEWGRPCService, LVRequestData, LVResponseData> WrappedHandler;
-
-//     LVRpcMethodHandler(MethodFunc func, LabVIEWGRPCService* service, LVMessageMetadataList* requestMetadats, LVMessageMetadataList* responseMetadata);
-//     void RunHandler(const HandlerParameter &param) final;
-//     void* Deserialize(grpc_call* call, grpc_byte_buffer* req, ::grpc::Status* status, void** /*handler_data*/) final;
-
-// private:
-//     MethodFunc m_Func;
-//     LabVIEWGRPCService* m_Service;
-//     WrappedHandler* m_WrappedHandler;
-//     LVMessageMetadataList* m_RequestMetadata;
-//     LVMessageMetadataList* m_ResponseMetadata;
-// };
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -169,9 +202,9 @@ class LabVIEWGRPCService final : public grpc::Service
 public:
     LabVIEWGRPCService(LabVIEWQueryServerInstance* instance);
     void SopServer();
-    void RegisterEvent(string eventName, LVUserEventRef reference);
+    void RegisterEvent(string eventName, LVUserEventRef reference, std::shared_ptr<MessageMetadata> requestMetadata, std::shared_ptr<MessageMetadata> responseMetadata);
 
-    Status GenericMethod(ServerContext* context, const google::protobuf::Message* request, google::protobuf::Message* response, const char* rpcName);
+    //Status GenericMethod(ServerContext* context, const google::protobuf::Message* request, google::protobuf::Message* response, const char* rpcName);
 
     // RPC Methods
     Status Register(ServerContext*context, const RegistrationRequest* request, ServerWriter<ServerEvent>* writer);
@@ -197,11 +230,11 @@ public:
 class GenericMethodData : public EventData
 {
 public:
-    GenericMethodData(ServerContext* context, const google::protobuf::Message* request, google::protobuf::Message* response);
+    GenericMethodData(ServerContext* context, LVMessage* request, LVMessage* response);
 
 public:
-    const google::protobuf::Message* request;
-    const google::protobuf::Message* response;
+    LVMessage* request;
+    LVMessage* response;
 };
 
 //---------------------------------------------------------------------
@@ -218,19 +251,6 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class QueryData : public EventData
-{
-public:
-    QueryData(ServerContext* context, const QueryRequest* request, QueryResponse* response);
-
-public:
-    const QueryRequest* request;
-    QueryResponse* response;
-};
-
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 class RegistrationRequestData : public EventData
 {
 public:
@@ -241,6 +261,13 @@ public:
     ::grpc::ServerWriter<::queryserver::ServerEvent>* eventWriter;
 };
 
+struct LVEventData
+{
+    LVUserEventRef event;
+    std::shared_ptr<MessageMetadata> requestMetadata;
+    std::shared_ptr<MessageMetadata> responsetMetadata;
+};
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 class LabVIEWQueryServerInstance
@@ -248,15 +275,48 @@ class LabVIEWQueryServerInstance
 public:
     int Run(string address, string serverCertificatePath, string serverKeyPath);
     void StopServer();
-    void RegisterEvent(string eventName, LVUserEventRef reference);
+    void RegisterEvent(string eventName, LVUserEventRef reference, std::shared_ptr<MessageMetadata> requestMetadata, std::shared_ptr<MessageMetadata> responseMetadata);
     void SendEvent(string name, EventData* data);
+
+    bool FindEventData(string name, LVEventData& data);
 
 private:
     unique_ptr<Server> m_Server;
-    map<string, LVUserEventRef> m_RegisteredServerMethods;
+    map<string, LVEventData> m_RegisteredServerMethods;
 
 private:
     static void RunServer(string address, string serverCertificatePath, string serverKeyPath, LabVIEWQueryServerInstance* instance, ServerStartEventData* serverStarted);
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+class CallData
+{
+public:
+    CallData(LabVIEWQueryServerInstance *instance, grpc::AsyncGenericService *service, grpc::ServerCompletionQueue *cq);
+    void Proceed();
+
+private:
+    bool ParseFromByteBuffer(grpc::ByteBuffer *buffer, grpc::protobuf::Message *message);
+    std::unique_ptr<grpc::ByteBuffer> SerializeToByteBuffer(grpc::protobuf::Message *message);
+
+private:
+    grpc::AsyncGenericService *_service;
+    grpc::ServerCompletionQueue *_cq;
+    grpc::GenericServerContext _ctx;
+    grpc::GenericServerAsyncReaderWriter _stream;
+    grpc::ByteBuffer _rb;
+
+    LabVIEWQueryServerInstance *_instance;
+
+    enum class CallStatus
+    {
+        Create,
+        Read,
+        Process,
+        Finish
+    };
+    CallStatus _status;
 };
 
 //---------------------------------------------------------------------
