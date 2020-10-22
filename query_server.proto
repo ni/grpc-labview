@@ -43,6 +43,16 @@ service QueryServer {
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+message DataTypeTest {
+  bool boolValaue = 1;
+  int32 intValue = 2;
+  float floatValue = 3;
+  double doubleValue = 4;
+  string stringValue = 5;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 message InvokeRequest {
   string command = 1;
   string parameter = 2;

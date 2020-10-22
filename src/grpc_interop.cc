@@ -55,7 +55,7 @@ void CopyToCluster(const LVMessage& message, int8_t* cluster)
         shared_ptr<LVMessageValue> value;
         for (auto v : message._values)
         {
-            if (v->protobufId == val.second.protobufIndex)
+            if (v->_protobufId == val.second.protobufIndex)
             {
                 value = v;
                 break;
@@ -66,10 +66,22 @@ void CopyToCluster(const LVMessage& message, int8_t* cluster)
             switch (val.second.type)
             {
                 case LVMessageMetadataType::StringValue:
-                {
-                    SetLVString((LStrHandle*)start, ((LVStringMessageValue*)value.get())->value);
-                }
-                break;
+                    SetLVString((LStrHandle*)start, ((LVStringMessageValue*)value.get())->_value);
+                    break;
+                case LVMessageMetadataType::BoolValue:
+                    *(bool*)start = ((LVBooleanMessageValue*)value.get())->_value;
+                    break;
+                case LVMessageMetadataType::DoubleValue:
+                    *(double*)start = ((LVDoubleMessageValue*)value.get())->_value;
+                    break;
+                case LVMessageMetadataType::FloatValue:
+                    *(float*)start = ((LVFloatMessageValue*)value.get())->_value;
+                    break;
+                case LVMessageMetadataType::Int32Value:
+                    *(int*)start = ((LVInt32MessageValue*)value.get())->_value;
+                    break;
+                case LVMessageMetadataType::MessageValue:
+                    break;
             }
         }
     }
@@ -86,10 +98,31 @@ void CopyFromCluster(LVMessage& message, int8_t* cluster)
         {
             case LVMessageMetadataType::StringValue:
             {
-                auto stringValue = std::make_shared<LVStringMessageValue>();
-                stringValue->value = GetLVString(*(LStrHandle*)start);
+                auto str = GetLVString(*(LStrHandle*)start);
+                auto stringValue = std::make_shared<LVStringMessageValue>(val.second.protobufIndex, str);
                 message._values.push_back(stringValue);
             }
+            case LVMessageMetadataType::BoolValue:
+            {
+                auto value = std::make_shared<LVBooleanMessageValue>(val.second.protobufIndex, *(bool*)start);
+                message._values.push_back(value);
+            }
+            case LVMessageMetadataType::DoubleValue:
+            {
+                auto value = std::make_shared<LVDoubleMessageValue>(val.second.protobufIndex, *(double*)start);
+                message._values.push_back(value);
+            }
+            case LVMessageMetadataType::FloatValue:
+            {
+                auto value = std::make_shared<LVFloatMessageValue>(val.second.protobufIndex, *(float*)start);
+                message._values.push_back(value);
+            }
+            case LVMessageMetadataType::Int32Value:
+            {
+                auto value = std::make_shared<LVInt32MessageValue>(val.second.protobufIndex, *(int*)start);
+                message._values.push_back(value);
+            }
+            case LVMessageMetadataType::MessageValue:
             break;
         }
     }

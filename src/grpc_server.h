@@ -59,6 +59,7 @@ public:
 enum class LVMessageMetadataType
 {
     Int32Value,
+    FloatValue,
     DoubleValue,
     BoolValue,
     StringValue,
@@ -94,7 +95,7 @@ struct LVMesageElementMetadata
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-using LVMessageMetadataList = std::map<int, MessageElementMetadata>;
+using LVMessageMetadataList = std::map<google::protobuf::uint32, MessageElementMetadata>;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -117,8 +118,12 @@ struct LVMessageMetadata
 class LVMessageValue
 {
 public:
-    int protobufId;    
+    LVMessageValue(int protobufId);
 
+public:
+    int _protobufId;    
+
+public:
     virtual void* RawValue() = 0;
     virtual size_t ByteSizeLong() = 0;
     virtual google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const = 0;
@@ -129,9 +134,28 @@ public:
 class LVStringMessageValue : public LVMessageValue
 {
 public:
-    std::string value;
+    LVStringMessageValue(int protobufId, std::string& value);
 
-    void* RawValue() override { return (void*)(value.c_str()); };
+public:
+    std::string _value;
+
+public:
+    void* RawValue() override { return (void*)(_value.c_str()); };
+    size_t ByteSizeLong() override;
+    google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+class LVBooleanMessageValue : public LVMessageValue
+{
+public:
+    LVBooleanMessageValue(int protobufId, bool value);
+
+public:
+    bool _value;    
+
+    void* RawValue() override { return &_value; };
     size_t ByteSizeLong() override;
     google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
 };
@@ -141,9 +165,42 @@ public:
 class LVInt32MessageValue : public LVMessageValue
 {
 public:
-    int value;    
+    LVInt32MessageValue(int protobufId, int value);
 
-    void* RawValue() override { return &value; };
+public:
+    int _value;    
+
+    void* RawValue() override { return &_value; };
+    size_t ByteSizeLong() override;
+    google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+class LVFloatMessageValue : public LVMessageValue
+{
+public:
+    LVFloatMessageValue(int protobufId, float value);
+
+public:
+    float _value;    
+
+    void* RawValue() override { return &_value; };
+    size_t ByteSizeLong() override;
+    google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+class LVDoubleMessageValue : public LVMessageValue
+{
+public:
+    LVDoubleMessageValue(int protobufId, double value);
+
+public:
+    double _value;    
+
+    void* RawValue() override { return &_value; };
     size_t ByteSizeLong() override;
     google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
 };
@@ -153,7 +210,7 @@ public:
 class LVMessage : public google::protobuf::Message
 {
 public:
-    LVMessage(const LVMessageMetadataList& metadata);
+    LVMessage(LVMessageMetadataList& metadata);
 
     ~LVMessage();
 
@@ -181,7 +238,7 @@ public:
 
 public:
     std::vector<shared_ptr<LVMessageValue>> _values;
-    const LVMessageMetadataList& _metadata;
+    LVMessageMetadataList& _metadata;
 
 private:
     mutable google::protobuf::internal::CachedSize _cached_size_;

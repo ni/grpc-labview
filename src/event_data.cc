@@ -101,7 +101,7 @@ void CallData::Proceed()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LVMessage::LVMessage(const LVMessageMetadataList &metadata) : _metadata(metadata)
+LVMessage::LVMessage(LVMessageMetadataList &metadata) : _metadata(metadata)
 {
 }
 
@@ -149,41 +149,46 @@ const char *LVMessage::_InternalParse(const char *ptr, google::protobuf::interna
         google::protobuf::uint32 tag;
         ptr = google::protobuf::internal::ReadTag(ptr, &tag);
         auto index = (tag >> 3);
-        // auto fieldInfo = m_Metadata[index];
-        LVMessageMetadataType dataType = LVMessageMetadataType::StringValue; // fieldInfo->dataType;
+        auto fieldInfo = _metadata[index];
+        LVMessageMetadataType dataType = fieldInfo.type;
         switch (dataType)
         {
             case LVMessageMetadataType::Int32Value:
             {
                 int32_t result;
                 ptr = google::protobuf::internal::ReadINT32(ptr, &result);
-
-                auto v = std::make_shared<LVInt32MessageValue>();
-                v->protobufId = index;
-                v->value = result;
+                auto v = std::make_shared<LVInt32MessageValue>(index, result);
                 _values.push_back(v);
             }
             break;
+            case LVMessageMetadataType::FloatValue:
+            {
+                float result;
+                ptr = google::protobuf::internal::ReadFLOAT(ptr, &result);
+                auto v = std::make_shared<LVFloatMessageValue>(index, result);
+                _values.push_back(v);
+            }
             case LVMessageMetadataType::DoubleValue:
             {
                 double result;
                 ptr = google::protobuf::internal::ReadDOUBLE(ptr, &result);
+                auto v = std::make_shared<LVDoubleMessageValue>(index, result);
+                _values.push_back(v);
             }
             break;
             case LVMessageMetadataType::BoolValue:
             {
                 bool result;
                 ptr = google::protobuf::internal::ReadBOOL(ptr, &result);
+                auto v = std::make_shared<LVBooleanMessageValue>(index, result);
+                _values.push_back(v);
             }
             break;
             case LVMessageMetadataType::StringValue:
             {
                 auto str = std::string();
                 ptr = google::protobuf::internal::InlineGreedyStringParser(&str, ptr, ctx);
-
-                auto v = std::make_shared<LVStringMessageValue>();
-                v->protobufId = index;
-                v->value = str;
+                auto v = std::make_shared<LVStringMessageValue>(index, str);
                 _values.push_back(v);
             }
             break;
@@ -298,23 +303,69 @@ google::protobuf::Metadata LVMessage::GetMetadata() const
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+LVMessageValue::LVMessageValue(int protobufId) :
+    _protobufId(protobufId)
+{    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LVStringMessageValue::LVStringMessageValue(int protobufId, std::string& value) :
+    LVMessageValue(protobufId),
+    _value(value)
+{    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 size_t LVStringMessageValue::ByteSizeLong()
 {
-    return 1 + google::protobuf::internal::WireFormatLite::StringSize(value);
+    return 1 + google::protobuf::internal::WireFormatLite::StringSize(_value);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 google::protobuf::uint8* LVStringMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
 {    
-    return stream->WriteString(1, value, target);
+    return stream->WriteString(_protobufId, _value, target);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LVBooleanMessageValue::LVBooleanMessageValue(int protobufId, bool value) :
+    LVMessageValue(protobufId),
+    _value(value)
+{    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+size_t LVBooleanMessageValue::ByteSizeLong()
+{
+    return 1 + google::protobuf::internal::WireFormatLite::kBoolSize;    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+google::protobuf::uint8* LVBooleanMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+{    
+    target = stream->EnsureSpace(target);
+    return google::protobuf::internal::WireFormatLite::WriteBoolToArray(_protobufId, _value, target);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LVInt32MessageValue::LVInt32MessageValue(int protobufId, int value) :
+    LVMessageValue(protobufId),
+    _value(value)
+{    
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 size_t LVInt32MessageValue::ByteSizeLong()
 {
-    return 1 + google::protobuf::internal::WireFormatLite::Int32Size(value);
+    return 1 + google::protobuf::internal::WireFormatLite::Int32Size(_value);
 }
 
 //---------------------------------------------------------------------
@@ -322,7 +373,53 @@ size_t LVInt32MessageValue::ByteSizeLong()
 google::protobuf::uint8* LVInt32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
 {    
     target = stream->EnsureSpace(target);
-    return google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, value, target);
+    return google::protobuf::internal::WireFormatLite::WriteInt32ToArray(_protobufId, _value, target);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LVFloatMessageValue::LVFloatMessageValue(int protobufId, float value) :
+    LVMessageValue(protobufId),
+    _value(value)
+{    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+size_t LVFloatMessageValue::ByteSizeLong()
+{    
+    return 1 + google::protobuf::internal::WireFormatLite::kFloatSize;    
+}
+    
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+google::protobuf::uint8* LVFloatMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+{    
+    target = stream->EnsureSpace(target);
+    return google::protobuf::internal::WireFormatLite::WriteFloatToArray(_protobufId, _value, target);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LVDoubleMessageValue::LVDoubleMessageValue(int protobufId, double value) :
+    LVMessageValue(protobufId),
+    _value(value)
+{    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+size_t LVDoubleMessageValue::ByteSizeLong()
+{    
+    return 1 + google::protobuf::internal::WireFormatLite::kDoubleSize;    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+google::protobuf::uint8* LVDoubleMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+{
+    target = stream->EnsureSpace(target);
+    return google::protobuf::internal::WireFormatLite::WriteDoubleToArray(_protobufId, _value, target);
 }
 
 //---------------------------------------------------------------------
