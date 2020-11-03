@@ -83,8 +83,6 @@ add_library(labview_grpc_server SHARED
   src/grpc_interop.cc
   src/event_data.cc
   src/lv_interop.cc
-  ${qs_proto_srcs}
-  ${qs_grpc_srcs}
   )
 target_link_libraries(labview_grpc_server
    ${_REFLECTION}

@@ -5,40 +5,63 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 using namespace std;
-using namespace queryserver;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-CallData::CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService *service, grpc::ServerCompletionQueue *cq)
-    : _server(server), _service(service), _cq(cq), _stream(&_ctx), _status(CallStatus::Create)
+CallData::CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService *service, grpc::ServerCompletionQueue *cq) :
+    _server(server), 
+    _service(service),
+    _cq(cq),
+    _stream(&_ctx),
+    _status(CallStatus::Create),
+    _writeSemaphore(0)
 {
     Proceed();
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-bool CallData::ParseFromByteBuffer(grpc::ByteBuffer *buffer, grpc::protobuf::Message *message)
+bool CallData::ParseFromByteBuffer(const grpc::ByteBuffer& buffer, grpc::protobuf::Message& message)
 {
     std::vector<grpc::Slice> slices;
-    (void)buffer->Dump(&slices);
+    buffer.Dump(&slices);
     std::string buf;
-    buf.reserve(buffer->Length());
+    buf.reserve(buffer.Length());
     for (auto s = slices.begin(); s != slices.end(); s++)
     {
         buf.append(reinterpret_cast<const char *>(s->begin()), s->size());
     }
-    return message->ParseFromString(buf);
+    return message.ParseFromString(buf);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 std::unique_ptr<grpc::ByteBuffer> CallData::SerializeToByteBuffer(
-    grpc::protobuf::Message *message)
+    const grpc::protobuf::Message& message)
 {
     std::string buf;
-    message->SerializeToString(&buf);
+    message.SerializeToString(&buf);
     grpc::Slice slice(buf);
     return std::unique_ptr<grpc::ByteBuffer>(new grpc::ByteBuffer(&slice, 1));
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void CallData::Write()
+{
+    auto wb = SerializeToByteBuffer(*_response);
+    grpc::WriteOptions options;
+    _status = CallStatus::Writing;
+    _stream.Write(*wb, this);
+    _writeSemaphore.wait();
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void CallData::Finish()
+{
+    _status = CallStatus::Finish;
+    _stream.Finish(grpc::Status::OK, this);
 }
 
 //---------------------------------------------------------------------
@@ -73,24 +96,23 @@ void CallData::Proceed()
         LVEventData eventData;
         if (_server->FindEventData(name, eventData))
         {
-            LVMessage request(eventData.requestMetadata->elements);
-            LVMessage response(eventData.responsetMetadata->elements);
-            ParseFromByteBuffer(&_rb, &request);
+            auto requestMetadata = _server->FindMetadata(eventData.requestMetadataName);
+            auto responseMetadata = _server->FindMetadata(eventData.responseMetadataName);
+            _request = std::make_shared<LVMessage>(requestMetadata->elements);
+            _response = std::make_shared<LVMessage>(responseMetadata->elements);
+            ParseFromByteBuffer(_rb, *_request);
 
-            GenericMethodData methodData(&_ctx, &request, &response);
-            _server->SendEvent(name, &methodData);
-
-            methodData.WaitForComplete();
-            
-            auto wb = SerializeToByteBuffer(&response);
-            grpc::WriteOptions options;
-            _stream.WriteAndFinish(*wb, options, grpc::Status::OK, this);
+            _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
+            _server->SendEvent(name, _methodData.get());
         }
         else
         {
             _stream.Finish(grpc::Status::CANCELLED, this);
-        }
-        _status = CallStatus::Finish;
+        }       
+    }
+    else if (_status == CallStatus::Writing)
+    {
+        _writeSemaphore.notify();
     }
     else
     {
@@ -447,11 +469,12 @@ void EventData::NotifyComplete()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-GenericMethodData::GenericMethodData(ServerContext *_context, LVMessage *_request, LVMessage *_response)
-    : EventData(_context)
+GenericMethodData::GenericMethodData(CallData* call, ServerContext *context, std::shared_ptr<LVMessage> request, std::shared_ptr<LVMessage> response)
+    : EventData(context)
 {
-    request = _request;
-    response = _response;
+    _call = call;
+    _request = request;
+    _response = response;
 }
 
 //---------------------------------------------------------------------
@@ -460,13 +483,4 @@ ServerStartEventData::ServerStartEventData()
     : EventData(NULL)
 {
     serverStartStatus = 0;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-RegistrationRequestData::RegistrationRequestData(ServerContext *_context, const RegistrationRequest *_request, ::grpc::ServerWriter<ServerEvent> *_writer)
-    : EventData(_context)
-{
-    request = _request;
-    eventWriter = _writer;
 }

@@ -158,13 +158,21 @@ LIBRARY_EXPORT int32_t LVStopServer(LVgRPCServerid* id)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t RegisterServerEvent(const char* name, LVUserEventRef* item, LVMessageMetadata* lvRequestMetadata, LVMessageMetadata* lvResponseMetadata, LVgRPCServerid* id)
+LIBRARY_EXPORT int32_t RegisterMessageMetadata(LVgRPCServerid* id, LVMessageMetadata* lvMetadata)
+{    
+    auto server = *(LabVIEWgRPCServer**)id;
+    auto metadata = CreateMessageMetadata(lvMetadata);
+    server->RegisterMetadata(metadata);
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t RegisterServerEvent(LVgRPCServerid* id, const char* name, LVUserEventRef* item, const char* requestMessageName, const char* responseMessageName)
 {
     auto server = *(LabVIEWgRPCServer**)id;
-    auto requestMetadata = CreateMessageMetadata(lvRequestMetadata);
-    auto responseMetadata = CreateMessageMetadata(lvResponseMetadata);
 
-    server->RegisterEvent(name, *item, requestMetadata, responseMetadata);
+    server->RegisterEvent(name, *item, requestMessageName, responseMessageName);
     return 0;
 }
 
@@ -173,7 +181,7 @@ LIBRARY_EXPORT int32_t RegisterServerEvent(const char* name, LVUserEventRef* ite
 LIBRARY_EXPORT int32_t GetRequestData(LVgRPCid id, int8_t* lvRequest)
 {
     auto data = *(GenericMethodData**)id;
-    CopyToCluster(*data->request, lvRequest);
+    CopyToCluster(*data->_request, lvRequest);
     return 0;
 }
 
@@ -182,32 +190,8 @@ LIBRARY_EXPORT int32_t GetRequestData(LVgRPCid id, int8_t* lvRequest)
 LIBRARY_EXPORT int32_t SetResponseData(LVgRPCid id, int8_t* lvRequest)
 {
     auto data = *(GenericMethodData**)id;
-    CopyFromCluster(*data->response, lvRequest);
-
-    // TODO: If this is a streaming call then we do not notify here.
-    data->NotifyComplete();
-    return 0;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t RegisterGetRequest(LVgRPCid id, LVRegistrationRequest* request)
-{
-    RegistrationRequestData* data = *(RegistrationRequestData**)id;
-    SetLVString(&request->eventName, data->request->eventname());
-    return 0;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t NotifyServerEvent(LVgRPCid id, LVServerEvent* event)
-{
-    RegistrationRequestData* data = *(RegistrationRequestData**)id;
-    queryserver::ServerEvent e;
-    e.set_eventdata(GetLVString(event->eventData));
-    e.set_serverid(event->serverId);
-    e.set_status(event->status);
-    data->eventWriter->Write(e);
+    CopyFromCluster(*data->_response, lvRequest);
+    data->_call->Write();
     return 0;
 }
 
@@ -215,7 +199,8 @@ LIBRARY_EXPORT int32_t NotifyServerEvent(LVgRPCid id, LVServerEvent* event)
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t CloseServerEvent(LVgRPCid id)
 {
-    RegistrationRequestData* data = *(RegistrationRequestData**)id;
+    GenericMethodData* data = *(GenericMethodData**)id;
     data->NotifyComplete();
+    data->_call->Finish();
     return 0;
 }

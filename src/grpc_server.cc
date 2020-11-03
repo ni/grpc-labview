@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <grpc_server.h>
+#include <grpcpp/ext/proto_server_reflection_plugin.h>
 #include <thread>
 #include <sstream>
 #include <fstream>
@@ -12,18 +13,27 @@
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
-using grpc::ServerWriter;
 using grpc::Status;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 using namespace std;
-using namespace queryserver;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LabVIEWgRPCServer::RegisterEvent(string name, LVUserEventRef item, std::shared_ptr<MessageMetadata> requestMetadata, std::shared_ptr<MessageMetadata> responseMetadata)
+void LabVIEWgRPCServer::RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata)
 {
+    lock_guard<mutex> lock(_mutex);
+
+    _registeredMessageMetadata.insert({requestMetadata->messageName, requestMetadata});
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LabVIEWgRPCServer::RegisterEvent(string name, LVUserEventRef item, string requestMetadata, string responseMetadata)
+{
+    lock_guard<mutex> lock(_mutex);
+
     LVEventData data = { item, requestMetadata, responseMetadata };
     _registeredServerMethods.insert(pair<string, LVEventData>(name, data));
 }
@@ -50,6 +60,18 @@ bool LabVIEWgRPCServer::FindEventData(string name, LVEventData& data)
         return true;
     }
     return false;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+shared_ptr<MessageMetadata> LabVIEWgRPCServer::FindMetadata(const string& name)
+{
+    auto it = _registeredMessageMetadata.find(name);
+    if (it != _registeredMessageMetadata.end())
+    {
+        return (*it).second;
+    }
+    return nullptr;
 }
 
 //---------------------------------------------------------------------
@@ -94,7 +116,10 @@ void LabVIEWgRPCServer::HandleRpcs(grpc::ServerCompletionQueue *cq)
         // event is uniquely identified by its tag, which in this case is the
         // memory address of a CallData instance.
         cq->Next(&tag, &ok);
-        GPR_ASSERT(ok);
+        if (!ok)
+        {
+            break;
+        }
         static_cast<CallData*>(tag)->Proceed();
     }
 }
