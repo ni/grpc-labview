@@ -47,6 +47,8 @@ typedef void* LVgRPCServerid;
 class LabVIEWgRPCServer;
 class LVMessage;
 class CallData;
+class MessageElementMetadata;
+struct MessageMetadata;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -81,9 +83,25 @@ enum class LVMessageMetadataType
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+class IMessageElementMetadataOwner
+{
+public:
+    virtual shared_ptr<MessageMetadata> FindMetadata(const string& name) = 0;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 class MessageElementMetadata
 {
 public:
+    MessageElementMetadata(IMessageElementMetadataOwner* owner) :
+        _owner(owner)
+    {            
+    }
+
+public:
+    IMessageElementMetadataOwner* _owner;
+
     std::string embeddedMessageName;
     
     int protobufIndex;
@@ -108,7 +126,7 @@ struct LVMesageElementMetadata
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-using LVMessageMetadataList = std::map<google::protobuf::uint32, MessageElementMetadata>;
+using LVMessageMetadataList = std::map<google::protobuf::uint32, std::shared_ptr<MessageElementMetadata>>;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -140,6 +158,22 @@ public:
     virtual void* RawValue() = 0;
     virtual size_t ByteSizeLong() = 0;
     virtual google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const = 0;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+class LVNestedMessageMessageValue : public LVMessageValue
+{
+public:
+    LVNestedMessageMessageValue(int protobufId, std::shared_ptr<LVMessage> value);
+
+public:
+    std::shared_ptr<LVMessage> _value;
+
+public:
+    void* RawValue() override { return (void*)(_value.get()); };
+    size_t ByteSizeLong() override;
+    google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
 };
 
 //---------------------------------------------------------------------
@@ -293,7 +327,7 @@ struct LVEventData
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class LabVIEWgRPCServer
+class LabVIEWgRPCServer : public IMessageElementMetadataOwner
 {
 public:
     int Run(string address, string serverCertificatePath, string serverKeyPath);

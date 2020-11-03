@@ -51,6 +51,11 @@ message DataTypeTest {
   string stringValue = 5;
 }
 
+message NestedMessageTest {
+  string root = 1;
+  DataTypeTest nested = 2;
+}
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 message InvokeRequest {

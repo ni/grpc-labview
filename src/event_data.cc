@@ -172,7 +172,7 @@ const char *LVMessage::_InternalParse(const char *ptr, google::protobuf::interna
         ptr = google::protobuf::internal::ReadTag(ptr, &tag);
         auto index = (tag >> 3);
         auto fieldInfo = _metadata[index];
-        LVMessageMetadataType dataType = fieldInfo.type;
+        LVMessageMetadataType dataType = fieldInfo->type;
         switch (dataType)
         {
             case LVMessageMetadataType::Int32Value:
@@ -211,6 +211,16 @@ const char *LVMessage::_InternalParse(const char *ptr, google::protobuf::interna
                 auto str = std::string();
                 ptr = google::protobuf::internal::InlineGreedyStringParser(&str, ptr, ctx);
                 auto v = std::make_shared<LVStringMessageValue>(index, str);
+                _values.push_back(v);
+            }
+            break;
+            case LVMessageMetadataType::MessageValue:
+            {
+                auto metadata = fieldInfo->_owner->FindMetadata(fieldInfo->embeddedMessageName);
+                
+                auto nestedMessage = std::make_shared<LVMessage>(metadata->elements);
+                ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
+                auto v = std::make_shared<LVNestedMessageMessageValue>(index, nestedMessage);
                 _values.push_back(v);
             }
             break;
@@ -328,6 +338,29 @@ google::protobuf::Metadata LVMessage::GetMetadata() const
 LVMessageValue::LVMessageValue(int protobufId) :
     _protobufId(protobufId)
 {    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LVNestedMessageMessageValue::LVNestedMessageMessageValue(int protobufId, std::shared_ptr<LVMessage> value) :
+    LVMessageValue(protobufId),
+    _value(value)
+{
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+size_t LVNestedMessageMessageValue::ByteSizeLong()
+{
+    return 1 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_value);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+google::protobuf::uint8* LVNestedMessageMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+{
+    target = stream->EnsureSpace(target);
+    return google::protobuf::internal::WireFormatLite::InternalWriteMessage(_protobufId, *_value, target, stream);        
 }
 
 //---------------------------------------------------------------------
