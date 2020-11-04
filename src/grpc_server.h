@@ -178,6 +178,22 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+class LVRepeatedNestedMessageMessageValue : public LVMessageValue
+{
+public:
+    LVRepeatedNestedMessageMessageValue(int protobufId);
+
+public:
+    std::vector<std::shared_ptr<LVMessage>> _value;
+
+public:
+    void* RawValue() override { return &_value; };
+    size_t ByteSizeLong() override;
+    google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 class LVStringMessageValue : public LVMessageValue
 {
 public:
@@ -194,6 +210,22 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+class LVRepeatedStringMessageValue : public LVMessageValue
+{
+public:
+    LVRepeatedStringMessageValue(int protobufId);
+
+public:
+    google::protobuf::RepeatedField<std::string> _value;
+
+public:
+    void* RawValue() override { return &_value; };
+    size_t ByteSizeLong() override;
+    google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 class LVBooleanMessageValue : public LVMessageValue
 {
 public:
@@ -201,6 +233,21 @@ public:
 
 public:
     bool _value;    
+
+    void* RawValue() override { return &_value; };
+    size_t ByteSizeLong() override;
+    google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+class LVRepeatedBooleanMessageValue : public LVMessageValue
+{
+public:
+    LVRepeatedBooleanMessageValue(int protobufId);
+
+public:
+    google::protobuf::RepeatedField<bool> _value;    
 
     void* RawValue() override { return &_value; };
     size_t ByteSizeLong() override;
@@ -224,6 +271,24 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+class LVRepeatedInt32MessageValue : public LVMessageValue
+{
+public:
+    LVRepeatedInt32MessageValue(int protobufId);
+
+public:
+    google::protobuf::RepeatedField<int> _value;    
+
+    void* RawValue() override { return &_value; };
+    size_t ByteSizeLong() override;
+    google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+
+private:
+    int _cachedSize;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 class LVFloatMessageValue : public LVMessageValue
 {
 public:
@@ -239,6 +304,21 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+class LVRepeatedFloatMessageValue : public LVMessageValue
+{
+public:
+    LVRepeatedFloatMessageValue(int protobufId);
+
+public:
+    google::protobuf::RepeatedField<float> _value;    
+
+    void* RawValue() override { return &_value; };
+    size_t ByteSizeLong() override;
+    google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 class LVDoubleMessageValue : public LVMessageValue
 {
 public:
@@ -246,6 +326,21 @@ public:
 
 public:
     double _value;    
+
+    void* RawValue() override { return &_value; };
+    size_t ByteSizeLong() override;
+    google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+class LVRepeatedDoubleMessageValue : public LVMessageValue
+{
+public:
+    LVRepeatedDoubleMessageValue(int protobufId);
+
+public:
+    google::protobuf::RepeatedField<double> _value;    
 
     void* RawValue() override { return &_value; };
     size_t ByteSizeLong() override;
@@ -289,6 +384,14 @@ public:
 
 private:
     mutable google::protobuf::internal::CachedSize _cached_size_;
+
+    const char *ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
+    const char *ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
+    const char *ParseFloat(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
+    const char *ParseDouble(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
+    const char *ParseString(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
+    const char *ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
+    bool ExpectTag(google::protobuf::uint32 tag, const char* ptr);
 };
 
 //---------------------------------------------------------------------

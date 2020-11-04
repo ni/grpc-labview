@@ -49,11 +49,18 @@ message DataTypeTest {
   float floatValue = 3;
   double doubleValue = 4;
   string stringValue = 5;
+  bytes bytesValue = 6;
+  repeated bool repeatedBoolValaue = 7;
+  repeated int32 repeatedIntValue = 8;
+  repeated float repeatedFloatValue = 9;
+  repeated double repeatedDoubleValue = 10;
+  repeated string repeatedStringValue = 11;
 }
 
 message NestedMessageTest {
   string root = 1;
   DataTypeTest nested = 2;
+  repeated DataTypeTest repeatedNested = 3;
 }
 
 //---------------------------------------------------------------------
