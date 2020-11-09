@@ -28,7 +28,7 @@ public:
     string Query(const string &command);
     unique_ptr<grpc::ClientReader<ServerEvent>> Register(const string& eventName);
 
-private:
+public:
     ClientContext m_context;
     unique_ptr<QueryServer::Stub> m_Stub;
 };
@@ -173,6 +173,26 @@ std::string read_keycert( const std::string& filename)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+void DoDataTypeTest(QueryClient& client)
+{    
+    ClientContext ctx;
+    TestDataTypesParameters request;
+    request.set_root("Root String");
+    request.mutable_repeatedstring()->Add("String 1");
+    request.mutable_repeatedstring()->Add("String 2");
+    request.mutable_repeatedstring()->Add("String 3");
+    TestDataTypesParameters response;
+    auto result = client.m_Stub->TestDataTypes(&ctx, request, &response);
+
+    cout << response.root() << endl;
+    for (auto i: response.repeatedstring())
+    {
+        cout << i << endl;
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 int main(int argc, char **argv)
 {
     auto target_str = GetServerAddress(argc, argv);
@@ -190,23 +210,26 @@ int main(int argc, char **argv)
     {
         creds = grpc::InsecureChannelCredentials();
     }
-    QueryClient client(grpc::CreateChannel(target_str, creds));
+    auto channel = grpc::CreateChannel(target_str, creds);
+    QueryClient client(channel);
 
-    auto result = client.Query("Uptime");
-    cout << "Server uptime: " << result << endl;
+    DoDataTypeTest(client);
 
-    auto reader = client.Register("Heartbeat");
-    int count = 0;
-    ServerEvent event;
-    while (reader->Read(&event))
-    {
-        cout << "Server Event: " << event.eventdata() << endl;
-        count += 1;
-        if (count == 10)
-        {
-            client.Invoke("Reset", "");
-        }
-    }
-    Status status = reader->Finish();
-    cout << "Server notifications complete" << endl;
+    // auto result = client.Query("Uptime");
+    // cout << "Server uptime: " << result << endl;
+
+    // auto reader = client.Register("Heartbeat");
+    // int count = 0;
+    // ServerEvent event;
+    // while (reader->Read(&event))
+    // {
+    //     cout << "Server Event: " << event.eventdata() << endl;
+    //     count += 1;
+    //     if (count == 10)
+    //     {
+    //         client.Invoke("Reset", "");
+    //     }
+    // }
+    // Status status = reader->Finish();
+    // cout << "Server notifications complete" << endl;
 }

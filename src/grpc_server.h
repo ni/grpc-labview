@@ -24,6 +24,7 @@
 #include <lv_interop.h>
 #include <condition_variable>
 #include <future>
+#include <map>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -379,7 +380,7 @@ public:
     google::protobuf::Metadata GetMetadata() const final;
 
 public:
-    std::vector<shared_ptr<LVMessageValue>> _values;
+    std::map<int, shared_ptr<LVMessageValue>> _values;
     LVMessageMetadataList& _metadata;
 
 private:

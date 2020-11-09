@@ -206,14 +206,14 @@ const char *LVMessage::ParseBoolean(const MessageElementMetadata& fieldInfo, uin
     {
         auto v = std::make_shared<LVRepeatedBooleanMessageValue>(index);
         ptr = google::protobuf::internal::PackedBoolParser(&(v->_value), ptr, ctx);
-        _values.push_back(v);
+        _values.emplace(index, v);
     }
     else
     {
         bool result;
         ptr = google::protobuf::internal::ReadBOOL(ptr, &result);
         auto v = std::make_shared<LVBooleanMessageValue>(index, result);
-        _values.push_back(v);
+        _values.emplace(index, v);
     }
     return ptr;
 }
@@ -226,14 +226,14 @@ const char *LVMessage::ParseInt32(const MessageElementMetadata& fieldInfo, uint3
     {
         auto v = std::make_shared<LVRepeatedInt32MessageValue>(index);
         ptr = google::protobuf::internal::PackedInt32Parser(&(v->_value), ptr, ctx);
-        _values.push_back(v);
+        _values.emplace(index, v);
     }
     else
     {
         int32_t result;
         ptr = google::protobuf::internal::ReadINT32(ptr, &result);
         auto v = std::make_shared<LVInt32MessageValue>(index, result);
-        _values.push_back(v);
+        _values.emplace(index, v);
     }
     return ptr;
 }
@@ -246,14 +246,14 @@ const char *LVMessage::ParseFloat(const MessageElementMetadata& fieldInfo, uint3
     {
         auto v = std::make_shared<LVRepeatedFloatMessageValue>(index);
         ptr = google::protobuf::internal::PackedFloatParser(&(v->_value), ptr, ctx);
-        _values.push_back(v);
+        _values.emplace(index, v);
     }
     else
     {
         float result;
         ptr = google::protobuf::internal::ReadFLOAT(ptr, &result);
         auto v = std::make_shared<LVFloatMessageValue>(index, result);
-        _values.push_back(v);
+        _values.emplace(index, v);
     }
     return ptr;
 }
@@ -266,14 +266,14 @@ const char *LVMessage::ParseDouble(const MessageElementMetadata& fieldInfo, uint
     {
         auto v = std::make_shared<LVRepeatedDoubleMessageValue>(index);
         ptr = google::protobuf::internal::PackedDoubleParser(&(v->_value), ptr, ctx);
-        _values.push_back(v);
+        _values.emplace(index, v);
     }
     else
     {
         double result;
         ptr = google::protobuf::internal::ReadDOUBLE(ptr, &result);
         auto v = std::make_shared<LVDoubleMessageValue>(index, result);
-        _values.push_back(v);
+        _values.emplace(index, v);
     }
     return ptr;
 }
@@ -284,7 +284,17 @@ const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageEl
 {    
     if (fieldInfo.isRepeated)
     {
-        auto v = std::make_shared<LVRepeatedStringMessageValue>(index);
+        std::shared_ptr<LVRepeatedStringMessageValue> v;
+        auto it = _values.find(index);
+        if (it == _values.end())
+        {
+            v = std::make_shared<LVRepeatedStringMessageValue>(index);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            v = static_pointer_cast<LVRepeatedStringMessageValue>((*it).second);
+        }
         ptr -= 1;
         do {
             ptr += 1;
@@ -292,7 +302,7 @@ const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageEl
             ptr = google::protobuf::internal::InlineGreedyStringParser(str, ptr, ctx);
             if (!ctx->DataAvailable(ptr))
             {
-            break;
+                break;
             }
         } while (ExpectTag(tag, ptr));
     }
@@ -301,7 +311,7 @@ const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageEl
         auto str = std::string();
         ptr = google::protobuf::internal::InlineGreedyStringParser(&str, ptr, ctx);
         auto v = std::make_shared<LVStringMessageValue>(index, str);
-        _values.push_back(v);
+        _values.emplace(index, v);
     }
     return ptr;
 }
@@ -346,7 +356,7 @@ const char *LVMessage::ParseNestedMessage(google::protobuf::uint32 tag, const Me
         auto nestedMessage = std::make_shared<LVMessage>(metadata->elements);
         ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
         auto v = std::make_shared<LVNestedMessageMessageValue>(index, nestedMessage);
-        _values.push_back(v);
+        _values.emplace(index, v);
     }
     return ptr;
 }
@@ -357,7 +367,7 @@ google::protobuf::uint8 *LVMessage::_InternalSerialize(google::protobuf::uint8 *
 {
     for (auto e : _values)
     {
-        target = e->Serialize(target, stream);
+        target = e.second->Serialize(target, stream);
     }
     return target;
 }
@@ -370,7 +380,7 @@ size_t LVMessage::ByteSizeLong() const
 
     for (auto e : _values)
     {
-        totalSize += e->ByteSizeLong();
+        totalSize += e.second->ByteSizeLong();
     }
     int cachedSize = google::protobuf::internal::ToCachedSize(totalSize);
     SetCachedSize(cachedSize);

@@ -33,12 +33,11 @@ package queryserver;
 // The QueryServer service definition.
 //---------------------------------------------------------------------
 service QueryServer {
-  
   rpc Invoke (InvokeRequest) returns (InvokeResponse) {}
-  
   rpc Query (QueryRequest) returns (QueryResponse) {}
-  
   rpc Register (RegistrationRequest) returns (stream ServerEvent) {}
+
+  rpc TestDataTypes(TestDataTypesParameters) returns (TestDataTypesParameters) {}
 }
 
 //---------------------------------------------------------------------
@@ -57,10 +56,13 @@ message DataTypeTest {
   repeated string repeatedStringValue = 11;
 }
 
-message NestedMessageTest {
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+message TestDataTypesParameters {
   string root = 1;
-  DataTypeTest nested = 2;
-  repeated DataTypeTest repeatedNested = 3;
+  repeated string RepeatedString = 2;
+  // DataTypeTest nested = 3;
+  // repeated DataTypeTest repeatedNested = 4;
 }
 
 //---------------------------------------------------------------------

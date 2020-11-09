@@ -106,4 +106,3 @@ string GetLVString(LStrHandle lvString)
     string result(chars, count);
     return result;
 }
-
