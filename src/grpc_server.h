@@ -120,7 +120,6 @@ struct LVMesageElementMetadata
 {
     LStrHandle embeddedMessageName;
     int protobufIndex;
-    int clusterOffset;
     int valueType;
     bool isRepeated;
 };
@@ -134,6 +133,7 @@ using LVMessageMetadataList = std::map<google::protobuf::uint32, std::shared_ptr
 struct MessageMetadata
 {
     std::string messageName;
+    int clusterSize;
     LVMessageMetadataList elements;
 };
 

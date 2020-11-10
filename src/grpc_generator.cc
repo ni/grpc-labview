@@ -90,7 +90,7 @@ LIBRARY_EXPORT int LVGetServices(LVProtoParser* parser, LV1DArrayHandle* service
         return -3;
     }
     (**services)->cnt = count;
-    const ServiceDescriptor** serviceElements = (const ServiceDescriptor**)((**services)->str);
+    const ServiceDescriptor** serviceElements = (**services)->bytes<const ServiceDescriptor*>();
     for (int x=0; x<count; ++x)
     {
         serviceElements[x] = parser->m_FileDescriptor->service(x);
@@ -124,7 +124,7 @@ LIBRARY_EXPORT int LVGetServiceMethods(ServiceDescriptor* service, LV1DArrayHand
         return -3;
     }
     (**methods)->cnt = count;
-    auto methodElements = (const MethodDescriptor**)((**methods)->str);
+    auto methodElements = (**methods)->bytes<const MethodDescriptor*>();
     for (int x=0; x<count; ++x)
     {
         methodElements[x] = service->method(x);
@@ -182,7 +182,7 @@ LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, LV1DArrayHandle* fields)
         return -3;
     }
     (**fields)->cnt = count;
-    auto fieldElements = (const FieldDescriptor**)((**fields)->str);
+    auto fieldElements = (**fields)->bytes<const FieldDescriptor*>();
     for (int x=0; x<count; ++x)
     {
         fieldElements[x] = descriptor->field(x);

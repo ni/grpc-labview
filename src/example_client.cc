@@ -181,6 +181,25 @@ void DoDataTypeTest(QueryClient& client)
     request.mutable_repeatedstring()->Add("String 1");
     request.mutable_repeatedstring()->Add("String 2");
     request.mutable_repeatedstring()->Add("String 3");
+
+    request.mutable_repeatedintvalue()->Add(1);
+    request.mutable_repeatedintvalue()->Add(2);
+    request.mutable_repeatedintvalue()->Add(3);
+    request.mutable_repeatedintvalue()->Add(4);
+    request.mutable_repeatedintvalue()->Add(5);
+    request.mutable_repeatedintvalue()->Add(6);
+
+    request.set_rootint32(42);
+    request.set_rootdouble(42.42);
+    request.set_rootbool(true);
+
+    request.mutable_repeateddoublevalue()->Add(1.1);
+    request.mutable_repeateddoublevalue()->Add(2.2);
+    request.mutable_repeateddoublevalue()->Add(3.3);
+    request.mutable_repeateddoublevalue()->Add(4.4);
+    request.mutable_repeateddoublevalue()->Add(5.5);
+    request.mutable_repeateddoublevalue()->Add(6.6);
+
     TestDataTypesParameters response;
     auto result = client.m_Stub->TestDataTypes(&ctx, request, &response);
 
@@ -188,6 +207,19 @@ void DoDataTypeTest(QueryClient& client)
     for (auto i: response.repeatedstring())
     {
         cout << i << endl;
+    }
+    for (int x = 0; x < response.mutable_repeatedintvalue()->size(); ++x)
+    {
+        cout << response.mutable_repeatedintvalue()->data()[x] << endl;
+    }
+
+    cout << response.rootint32() << endl;
+    cout << response.rootdouble() << endl;
+    cout << response.rootbool() << endl;
+
+    for (int x = 0; x < response.mutable_repeateddoublevalue()->size(); ++x)
+    {
+        cout << response.mutable_repeateddoublevalue()->data()[x] << endl;
     }
 }
 

@@ -61,6 +61,11 @@ message DataTypeTest {
 message TestDataTypesParameters {
   string root = 1;
   repeated string RepeatedString = 2;
+  repeated int32 RepeatedIntValue = 3;
+  int32 rootInt32 = 4;
+  bool rootBool = 5;
+  repeated double RepeatedDoubleValue = 6;
+  double rootDouble = 7;
   // DataTypeTest nested = 3;
   // repeated DataTypeTest repeatedNested = 4;
 }

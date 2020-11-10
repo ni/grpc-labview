@@ -31,8 +31,18 @@ typedef struct {
 
 typedef struct {
 	int32_t cnt; /* number of bytes that follow */
-    int32_t padding;
-	int8_t str[1]; /* cnt bytes */
+    //int32_t padding;
+	int8_t rawBytes[1]; /* cnt bytes */
+
+    template<typename T>
+    T* bytes()
+    {
+        if (sizeof(T) < 8)
+        {
+            return (T*)rawBytes;
+        }
+        return (T*)(rawBytes + 4); // 8-byte aligned data
+    }
 } LV1DArray, * LV1DArrayPtr, ** LV1DArrayHandle;
 
 //---------------------------------------------------------------------
