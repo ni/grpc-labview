@@ -81,6 +81,7 @@ target_link_libraries(labview_query_client
 add_library(labview_grpc_server SHARED
   src/grpc_server.cc
   src/grpc_interop.cc
+  src/cluster_copier.cc
   src/event_data.cc
   src/lv_interop.cc
   )

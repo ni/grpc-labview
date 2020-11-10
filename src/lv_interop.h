@@ -24,14 +24,16 @@ typedef int32_t MagicCookie;
 typedef MagicCookie LVRefNum;
 typedef MagicCookie LVUserEventRef;
 
-typedef struct {
+struct LStr {
     int32_t cnt; /* number of bytes that follow */
     char str[1]; /* cnt bytes */
-} LStr, * LStrPtr, ** LStrHandle;
+};
 
-typedef struct {
+using LStrPtr = LStr*;
+using LStrHandle =  LStr**;
+
+struct LV1DArray {
 	int32_t cnt; /* number of bytes that follow */
-    //int32_t padding;
 	int8_t rawBytes[1]; /* cnt bytes */
 
     template<typename T>
@@ -43,7 +45,10 @@ typedef struct {
         }
         return (T*)(rawBytes + 4); // 8-byte aligned data
     }
-} LV1DArray, * LV1DArrayPtr, ** LV1DArrayHandle;
+};
+
+using LV1DArrayPtr = LV1DArray*;
+using LV1DArrayHandle = LV1DArray**;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
