@@ -45,6 +45,16 @@ struct LV1DArray {
         }
         return (T*)(rawBytes + 4); // 8-byte aligned data
     }
+
+    template<typename T>
+    T* bytes(int byteOffset)
+    {
+        if (sizeof(T) < 8)
+        {
+            return (T*)(rawBytes + byteOffset);
+        }
+        return (T*)(rawBytes + 4 + byteOffset); // 8-byte aligned data
+    }
 };
 
 using LV1DArrayPtr = LV1DArray*;

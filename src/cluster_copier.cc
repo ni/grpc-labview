@@ -35,17 +35,20 @@ void ClusterDataCopier::CopyMessageToCluster(const shared_ptr<MessageElementMeta
 {
     if (metadata->isRepeated)
     {
-        auto repeatedNested = static_cast<const LVRepeatedNestedMessageMessageValue&>(*value);
-        LVNumericArrayResize(0x08, 1, start, repeatedNested._value.size());
+        auto repeatedNested = static_pointer_cast<LVRepeatedNestedMessageMessageValue>(value);
+        auto nestedMetadata = repeatedNested->_value.front()->_metadata; 
+        auto clusterSize = nestedMetadata->clusterSize;
+
+        LVNumericArrayResize(0x08, 1, start, repeatedNested->_value.size() * clusterSize);
         auto array = *(LV1DArrayHandle*)start;
-        (*array)->cnt = repeatedNested._value.size();
+        (*array)->cnt = repeatedNested->_value.size();
         int x = 0;
-        auto lvCluster = (*array)->bytes<LVCluster*>();
-        for (auto str : repeatedNested._value)
+        for (auto str : repeatedNested->_value)
         {
+            auto lvCluster = (*array)->bytes<LVCluster*>(x * clusterSize);
             *lvCluster = nullptr;
             CopyToCluster(*str, (int8_t*)lvCluster);
-            lvCluster += 1;
+            x += 1;
         }
     }
     else
@@ -135,7 +138,7 @@ void ClusterDataCopier::CopyFloatToCluster(const shared_ptr<MessageElementMetada
 //---------------------------------------------------------------------
 void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
 {
-    for (auto val : message._metadata)
+    for (auto val : message._metadata->_mappedElements)
     {
         auto start = cluster + val.second->clusterOffset;
         shared_ptr<LVMessageValue> value;
@@ -167,7 +170,7 @@ void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
                     CopyInt32ToCluster(val.second, start, value);
                     break;
                 case LVMessageMetadataType::MessageValue:
-                    CopyToCluster(*((LVNestedMessageMessageValue*)value.get())->_value, start);
+                    CopyMessageToCluster(val.second, start, value);
                     break;
             }
         }
@@ -304,9 +307,42 @@ void ClusterDataCopier::CopyFloatFromCluster(const shared_ptr<MessageElementMeta
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+void ClusterDataCopier::CopyMessageFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+{    
+    auto nestedMetadata = metadata->_owner->FindMetadata(metadata->embeddedMessageName);
+
+    if (metadata->isRepeated)
+    {
+        auto array = *(LV1DArrayHandle*)start;
+        if (array && *array)
+        {
+            auto count = (*array)->cnt;
+            auto repeatedValue = std::make_shared<LVRepeatedNestedMessageMessageValue>(metadata->protobufIndex);
+            message._values.emplace(metadata->protobufIndex, repeatedValue);
+            
+            for (int x=0; x<count; ++x)
+            {
+                auto data = (*array)->bytes<LVCluster*>(nestedMetadata->clusterSize * x);
+                auto nested = std::make_shared<LVMessage>(nestedMetadata);
+                repeatedValue->_value.push_back(nested);
+                CopyFromCluster(*nested, (int8_t*)data);
+            }
+        }
+    }
+    else
+    {
+        auto nested = std::make_shared<LVMessage>(nestedMetadata);
+        CopyFromCluster(*nested, start);
+        auto value = std::make_shared<LVNestedMessageMessageValue>(metadata->protobufIndex, nested);
+        message._values.emplace(metadata->protobufIndex, value);
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void ClusterDataCopier::CopyFromCluster(LVMessage& message, int8_t* cluster)
 {
-    for (auto val : message._metadata)
+    for (auto val : message._metadata->_mappedElements)
     {
         auto start = cluster + val.second->clusterOffset;
         switch (val.second->type)
@@ -327,13 +363,7 @@ void ClusterDataCopier::CopyFromCluster(LVMessage& message, int8_t* cluster)
                 CopyInt32FromCluster(val.second, start, message);
                 break;
             case LVMessageMetadataType::MessageValue:
-                {
-                    auto metadata = val.second->_owner->FindMetadata(val.second->embeddedMessageName);
-                    auto nested = std::make_shared<LVMessage>(metadata->_mappedElements);
-                    CopyFromCluster(*nested, start);
-                    auto value = std::make_shared<LVNestedMessageMessageValue>(val.second->protobufIndex, nested);
-                    message._values.emplace(val.first, value);
-                }
+                CopyMessageFromCluster(val.second, start, message);
                 break;
         }
     }

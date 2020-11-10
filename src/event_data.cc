@@ -98,8 +98,8 @@ void CallData::Proceed()
         {
             auto requestMetadata = _server->FindMetadata(eventData.requestMetadataName);
             auto responseMetadata = _server->FindMetadata(eventData.responseMetadataName);
-            _request = std::make_shared<LVMessage>(requestMetadata->_mappedElements);
-            _response = std::make_shared<LVMessage>(responseMetadata->_mappedElements);
+            _request = std::make_shared<LVMessage>(requestMetadata);
+            _response = std::make_shared<LVMessage>(responseMetadata);
             ParseFromByteBuffer(_rb, *_request);
 
             _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
@@ -123,7 +123,7 @@ void CallData::Proceed()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LVMessage::LVMessage(LVMessageMetadataMap &metadata) : 
+LVMessage::LVMessage(shared_ptr<MessageMetadata> metadata) : 
     _metadata(metadata)
 {
 }
@@ -172,7 +172,7 @@ const char *LVMessage::_InternalParse(const char *ptr, google::protobuf::interna
         google::protobuf::uint32 tag;
         ptr = google::protobuf::internal::ReadTag(ptr, &tag);
         auto index = (tag >> 3);
-        auto fieldInfo = _metadata[index];
+        auto fieldInfo = _metadata->_mappedElements[index];
         LVMessageMetadataType dataType = fieldInfo->type;
         switch (dataType)
         {
@@ -341,9 +341,19 @@ const char *LVMessage::ParseNestedMessage(google::protobuf::uint32 tag, const Me
     {
         ptr -= 1;
         do {
-            auto v = std::make_shared<LVRepeatedNestedMessageMessageValue>(index);
+            std::shared_ptr<LVRepeatedNestedMessageMessageValue> v;
+            auto it = _values.find(index);
+            if (it == _values.end())
+            {
+                v = std::make_shared<LVRepeatedNestedMessageMessageValue>(index);
+                _values.emplace(index, v);
+            }
+            else
+            {
+                v = static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
+            }
             ptr += 1;
-            auto nestedMessage = std::make_shared<LVMessage>(metadata->_mappedElements);
+            auto nestedMessage = std::make_shared<LVMessage>(metadata);
             ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
             v->_value.push_back(nestedMessage);
             if (!ctx->DataAvailable(ptr))
@@ -354,7 +364,7 @@ const char *LVMessage::ParseNestedMessage(google::protobuf::uint32 tag, const Me
     }
     else
     {
-        auto nestedMessage = std::make_shared<LVMessage>(metadata->_mappedElements);
+        auto nestedMessage = std::make_shared<LVMessage>(metadata);
         ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
         auto v = std::make_shared<LVNestedMessageMessageValue>(index, nestedMessage);
         _values.emplace(index, v);

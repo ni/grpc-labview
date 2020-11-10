@@ -361,7 +361,7 @@ public:
 class LVMessage : public google::protobuf::Message
 {
 public:
-    LVMessage(LVMessageMetadataMap& metadata);
+    LVMessage(shared_ptr<MessageMetadata> metadata);
 
     ~LVMessage();
 
@@ -389,7 +389,7 @@ public:
 
 public:
     std::map<int, shared_ptr<LVMessageValue>> _values;
-    LVMessageMetadataMap& _metadata;
+    std::shared_ptr<MessageMetadata> _metadata;
 
 private:
     mutable google::protobuf::internal::CachedSize _cached_size_;

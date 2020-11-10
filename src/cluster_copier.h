@@ -24,6 +24,7 @@ private:
     static void CopyFloatToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value);
 
     static void CopyStringFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
+    static void CopyMessageFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
     static void CopyBoolFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
     static void CopyInt32FromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
     static void CopyDoubleFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);

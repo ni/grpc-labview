@@ -220,6 +220,16 @@ void DoDataTypeTest(QueryClient& client)
     request.mutable_nested()->set_intvalue(4242);
     request.mutable_nested()->set_floatvalue(15.14);
 
+    auto nested = request.mutable_repeatednested()->Add();
+    nested->set_boolvalaue(true);
+    nested->set_floatvalue(1.1);
+    nested = request.mutable_repeatednested()->Add();
+    nested->set_boolvalaue(false);
+    nested->set_floatvalue(2.2);
+    nested = request.mutable_repeatednested()->Add();
+    nested->set_boolvalaue(true);
+    nested->set_floatvalue(3.3);
+
     TestDataTypesParameters response;
     auto result = client.m_Stub->TestDataTypes(&ctx, request, &response);
 
@@ -257,6 +267,11 @@ void DoDataTypeTest(QueryClient& client)
     cout << response.nested().doublevalue() << endl;
     cout << response.nested().intvalue() << endl;
     cout << response.nested().floatvalue() << endl;
+
+    for (int x = 0; x < response.repeatednested().size(); ++x)
+    {
+        cout << response.repeatednested()[x].boolvalaue() << ", " << response.repeatednested()[x].floatvalue() << endl;
+    }
 }
 
 //---------------------------------------------------------------------
