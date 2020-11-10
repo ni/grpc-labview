@@ -74,10 +74,94 @@ shared_ptr<MessageMetadata> LabVIEWgRPCServer::FindMetadata(const string& name)
     return nullptr;
 }
 
+int ClusterElementSize(LVMessageMetadataType type, bool repeated)
+{
+    if (repeated)
+    {
+        return 8;
+    }
+    switch (type)
+    {
+    case LVMessageMetadataType::BoolValue:
+        return 1;
+    case LVMessageMetadataType::Int32Value:
+    case LVMessageMetadataType::FloatValue:
+        return 4;
+    case LVMessageMetadataType::DoubleValue:
+    case LVMessageMetadataType::StringValue:
+    case LVMessageMetadataType::MessageValue:
+        return 8;
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+int AlignClusterOffset(int clusterOffset, LVMessageMetadataType type, bool repeated)
+{
+    if (clusterOffset == 0)
+    {
+        return 0;
+    }
+    auto multiple = ClusterElementSize(type, repeated);    
+    int remainder = abs(clusterOffset) % multiple;
+    if (remainder == 0)
+    {
+        return clusterOffset;
+    }
+    return clusterOffset + multiple - remainder;
+}
+
+void LabVIEWgRPCServer::UpdateMetadataClusterLayout(std::shared_ptr<MessageMetadata>& metadata)
+{
+    if (metadata->clusterSize != 0)
+    {
+        return;
+    }    
+    int clusterOffset = 0;
+    for (auto element: metadata->_elements)
+    {
+        auto elementType = element->type;
+        auto nestedElement = element;
+        while (elementType == LVMessageMetadataType::MessageValue)
+        {
+            auto nestedMetadata = FindMetadata(element->embeddedMessageName);
+            auto nestedElement = nestedMetadata->_elements.front();
+            elementType = nestedElement->type;
+        }    
+        clusterOffset = AlignClusterOffset(clusterOffset, element->type, element->isRepeated);
+        element->clusterOffset = clusterOffset;
+        if (element->type == LVMessageMetadataType::MessageValue)
+        {                
+            auto nestedMetadata = FindMetadata(element->embeddedMessageName);
+            UpdateMetadataClusterLayout(nestedMetadata);
+            clusterOffset += nestedMetadata->clusterSize;
+        }
+        else
+        {
+            clusterOffset += ClusterElementSize(element->type, element->isRepeated);
+        }
+    }
+    metadata->clusterSize = AlignClusterOffset(clusterOffset, LVMessageMetadataType::StringValue, true);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LabVIEWgRPCServer::FinalizeMetadata()
+{
+    for (auto metadata: _registeredMessageMetadata)
+    {
+        UpdateMetadataClusterLayout(metadata.second);
+    }
+}
+
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 int LabVIEWgRPCServer::Run(string address, string serverCertificatePath, string serverKeyPath)
 {
+    FinalizeMetadata();
+    
     auto serverStarted = new ServerStartEventData;
     _runFuture = std::async(std::launch::async, [=]() { RunServer(address, serverCertificatePath, serverKeyPath, serverStarted); });
     serverStarted->WaitForComplete();

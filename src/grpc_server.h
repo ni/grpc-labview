@@ -126,15 +126,23 @@ struct LVMesageElementMetadata
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-using LVMessageMetadataList = std::map<google::protobuf::uint32, std::shared_ptr<MessageElementMetadata>>;
+using LVMessageMetadataMap = std::map<google::protobuf::uint32, std::shared_ptr<MessageElementMetadata>>;
+using LVMessageMetadataList = std::vector<std::shared_ptr<MessageElementMetadata>>;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 struct MessageMetadata
 {
+public:
+    MessageMetadata() :
+        clusterSize(0)
+    {            
+    }
+
     std::string messageName;
     int clusterSize;
-    LVMessageMetadataList elements;
+    LVMessageMetadataList _elements;
+    LVMessageMetadataMap _mappedElements;
 };
 
 //---------------------------------------------------------------------
@@ -353,7 +361,7 @@ public:
 class LVMessage : public google::protobuf::Message
 {
 public:
-    LVMessage(LVMessageMetadataList& metadata);
+    LVMessage(LVMessageMetadataMap& metadata);
 
     ~LVMessage();
 
@@ -381,7 +389,7 @@ public:
 
 public:
     std::map<int, shared_ptr<LVMessageValue>> _values;
-    LVMessageMetadataList& _metadata;
+    LVMessageMetadataMap& _metadata;
 
 private:
     mutable google::protobuf::internal::CachedSize _cached_size_;
@@ -452,6 +460,8 @@ private:
     std::future<void> _runFuture;
 
 private:
+    void FinalizeMetadata();
+    void UpdateMetadataClusterLayout(std::shared_ptr<MessageMetadata>& metadata);
     void RunServer(string address, string serverCertificatePath, string serverKeyPath, ServerStartEventData* serverStarted);
     void HandleRpcs(grpc::ServerCompletionQueue *cq);
 };

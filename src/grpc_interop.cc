@@ -20,44 +20,6 @@ void OccurServerEvent(LVUserEventRef event, EventData* data)
     auto error = LVPostLVUserEvent(event, &data);
 }
 
-int ClusterElementSize(LVMessageMetadataType type, bool repeated)
-{
-    if (repeated)
-    {
-        return 8;
-    }
-    switch (type)
-    {
-    case LVMessageMetadataType::BoolValue:
-        return 1;
-    case LVMessageMetadataType::Int32Value:
-    case LVMessageMetadataType::FloatValue:
-        return 4;
-    case LVMessageMetadataType::DoubleValue:
-    case LVMessageMetadataType::StringValue:
-    case LVMessageMetadataType::MessageValue:
-        return 8;
-    }
-    return 0;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-int AlignClusterOffset(int clusterOffset, LVMessageMetadataType type, bool repeated)
-{
-    if (clusterOffset == 0)
-    {
-        return 0;
-    }
-    auto multiple = ClusterElementSize(type, repeated);    
-    int remainder = abs(clusterOffset) % multiple;
-    if (remainder == 0)
-    {
-        return clusterOffset;
-    }
-    return clusterOffset + multiple - remainder;
-}
-
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 std::shared_ptr<MessageMetadata> CreateMessageMetadata(IMessageElementMetadataOwner* metadataOwner, LVMessageMetadata* lvMetadata)
@@ -77,14 +39,11 @@ std::shared_ptr<MessageMetadata> CreateMessageMetadata(IMessageElementMetadataOw
             element->protobufIndex = lvElement->protobufIndex;
             element->type = (LVMessageMetadataType)lvElement->valueType;
             element->isRepeated = lvElement->isRepeated;
-            metadata->elements.insert({element->protobufIndex, element});
+            metadata->_elements.push_back(element);
+            metadata->_mappedElements.emplace(element->protobufIndex, element);
 
-            clusterOffset = AlignClusterOffset(clusterOffset, element->type, element->isRepeated);
-            element->clusterOffset = clusterOffset;
-            clusterOffset += ClusterElementSize(element->type, element->isRepeated);
         }
     }
-    metadata->clusterSize = AlignClusterOffset(clusterOffset, LVMessageMetadataType::StringValue, true);
     return metadata;
 }
 
@@ -146,7 +105,7 @@ void CopyMessageToCluster(const shared_ptr<MessageElementMetadata> metadata, int
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void CopyIntToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+void CopyInt32ToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
     {        
@@ -160,6 +119,25 @@ void CopyIntToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t*
     else
     {
         *(int*)start = ((LVInt32MessageValue*)value.get())->_value;
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void CopyBoolToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+{
+    if (metadata->isRepeated)
+    {        
+        auto repeatedBoolean = static_pointer_cast<LVRepeatedBooleanMessageValue>(value);
+        LVNumericArrayResize(0x01, 1, start, repeatedBoolean->_value.size());
+        auto array = *(LV1DArrayHandle*)start;
+        (*array)->cnt = repeatedBoolean->_value.size();
+        auto byteCount = repeatedBoolean->_value.size() * sizeof(bool);
+        memcpy((*array)->bytes<bool>(), repeatedBoolean->_value.data(), byteCount);
+    }
+    else
+    {
+        *(bool*)start = ((LVBooleanMessageValue*)value.get())->_value;
     }
 }
 
@@ -202,15 +180,15 @@ void CopyFloatToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_
     }
 }
 
+struct TestI
+{
+    bool boolValue;
+};
+
 struct Test
 {
-    void* root;
-    void* RepeatedString;
-    void* RepeatedIntValue;
-    int32_t rootInt32;
-    bool rootBool;
-    void* RepeatedDoubleValue;
-    double rootDouble;
+    bool boolValue;
+    TestI inside;
 };
 
 //---------------------------------------------------------------------
@@ -218,7 +196,8 @@ struct Test
 void CopyToCluster(const LVMessage& message, int8_t* cluster)
 {
     auto t = (Test*)cluster;
-    auto offset = offsetof(Test, RepeatedDoubleValue);
+    auto offset = offsetof(Test, inside);
+    auto size = sizeof(t);
 
     for (auto val : message._metadata)
     {
@@ -240,7 +219,7 @@ void CopyToCluster(const LVMessage& message, int8_t* cluster)
                     CopyStringToCluster(val.second, start, value);
                     break;
                 case LVMessageMetadataType::BoolValue:
-                    *(bool*)start = ((LVBooleanMessageValue*)value.get())->_value;
+                    CopyBoolToCluster(val.second, start, value);
                     break;
                 case LVMessageMetadataType::DoubleValue:
                     CopyDoubleToCluster(val.second, start, value);
@@ -249,7 +228,7 @@ void CopyToCluster(const LVMessage& message, int8_t* cluster)
                     CopyFloatToCluster(val.second, start, value);
                     break;
                 case LVMessageMetadataType::Int32Value:
-                    CopyIntToCluster(val.second, start, value);
+                    CopyInt32ToCluster(val.second, start, value);
                     break;
                 case LVMessageMetadataType::MessageValue:
                     CopyToCluster(*((LVNestedMessageMessageValue*)value.get())->_value, start);
@@ -284,6 +263,31 @@ void CopyStringFromCluster(const shared_ptr<MessageElementMetadata> metadata, in
         auto str = GetLVString(*(LStrHandle*)start);
         auto stringValue = std::make_shared<LVStringMessageValue>(metadata->protobufIndex, str);
         message._values.emplace(metadata->protobufIndex, stringValue);
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void CopyBoolFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+{    
+    if (metadata->isRepeated)
+    {
+        auto array = *(LV1DArrayHandle*)start;
+        if (array && *array)
+        {
+            auto count = (*array)->cnt;
+            auto repeatedValue = std::make_shared<LVRepeatedBooleanMessageValue>(metadata->protobufIndex);
+            message._values.emplace(metadata->protobufIndex, repeatedValue);
+            auto data = (*array)->bytes<bool>();
+            repeatedValue->_value.Reserve(count);
+            auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
+            memcpy(dest, data, count * sizeof(bool));
+        }
+    }
+    else
+    {
+        auto value = std::make_shared<LVBooleanMessageValue>(metadata->protobufIndex, *(bool*)start);
+        message._values.emplace(metadata->protobufIndex, value);
     }
 }
 
@@ -339,10 +343,33 @@ void CopyDoubleFromCluster(const shared_ptr<MessageElementMetadata> metadata, in
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+void CopyFloatFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+{    
+    if (metadata->isRepeated)
+    {
+        auto array = *(LV1DArrayHandle*)start;
+        if (array && *array)
+        {
+            auto count = (*array)->cnt;
+            auto repeatedValue = std::make_shared<LVRepeatedFloatMessageValue>(metadata->protobufIndex);
+            message._values.emplace(metadata->protobufIndex, repeatedValue);
+            auto data = (*array)->bytes<float>();
+            repeatedValue->_value.Reserve(count);
+            auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
+            memcpy(dest, data, count * sizeof(float));
+        }
+    }
+    else
+    {
+        auto value = std::make_shared<LVFloatMessageValue>(metadata->protobufIndex, *(float*)start);
+        message._values.emplace(metadata->protobufIndex, value);
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void CopyFromCluster(LVMessage& message, int8_t* cluster)
 {
-    auto offset = offsetof(Test, RepeatedDoubleValue);
-    
     for (auto val : message._metadata)
     {
         auto start = cluster + val.second->clusterOffset;
@@ -352,19 +379,13 @@ void CopyFromCluster(LVMessage& message, int8_t* cluster)
                 CopyStringFromCluster(val.second, start, message);
                 break;
             case LVMessageMetadataType::BoolValue:
-                {
-                    auto value = std::make_shared<LVBooleanMessageValue>(val.second->protobufIndex, *(bool*)start);
-                    message._values.emplace(val.first, value);
-                }
+                CopyBoolFromCluster(val.second, start, message);
                 break;
             case LVMessageMetadataType::DoubleValue:
                 CopyDoubleFromCluster(val.second, start, message);
                 break;
             case LVMessageMetadataType::FloatValue:
-                {
-                    auto value = std::make_shared<LVFloatMessageValue>(val.second->protobufIndex, *(float*)start);
-                    message._values.emplace(val.first, value);
-                }
+                CopyFloatFromCluster(val.second, start, message);
                 break;
             case LVMessageMetadataType::Int32Value:
                 CopyInt32FromCluster(val.second, start, message);
@@ -372,7 +393,7 @@ void CopyFromCluster(LVMessage& message, int8_t* cluster)
             case LVMessageMetadataType::MessageValue:
                 {
                     auto metadata = val.second->_owner->FindMetadata(val.second->embeddedMessageName);
-                    auto nested = std::make_shared<LVMessage>(metadata->elements);
+                    auto nested = std::make_shared<LVMessage>(metadata->_mappedElements);
                     CopyFromCluster(*nested, start);
                     auto value = std::make_shared<LVNestedMessageMessageValue>(val.second->protobufIndex, nested);
                     message._values.emplace(val.first, value);

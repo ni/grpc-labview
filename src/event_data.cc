@@ -98,8 +98,8 @@ void CallData::Proceed()
         {
             auto requestMetadata = _server->FindMetadata(eventData.requestMetadataName);
             auto responseMetadata = _server->FindMetadata(eventData.responseMetadataName);
-            _request = std::make_shared<LVMessage>(requestMetadata->elements);
-            _response = std::make_shared<LVMessage>(responseMetadata->elements);
+            _request = std::make_shared<LVMessage>(requestMetadata->_mappedElements);
+            _response = std::make_shared<LVMessage>(responseMetadata->_mappedElements);
             ParseFromByteBuffer(_rb, *_request);
 
             _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
@@ -123,7 +123,8 @@ void CallData::Proceed()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LVMessage::LVMessage(LVMessageMetadataList &metadata) : _metadata(metadata)
+LVMessage::LVMessage(LVMessageMetadataMap &metadata) : 
+    _metadata(metadata)
 {
 }
 
@@ -342,7 +343,7 @@ const char *LVMessage::ParseNestedMessage(google::protobuf::uint32 tag, const Me
         do {
             auto v = std::make_shared<LVRepeatedNestedMessageMessageValue>(index);
             ptr += 1;
-            auto nestedMessage = std::make_shared<LVMessage>(metadata->elements);
+            auto nestedMessage = std::make_shared<LVMessage>(metadata->_mappedElements);
             ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
             v->_value.push_back(nestedMessage);
             if (!ctx->DataAvailable(ptr))
@@ -353,7 +354,7 @@ const char *LVMessage::ParseNestedMessage(google::protobuf::uint32 tag, const Me
     }
     else
     {
-        auto nestedMessage = std::make_shared<LVMessage>(metadata->elements);
+        auto nestedMessage = std::make_shared<LVMessage>(metadata->_mappedElements);
         ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
         auto v = std::make_shared<LVNestedMessageMessageValue>(index, nestedMessage);
         _values.emplace(index, v);

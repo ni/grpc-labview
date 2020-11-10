@@ -28,6 +28,7 @@
 		<Item Name="QueryServer_ServerRefs.ctl" Type="VI" URL="../QueryServer_ServerRefs.ctl"/>
 		<Item Name="QueryServer_StartServer.vi" Type="VI" URL="../QueryServer_StartServer.vi"/>
 	</Item>
+	<Item Name="QueryServer_DataTypeTest.ctl" Type="VI" URL="../QueryServer_DataTypeTest.ctl"/>
 	<Item Name="QueryServer_Event_Close.vi" Type="VI" URL="../QueryServer_Event_Close.vi"/>
 	<Item Name="QueryServer_Event_Fire.vi" Type="VI" URL="../QueryServer_Event_Fire.vi"/>
 	<Item Name="QueryServer_GetRequest_Invoke.vi" Type="VI" URL="../QueryServer_GetRequest_Invoke.vi"/>
