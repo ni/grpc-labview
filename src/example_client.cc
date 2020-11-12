@@ -298,21 +298,21 @@ int main(int argc, char **argv)
 
     DoDataTypeTest(client);
 
-    // auto result = client.Query("Uptime");
-    // cout << "Server uptime: " << result << endl;
+    auto result = client.Query("Uptime");
+    cout << "Server uptime: " << result << endl;
 
-    // auto reader = client.Register("Heartbeat");
-    // int count = 0;
-    // ServerEvent event;
-    // while (reader->Read(&event))
-    // {
-    //     cout << "Server Event: " << event.eventdata() << endl;
-    //     count += 1;
-    //     if (count == 10)
-    //     {
-    //         client.Invoke("Reset", "");
-    //     }
-    // }
-    // Status status = reader->Finish();
-    // cout << "Server notifications complete" << endl;
+    auto reader = client.Register("Heartbeat");
+    int count = 0;
+    ServerEvent event;
+    while (reader->Read(&event))
+    {
+        cout << "Server Event: " << event.eventdata() << endl;
+        count += 1;
+        if (count == 10)
+        {
+            client.Invoke("Reset", "");
+        }
+    }
+    Status status = reader->Finish();
+    cout << "Server notifications complete" << endl;
 }
