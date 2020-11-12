@@ -13,10 +13,8 @@
 		<Item Name="QueryServer_AddQueryEvent.vi" Type="VI" URL="../QueryServer_AddQueryEvent.vi"/>
 		<Item Name="QueryServer_AddRegisterEvent.vi" Type="VI" URL="../QueryServer_AddRegisterEvent.vi"/>
 		<Item Name="QueryServer_AddTestDataTypesEvent.vi" Type="VI" URL="../QueryServer_AddTestDataTypesEvent.vi"/>
-		<Item Name="QueryServer_CreateAndRegisterServerEvent.vim" Type="VI" URL="../QueryServer_CreateAndRegisterServerEvent.vim"/>
 		<Item Name="QueryServer_CreateServer.vi" Type="VI" URL="../QueryServer_CreateServer.vi"/>
 		<Item Name="QueryServer_Event.ctl" Type="VI" URL="../QueryServer_Event.ctl"/>
-		<Item Name="QueryServer_gRPCid.ctl" Type="VI" URL="../QueryServer_gRPCid.ctl"/>
 		<Item Name="QueryServer_InvokeEventData.ctl" Type="VI" URL="../QueryServer_InvokeEventData.ctl"/>
 		<Item Name="QueryServer_InvokeRequest.ctl" Type="VI" URL="../QueryServer_InvokeRequest.ctl"/>
 		<Item Name="QueryServer_InvokeResponse.ctl" Type="VI" URL="../QueryServer_InvokeResponse.ctl"/>
@@ -26,10 +24,8 @@
 		<Item Name="QueryServer_RegisterEventData.ctl" Type="VI" URL="../QueryServer_RegisterEventData.ctl"/>
 		<Item Name="QueryServer_RegisterRequest.ctl" Type="VI" URL="../QueryServer_RegisterRequest.ctl"/>
 		<Item Name="QueryServer_ServerRefs.ctl" Type="VI" URL="../QueryServer_ServerRefs.ctl"/>
-		<Item Name="QueryServer_StartServer.vi" Type="VI" URL="../QueryServer_StartServer.vi"/>
 	</Item>
 	<Item Name="QueryServer_DataTypeTest.ctl" Type="VI" URL="../QueryServer_DataTypeTest.ctl"/>
-	<Item Name="QueryServer_Event_Close.vi" Type="VI" URL="../QueryServer_Event_Close.vi"/>
 	<Item Name="QueryServer_Event_Fire.vi" Type="VI" URL="../QueryServer_Event_Fire.vi"/>
 	<Item Name="QueryServer_GetRequest_Invoke.vi" Type="VI" URL="../QueryServer_GetRequest_Invoke.vi"/>
 	<Item Name="QueryServer_GetRequest_Query.vi" Type="VI" URL="../QueryServer_GetRequest_Query.vi"/>

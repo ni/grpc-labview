@@ -7,16 +7,19 @@ void ClusterDataCopier::CopyStringToCluster(const shared_ptr<MessageElementMetad
     if (metadata->isRepeated)
     {        
         auto repeatedString = static_cast<const LVRepeatedStringMessageValue&>(*value);
-        LVNumericArrayResize(0x08, 1, start, repeatedString._value.size());
-        auto array = *(LV1DArrayHandle*)start;
-        (*array)->cnt = repeatedString._value.size();
-        int x = 0;
-        auto lvString = (*array)->bytes<LStrHandle>();
-        for (auto str: repeatedString._value)
+        if (repeatedString._value.size() != 0)
         {
-            *lvString = nullptr;
-            SetLVString(lvString, str);
-            lvString += 1;
+            LVNumericArrayResize(0x08, 1, start, repeatedString._value.size());
+            auto array = *(LV1DArrayHandle*)start;
+            (*array)->cnt = repeatedString._value.size();
+            int x = 0;
+            auto lvString = (*array)->bytes<LStrHandle>();
+            for (auto str : repeatedString._value)
+            {
+                *lvString = nullptr;
+                SetLVString(lvString, str);
+                lvString += 1;
+            }
         }
     }
     else
@@ -36,19 +39,22 @@ void ClusterDataCopier::CopyMessageToCluster(const shared_ptr<MessageElementMeta
     if (metadata->isRepeated)
     {
         auto repeatedNested = static_pointer_cast<LVRepeatedNestedMessageMessageValue>(value);
-        auto nestedMetadata = repeatedNested->_value.front()->_metadata; 
-        auto clusterSize = nestedMetadata->clusterSize;
-
-        LVNumericArrayResize(0x08, 1, start, repeatedNested->_value.size() * clusterSize);
-        auto array = *(LV1DArrayHandle*)start;
-        (*array)->cnt = repeatedNested->_value.size();
-        int x = 0;
-        for (auto str : repeatedNested->_value)
+        if (repeatedNested->_value.size() != 0)
         {
-            auto lvCluster = (*array)->bytes<LVCluster*>(x * clusterSize);
-            *lvCluster = nullptr;
-            CopyToCluster(*str, (int8_t*)lvCluster);
-            x += 1;
+            auto nestedMetadata = repeatedNested->_value.front()->_metadata;
+            auto clusterSize = nestedMetadata->clusterSize;
+
+            LVNumericArrayResize(0x08, 1, start, repeatedNested->_value.size() * clusterSize);
+            auto array = *(LV1DArrayHandle*)start;
+            (*array)->cnt = repeatedNested->_value.size();
+            int x = 0;
+            for (auto str : repeatedNested->_value)
+            {
+                auto lvCluster = (*array)->bytes<LVCluster*>(x * clusterSize);
+                *lvCluster = nullptr;
+                CopyToCluster(*str, (int8_t*)lvCluster);
+                x += 1;
+            }
         }
     }
     else
@@ -64,11 +70,14 @@ void ClusterDataCopier::CopyInt32ToCluster(const shared_ptr<MessageElementMetada
     if (metadata->isRepeated)
     {        
         auto repeatedInt32 = static_pointer_cast<LVRepeatedInt32MessageValue>(value);
-        LVNumericArrayResize(0x03, 1, start, repeatedInt32->_value.size());
-        auto array = *(LV1DArrayHandle*)start;
-        (*array)->cnt = repeatedInt32->_value.size();
-        auto byteCount = repeatedInt32->_value.size() * sizeof(int32_t);
-        memcpy((*array)->bytes<int32_t>(), repeatedInt32->_value.data(), byteCount);
+        if (repeatedInt32->_value.size() != 0)
+        {
+            LVNumericArrayResize(0x03, 1, start, repeatedInt32->_value.size());
+            auto array = *(LV1DArrayHandle*)start;
+            (*array)->cnt = repeatedInt32->_value.size();
+            auto byteCount = repeatedInt32->_value.size() * sizeof(int32_t);
+            memcpy((*array)->bytes<int32_t>(), repeatedInt32->_value.data(), byteCount);
+        }
     }
     else
     {
@@ -83,11 +92,14 @@ void ClusterDataCopier::CopyBoolToCluster(const shared_ptr<MessageElementMetadat
     if (metadata->isRepeated)
     {        
         auto repeatedBoolean = static_pointer_cast<LVRepeatedBooleanMessageValue>(value);
-        LVNumericArrayResize(0x01, 1, start, repeatedBoolean->_value.size());
-        auto array = *(LV1DArrayHandle*)start;
-        (*array)->cnt = repeatedBoolean->_value.size();
-        auto byteCount = repeatedBoolean->_value.size() * sizeof(bool);
-        memcpy((*array)->bytes<bool>(), repeatedBoolean->_value.data(), byteCount);
+        if (repeatedBoolean->_value.size() != 0)
+        {
+            LVNumericArrayResize(0x01, 1, start, repeatedBoolean->_value.size());
+            auto array = *(LV1DArrayHandle*)start;
+            (*array)->cnt = repeatedBoolean->_value.size();
+            auto byteCount = repeatedBoolean->_value.size() * sizeof(bool);
+            memcpy((*array)->bytes<bool>(), repeatedBoolean->_value.data(), byteCount);
+        }
     }
     else
     {
@@ -102,12 +114,15 @@ void ClusterDataCopier::CopyDoubleToCluster(const shared_ptr<MessageElementMetad
     if (metadata->isRepeated)
     {
         auto repeatedDouble = static_pointer_cast<LVRepeatedDoubleMessageValue>(value);
-        auto array = *(LV1DArrayHandle*)start;
-        LVNumericArrayResize(0x0A, 1, start, repeatedDouble->_value.size());
-        array = *(LV1DArrayHandle*)start;
-        (*array)->cnt = repeatedDouble->_value.size();
-        auto byteCount = repeatedDouble->_value.size() * sizeof(double);
-        memcpy((*array)->bytes<double>(), repeatedDouble->_value.data(), byteCount);
+        if (repeatedDouble->_value.size() != 0)
+        {
+            auto array = *(LV1DArrayHandle*)start;
+            LVNumericArrayResize(0x0A, 1, start, repeatedDouble->_value.size());
+            array = *(LV1DArrayHandle*)start;
+            (*array)->cnt = repeatedDouble->_value.size();
+            auto byteCount = repeatedDouble->_value.size() * sizeof(double);
+            memcpy((*array)->bytes<double>(), repeatedDouble->_value.data(), byteCount);
+        }
     }
     else
     {
@@ -122,11 +137,14 @@ void ClusterDataCopier::CopyFloatToCluster(const shared_ptr<MessageElementMetada
     if (metadata->isRepeated)
     {
         auto repeatedFloat = static_pointer_cast<LVRepeatedFloatMessageValue>(value);
-        LVNumericArrayResize(0x03, 1, start, repeatedFloat->_value.size());
-        auto array = *(LV1DArrayHandle*)start;
-        (*array)->cnt = repeatedFloat->_value.size();
-        auto byteCount = repeatedFloat->_value.size() * sizeof(float);
-        memcpy((*array)->bytes<float>(), repeatedFloat->_value.data(), byteCount);
+        if (repeatedFloat->_value.size() != 0)
+        {
+            LVNumericArrayResize(0x03, 1, start, repeatedFloat->_value.size());
+            auto array = *(LV1DArrayHandle*)start;
+            (*array)->cnt = repeatedFloat->_value.size();
+            auto byteCount = repeatedFloat->_value.size() * sizeof(float);
+            memcpy((*array)->bytes<float>(), repeatedFloat->_value.data(), byteCount);
+        }
     }
     else
     {
@@ -184,7 +202,7 @@ void ClusterDataCopier::CopyStringFromCluster(const shared_ptr<MessageElementMet
     if (metadata->isRepeated)
     {
         auto array = *(LV1DArrayHandle*)start;
-        if (array && *array)
+        if (array && *array && ((*array)->cnt != 0))
         {
             auto repeatedStringValue = std::make_shared<LVRepeatedStringMessageValue>(metadata->protobufIndex);
             message._values.emplace(metadata->protobufIndex, repeatedStringValue);
@@ -212,7 +230,7 @@ void ClusterDataCopier::CopyBoolFromCluster(const shared_ptr<MessageElementMetad
     if (metadata->isRepeated)
     {
         auto array = *(LV1DArrayHandle*)start;
-        if (array && *array)
+        if (array && *array && ((*array)->cnt != 0))
         {
             auto count = (*array)->cnt;
             auto repeatedValue = std::make_shared<LVRepeatedBooleanMessageValue>(metadata->protobufIndex);
@@ -237,7 +255,7 @@ void ClusterDataCopier::CopyInt32FromCluster(const shared_ptr<MessageElementMeta
     if (metadata->isRepeated)
     {
         auto array = *(LV1DArrayHandle*)start;
-        if (array && *array)
+        if (array && *array && ((*array)->cnt != 0))
         {
             auto count = (*array)->cnt;
             auto repeatedValue = std::make_shared<LVRepeatedInt32MessageValue>(metadata->protobufIndex);
@@ -262,7 +280,7 @@ void ClusterDataCopier::CopyDoubleFromCluster(const shared_ptr<MessageElementMet
     if (metadata->isRepeated)
     {
         auto array = *(LV1DArrayHandle*)start;
-        if (array && *array)
+        if (array && *array && ((*array)->cnt != 0))
         {
             auto count = (*array)->cnt;
             auto repeatedValue = std::make_shared<LVRepeatedDoubleMessageValue>(metadata->protobufIndex);
@@ -287,7 +305,7 @@ void ClusterDataCopier::CopyFloatFromCluster(const shared_ptr<MessageElementMeta
     if (metadata->isRepeated)
     {
         auto array = *(LV1DArrayHandle*)start;
-        if (array && *array)
+        if (array && *array && ((*array)->cnt != 0))
         {
             auto count = (*array)->cnt;
             auto repeatedValue = std::make_shared<LVRepeatedFloatMessageValue>(metadata->protobufIndex);
@@ -314,18 +332,21 @@ void ClusterDataCopier::CopyMessageFromCluster(const shared_ptr<MessageElementMe
     if (metadata->isRepeated)
     {
         auto array = *(LV1DArrayHandle*)start;
-        if (array && *array)
+        if (array && *array && ((*array)->cnt != 0))
         {
             auto count = (*array)->cnt;
-            auto repeatedValue = std::make_shared<LVRepeatedNestedMessageMessageValue>(metadata->protobufIndex);
-            message._values.emplace(metadata->protobufIndex, repeatedValue);
-            
-            for (int x=0; x<count; ++x)
+            if (count != 0)
             {
-                auto data = (*array)->bytes<LVCluster*>(nestedMetadata->clusterSize * x);
-                auto nested = std::make_shared<LVMessage>(nestedMetadata);
-                repeatedValue->_value.push_back(nested);
-                CopyFromCluster(*nested, (int8_t*)data);
+                auto repeatedValue = std::make_shared<LVRepeatedNestedMessageMessageValue>(metadata->protobufIndex);
+                message._values.emplace(metadata->protobufIndex, repeatedValue);
+
+                for (int x = 0; x < count; ++x)
+                {
+                    auto data = (*array)->bytes<LVCluster*>(nestedMetadata->clusterSize * x);
+                    auto nested = std::make_shared<LVMessage>(nestedMetadata);
+                    repeatedValue->_value.push_back(nested);
+                    CopyFromCluster(*nested, (int8_t*)data);
+                }
             }
         }
     }
