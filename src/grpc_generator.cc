@@ -23,7 +23,7 @@ struct LVMessageField
 class ErrorCollector : public MultiFileErrorCollector
 {
 public:
-    void MultiFileErrorCollector::AddError(const std::string & filename, int line, int column, const std::string & message) final
+    void AddError(const std::string & filename, int line, int column, const std::string & message)
     {            
     }
 };
