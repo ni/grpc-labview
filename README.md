@@ -9,6 +9,11 @@ as a pattern to implement a gRPC service of your design.
 
 the project supports Windows, Linux, and Linux RT.
 
+## Note: This project is not yet complete
+* Not all .proto data types are supported
+* The VI generated has not yet been implemneted - VIs need to be implemented by hand to match the .proto file
+* Extensive testing is not complete
+
 ## Building on Windows
 
 ### Prerequisites
