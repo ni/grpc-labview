@@ -1,12 +1,13 @@
-# Example gRPC Service for LabVIEW
+# gRPC Support for LabVIEW
 
-This repo contains an example / pattern to use to implement a gRPC server / client for LabVIEW.
-query_server.proto defines a simple query service that can be used for a variety of purposes.  
+This repo contains necessary C++ code and support VIs to implement a gRPC server in LabVIEW.
+
+eexample/ExampleQueryServer.vi with query_server.proto defines a simple query service example that can be used for a variety of purposes.  
 
 You can either use the service as defined to implement a generic server via gPRC or use the implementation
 as a pattern to implement a gRPC service of your design.
 
-the project support Windows and Linux for both the client and server.
+the project supports Windows, Linux, and Linux RT.
 
 ## Building on Windows
 
@@ -42,7 +43,7 @@ Build Release
 > mkdir build
 > cd build
 > cmake ..
-> cmake --build . --Config Release
+> cmake --build . --config Release
 ```
 
 ## Building on Linux

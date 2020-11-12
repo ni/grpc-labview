@@ -1,11 +1,11 @@
-# Contributing to labview-grpc-query-server
+# Contributing to grpc-labview
 
-Contributions to labview-grpc-query-server are welcome from all!
+Contributions to grpc-labview are welcome from all!
 
-labview-grpc-query-server is managed via [git](https://git-scm.com), with the canonical upstream
-repository hosted on [GitHub](https://github.com/ni/<reponame>/).
+grpc-labview is managed via [git](https://git-scm.com), with the canonical upstream
+repository hosted on [GitHub](https://github.com/ni/grpc-labview).
 
-labview-grpc-query-server follows a pull-request model for development.  If you wish to
+grpc-labview follows a pull-request model for development.  If you wish to
 contribute, you will need to create a GitHub account, fork this project, push a
 branch with your changes to your project, and then submit a pull request.
 
