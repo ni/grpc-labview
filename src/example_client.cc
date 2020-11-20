@@ -157,6 +157,8 @@ string GetCertPath(int argc, char** argv)
     return cert_str;
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 std::string read_keycert( const std::string& filename)
 {	
     std::string data;

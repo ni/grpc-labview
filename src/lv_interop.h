@@ -39,21 +39,29 @@ struct LV1DArray {
     template<typename T>
     T* bytes()
     {
+#ifndef _PS_4
         if (sizeof(T) < 8)
         {
             return (T*)rawBytes;
         }
         return (T*)(rawBytes + 4); // 8-byte aligned data
+#else
+        return (T*)rawBytes;
+#endif
     }
 
     template<typename T>
     T* bytes(int byteOffset)
     {
+#ifndef _PS_4
         if (sizeof(T) < 8)
         {
             return (T*)(rawBytes + byteOffset);
         }
         return (T*)(rawBytes + 4 + byteOffset); // 8-byte aligned data
+#else
+        return (T*)(rawBytes + byteOffset);
+#endif
     }
 };
 

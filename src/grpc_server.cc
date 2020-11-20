@@ -74,8 +74,11 @@ shared_ptr<MessageMetadata> LabVIEWgRPCServer::FindMetadata(const string& name)
     return nullptr;
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 int ClusterElementSize(LVMessageMetadataType type, bool repeated)
 {
+#ifndef _PS_4
     if (repeated)
     {
         return 8;
@@ -92,6 +95,25 @@ int ClusterElementSize(LVMessageMetadataType type, bool repeated)
     case LVMessageMetadataType::MessageValue:
         return 8;
     }
+#else
+    if (repeated)
+    {
+        return 4;
+    }
+    switch (type)
+    {
+    case LVMessageMetadataType::BoolValue:
+        return 1;
+    case LVMessageMetadataType::Int32Value:
+    case LVMessageMetadataType::FloatValue:
+        return 4;
+    case LVMessageMetadataType::StringValue:
+    case LVMessageMetadataType::MessageValue:
+        return 4;
+    case LVMessageMetadataType::DoubleValue:
+        return 8;
+    }
+#endif
     return 0;
 }
 
@@ -99,6 +121,7 @@ int ClusterElementSize(LVMessageMetadataType type, bool repeated)
 //---------------------------------------------------------------------
 int AlignClusterOffset(int clusterOffset, LVMessageMetadataType type, bool repeated)
 {
+#ifndef _PS_4
     if (clusterOffset == 0)
     {
         return 0;
@@ -110,8 +133,13 @@ int AlignClusterOffset(int clusterOffset, LVMessageMetadataType type, bool repea
         return clusterOffset;
     }
     return clusterOffset + multiple - remainder;
+#else
+    return clusterOffset;
+#endif
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void LabVIEWgRPCServer::UpdateMetadataClusterLayout(std::shared_ptr<MessageMetadata>& metadata)
 {
     if (metadata->clusterSize != 0)

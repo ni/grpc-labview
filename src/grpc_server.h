@@ -116,6 +116,10 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+#ifdef _PS_4
+#pragma pack push
+#pragma pack(1)
+#endif
 struct LVMesageElementMetadata
 {
     LStrHandle embeddedMessageName;
@@ -123,6 +127,9 @@ struct LVMesageElementMetadata
     int valueType;
     bool isRepeated;
 };
+#ifdef _PS_4
+#pragma pack pop
+#endif
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
