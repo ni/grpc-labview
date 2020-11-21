@@ -88,12 +88,25 @@ Download the repo and update submodules, this will pull the gRPC components and 
 > cd labview-grpc-query-server
 > git submodule update --init --recursive
 ```
-Build
+
+Build Debug
 
 ```
-> cmake .
+> mkdir -p cmake/build
+> cd cmake/build
+> cmake ../..
 > make
 ```
+
+Build Release
+
+```
+> mkdir -p cmake/build
+> cd cmake/build
+cmake -DCMAKE_BUILD_TYPE=Release ../..
+> make
+```
+
 ## Building on Linux RT
 
 Install required packages not installed by default
@@ -115,10 +128,21 @@ Download the repo and update submodules, this will pull the gRPC components and 
 > git submodule update --init --recursive
 ```
 
-Build
+Build Debug
 
 ```
-> cmake .
+> mkdir -p cmake/build
+> cd cmake/build
+> cmake ../..
+> make
+```
+
+Build Release
+
+```
+> mkdir -p cmake/build
+> cd cmake/build
+cmake -DCMAKE_BUILD_TYPE=Release ../..
 > make
 ```
 
