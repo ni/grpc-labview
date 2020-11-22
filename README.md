@@ -31,8 +31,8 @@ To prepare for cmake + Microsoft Visual C++ compiler build
 Download the repo and update submodules, this will pull the gRPC components and all dependencies
 
 ```
-> git clone https://github.com/ni/labview-grpc-query-server.git labview-grpc-query-server
-> cd labview-grpc-query-server
+> git clone https://github.com/ni/grpc-labview.git grpc-labview
+> cd grpc-labview
 > git submodule update --init --recursive
 ```
 
@@ -58,8 +58,8 @@ Build Release
 Download the repo and update submodules, this will pull the gRPC components and all dependencies
 
 ```
-> git clone https://github.com/ni/labview-grpc-query-server.git labview-grpc-query-server
-> cd labview-grpc-query-server
+> git clone https://github.com/ni/grpc-labview.git grpc-labview
+> cd grpc-labview
 > git submodule update --init --recursive
 ```
 
@@ -84,8 +84,8 @@ Build Release
 Download the repo and update submodules, this will pull the gRPC components and all dependencies
 
 ```
-> git clone https://github.com/ni/labview-grpc-query-server.git labview-grpc-query-server
-> cd labview-grpc-query-server
+> git clone https://github.com/ni/grpc-labview.git grpc-labview
+> cd grpc-labview
 > git submodule update --init --recursive
 ```
 
@@ -123,8 +123,8 @@ Install required packages not installed by default
 Download the repo and update submodules, this will pull the gRPC components and all dependencies
 
 ```
-> git clone https://github.com/ni/labview-grpc-query-server.git labview-grpc-query-server
-> cd labview-grpc-query-server
+> git clone https://github.com/ni/grpc-labview.git grpc-labview
+> cd grpc-labview
 > git submodule update --init --recursive
 ```
 
