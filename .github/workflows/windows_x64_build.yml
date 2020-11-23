@@ -18,24 +18,14 @@ jobs:
     - uses: actions/checkout@v2
     - uses: ilammy/msvc-dev-cmd@v1.4.1
 
-    #- name: Update Submodules
-    #  working-directory: ${{runner.workspace}}/grpc-labview      
-    #  run: git submodule update --init --recursive
+    - name: Update Submodules
+      working-directory: ${{runner.workspace}}/grpc-labview      
+      run: git submodule update --init --recursive
       
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
       # We'll use this as our working directory for all subsequent commands
       run: mkdir ${{runner.workspace}}\grpc-labview\build
-
-    - name: Test1
-      shell: bash
-      working-directory: ${{runner.workspace}}\grpc-labview\build
-      run: ls
-      
-    - name: Test2
-      shell: bash
-      working-directory: ${{runner.workspace}}\grpc-labview\build
-      run: ls ..
 
     - name: Configure CMake
       working-directory: ${{runner.workspace}}\grpc-labview\build
