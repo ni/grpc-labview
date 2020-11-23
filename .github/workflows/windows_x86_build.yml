@@ -1,0 +1,31 @@
+name: Windows x86 build
+
+on: [push]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ilammy/msvc-dev-cmd@v1.4.1
+      with:
+        arch: x86
+
+    - name: Update Submodules
+      working-directory: ${{runner.workspace}}/grpc-labview      
+      run: git submodule update --init --recursive
+      
+    - name: Create Build Environment
+      run: mkdir ${{runner.workspace}}\grpc-labview\build
+
+    - name: Configure CMake
+      working-directory: ${{runner.workspace}}\grpc-labview\build
+      run: cmake ..
+
+    - name: Build
+      working-directory: ${{runner.workspace}}\grpc-labview\build
+      run: cmake --build . --config $BUILD_TYPE
