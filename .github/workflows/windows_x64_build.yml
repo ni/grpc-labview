@@ -25,30 +25,23 @@ jobs:
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
       # We'll use this as our working directory for all subsequent commands
-      shell: bash
-      run: cmake -E make_directory ${{runner.workspace}}\build
+      run: mkdir ${{runner.workspace}}\grpc-labview\build
 
     - name: Test1
       shell: bash
-      working-directory: ${{runner.workspace}}
+      working-directory: ${{runner.workspace}}\grpc-labview\build
       run: ls
       
     - name: Test2
       shell: bash
-      working-directory: ${{runner.workspace}}
+      working-directory: ${{runner.workspace}}\grpc-labview\build
       run: ls ..
 
-    - name: Test3
-      shell: bash
-      working-directory: ${{runner.workspace}}
-      run: ls grpc-labview
-
     - name: Configure CMake
-      working-directory: ${{runner.workspace}}
-      run: cmake ..\grpc-labview
+      working-directory: ${{runner.workspace}}\grpc-labview\build
+      run: cmake ..
 
     - name: Build
-      shell: bash
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ${{runner.workspace}}\grpc-labview\build
       # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: cmake --build . --config $BUILD_TYPE
