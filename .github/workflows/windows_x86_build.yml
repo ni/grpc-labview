@@ -24,8 +24,8 @@ jobs:
 
     - name: Configure CMake
       working-directory: ${{runner.workspace}}\grpc-labview\build
-      run: cmake ..
-
+      run: cmake -A Win32 ..
+      
     - name: Build
       working-directory: ${{runner.workspace}}\grpc-labview\build
       run: cmake --build . --config $BUILD_TYPE
