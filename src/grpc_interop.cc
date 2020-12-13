@@ -111,7 +111,10 @@ LIBRARY_EXPORT int32_t SetResponseData(LVgRPCid id, int8_t* lvRequest)
 {
     auto data = *(GenericMethodData**)id;
     ClusterDataCopier::CopyFromCluster(*data->_response, lvRequest);
-    data->_call->Write();
+    if (!data->_call->Write())
+    {
+        return -1;
+    }
     return 0;
 }
 
@@ -123,4 +126,12 @@ LIBRARY_EXPORT int32_t CloseServerEvent(LVgRPCid id)
     data->NotifyComplete();
     data->_call->Finish();
     return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t IsCancelled(LVgRPCid id)
+{
+    GenericMethodData* data = *(GenericMethodData**)id;
+    return data->_call->IsCancelled();
 }

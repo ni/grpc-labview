@@ -47,13 +47,22 @@ std::unique_ptr<grpc::ByteBuffer> CallData::SerializeToByteBuffer(
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void CallData::Write()
+bool CallData::Write()
 {
+    if (_ctx.IsCancelled())
+    {
+        return false;
+    }
     auto wb = SerializeToByteBuffer(*_response);
     grpc::WriteOptions options;
     _status = CallStatus::Writing;
     _stream.Write(*wb, this);
     _writeSemaphore.wait();
+    if (_ctx.IsCancelled())
+    {
+        return false;
+    }
+    return true;
 }
 
 //---------------------------------------------------------------------
@@ -62,6 +71,13 @@ void CallData::Finish()
 {
     _status = CallStatus::Finish;
     _stream.Finish(grpc::Status::OK, this);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+bool CallData::IsCancelled()
+{
+    return _ctx.IsCancelled();
 }
 
 //---------------------------------------------------------------------

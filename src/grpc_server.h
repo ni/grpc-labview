@@ -514,8 +514,9 @@ class CallData
 public:
     CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService* service, grpc::ServerCompletionQueue* cq);
     void Proceed();
-    void Write();
+    bool Write();
     void Finish();
+    bool IsCancelled();
 
 private:
     bool ParseFromByteBuffer(const grpc::ByteBuffer& buffer, grpc::protobuf::Message& message);
