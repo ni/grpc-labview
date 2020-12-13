@@ -108,7 +108,7 @@ Build Release
 ```
 > mkdir -p cmake/build
 > cd cmake/build
-cmake -DCMAKE_BUILD_TYPE=Release ../..
+> cmake -DCMAKE_BUILD_TYPE=Release ../..
 > make
 ```
 
@@ -147,7 +147,7 @@ Build Release
 ```
 > mkdir -p cmake/build
 > cd cmake/build
-cmake -DCMAKE_BUILD_TYPE=Release ../..
+> cmake -DCMAKE_BUILD_TYPE=Release ../..
 > make
 ```
 

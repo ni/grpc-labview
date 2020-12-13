@@ -124,7 +124,7 @@ LIBRARY_EXPORT int32_t CloseServerEvent(LVgRPCid id)
 {
     GenericMethodData* data = *(GenericMethodData**)id;
     data->NotifyComplete();
-    data->_call->Finish();
+    data->_call->Finish();    
     return 0;
 }
 

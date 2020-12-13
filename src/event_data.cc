@@ -14,9 +14,10 @@ CallData::CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService *service
     _cq(cq),
     _stream(&_ctx),
     _status(CallStatus::Create),
-    _writeSemaphore(0)
+    _writeSemaphore(0),
+    _cancelled(false)
 {
-    Proceed();
+    Proceed(true);
 }
 
 //---------------------------------------------------------------------
@@ -47,9 +48,23 @@ std::unique_ptr<grpc::ByteBuffer> CallData::SerializeToByteBuffer(
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+CallFinishedData::CallFinishedData(CallData* callData)
+{
+    _call = callData;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void CallFinishedData::Proceed(bool ok)
+{
+    _call->CallFinished();    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 bool CallData::Write()
 {
-    if (_ctx.IsCancelled())
+    if (IsCancelled())
     {
         return false;
     }
@@ -58,7 +73,7 @@ bool CallData::Write()
     _status = CallStatus::Writing;
     _stream.Write(*wb, this);
     _writeSemaphore.wait();
-    if (_ctx.IsCancelled())
+    if (IsCancelled())
     {
         return false;
     }
@@ -67,23 +82,45 @@ bool CallData::Write()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+void CallData::CallFinished()
+{
+    _cancelled = _ctx.IsCancelled();      
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void CallData::Finish()
 {
-    _status = CallStatus::Finish;
-    _stream.Finish(grpc::Status::OK, this);
+    if (_status == CallStatus::PendingFinish)
+    {
+        _status = CallStatus::Finish;
+        Proceed(false);
+    }
+    else
+    {
+        _status = CallStatus::Finish;
+        _stream.Finish(grpc::Status::OK, this);
+    }
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 bool CallData::IsCancelled()
 {
-    return _ctx.IsCancelled();
+    return _cancelled;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void CallData::Proceed()
+void CallData::Proceed(bool ok)
 {
+    if (!ok)
+    {
+        if (_status != CallStatus::Finish)
+        {
+            _status = CallStatus::PendingFinish;
+        }
+    }
     if (_status == CallStatus::Create)
     {
         // As part of the initial CREATE state, we *request* that the system
@@ -92,7 +129,7 @@ void CallData::Proceed()
         // instances can serve different requests concurrently), in this case
         // the memory address of this CallData instance.
         _service->RequestCall(&_ctx, &_stream, _cq, _cq, this);
-        // Make this instance progress to the PROCESS state.
+        _ctx.AsyncNotifyWhenDone(new CallFinishedData(this));
         _status = CallStatus::Read;
     }
     else if (_status == CallStatus::Read)
@@ -129,6 +166,9 @@ void CallData::Proceed()
     else if (_status == CallStatus::Writing)
     {
         _writeSemaphore.notify();
+    }
+    else if (_status == CallStatus::PendingFinish)
+    {        
     }
     else
     {

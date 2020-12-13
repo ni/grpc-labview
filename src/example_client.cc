@@ -194,14 +194,14 @@ void DoDataTypeTest(QueryClient& client)
     request.set_rootint32(42);
     request.set_rootdouble(42.42);
     request.set_rootbool(true);
-    request.set_rootfloat(37.56);
+    request.set_rootfloat(37.56f);
 
-    request.mutable_repeateddoublevalue()->Add(1.1);
-    request.mutable_repeateddoublevalue()->Add(2.2);
-    request.mutable_repeateddoublevalue()->Add(3.3);
-    request.mutable_repeateddoublevalue()->Add(4.4);
-    request.mutable_repeateddoublevalue()->Add(5.5);
-    request.mutable_repeateddoublevalue()->Add(6.6);
+    request.mutable_repeateddoublevalue()->Add(1.1f);
+    request.mutable_repeateddoublevalue()->Add(2.2f);
+    request.mutable_repeateddoublevalue()->Add(3.3f);
+    request.mutable_repeateddoublevalue()->Add(4.4f);
+    request.mutable_repeateddoublevalue()->Add(5.5f);
+    request.mutable_repeateddoublevalue()->Add(6.6f);
 
     request.mutable_repeatedboolvalue()->Add(true);
     request.mutable_repeatedboolvalue()->Add(true);
@@ -210,27 +210,27 @@ void DoDataTypeTest(QueryClient& client)
     request.mutable_repeatedboolvalue()->Add(true);
     request.mutable_repeatedboolvalue()->Add(false);
 
-    request.mutable_repeatedfloatvalue()->Add(1.23);
-    request.mutable_repeatedfloatvalue()->Add(2.23);
-    request.mutable_repeatedfloatvalue()->Add(3.23);
-    request.mutable_repeatedfloatvalue()->Add(4.23);
-    request.mutable_repeatedfloatvalue()->Add(5.23);
-    request.mutable_repeatedfloatvalue()->Add(6.23);
+    request.mutable_repeatedfloatvalue()->Add(1.23f);
+    request.mutable_repeatedfloatvalue()->Add(2.23f);
+    request.mutable_repeatedfloatvalue()->Add(3.23f);
+    request.mutable_repeatedfloatvalue()->Add(4.23f);
+    request.mutable_repeatedfloatvalue()->Add(5.23f);
+    request.mutable_repeatedfloatvalue()->Add(6.23f);
 
     request.mutable_nested()->set_boolvalaue(true);
     request.mutable_nested()->set_doublevalue(12.12);
     request.mutable_nested()->set_intvalue(4242);
-    request.mutable_nested()->set_floatvalue(15.14);
+    request.mutable_nested()->set_floatvalue(15.14f);
 
     auto nested = request.mutable_repeatednested()->Add();
     nested->set_boolvalaue(true);
-    nested->set_floatvalue(1.1);
+    nested->set_floatvalue(1.1f);
     nested = request.mutable_repeatednested()->Add();
     nested->set_boolvalaue(false);
-    nested->set_floatvalue(2.2);
+    nested->set_floatvalue(2.2f);
     nested = request.mutable_repeatednested()->Add();
     nested->set_boolvalaue(true);
-    nested->set_floatvalue(3.3);
+    nested->set_floatvalue(3.3f);
 
     TestDataTypesParameters response;
     auto result = client.m_Stub->TestDataTypes(&ctx, request, &response);
