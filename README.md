@@ -9,6 +9,11 @@ as a pattern to implement a gRPC service of your design.
 
 the project supports Windows, Linux, and Linux RT.
 
+## Build Status
+![Linux Build](https://github.com/ni/grpc-labview/workflows/Linux%20Build/badge.svg)
+![Windows x64 build](https://github.com/ni/grpc-labview/workflows/Windows%20x64%20build/badge.svg)
+![Windows x86 build](https://github.com/ni/grpc-labview/workflows/Windows%20x86%20build/badge.svg)
+
 ## Note: This project is not yet complete
 * Not all .proto data types are supported
 * The VI generated has not yet been implemneted - VIs need to be implemented by hand to match the .proto file
