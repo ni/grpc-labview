@@ -367,6 +367,8 @@ void ClusterDataCopier::CopyMessageFromCluster(const shared_ptr<MessageElementMe
 //---------------------------------------------------------------------
 void ClusterDataCopier::CopyFromCluster(LVMessage& message, int8_t* cluster)
 {
+    message._values.clear();
+
     for (auto val : message._metadata->_mappedElements)
     {
         auto start = cluster + val.second->clusterOffset;
