@@ -16,9 +16,12 @@ grpc
 build
 .vs
 .vscode
+__pycache__
 
 example_client
 liblabview_query_server.so
 liblabview_query_client.so
 *.pb.cc
 *.pb.h
+*_pb2.py
+*_pb2_grpc.py
