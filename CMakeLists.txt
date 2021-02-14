@@ -47,7 +47,7 @@ endif()
 #----------------------------------------------------------------------
 # Proto file
 #----------------------------------------------------------------------
-get_filename_component(qs_proto "query_server.proto" ABSOLUTE)
+get_filename_component(qs_proto "examples/query_server/query_server.proto" ABSOLUTE)
 get_filename_component(qs_proto_path "${qs_proto}" PATH)
 
 #----------------------------------------------------------------------
