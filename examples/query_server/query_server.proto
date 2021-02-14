@@ -58,9 +58,12 @@ message QueryRequest {
 }
 
 //---------------------------------------------------------------------
+// Result message from the Query RPC method
 //---------------------------------------------------------------------
 message QueryResponse {
+  // The string result of the server query
   string message = 1;
+  // status result of the server query
   int32 status = 2;
 }
 
