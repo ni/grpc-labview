@@ -36,6 +36,41 @@ service QueryServer {
   rpc Invoke (InvokeRequest) returns (InvokeResponse) {}
   rpc Query (QueryRequest) returns (QueryResponse) {}
   rpc Register (RegistrationRequest) returns (stream ServerEvent) {}
+
+  rpc TestDataTypes(TestDataTypesParameters) returns (TestDataTypesParameters) {}
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+message DataTypeTest {
+  bool boolValaue = 1;
+  int32 intValue = 2;
+  float floatValue = 3;
+  double doubleValue = 4;
+  // string stringValue = 5;
+  // bytes bytesValue = 6;
+  // repeated bool repeatedBoolValaue = 7;
+  // repeated int32 repeatedIntValue = 8;
+  // repeated float repeatedFloatValue = 9;
+  // repeated double repeatedDoubleValue = 10;
+  // repeated string repeatedStringValue = 11;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+message TestDataTypesParameters {
+  string root = 1;
+  repeated string RepeatedString = 2;
+  repeated int32 RepeatedIntValue = 3;
+  int32 rootInt32 = 4;
+  bool rootBool = 5;
+  repeated double RepeatedDoubleValue = 6;
+  double rootDouble = 7;
+  repeated bool RepeatedBoolValue = 8;
+  float rootFloat = 9;
+  repeated float RepeatedFloatValue = 10;
+  DataTypeTest nested = 11;
+  repeated DataTypeTest repeatedNested = 12;
 }
 
 //---------------------------------------------------------------------

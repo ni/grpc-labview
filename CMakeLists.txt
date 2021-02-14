@@ -45,29 +45,6 @@ else()
 endif()
 
 #----------------------------------------------------------------------
-# Proto file
-#----------------------------------------------------------------------
-get_filename_component(qs_proto "examples/query_server/query_server.proto" ABSOLUTE)
-get_filename_component(qs_proto_path "${qs_proto}" PATH)
-
-#----------------------------------------------------------------------
-# Generated sources
-#----------------------------------------------------------------------
-set(qs_proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/query_server.pb.cc")
-set(qs_proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/query_server.pb.h")
-set(qs_grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/query_server.grpc.pb.cc")
-set(qs_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/query_server.grpc.pb.h")
-add_custom_command(
-  OUTPUT "${qs_proto_srcs}" "${qs_proto_hdrs}" "${qs_grpc_srcs}" "${qs_grpc_hdrs}"
-  COMMAND ${_PROTOBUF_PROTOC}
-  ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
-    --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
-    -I "${qs_proto_path}"
-    --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-    "${qs_proto}"
-  DEPENDS "${qs_proto}")
-
-#----------------------------------------------------------------------
 # Include generated *.pb.h files
 #----------------------------------------------------------------------
 include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src")
@@ -75,12 +52,12 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src")
 #----------------------------------------------------------------------
 # LabVIEW client support to communicate with a gRPC server
 #----------------------------------------------------------------------
-add_library(labview_query_client SHARED
+add_library(labview_grpc_client SHARED
    "src/grpc_client.cc"
    ${qs_proto_srcs}
    ${qs_grpc_srcs}
    )
-target_link_libraries(labview_query_client
+target_link_libraries(labview_grpc_client
    ${_REFLECTION}
    ${_GRPC_GRPCPP}
    ${_PROTOBUF_LIBPROTOBUF})
@@ -113,6 +90,33 @@ target_link_libraries(labview_grpc_generator
    ${_GRPC_GRPCPP}
    ${_PROTOBUF_LIBPROTOBUF})
 
+#######################################################################
+# QueryServer Example
+#######################################################################
+
+#----------------------------------------------------------------------
+# Proto file
+#----------------------------------------------------------------------
+get_filename_component(qs_proto "examples/query_server/query_server.proto" ABSOLUTE)
+get_filename_component(qs_proto_path "${qs_proto}" PATH)
+
+#----------------------------------------------------------------------
+# Generated sources
+#----------------------------------------------------------------------
+set(qs_proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/query_server.pb.cc")
+set(qs_proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/query_server.pb.h")
+set(qs_grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/query_server.grpc.pb.cc")
+set(qs_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/query_server.grpc.pb.h")
+add_custom_command(
+  OUTPUT "${qs_proto_srcs}" "${qs_proto_hdrs}" "${qs_grpc_srcs}" "${qs_grpc_hdrs}"
+  COMMAND ${_PROTOBUF_PROTOC}
+  ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
+    --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
+    -I "${qs_proto_path}"
+    --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
+    "${qs_proto}"
+  DEPENDS "${qs_proto}")
+
 #----------------------------------------------------------------------
 # Example C++ application to talk to the example query server
 #----------------------------------------------------------------------
@@ -122,6 +126,46 @@ add_executable(example_client
   ${qs_grpc_srcs}
   )
 target_link_libraries(example_client
+   ${_REFLECTION}
+   ${_GRPC_GRPCPP}
+   ${_PROTOBUF_LIBPROTOBUF})
+
+#######################################################################
+# Testing Project
+#######################################################################
+
+#----------------------------------------------------------------------
+# Proto file
+#----------------------------------------------------------------------
+get_filename_component(dm_proto "tests/data_marshal/data_marshal.proto" ABSOLUTE)
+get_filename_component(dm_proto_path "${dm_proto}" PATH)
+
+#----------------------------------------------------------------------
+# Generated sources
+#----------------------------------------------------------------------
+set(dm_proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/data_marshal.pb.cc")
+set(dm_proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/data_marshal.pb.h")
+set(dm_grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/data_marshal.grpc.pb.cc")
+set(dm_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/data_marshal.grpc.pb.h")
+add_custom_command(
+  OUTPUT "${dm_proto_srcs}" "${dm_proto_hdrs}" "${dm_grpc_srcs}" "${dm_grpc_hdrs}"
+  COMMAND ${_PROTOBUF_PROTOC}
+  ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
+    --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
+    -I "${dm_proto_path}"
+    --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
+    "${dm_proto}"
+  DEPENDS "${dm_proto}")
+
+#----------------------------------------------------------------------
+# Test application
+#----------------------------------------------------------------------
+add_executable(test_client
+  "src/test_client.cc"
+  ${dm_proto_srcs}
+  ${dm_grpc_srcs}
+  )
+target_link_libraries(test_client
    ${_REFLECTION}
    ${_GRPC_GRPCPP}
    ${_PROTOBUF_LIBPROTOBUF})
