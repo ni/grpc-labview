@@ -27,6 +27,7 @@
 			<Item Name="OOP Server" Type="Folder">
 				<Item Name="OOP Server Example.vi" Type="VI" URL="../Servers/OOP Server/OOP Server Example.vi"/>
 				<Item Name="OOP Server.lvclass" Type="LVClass" URL="../Servers/OOP Server/Class/OOP Server.lvclass"/>
+				<Item Name="OOP Server.lvlib" Type="Library" URL="../Servers/OOP Server/OOP Server.lvlib"/>
 			</Item>
 			<Item Name="Query Server" Type="Folder">
 				<Item Name="VIs" Type="Folder">
