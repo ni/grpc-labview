@@ -74,13 +74,6 @@
 				<Item Name="Trim Whitespace.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/Trim Whitespace.vi"/>
 				<Item Name="whitespace.ctl" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/whitespace.ctl"/>
 			</Item>
-			<Item Name="Complete Call.vi" Type="VI" URL="../Servers/gRPC interface/Server API/Message Requests/Complete Call.vi"/>
-			<Item Name="Create And Register Server Event.vim" Type="VI" URL="../Servers/gRPC interface/Server API/Server/Create And Register Server Event.vim"/>
-			<Item Name="grpcId.ctl" Type="VI" URL="../Servers/gRPC interface/Server API/typeDefs/grpcId.ctl"/>
-			<Item Name="labview_grpc_server.dll" Type="Document" URL="../gRPC Interface/dlls/labview_grpc_server.dll"/>
-			<Item Name="labview_grpc_server.dll" Type="Document" URL="../Servers/gRPC interface/dlls/labview_grpc_server.dll"/>
-			<Item Name="Read Call Request.vim" Type="VI" URL="../Servers/gRPC interface/Server API/Message Requests/Read Call Request.vim"/>
-			<Item Name="Write Call Response.vim" Type="VI" URL="../Servers/gRPC interface/Server API/Message Requests/Write Call Response.vim"/>
 		</Item>
 		<Item Name="Build Specifications" Type="Build"/>
 	</Item>
