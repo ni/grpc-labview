@@ -34,10 +34,12 @@
 	<Property Name="Serialized ACL" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!A1%!!!@````]!!".V&lt;H.J:WZF:#"C?82F)'&amp;S=G&amp;Z!!%!!1!!!!A)!!!!#!!!!!!!!!!</Property>
 	<Property Name="Use Data Logging Database" Type="Bool">true</Property>
 	<Item Name="Class API" Type="Folder">
+		<Item Name="Clear Private Data Cluster.vi" Type="VI" URL="../Class API/Clear Private Data Cluster.vi"/>
 		<Item Name="Copy Class Item.vi" Type="VI" URL="../Class API/Copy Class Item.vi"/>
 		<Item Name="Create LVClass Copy.vi" Type="VI" URL="../Class API/Create LVClass Copy.vi"/>
 		<Item Name="Delete LVClass Item.vi" Type="VI" URL="../Class API/Delete LVClass Item.vi"/>
 		<Item Name="Find Class in ProjectItem.vi" Type="VI" URL="../Class API/Find Class in ProjectItem.vi"/>
+		<Item Name="Find Item in LVClass.vi" Type="VI" URL="../Class API/Find Item in LVClass.vi"/>
 		<Item Name="Get LVClass Item Path.vi" Type="VI" URL="../Class API/Get LVClass Item Path.vi"/>
 		<Item Name="Open LVClass.vi" Type="VI" URL="../Class API/Open LVClass.vi"/>
 		<Item Name="Ref to LVClass.vi" Type="VI" URL="../Class API/Ref to LVClass.vi"/>
@@ -47,6 +49,7 @@
 		<Item Name="Add File to Lib.vi" Type="VI" URL="../Library API/Add File to Lib.vi"/>
 		<Item Name="Add LVClass to Lib.vi" Type="VI" URL="../Library API/Add LVClass to Lib.vi"/>
 		<Item Name="Copy Library Item.vi" Type="VI" URL="../Library API/Copy Library Item.vi"/>
+		<Item Name="Find Item in Library.vi" Type="VI" URL="../Library API/Find Item in Library.vi"/>
 		<Item Name="Find Library in ProjectItem.vi" Type="VI" URL="../Library API/Find Library in ProjectItem.vi"/>
 		<Item Name="Open Library.vi" Type="VI" URL="../Library API/Open Library.vi"/>
 		<Item Name="Ref To Library.vi" Type="VI" URL="../Library API/Ref To Library.vi"/>
@@ -69,6 +72,9 @@
 		<Item Name="Delete LVClass from ProjectItem.vi" Type="VI" URL="../Project API/Delete LVClass from ProjectItem.vi"/>
 		<Item Name="Add File to ProjectItem.vi" Type="VI" URL="../Project API/Add File to ProjectItem.vi"/>
 		<Item Name="Create Virtual FolderItem.vi" Type="VI" URL="../Project API/Create Virtual FolderItem.vi"/>
+	</Item>
+	<Item Name="Top Level API" Type="Folder">
+		<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
 	</Item>
 	<Item Name="VI API" Type="Folder">
 		<Item Name="Block Diagram" Type="Folder">
