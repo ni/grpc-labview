@@ -51,6 +51,7 @@
 		<Item Name="Copy Library Item.vi" Type="VI" URL="../Library API/Copy Library Item.vi"/>
 		<Item Name="Find Item in Library.vi" Type="VI" URL="../Library API/Find Item in Library.vi"/>
 		<Item Name="Find Library in ProjectItem.vi" Type="VI" URL="../Library API/Find Library in ProjectItem.vi"/>
+		<Item Name="Get ControlRef from LibraryItem.vi" Type="VI" URL="../Library API/Get ControlRef from LibraryItem.vi"/>
 		<Item Name="Open Library.vi" Type="VI" URL="../Library API/Open Library.vi"/>
 		<Item Name="Ref To Library.vi" Type="VI" URL="../Library API/Ref To Library.vi"/>
 		<Item Name="Save Library.vi" Type="VI" URL="../Library API/Save Library.vi"/>
@@ -117,5 +118,10 @@
 			<Item Name="SubVI Template.vit" Type="VI" URL="../VI API/General VI API/SubVI Template.vit"/>
 		</Item>
 	</Item>
+	<Item Name="Add Control to Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Add Control to Cluster.vi"/>
+	<Item Name="Add Control to Server ClusterDef.vi" Type="VI" URL="../Top Level API/Add Control to Server ClusterDef.vi"/>
+	<Item Name="Get ControlRef from ClassItem.vi" Type="VI" URL="../Class API/Get ControlRef from ClassItem.vi"/>
+	<Item Name="Get ControlRef from ctrlVI.vi" Type="VI" URL="../VI API/Front Panel API/Get ControlRef from ctrlVI.vi"/>
+	<Item Name="Get VIRef from ClassItem.vi" Type="VI" URL="../Class API/Get VIRef from ClassItem.vi"/>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
