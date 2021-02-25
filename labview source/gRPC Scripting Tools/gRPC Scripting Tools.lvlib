@@ -87,6 +87,7 @@
 		<Item Name="Update Bind Method Constants.vi" Type="VI" URL="../Top Level API/Update Bind Method Constants.vi"/>
 		<Item Name="Create Message Data Element.vi" Type="VI" URL="../Top Level API/Create Message Data Element.vi"/>
 		<Item Name="Create Message Data Clusters (simple).vi" Type="VI" URL="../Top Level API/Create Message Data Clusters (simple).vi"/>
+		<Item Name="Create Message Data Clusters (complex).vi" Type="VI" URL="../Top Level API/Create Message Data Clusters (complex).vi"/>
 	</Item>
 	<Item Name="VI API" Type="Folder">
 		<Item Name="Block Diagram" Type="Folder">
@@ -120,6 +121,8 @@
 			<Item Name="Get VI FP Reference.vi" Type="VI" URL="../VI API/Front Panel API/Get VI FP Reference.vi"/>
 			<Item Name="Get ControlRef from ctrlVI.vi" Type="VI" URL="../VI API/Front Panel API/Get ControlRef from ctrlVI.vi"/>
 			<Item Name="Create Cluster Control.vi" Type="VI" URL="../VI API/Front Panel API/Create Cluster Control.vi"/>
+			<Item Name="Delete Control from Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Delete Control from Cluster.vi"/>
+			<Item Name="Find Control Index in Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Find Control Index in Cluster.vi"/>
 		</Item>
 		<Item Name="General VI API" Type="Folder">
 			<Item Name="Coordinates" Type="Folder">
