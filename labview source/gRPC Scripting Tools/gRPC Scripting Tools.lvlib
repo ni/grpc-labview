@@ -85,6 +85,8 @@
 		<Item Name="Update Bind Methods.vi" Type="VI" URL="../Top Level API/Update Bind Methods.vi"/>
 		<Item Name="Update Bind Method Controls.vi" Type="VI" URL="../Top Level API/Update Bind Method Controls.vi"/>
 		<Item Name="Update Bind Method Constants.vi" Type="VI" URL="../Top Level API/Update Bind Method Constants.vi"/>
+		<Item Name="Create Message Data Element.vi" Type="VI" URL="../Top Level API/Create Message Data Element.vi"/>
+		<Item Name="Create Message Data Clusters (simple).vi" Type="VI" URL="../Top Level API/Create Message Data Clusters (simple).vi"/>
 	</Item>
 	<Item Name="VI API" Type="Folder">
 		<Item Name="Block Diagram" Type="Folder">
@@ -110,13 +112,14 @@
 			<Item Name="Get BD Reference.vi" Type="VI" URL="../VI API/Block Diagram API/Get BD Reference.vi"/>
 		</Item>
 		<Item Name="Front Panel" Type="Folder">
-			<Item Name="Add Control to Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Add Control to Cluster.vi"/>
+			<Item Name="Add Control to Cluster (from src ref).vi" Type="VI" URL="../VI API/Front Panel API/Add Control to Cluster (from src ref).vi"/>
 			<Item Name="Create Enum Ctrl.vi" Type="VI" URL="../VI API/Front Panel API/Create Enum Ctrl.vi"/>
 			<Item Name="Create String Control.vi" Type="VI" URL="../VI API/Front Panel API/Create String Control.vi"/>
 			<Item Name="Create Type Definition.vi" Type="VI" URL="../VI API/Front Panel API/Create Type Definition.vi"/>
 			<Item Name="Get String Control Terminal.vi" Type="VI" URL="../VI API/Front Panel API/Get String Control Terminal.vi"/>
 			<Item Name="Get VI FP Reference.vi" Type="VI" URL="../VI API/Front Panel API/Get VI FP Reference.vi"/>
 			<Item Name="Get ControlRef from ctrlVI.vi" Type="VI" URL="../VI API/Front Panel API/Get ControlRef from ctrlVI.vi"/>
+			<Item Name="Create Cluster Control.vi" Type="VI" URL="../VI API/Front Panel API/Create Cluster Control.vi"/>
 		</Item>
 		<Item Name="General VI API" Type="Folder">
 			<Item Name="Coordinates" Type="Folder">
@@ -131,6 +134,8 @@
 	</Item>
 	<Item Name="TypeDefs" Type="Folder">
 		<Item Name="RPC Method Parameters.ctl" Type="VI" URL="../TypeDefs/RPC Method Parameters.ctl"/>
+		<Item Name="Message Element Metadata (Scripting).ctl" Type="VI" URL="../TypeDefs/Message Element Metadata (Scripting).ctl"/>
+		<Item Name="Message Metadata (Scripting).ctl" Type="VI" URL="../TypeDefs/Message Metadata (Scripting).ctl"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
