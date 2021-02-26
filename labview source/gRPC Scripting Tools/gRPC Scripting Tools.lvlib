@@ -76,6 +76,7 @@
 		<Item Name="Delete LVClass from ProjectItem.vi" Type="VI" URL="../Project API/Delete LVClass from ProjectItem.vi"/>
 		<Item Name="Add File to ProjectItem.vi" Type="VI" URL="../Project API/Add File to ProjectItem.vi"/>
 		<Item Name="Create Virtual FolderItem.vi" Type="VI" URL="../Project API/Create Virtual FolderItem.vi"/>
+		<Item Name="Find Item in ProjectItem.vi" Type="VI" URL="../Project API/Find Item in ProjectItem.vi"/>
 	</Item>
 	<Item Name="Top Level API" Type="Folder">
 		<Item Name="Add Control to Server ClusterDef.vi" Type="VI" URL="../Top Level API/Add Control to Server ClusterDef.vi"/>
@@ -88,6 +89,13 @@
 		<Item Name="Create Message Data Element.vi" Type="VI" URL="../Top Level API/Create Message Data Element.vi"/>
 		<Item Name="Create Message Data Clusters (simple).vi" Type="VI" URL="../Top Level API/Create Message Data Clusters (simple).vi"/>
 		<Item Name="Create Message Data Clusters (complex).vi" Type="VI" URL="../Top Level API/Create Message Data Clusters (complex).vi"/>
+		<Item Name="Create Message Data Clusters.vi" Type="VI" URL="../Top Level API/Create Message Data Clusters.vi"/>
+		<Item Name="Create Message Accessor.vi" Type="VI" URL="../Top Level API/Create Message Accessor.vi"/>
+		<Item Name="Create Message Getter.vi" Type="VI" URL="../Top Level API/Create Message Getter.vi"/>
+		<Item Name="Update Message Getter.vi" Type="VI" URL="../Top Level API/Update Message Getter.vi"/>
+		<Item Name="Create Message Setter.vi" Type="VI" URL="../Top Level API/Create Message Setter.vi"/>
+		<Item Name="Update Message Setter.vi" Type="VI" URL="../Top Level API/Update Message Setter.vi"/>
+		<Item Name="Create Message Accessors.vi" Type="VI" URL="../Top Level API/Create Message Accessors.vi"/>
 	</Item>
 	<Item Name="VI API" Type="Folder">
 		<Item Name="Block Diagram" Type="Folder">
@@ -123,6 +131,7 @@
 			<Item Name="Create Cluster Control.vi" Type="VI" URL="../VI API/Front Panel API/Create Cluster Control.vi"/>
 			<Item Name="Delete Control from Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Delete Control from Cluster.vi"/>
 			<Item Name="Find Control Index in Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Find Control Index in Cluster.vi"/>
+			<Item Name="Add TypeDef to Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Add TypeDef to Cluster.vi"/>
 		</Item>
 		<Item Name="General VI API" Type="Folder">
 			<Item Name="Coordinates" Type="Folder">
