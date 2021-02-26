@@ -12,6 +12,7 @@ using namespace google::protobuf;
 //---------------------------------------------------------------------
 struct LVMessageField
 {    
+    LStrHandle fieldName;
     LStrHandle embeddedMessage;
     int32_t protobufIndex;
     int32_t type;
@@ -215,6 +216,7 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
     {
         return -1;
     }
+    int error = 0;
     switch (field->type())
     {
         case FieldDescriptor::TYPE_DOUBLE:
@@ -273,7 +275,12 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
     {
         SetLVString(&info->embeddedMessage, field->message_type()->name());
     }
+    SetLVString(&info->fieldName, field->name());
     info->protobufIndex = field->number();
     info->isRepeated = field->is_repeated();
-    return 0;
+    if (info->type == 99)
+    {
+        error = -2;
+    }
+    return error;
 }
