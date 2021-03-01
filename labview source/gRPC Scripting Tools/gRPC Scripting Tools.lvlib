@@ -98,6 +98,7 @@
 		<Item Name="Update Message Setter.vi" Type="VI" URL="../Top Level API/Update Message Setter.vi"/>
 		<Item Name="Create Message Accessors.vi" Type="VI" URL="../Top Level API/Create Message Accessors.vi"/>
 		<Item Name="Update Methods Registration.vi" Type="VI" URL="../Top Level API/Update Methods Registration.vi"/>
+		<Item Name="Update Messages MetaData.vi" Type="VI" URL="../Top Level API/Update Messages MetaData.vi"/>
 	</Item>
 	<Item Name="VI API" Type="Folder">
 		<Item Name="Block Diagram" Type="Folder">
@@ -115,6 +116,7 @@
 					<Item Name="Insert BD Enum.vi" Type="VI" URL="../VI API/Block Diagram API/Constants/Enum/Insert BD Enum.vi"/>
 				</Item>
 				<Item Name="Connect Const to Source.vi" Type="VI" URL="../VI API/Block Diagram API/Constants/Connect Const to Source.vi"/>
+				<Item Name="Get Constant (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Constants/Get Constant (by Name).vi"/>
 			</Item>
 			<Item Name="SubVI" Type="Folder">
 				<Item Name="Get SubVI Terminal (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI Terminal (by Name).vi"/>
