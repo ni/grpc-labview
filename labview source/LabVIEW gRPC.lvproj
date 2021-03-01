@@ -20,7 +20,7 @@
 		<Item Name="gRPC interface" Type="Folder">
 			<Item Name="gprc-lvsupport.lvlib" Type="Library" URL="../gRPC interface/gprc-lvsupport.lvlib"/>
 		</Item>
-		<Item Name="gRPC Scripting Tools" Type="Folder">
+		<Item Name="Scripting Tools" Type="Folder">
 			<Item Name="gRPC Scripting Tools.lvlib" Type="Library" URL="../gRPC Scripting Tools/gRPC Scripting Tools.lvlib"/>
 		</Item>
 		<Item Name="Servers" Type="Folder">

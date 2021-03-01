@@ -77,6 +77,7 @@
 		<Item Name="Add File to ProjectItem.vi" Type="VI" URL="../Project API/Add File to ProjectItem.vi"/>
 		<Item Name="Create Virtual FolderItem.vi" Type="VI" URL="../Project API/Create Virtual FolderItem.vi"/>
 		<Item Name="Find Item in ProjectItem.vi" Type="VI" URL="../Project API/Find Item in ProjectItem.vi"/>
+		<Item Name="Get ProjectItem Descendants (with Pattern).vi" Type="VI" URL="../Project API/Get ProjectItem Descendants (with Pattern).vi"/>
 	</Item>
 	<Item Name="Top Level API" Type="Folder">
 		<Item Name="Add Control to Server ClusterDef.vi" Type="VI" URL="../Top Level API/Add Control to Server ClusterDef.vi"/>
@@ -96,6 +97,7 @@
 		<Item Name="Create Message Setter.vi" Type="VI" URL="../Top Level API/Create Message Setter.vi"/>
 		<Item Name="Update Message Setter.vi" Type="VI" URL="../Top Level API/Update Message Setter.vi"/>
 		<Item Name="Create Message Accessors.vi" Type="VI" URL="../Top Level API/Create Message Accessors.vi"/>
+		<Item Name="Update Methods Registration.vi" Type="VI" URL="../Top Level API/Update Methods Registration.vi"/>
 	</Item>
 	<Item Name="VI API" Type="Folder">
 		<Item Name="Block Diagram" Type="Folder">
@@ -105,6 +107,8 @@
 				<Item Name="Create Case Structure.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Create Case Structure.vi"/>
 				<Item Name="Get Case Struct Terminals.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Struct Terminals.vi"/>
 				<Item Name="Set Default Case.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Set Default Case.vi"/>
+				<Item Name="Get Case Structure (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Structure (by Name).vi"/>
+				<Item Name="Get Case Structure Frame (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Structure Frame (by Name).vi"/>
 			</Item>
 			<Item Name="Constants" Type="Folder">
 				<Item Name="Enum" Type="Folder">
@@ -112,10 +116,18 @@
 				</Item>
 				<Item Name="Connect Const to Source.vi" Type="VI" URL="../VI API/Block Diagram API/Constants/Connect Const to Source.vi"/>
 			</Item>
-			<Item Name="SubVI" Type="Folder"/>
+			<Item Name="SubVI" Type="Folder">
+				<Item Name="Get SubVI Terminal (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI Terminal (by Name).vi"/>
+				<Item Name="Get SubVI Reference (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI Reference (by Name).vi"/>
+			</Item>
 			<Item Name="Tunnels" Type="Folder">
 				<Item Name="Connect Terminals.vi" Type="VI" URL="../VI API/Block Diagram API/Tunnels/Connect Terminals.vi"/>
 				<Item Name="Get Inside Terminals.vi" Type="VI" URL="../VI API/Block Diagram API/Tunnels/Get Inside Terminals.vi"/>
+			</Item>
+			<Item Name="Bundler" Type="Folder">
+				<Item Name="Get NamedBundler.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get NamedBundler.vi"/>
+				<Item Name="Set NamedBundler Input Count.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Set NamedBundler Input Count.vi"/>
+				<Item Name="Get NamedBundler Input.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get NamedBundler Input.vi"/>
 			</Item>
 			<Item Name="BD CleanUp.vi" Type="VI" URL="../VI API/Block Diagram API/BD CleanUp.vi"/>
 			<Item Name="Get BD Reference.vi" Type="VI" URL="../VI API/Block Diagram API/Get BD Reference.vi"/>
