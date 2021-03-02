@@ -99,6 +99,9 @@
 		<Item Name="Create Message Accessors.vi" Type="VI" URL="../Top Level API/Create Message Accessors.vi"/>
 		<Item Name="Update Methods Registration.vi" Type="VI" URL="../Top Level API/Update Methods Registration.vi"/>
 		<Item Name="Update Messages MetaData.vi" Type="VI" URL="../Top Level API/Update Messages MetaData.vi"/>
+		<Item Name="Update Methods Events.vi" Type="VI" URL="../Top Level API/Update Methods Events.vi"/>
+		<Item Name="Update Method Event Unbundlers.vi" Type="VI" URL="../Top Level API/Update Method Event Unbundlers.vi"/>
+		<Item Name="Update SyncMethod Events.vi" Type="VI" URL="../Top Level API/Update SyncMethod Events.vi"/>
 	</Item>
 	<Item Name="VI API" Type="Folder">
 		<Item Name="Block Diagram" Type="Folder">
@@ -130,6 +133,15 @@
 				<Item Name="Get NamedBundler.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get NamedBundler.vi"/>
 				<Item Name="Set NamedBundler Input Count.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Set NamedBundler Input Count.vi"/>
 				<Item Name="Get NamedBundler Input.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get NamedBundler Input.vi"/>
+				<Item Name="Get NamedUnbundler.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get NamedUnbundler.vi"/>
+			</Item>
+			<Item Name="Event Structure" Type="Folder">
+				<Item Name="Get Event Structure (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Event Structure/Get Event Structure (by Name).vi"/>
+				<Item Name="Add Event Structure Frame.vi" Type="VI" URL="../VI API/Block Diagram API/Event Structure/Add Event Structure Frame.vi"/>
+				<Item Name="Set Frame User Events.vi" Type="VI" URL="../VI API/Block Diagram API/Event Structure/Set Frame User Events.vi"/>
+			</Item>
+			<Item Name="Diagram Disable Structure" Type="Folder">
+				<Item Name="Create Diagram Disable Structure.vi" Type="VI" URL="../VI API/Block Diagram API/Diagram Disable Structure/Create Diagram Disable Structure.vi"/>
 			</Item>
 			<Item Name="BD CleanUp.vi" Type="VI" URL="../VI API/Block Diagram API/BD CleanUp.vi"/>
 			<Item Name="Get BD Reference.vi" Type="VI" URL="../VI API/Block Diagram API/Get BD Reference.vi"/>
