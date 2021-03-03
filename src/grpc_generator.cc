@@ -10,6 +10,9 @@ using namespace google::protobuf;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+#ifdef _PS_4
+#pragma pack (push, 1)
+#endif
 struct LVMessageField
 {    
     LStrHandle fieldName;
@@ -18,6 +21,9 @@ struct LVMessageField
     int32_t type;
     char isRepeated;
 };
+#ifdef _PS_4
+#pragma pack (pop)
+#endif
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -147,6 +153,30 @@ LIBRARY_EXPORT int LVGetMethodName(MethodDescriptor* method, LStrHandle* name)
         return -1;
     }
     SetLVString(name, method->name());
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int LVIsMethodClientStreaming(MethodDescriptor* method, int* clientStreaming)
+{
+    if (method == nullptr)
+    {
+        return -1;
+    }
+    *clientStreaming = method->client_streaming();
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int LVIsMethodServerStreaming(MethodDescriptor* method, int* serverStreaming)
+{
+    if (method == nullptr)
+    {
+        return -1;
+    }
+    *serverStreaming = method->server_streaming();
     return 0;
 }
 
