@@ -80,28 +80,36 @@
 		<Item Name="Get ProjectItem Descendants (with Pattern).vi" Type="VI" URL="../Project API/Get ProjectItem Descendants (with Pattern).vi"/>
 	</Item>
 	<Item Name="Top Level API" Type="Folder">
-		<Item Name="Add Control to Server ClusterDef.vi" Type="VI" URL="../Top Level API/Add Control to Server ClusterDef.vi"/>
-		<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
-		<Item Name="Populate gRPC Events.vi" Type="VI" URL="../Top Level API/Populate gRPC Events.vi"/>
-		<Item Name="Create RPC Method from Template.vi" Type="VI" URL="../Top Level API/Create RPC Method from Template.vi"/>
-		<Item Name="Update Bind Methods.vi" Type="VI" URL="../Top Level API/Update Bind Methods.vi"/>
-		<Item Name="Update Bind Method Controls.vi" Type="VI" URL="../Top Level API/Update Bind Method Controls.vi"/>
-		<Item Name="Update Bind Method Constants.vi" Type="VI" URL="../Top Level API/Update Bind Method Constants.vi"/>
-		<Item Name="Create Message Data Element.vi" Type="VI" URL="../Top Level API/Create Message Data Element.vi"/>
-		<Item Name="Create Message Data Clusters (simple).vi" Type="VI" URL="../Top Level API/Create Message Data Clusters (simple).vi"/>
-		<Item Name="Create Message Data Clusters (complex).vi" Type="VI" URL="../Top Level API/Create Message Data Clusters (complex).vi"/>
-		<Item Name="Create Message Data Clusters.vi" Type="VI" URL="../Top Level API/Create Message Data Clusters.vi"/>
-		<Item Name="Create Message Accessor.vi" Type="VI" URL="../Top Level API/Create Message Accessor.vi"/>
-		<Item Name="Create Message Getter.vi" Type="VI" URL="../Top Level API/Create Message Getter.vi"/>
-		<Item Name="Update Message Getter.vi" Type="VI" URL="../Top Level API/Update Message Getter.vi"/>
-		<Item Name="Create Message Setter.vi" Type="VI" URL="../Top Level API/Create Message Setter.vi"/>
-		<Item Name="Update Message Setter.vi" Type="VI" URL="../Top Level API/Update Message Setter.vi"/>
-		<Item Name="Create Message Accessors.vi" Type="VI" URL="../Top Level API/Create Message Accessors.vi"/>
-		<Item Name="Update Methods Registration.vi" Type="VI" URL="../Top Level API/Update Methods Registration.vi"/>
-		<Item Name="Update Messages MetaData.vi" Type="VI" URL="../Top Level API/Update Messages MetaData.vi"/>
-		<Item Name="Update Methods Events.vi" Type="VI" URL="../Top Level API/Update Methods Events.vi"/>
-		<Item Name="Update Method Event Unbundlers.vi" Type="VI" URL="../Top Level API/Update Method Event Unbundlers.vi"/>
-		<Item Name="Update SyncMethod Events.vi" Type="VI" URL="../Top Level API/Update SyncMethod Events.vi"/>
+		<Item Name="RPC Messages" Type="Folder">
+			<Item Name="Create Message Data Element.vi" Type="VI" URL="../Top Level API/Create Message Data Element.vi"/>
+			<Item Name="Create Message Data Clusters (simple).vi" Type="VI" URL="../Top Level API/Create Message Data Clusters (simple).vi"/>
+			<Item Name="Create Message Data Clusters (complex).vi" Type="VI" URL="../Top Level API/Create Message Data Clusters (complex).vi"/>
+			<Item Name="Create Message Data Clusters.vi" Type="VI" URL="../Top Level API/Create Message Data Clusters.vi"/>
+			<Item Name="Create Message Accessor.vi" Type="VI" URL="../Top Level API/Create Message Accessor.vi"/>
+			<Item Name="Create Message Getter.vi" Type="VI" URL="../Top Level API/Create Message Getter.vi"/>
+			<Item Name="Update Message Getter.vi" Type="VI" URL="../Top Level API/Update Message Getter.vi"/>
+			<Item Name="Create Message Setter.vi" Type="VI" URL="../Top Level API/Create Message Setter.vi"/>
+			<Item Name="Create Message Accessors.vi" Type="VI" URL="../Top Level API/Create Message Accessors.vi"/>
+			<Item Name="Update Messages MetaData.vi" Type="VI" URL="../Top Level API/Update Messages MetaData.vi"/>
+			<Item Name="Update Message Setter.vi" Type="VI" URL="../Top Level API/Update Message Setter.vi"/>
+		</Item>
+		<Item Name="RPC Events" Type="Folder">
+			<Item Name="Populate gRPC Events.vi" Type="VI" URL="../Top Level API/Populate gRPC Events.vi"/>
+			<Item Name="Add Control to Server ClusterDef.vi" Type="VI" URL="../Top Level API/Add Control to Server ClusterDef.vi"/>
+		</Item>
+		<Item Name="RPC Methods" Type="Folder">
+			<Item Name="Update Bind Methods.vi" Type="VI" URL="../Top Level API/Update Bind Methods.vi"/>
+			<Item Name="Update Bind Method Controls.vi" Type="VI" URL="../Top Level API/Update Bind Method Controls.vi"/>
+			<Item Name="Update Bind Method Constants.vi" Type="VI" URL="../Top Level API/Update Bind Method Constants.vi"/>
+			<Item Name="Update Methods Registration.vi" Type="VI" URL="../Top Level API/Update Methods Registration.vi"/>
+			<Item Name="Update Methods Event Structures.vi" Type="VI" URL="../Top Level API/Update Methods Event Structures.vi"/>
+			<Item Name="Update Method Event Unbundlers.vi" Type="VI" URL="../Top Level API/Update Method Event Unbundlers.vi"/>
+			<Item Name="Create RPC Method from Template.vi" Type="VI" URL="../Top Level API/Create RPC Method from Template.vi"/>
+			<Item Name="Update SyncMethod Event Structure.vi" Type="VI" URL="../Top Level API/Update SyncMethod Event Structure.vi"/>
+		</Item>
+		<Item Name="RPC Server" Type="Folder">
+			<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
+		</Item>
 	</Item>
 	<Item Name="VI API" Type="Folder">
 		<Item Name="Block Diagram" Type="Folder">
