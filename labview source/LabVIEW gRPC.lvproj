@@ -17,9 +17,6 @@
 				<Item Name="CPP Client.exe" Type="Document" URL="../Clients/CPP client/CPP Client.exe"/>
 			</Item>
 		</Item>
-		<Item Name="Generated Server" Type="Folder">
-			<Item Name="Generated Server.lvlib" Type="Library" URL="../Servers/Generated Server/Generated Server.lvlib"/>
-		</Item>
 		<Item Name="gRPC interface" Type="Folder">
 			<Item Name="gprc-lvsupport.lvlib" Type="Library" URL="../gRPC interface/gprc-lvsupport.lvlib"/>
 		</Item>
