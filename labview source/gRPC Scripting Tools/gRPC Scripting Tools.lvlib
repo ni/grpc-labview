@@ -78,6 +78,7 @@
 		<Item Name="Create Virtual FolderItem.vi" Type="VI" URL="../Project API/Create Virtual FolderItem.vi"/>
 		<Item Name="Find Item in ProjectItem.vi" Type="VI" URL="../Project API/Find Item in ProjectItem.vi"/>
 		<Item Name="Get ProjectItem Descendants (with Pattern).vi" Type="VI" URL="../Project API/Get ProjectItem Descendants (with Pattern).vi"/>
+		<Item Name="Close Project.vi" Type="VI" URL="../Project API/Close Project.vi"/>
 	</Item>
 	<Item Name="Top Level API" Type="Folder">
 		<Item Name="RPC Messages" Type="Folder">
@@ -92,6 +93,7 @@
 			<Item Name="Create Message Accessors.vi" Type="VI" URL="../Top Level API/Create Message Accessors.vi"/>
 			<Item Name="Update Messages MetaData.vi" Type="VI" URL="../Top Level API/Update Messages MetaData.vi"/>
 			<Item Name="Update Message Setter.vi" Type="VI" URL="../Top Level API/Update Message Setter.vi"/>
+			<Item Name="Generate RPC Messages.vi" Type="VI" URL="../Top Level API/Generate RPC Messages.vi"/>
 		</Item>
 		<Item Name="RPC Events" Type="Folder">
 			<Item Name="Populate gRPC Events.vi" Type="VI" URL="../Top Level API/Populate gRPC Events.vi"/>
@@ -104,12 +106,15 @@
 			<Item Name="Update Methods Registration.vi" Type="VI" URL="../Top Level API/Update Methods Registration.vi"/>
 			<Item Name="Update Methods Event Structures.vi" Type="VI" URL="../Top Level API/Update Methods Event Structures.vi"/>
 			<Item Name="Update Method Event Unbundlers.vi" Type="VI" URL="../Top Level API/Update Method Event Unbundlers.vi"/>
-			<Item Name="Create RPC Method from Template.vi" Type="VI" URL="../Top Level API/Create RPC Method from Template.vi"/>
+			<Item Name="Generate RPC Methods.vi" Type="VI" URL="../Top Level API/Generate RPC Methods.vi"/>
 			<Item Name="Update SyncMethod Event Structure.vi" Type="VI" URL="../Top Level API/Update SyncMethod Event Structure.vi"/>
+			<Item Name="Create RPC Method.vi" Type="VI" URL="../Top Level API/Create RPC Method.vi"/>
+			<Item Name="Clear Methods Registration.vi" Type="VI" URL="../Top Level API/Clear Methods Registration.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
 		</Item>
+		<Item Name="Add Server Library to Project.vi" Type="VI" URL="../Top Level API/Add Server Library to Project.vi"/>
 	</Item>
 	<Item Name="VI API" Type="Folder">
 		<Item Name="Block Diagram" Type="Folder">
@@ -132,6 +137,7 @@
 			<Item Name="SubVI" Type="Folder">
 				<Item Name="Get SubVI Terminal (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI Terminal (by Name).vi"/>
 				<Item Name="Get SubVI Reference (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI Reference (by Name).vi"/>
+				<Item Name="Get SubVI References (by Pattern).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI References (by Pattern).vi"/>
 			</Item>
 			<Item Name="Tunnels" Type="Folder">
 				<Item Name="Connect Terminals.vi" Type="VI" URL="../VI API/Block Diagram API/Tunnels/Connect Terminals.vi"/>
@@ -166,6 +172,8 @@
 			<Item Name="Delete Control from Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Delete Control from Cluster.vi"/>
 			<Item Name="Find Control Index in Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Find Control Index in Cluster.vi"/>
 			<Item Name="Add TypeDef to Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Add TypeDef to Cluster.vi"/>
+			<Item Name="Delete Cluster Controls.vi" Type="VI" URL="../VI API/Front Panel API/Delete Cluster Controls.vi"/>
+			<Item Name="Get Control (by Name).vi" Type="VI" URL="../VI API/Front Panel API/Get Control (by Name).vi"/>
 		</Item>
 		<Item Name="General VI API" Type="Folder">
 			<Item Name="Coordinates" Type="Folder">
