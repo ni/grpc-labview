@@ -47,6 +47,7 @@
 		<Item Name="Save LVClass.vi" Type="VI" URL="../Class API/Save LVClass.vi"/>
 		<Item Name="Get VIRef from ClassItem.vi" Type="VI" URL="../Class API/Get VIRef from ClassItem.vi"/>
 		<Item Name="Get ControlRef from ClassItem.vi" Type="VI" URL="../Class API/Get ControlRef from ClassItem.vi"/>
+		<Item Name="Delete Item from LVClass.vi" Type="VI" URL="../Class API/Delete Item from LVClass.vi"/>
 	</Item>
 	<Item Name="Library API" Type="Folder">
 		<Item Name="Add File to Lib.vi" Type="VI" URL="../Library API/Add File to Lib.vi"/>
