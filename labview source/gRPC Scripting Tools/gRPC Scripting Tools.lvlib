@@ -191,6 +191,25 @@
 		<Item Name="RPC Method Parameters.ctl" Type="VI" URL="../TypeDefs/RPC Method Parameters.ctl"/>
 		<Item Name="Message Element Metadata (Scripting).ctl" Type="VI" URL="../TypeDefs/Message Element Metadata (Scripting).ctl"/>
 		<Item Name="Message Metadata (Scripting).ctl" Type="VI" URL="../TypeDefs/Message Metadata (Scripting).ctl"/>
+		<Item Name="Message Element Type.ctl" Type="VI" URL="../TypeDefs/Message Element Type.ctl"/>
+	</Item>
+	<Item Name="Proto Parser API" Type="Folder">
+		<Item Name="ProtoGenerator.vi" Type="VI" URL="../Proto Parser API/ProtoGenerator.vi"/>
+		<Item Name="Load ProtoFile.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Load ProtoFile.vi"/>
+		<Item Name="Get ProtoParser DLL Directory.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get ProtoParser DLL Directory.vi"/>
+		<Item Name="Get gRPC Services.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Services.vi"/>
+		<Item Name="Get gRPC Service Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Service Name.vi"/>
+		<Item Name="Get gRPC Service Methods.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Service Methods.vi"/>
+		<Item Name="Get gRPC Method Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Method Name.vi"/>
+		<Item Name="Check Method Client Streaming.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Check Method Client Streaming.vi"/>
+		<Item Name="Check Method Server Streaming.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Check Method Server Streaming.vi"/>
+		<Item Name="Get Method Input Message.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Method Input Message.vi"/>
+		<Item Name="Get Method Output Message.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Method Output Message.vi"/>
+		<Item Name="Get Message Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message Name.vi"/>
+		<Item Name="Get Message Fields.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message Fields.vi"/>
+		<Item Name="Get Message Field Info.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message Field Info.vi"/>
+		<Item Name="Get gRPC Package.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Package.vi"/>
+		<Item Name="Get gRPC Package Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Package Name.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
