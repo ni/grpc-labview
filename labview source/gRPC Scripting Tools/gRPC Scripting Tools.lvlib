@@ -79,6 +79,7 @@
 		<Item Name="Create Virtual FolderItem.vi" Type="VI" URL="../Project API/Create Virtual FolderItem.vi"/>
 		<Item Name="Find Item in ProjectItem.vi" Type="VI" URL="../Project API/Find Item in ProjectItem.vi"/>
 		<Item Name="Get ProjectItem Descendants (with Pattern).vi" Type="VI" URL="../Project API/Get ProjectItem Descendants (with Pattern).vi"/>
+		<Item Name="Get ProjectItem Descendants (with Type).vi" Type="VI" URL="../Project API/Get ProjectItem Descendants (with Type).vi"/>
 		<Item Name="Close Project.vi" Type="VI" URL="../Project API/Close Project.vi"/>
 	</Item>
 	<Item Name="Top Level API" Type="Folder">
@@ -111,11 +112,13 @@
 			<Item Name="Update SyncMethod Event Structure.vi" Type="VI" URL="../Top Level API/Update SyncMethod Event Structure.vi"/>
 			<Item Name="Create RPC Method.vi" Type="VI" URL="../Top Level API/Create RPC Method.vi"/>
 			<Item Name="Clear Methods Registration.vi" Type="VI" URL="../Top Level API/Clear Methods Registration.vi"/>
+			<Item Name="Update Method Accessors.vi" Type="VI" URL="../Top Level API/Update Method Accessors.vi"/>
+			<Item Name="Update Method Getter.vi" Type="VI" URL="../Top Level API/Update Method Getter.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
+			<Item Name="Add Server Library to Project.vi" Type="VI" URL="../Top Level API/Add Server Library to Project.vi"/>
 		</Item>
-		<Item Name="Add Server Library to Project.vi" Type="VI" URL="../Top Level API/Add Server Library to Project.vi"/>
 	</Item>
 	<Item Name="VI API" Type="Folder">
 		<Item Name="Block Diagram" Type="Folder">
@@ -139,6 +142,7 @@
 				<Item Name="Get SubVI Terminal (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI Terminal (by Name).vi"/>
 				<Item Name="Get SubVI Reference (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI Reference (by Name).vi"/>
 				<Item Name="Get SubVI References (by Pattern).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI References (by Pattern).vi"/>
+				<Item Name="Get SubVI References.vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI References.vi"/>
 			</Item>
 			<Item Name="Tunnels" Type="Folder">
 				<Item Name="Connect Terminals.vi" Type="VI" URL="../VI API/Block Diagram API/Tunnels/Connect Terminals.vi"/>
@@ -212,4 +216,5 @@
 		<Item Name="Get gRPC Package Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Package Name.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
+	<Item Name="Update Method Setter.vi" Type="VI" URL="../Top Level API/Update Method Setter.vi"/>
 </Library>

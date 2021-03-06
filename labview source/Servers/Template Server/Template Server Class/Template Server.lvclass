@@ -212,23 +212,45 @@
 	</Item>
 	<Item Name="RPC Methods" Type="Folder">
 		<Item Name="TemplateMethod" Type="Folder">
-			<Item Name="Bind RPC Template.vi" Type="VI" URL="../RPC Methods/Template/Bind RPC Template.vi">
-				<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!,$!!!!$Q!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!%%!Q`````Q&gt;$&lt;WVN97ZE!!J!5Q2%982B!!"T!0%!!!!!!!!!!R65:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:M;7)86'6N='RB&gt;'5A5W6S&gt;G6S,GRW9WRB=X-95W6S&gt;G6S)%FO&gt;'6S&lt;G&amp;M)%2B&gt;'%O9X2M!#2!5!!#!!1!"26#;7ZE)%FO&gt;'6S&lt;G&amp;M)%VF=X.B:W5!)%"Q!"E!!1!'&amp;&amp;2F&lt;8"M982F)%FO&gt;'6S&lt;G&amp;M)&amp;6&amp;!!"0!0(&lt;01`V!!!!!R65:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:M;7)5:X"S9SVM&gt;H.V=("P=H1O&lt;(:M;7)+:X*Q9UFE,G.U&lt;!!21!A!"G&gt;35%.J:!!!8!$R!!!!!!!!!!-66'6N='RB&gt;'5A5W6S&gt;G6S,GRW&lt;'FC&amp;'&gt;Q=G-N&lt;(:T&gt;8"Q&lt;X*U,GRW&lt;'FC%G&gt;35%.*:#"$&lt;(6T&gt;'6S,G.U&lt;!!71&amp;!!!1!)#'6W:7ZU)'FO!!!=1(!!'1!"!!E16'6N='RB&gt;'5A:V*11S"621!!71$RWTU0^1!!!!-66'6N='RB&gt;'5A5W6S&gt;G6S,GRW&lt;'FC&amp;'&gt;Q=G-N&lt;(:T&gt;8"Q&lt;X*U,GRW&lt;'FC#G&gt;S='.*:#ZD&gt;'Q!'U!)!"&amp;H5F"$;71A=W6S&gt;G6S)'^V&gt;!!%!!!!71$RWTU0^1!!!!-66'6N='RB&gt;'5A5W6S&gt;G6S,GRW&lt;'FC&amp;'&gt;Q=G-N&lt;(:T&gt;8"Q&lt;X*U,GRW&lt;'FC#G&gt;S='.*:#ZD&gt;'Q!'U!)!""H5F"$;71A=W6S&gt;G6S)'FO!!"5!0!!$!!$!!=!#A!,!!Q!$!!-!!Q!$!!-!!Q!$1-!!(A!!!E!!!!*!!!!#1!!!!U,!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%!!!!!!"!!Y!!!!!</Property>
-				<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
-				<Property Name="NI.ClassItem.Flags" Type="Int">0</Property>
-				<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
-				<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
-				<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
-				<Property Name="NI.ClassItem.State" Type="Int">1350574608</Property>
+			<Item Name="Messaging" Type="Folder">
+				<Item Name="Get RPC Template __Input.vi" Type="VI" URL="../RPC Methods/Template/Messaging/Get RPC Template __Input.vi">
+					<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!(9!!!!#Q!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!!Z!-0````]%2'&amp;U91!!;1$R!!!!!!!!!!-66'6N='RB&gt;'5A5W6S&gt;G6S,GRW&lt;'FC&amp;V2F&lt;8"M982F)&amp;.F=H:F=CZM&gt;G.M98.T'&amp;2F&lt;8"M982F476T=W&amp;H:6^%982B,G.U&lt;!!;1&amp;!!!1!&amp;$%VF=X.B:W5A2'&amp;U91!!5Q$RWTU0^1!!!!-66'6N='RB&gt;'5A5W6S&gt;G6S,GRW&lt;'FC&amp;'&gt;Q=G-N&lt;(:T&gt;8"Q&lt;X*U,GRW&lt;'FC#G&gt;S='.*:#ZD&gt;'Q!&amp;5!)!!JH5F"$;71A&lt;X6U!!!A1&amp;!!!Q!!!!%!!B.F=H*P=C"J&lt;C!I&lt;G]A:8*S&lt;X)J!&amp;%!]&gt;M^$`5!!!!$&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B2H=(*D,7RW=X6Q='^S&gt;#ZM&gt;GRJ9AJH=H"D371O9X2M!".!#!!*:V*11WFE)'FO!&amp;1!]!!-!!-!"!!'!!=!"!!%!!1!"!!)!!1!"!!*!Q!!?!!!$1A!!!!!!!!*!!!!$1M!!!!!!!!!!!!!!!!!!!!!!!!+!!!!!!!!!!!!!!!3!!!!!!%!#A!!!!!</Property>
+					<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
+					<Property Name="NI.ClassItem.Flags" Type="Int">0</Property>
+					<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
+					<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
+					<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
+					<Property Name="NI.ClassItem.State" Type="Int">1115685392</Property>
+				</Item>
+				<Item Name="Set RPC Template __Output.vi" Type="VI" URL="../RPC Methods/Template/Messaging/Set RPC Template __Output.vi">
+					<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!':!!!!#Q!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!"2!)1Z4&gt;(*F:7VJ&lt;G=`)#B'+1!!)%"1!!-!!!!"!!)4:8*S&lt;X)A;7YA+'ZP)'6S=G^S+1!/1$$`````"%2B&gt;'%!!'E!]1!!!!!!!!!$&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B&gt;5:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:D&lt;'&amp;T=RB5:7VQ&lt;'&amp;U:5VF=X.B:W6@2'&amp;U93ZD&gt;'Q!'E"1!!%!"QR.:8.T97&gt;F)%2B&gt;'%!!&amp;%!]&gt;M^$`5!!!!$&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B2H=(*D,7RW=X6Q='^S&gt;#ZM&gt;GRJ9AJH=H"D371O9X2M!".!#!!*:V*11WFE)'FO!&amp;1!]!!-!!-!"!!%!!1!"!!%!!1!"1!'!!1!#!!*!Q!!?!!!$1A!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!I!!!!+!!!!!!!!!")!!!!3!!!!!!%!#A!!!!!</Property>
+					<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
+					<Property Name="NI.ClassItem.Flags" Type="Int">0</Property>
+					<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
+					<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
+					<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
+					<Property Name="NI.ClassItem.State" Type="Int">1115685392</Property>
+				</Item>
 			</Item>
-			<Item Name="RPC__method Template.vi" Type="VI" URL="../RPC Methods/Template/RPC__method Template.vi">
-				<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!&amp;9!!!!#1!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!%B!=!!?!!!P&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B&gt;5:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:D&lt;'&amp;T=Q!/4U^1)&amp;.F=H:F=C"P&gt;81!!#"!5!!$!!!!!1!#%W6S=G^S)'FO)#BO&lt;S"F=H*P=CE!2E"Q!"Y!!#]66'6N='RB&gt;'5A5W6S&gt;G6S,GRW&lt;'FC&amp;V2F&lt;8"M982F)&amp;.F=H:F=CZM&gt;G.M98.T!!V04V!A5W6S&gt;G6S)'FO!'%!]!!-!!-!"!!%!!5!"!!%!!1!"!!'!!1!"!!(!Q!!?!!!$1A!!!!!!!!!!!!!$1M!!!!!!!!!!!!!!!!!!!!!!!!+!!!!!!!!!!!!!!!1!!!.!!!!$!!!!!!!!!!!!!!"!!A!!!!!</Property>
+			<Item Name="Registration" Type="Folder">
+				<Item Name="Bind RPC Template.vi" Type="VI" URL="../RPC Methods/Template/Registration/Bind RPC Template.vi">
+					<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!,$!!!!$Q!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!%%!Q`````Q&gt;$&lt;WVN97ZE!!J!5Q2%982B!!"T!0%!!!!!!!!!!R65:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:M;7)86'6N='RB&gt;'5A5W6S&gt;G6S,GRW9WRB=X-95W6S&gt;G6S)%FO&gt;'6S&lt;G&amp;M)%2B&gt;'%O9X2M!#2!5!!#!!1!"26#;7ZE)%FO&gt;'6S&lt;G&amp;M)%VF=X.B:W5!)%"Q!"E!!1!'&amp;&amp;2F&lt;8"M982F)%FO&gt;'6S&lt;G&amp;M)&amp;6&amp;!!"0!0(&lt;01`V!!!!!R65:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:M;7)5:X"S9SVM&gt;H.V=("P=H1O&lt;(:M;7)+:X*Q9UFE,G.U&lt;!!21!A!"G&gt;35%.J:!!!8!$R!!!!!!!!!!-66'6N='RB&gt;'5A5W6S&gt;G6S,GRW&lt;'FC&amp;'&gt;Q=G-N&lt;(:T&gt;8"Q&lt;X*U,GRW&lt;'FC%G&gt;35%.*:#"$&lt;(6T&gt;'6S,G.U&lt;!!71&amp;!!!1!)#'6W:7ZU)'FO!!!=1(!!'1!"!!E16'6N='RB&gt;'5A:V*11S"621!!71$RWTU0^1!!!!-66'6N='RB&gt;'5A5W6S&gt;G6S,GRW&lt;'FC&amp;'&gt;Q=G-N&lt;(:T&gt;8"Q&lt;X*U,GRW&lt;'FC#G&gt;S='.*:#ZD&gt;'Q!'U!)!"&amp;H5F"$;71A=W6S&gt;G6S)'^V&gt;!!%!!!!71$RWTU0^1!!!!-66'6N='RB&gt;'5A5W6S&gt;G6S,GRW&lt;'FC&amp;'&gt;Q=G-N&lt;(:T&gt;8"Q&lt;X*U,GRW&lt;'FC#G&gt;S='.*:#ZD&gt;'Q!'U!)!""H5F"$;71A=W6S&gt;G6S)'FO!!"5!0!!$!!$!!=!#A!,!!Q!$!!-!!Q!$!!-!!Q!$1-!!(A!!!E!!!!*!!!!#1!!!!U,!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%!!!!!!"!!Y!!!!!</Property>
+					<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
+					<Property Name="NI.ClassItem.Flags" Type="Int">0</Property>
+					<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
+					<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
+					<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
+					<Property Name="NI.ClassItem.State" Type="Int">1350574608</Property>
+				</Item>
+			</Item>
+			<Item Name="RPC Method Template.vi" Type="VI" URL="../RPC Methods/Template/RPC Method Template.vi">
+				<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!%$!!!!#!!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!#"!5!!$!!!!!1!#%W6S=G^S)'FO)#BO&lt;S"F=H*P=CE!2E"Q!"Y!!#]66'6N='RB&gt;'5A5W6S&gt;G6S,GRW&lt;'FC&amp;V2F&lt;8"M982F)&amp;.F=H:F=CZM&gt;G.M98.T!!V04V!A5W6S&gt;G6S)'FO!&amp;1!]!!-!!-!"!!%!!1!"!!%!!1!"!!&amp;!!1!"!!'!Q!!?!!!$1A!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!+!!!!!!!!!!!!!!!1!!!!!!%!"Q!!!!!</Property>
 				<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
 				<Property Name="NI.ClassItem.Flags" Type="Int">0</Property>
 				<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
 				<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
 				<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
-				<Property Name="NI.ClassItem.State" Type="Int">1350574608</Property>
+				<Property Name="NI.ClassItem.State" Type="Int">1342710288</Property>
 			</Item>
 		</Item>
 	</Item>
@@ -243,13 +265,22 @@
 			<Property Name="NI.ClassItem.State" Type="Int">1350574608</Property>
 		</Item>
 		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../Server API/Register gRPC Messages.vi">
-			<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!&amp;C!!!!#1!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!%R!=!!?!!!P&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B&gt;5:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:D&lt;'&amp;T=Q!46'6N='RB&gt;'5A5W6S&gt;G6S)'^V&gt;!!A1&amp;!!!Q!!!!%!!B.F=H*P=C"J&lt;C!I&lt;G]A:8*S&lt;X)J!%R!=!!?!!!P&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B&gt;5:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:D&lt;'&amp;T=Q!36'6N='RB&gt;'5A5W6S&gt;G6S)'FO!!"B!0!!$!!$!!1!"!!&amp;!!1!"!!%!!1!"A!%!!1!"Q-!!(A!!!E!!!!!!!!!!!!!!!E!!!!!!!!!!!!!!!!!!!!!!!!!#!!!!!!!!!!!!!!!#!!!$1!!!!Q!!!!!!!!!!!!!!1!)!!!!!!</Property>
+			<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!&amp;C!!!!#1!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!%R!=!!?!!!P&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B&gt;5:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:D&lt;'&amp;T=Q!46'6N='RB&gt;'5A5W6S&gt;G6S)'^V&gt;!!A1&amp;!!!Q!!!!%!!B.F=H*P=C"J&lt;C!I&lt;G]A:8*S&lt;X)J!%R!=!!?!!!P&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B&gt;5:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:D&lt;'&amp;T=Q!36'6N='RB&gt;'5A5W6S&gt;G6S)'FO!!"B!0!!$!!$!!1!"!!&amp;!!1!"!!%!!1!"A!%!!1!"Q-!!(A!!!U)!!!!!!!!!!!!!!U,!!!!!!!!!!!!!!!!!!!!!!!!#A!!!!!!!!!!!!!!#!!!$1!!!!Q!!!!!!!!!!!!!!1!)!!!!!!</Property>
 			<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
 			<Property Name="NI.ClassItem.Flags" Type="Int">0</Property>
 			<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
 			<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
 			<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
-			<Property Name="NI.ClassItem.State" Type="Int">1342710288</Property>
+			<Property Name="NI.ClassItem.State" Type="Int">1115685392</Property>
+		</Item>
+		<Item Name="Register gRPC Methods.vi" Type="VI" URL="../Server API/Register gRPC Methods.vi">
+			<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!&amp;C!!!!#1!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!%R!=!!?!!!P&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B&gt;5:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:D&lt;'&amp;T=Q!46'6N='RB&gt;'5A5W6S&gt;G6S)'^V&gt;!!A1&amp;!!!Q!!!!%!!B.F=H*P=C"J&lt;C!I&lt;G]A:8*S&lt;X)J!%R!=!!?!!!P&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B&gt;5:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:D&lt;'&amp;T=Q!36'6N='RB&gt;'5A5W6S&gt;G6S)'FO!!"B!0!!$!!$!!1!"!!&amp;!!1!"!!%!!1!"A!%!!1!"Q)!!(A!!!E!!!!!!!!!!!!!!!E!!!!!!!!!!!!!!!!!!!!!!!!!#!!!!!!!!!!!!!!!#!!!$1!!!!Q!!!!!!!!!!!!!!1!)!!!!!!</Property>
+			<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
+			<Property Name="NI.ClassItem.Flags" Type="Int">0</Property>
+			<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
+			<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
+			<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
+			<Property Name="NI.ClassItem.State" Type="Int">1342710272</Property>
 		</Item>
 		<Item Name="Register gRPC Parameters.vi" Type="VI" URL="../Server API/Register gRPC Parameters.vi">
 			<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!&amp;9!!!!#1!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!%B!=!!?!!!P&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B&gt;5:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:D&lt;'&amp;T=Q!/4U^1)&amp;.F=H:F=C"P&gt;81!!#"!5!!$!!!!!1!#%W6S=G^S)'FO)#BO&lt;S"F=H*P=CE!2E"Q!"Y!!#]66'6N='RB&gt;'5A5W6S&gt;G6S,GRW&lt;'FC&amp;V2F&lt;8"M982F)&amp;.F=H:F=CZM&gt;G.M98.T!!V04V!A5W6S&gt;G6S)'FO!'%!]!!-!!-!"!!%!!5!"!!%!!1!"!!'!!1!"!!(!Q!!?!!!$1A!!!!!!!!!!!!!$1M!!!!!!!!!!!!!!!!!!!!!!!!+!!!!!!!!!!!!!!!3!!!.!!!!$!!!!!!!!!!!!!!"!!A!!!!!</Property>
@@ -294,7 +325,7 @@
 			<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
 			<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
 			<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
-			<Property Name="NI.ClassItem.State" Type="Int">1350574608</Property>
+			<Property Name="NI.ClassItem.State" Type="Int">1074274832</Property>
 		</Item>
 		<Item Name="Stop Server.vi" Type="VI" URL="../Server API/Stop Server.vi">
 			<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!&amp;9!!!!#1!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!%B!=!!?!!!P&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B&gt;5:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:D&lt;'&amp;T=Q!/4U^1)&amp;.F=H:F=C"P&gt;81!!#"!5!!$!!!!!1!#%W6S=G^S)'FO)#BO&lt;S"F=H*P=CE!2E"Q!"Y!!#]66'6N='RB&gt;'5A5W6S&gt;G6S,GRW&lt;'FC&amp;V2F&lt;8"M982F)&amp;.F=H:F=CZM&gt;G.M98.T!!V04V!A5W6S&gt;G6S)'FO!'%!]!!-!!-!"!!%!!5!"!!%!!1!"!!'!!1!"!!(!Q!!?!!!#1!!!!!!!!!!!!!!$1M!!!!!!!!!!!!!!!!!!!!!!!!+!!!!!!!!!!!!!!!1!!!.!!!!$!!!!!!!!!!!!!!"!!A!!!!!</Property>
@@ -343,14 +374,5 @@
 			<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
 			<Property Name="NI.ClassItem.State" Type="Int">1074541056</Property>
 		</Item>
-	</Item>
-	<Item Name="Register gRPC Methods.vi" Type="VI" URL="../Server API/Register gRPC Methods.vi">
-		<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!&amp;C!!!!#1!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!%R!=!!?!!!P&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B&gt;5:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:D&lt;'&amp;T=Q!46'6N='RB&gt;'5A5W6S&gt;G6S)'^V&gt;!!A1&amp;!!!Q!!!!%!!B.F=H*P=C"J&lt;C!I&lt;G]A:8*S&lt;X)J!%R!=!!?!!!P&amp;62F&lt;8"M982F)&amp;.F=H:F=CZM&gt;GRJ9B&gt;5:7VQ&lt;'&amp;U:3"4:8*W:8)O&lt;(:D&lt;'&amp;T=Q!36'6N='RB&gt;'5A5W6S&gt;G6S)'FO!!"B!0!!$!!$!!1!"!!&amp;!!1!"!!%!!1!"A!%!!1!"Q)!!(A!!!E!!!!!!!!!!!!!!!E!!!!!!!!!!!!!!!!!!!!!!!!!#!!!!!!!!!!!!!!!#!!!$1!!!!Q!!!!!!!!!!!!!!1!)!!!!!!</Property>
-		<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
-		<Property Name="NI.ClassItem.Flags" Type="Int">0</Property>
-		<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
-		<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
-		<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
-		<Property Name="NI.ClassItem.State" Type="Int">1342710272</Property>
 	</Item>
 </LVClass>
