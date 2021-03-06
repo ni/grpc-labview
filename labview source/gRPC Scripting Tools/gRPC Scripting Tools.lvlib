@@ -114,6 +114,7 @@
 			<Item Name="Clear Methods Registration.vi" Type="VI" URL="../Top Level API/Clear Methods Registration.vi"/>
 			<Item Name="Update Method Accessors.vi" Type="VI" URL="../Top Level API/Update Method Accessors.vi"/>
 			<Item Name="Update Method Getter.vi" Type="VI" URL="../Top Level API/Update Method Getter.vi"/>
+			<Item Name="Update Method Setter.vi" Type="VI" URL="../Top Level API/Update Method Setter.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
@@ -216,5 +217,4 @@
 		<Item Name="Get gRPC Package Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Package Name.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
-	<Item Name="Update Method Setter.vi" Type="VI" URL="../Top Level API/Update Method Setter.vi"/>
 </Library>
