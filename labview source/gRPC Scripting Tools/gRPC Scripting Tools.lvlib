@@ -215,6 +215,7 @@
 		<Item Name="Get Message Field Info.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message Field Info.vi"/>
 		<Item Name="Get gRPC Package.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Package.vi"/>
 		<Item Name="Get gRPC Package Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Package Name.vi"/>
+		<Item Name="Get Message Parameters.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message Parameters.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
