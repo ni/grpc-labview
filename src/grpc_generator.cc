@@ -95,6 +95,7 @@ LIBRARY_EXPORT int LVGetServices(LVProtoParser* parser, LV1DArrayHandle* service
     {
         return -2;
     }
+
     auto count = parser->m_FileDescriptor->service_count();
     if (LVNumericArrayResize(0x08, 1, services, count * sizeof(ServiceDescriptor*)) != 0)
     {
@@ -105,6 +106,33 @@ LIBRARY_EXPORT int LVGetServices(LVProtoParser* parser, LV1DArrayHandle* service
     for (int x=0; x<count; ++x)
     {
         serviceElements[x] = parser->m_FileDescriptor->service(x);
+    }
+    return 0;    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int LVGetMessages(LVProtoParser* parser, LV1DArrayHandle* messages)
+{
+    if (parser == nullptr)
+    {
+        return -1;
+    }
+    if (parser->m_FileDescriptor == nullptr)
+    {
+        return -2;
+    }
+
+    auto count = parser->m_FileDescriptor->message_type_count();
+    if (LVNumericArrayResize(0x08, 1, messages, count * sizeof(Descriptor*)) != 0)
+    {
+        return -3;
+    }
+    (**messages)->cnt = count;
+    const Descriptor** messageElements = (**messages)->bytes<const Descriptor*>();
+    for (int x=0; x<count; ++x)
+    {
+        messageElements[x] = parser->m_FileDescriptor->message_type(x);
     }
     return 0;    
 }
@@ -153,6 +181,18 @@ LIBRARY_EXPORT int LVGetMethodName(MethodDescriptor* method, LStrHandle* name)
         return -1;
     }
     SetLVString(name, method->name());
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int LVGetMethodFullName(MethodDescriptor* method, LStrHandle* name)
+{
+    if (method == nullptr)
+    {
+        return -1;
+    }
+    SetLVString(name, method->full_name());
     return 0;
 }
 
