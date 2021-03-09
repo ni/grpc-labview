@@ -216,6 +216,15 @@
 		<Item Name="Get gRPC Package.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Package.vi"/>
 		<Item Name="Get gRPC Package Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Package Name.vi"/>
 		<Item Name="Get Message Parameters.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message Parameters.vi"/>
+		<Item Name="Get gRPC Method FullName.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Method FullName.vi"/>
+		<Item Name="Get ProtoFile Messages.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get ProtoFile Messages.vi"/>
+		<Item Name="Translate gRPC Method FullName.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Translate gRPC Method FullName.vi"/>
+	</Item>
+	<Item Name="Animation API" Type="Folder">
+		<Item Name="Animation.vi" Type="VI" URL="../Animation API/Animation.vi"/>
+		<Item Name="Get Subpanel Ref.vi" Type="VI" URL="../Animation API/Get Subpanel Ref.vi"/>
+		<Item Name="Display Loader.vi" Type="VI" URL="../Animation API/Display Loader.vi"/>
+		<Item Name="Hide Loader.vi" Type="VI" URL="../Animation API/Hide Loader.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
