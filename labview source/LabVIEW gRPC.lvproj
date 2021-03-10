@@ -13,9 +13,18 @@
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
 		<Item Name="Clients" Type="Folder">
+			<Item Name="better_python_client" Type="Folder">
+				<Item Name="query_client.py" Type="Document" URL="../Clients/better_python_client/query_client.py"/>
+			</Item>
 			<Item Name="CPP client" Type="Folder">
 				<Item Name="CPP Client.exe" Type="Document" URL="../Clients/CPP client/CPP Client.exe"/>
 			</Item>
+			<Item Name="python_client" Type="Folder">
+				<Item Name="query_client.py" Type="Document" URL="../Clients/python_client/query_client.py"/>
+			</Item>
+		</Item>
+		<Item Name="Generated Server" Type="Folder">
+			<Item Name="Generated Server.lvlib" Type="Library" URL="../Servers/Generated Server/Generated Server.lvlib"/>
 		</Item>
 		<Item Name="gRPC interface" Type="Folder">
 			<Item Name="gprc-lvsupport.lvlib" Type="Library" URL="../gRPC interface/gprc-lvsupport.lvlib"/>
