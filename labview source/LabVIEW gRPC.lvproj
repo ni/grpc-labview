@@ -23,9 +23,6 @@
 				<Item Name="query_client.py" Type="Document" URL="../Clients/python_client/query_client.py"/>
 			</Item>
 		</Item>
-		<Item Name="Generated Server" Type="Folder">
-			<Item Name="Generated Server.lvlib" Type="Library" URL="../Servers/Generated Server/Generated Server.lvlib"/>
-		</Item>
 		<Item Name="gRPC interface" Type="Folder">
 			<Item Name="gprc-lvsupport.lvlib" Type="Library" URL="../gRPC interface/gprc-lvsupport.lvlib"/>
 		</Item>
