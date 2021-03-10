@@ -10,13 +10,20 @@ using namespace google::protobuf;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+#ifdef _PS_4
+#pragma pack (push, 1)
+#endif
 struct LVMessageField
 {    
-    int type;
-    LStrHandle label;
-    int tagNumber;
-    bool isRepeated;
+    LStrHandle fieldName;
+    LStrHandle embeddedMessage;
+    int32_t protobufIndex;
+    int32_t type;
+    char isRepeated;
 };
+#ifdef _PS_4
+#pragma pack (pop)
+#endif
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -34,7 +41,7 @@ class LVProtoParser
 {
 public:
     LVProtoParser();
-    void Import(const std::string& filePath);
+    void Import(const std::string& filePath, const std::string& searchPath);
 
 public:
     DiskSourceTree m_SourceTree;
@@ -53,22 +60,26 @@ LVProtoParser::LVProtoParser()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LVProtoParser::Import(const std::string& filePath)
+void LVProtoParser::Import(const std::string& filePath, const std::string& search)
 {
-    m_SourceTree.MapPath("", "C:\\dev");
+    std::string searchPath = search;
+    std::replace(searchPath.begin(), searchPath.end(), '\\', '/');
+    m_SourceTree.MapPath("", searchPath);
+    
     std::string path = filePath;
     std::replace(path.begin(), path.end(), '\\', '/');
+    
     m_FileDescriptor = m_Importer.Import(path);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVImportProto(const char* filePath, LVProtoParser** parser)
+LIBRARY_EXPORT int LVImportProto(const char* filePath, const char* searchPath, LVProtoParser** parser)
 {
     InitCallbacks();
 
     *parser = new LVProtoParser();
-    (*parser)->Import(filePath);
+    (*parser)->Import(filePath, searchPath);
     return 0;    
 }
 
@@ -84,8 +95,9 @@ LIBRARY_EXPORT int LVGetServices(LVProtoParser* parser, LV1DArrayHandle* service
     {
         return -2;
     }
+
     auto count = parser->m_FileDescriptor->service_count();
-    if (LVNumericArrayResize(0x01, 1, services, count * sizeof(ServiceDescriptor*)) != 0)
+    if (LVNumericArrayResize(0x08, 1, services, count * sizeof(ServiceDescriptor*)) != 0)
     {
         return -3;
     }
@@ -94,6 +106,33 @@ LIBRARY_EXPORT int LVGetServices(LVProtoParser* parser, LV1DArrayHandle* service
     for (int x=0; x<count; ++x)
     {
         serviceElements[x] = parser->m_FileDescriptor->service(x);
+    }
+    return 0;    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int LVGetMessages(LVProtoParser* parser, LV1DArrayHandle* messages)
+{
+    if (parser == nullptr)
+    {
+        return -1;
+    }
+    if (parser->m_FileDescriptor == nullptr)
+    {
+        return -2;
+    }
+
+    auto count = parser->m_FileDescriptor->message_type_count();
+    if (LVNumericArrayResize(0x08, 1, messages, count * sizeof(Descriptor*)) != 0)
+    {
+        return -3;
+    }
+    (**messages)->cnt = count;
+    const Descriptor** messageElements = (**messages)->bytes<const Descriptor*>();
+    for (int x=0; x<count; ++x)
+    {
+        messageElements[x] = parser->m_FileDescriptor->message_type(x);
     }
     return 0;    
 }
@@ -119,7 +158,8 @@ LIBRARY_EXPORT int LVGetServiceMethods(ServiceDescriptor* service, LV1DArrayHand
         return -1;
     }
     auto count = service->method_count();
-    if (LVNumericArrayResize(0x01, 1, methods, count * sizeof(ServiceDescriptor*)) != 0)
+    auto size = sizeof(ServiceDescriptor*);
+    if (LVNumericArrayResize(0x08, 1, methods, count * size) != 0)
     {
         return -3;
     }
@@ -141,6 +181,42 @@ LIBRARY_EXPORT int LVGetMethodName(MethodDescriptor* method, LStrHandle* name)
         return -1;
     }
     SetLVString(name, method->name());
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int LVGetMethodFullName(MethodDescriptor* method, LStrHandle* name)
+{
+    if (method == nullptr)
+    {
+        return -1;
+    }
+    SetLVString(name, method->full_name());
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int LVIsMethodClientStreaming(MethodDescriptor* method, int* clientStreaming)
+{
+    if (method == nullptr)
+    {
+        return -1;
+    }
+    *clientStreaming = method->client_streaming();
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int LVIsMethodServerStreaming(MethodDescriptor* method, int* serverStreaming)
+{
+    if (method == nullptr)
+    {
+        return -1;
+    }
+    *serverStreaming = method->server_streaming();
     return 0;
 }
 
@@ -170,6 +246,18 @@ LIBRARY_EXPORT int LVGetMethodOutput(MethodDescriptor* method, const Descriptor*
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+LIBRARY_EXPORT int LVMessageName(Descriptor* descriptor, LStrHandle* name)
+{
+    if (descriptor == nullptr)
+    {
+        return -1;
+    }
+    SetLVString(name, descriptor->name());
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, LV1DArrayHandle* fields)
 {
     if (descriptor == nullptr)
@@ -177,15 +265,15 @@ LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, LV1DArrayHandle* fields)
         return -1;
     }
     auto count = descriptor->field_count();
-    if (LVNumericArrayResize(0x01, 1, fields, count * sizeof(FieldDescriptor*)) != 0)
+    if (LVNumericArrayResize(0x08, 1, fields, count * sizeof(FieldDescriptor*)) != 0)
     {
-        return -3;
+       return -3;
     }
     (**fields)->cnt = count;
     auto fieldElements = (**fields)->bytes<const FieldDescriptor*>();
     for (int x=0; x<count; ++x)
     {
-        fieldElements[x] = descriptor->field(x);
+       fieldElements[x] = descriptor->field(x);
     }
     return 0;
 }
@@ -198,9 +286,71 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
     {
         return -1;
     }
-    info->type = field->type();
-    SetLVString(&info->label, field->name());
-    info->tagNumber = field->number();
+    int error = 0;
+    switch (field->type())
+    {
+        case FieldDescriptor::TYPE_DOUBLE:
+            info->type = 2;
+            break;
+        case FieldDescriptor::TYPE_FLOAT:
+            info->type = 1;
+            break;
+        case FieldDescriptor::TYPE_INT64:
+            info->type = 99;
+            break;
+        case FieldDescriptor::TYPE_UINT64:
+            info->type = 99;
+            break;
+        case FieldDescriptor::TYPE_INT32:
+            info->type = 0;
+            break;
+        case FieldDescriptor::TYPE_FIXED64:
+            info->type = 99;
+            break;
+        case FieldDescriptor::TYPE_FIXED32:
+            info->type = 99;
+            break;
+        case FieldDescriptor::TYPE_BOOL:
+            info->type = 3;
+            break;
+        case FieldDescriptor::TYPE_STRING:
+            info->type = 4;
+            break;
+        case FieldDescriptor::TYPE_MESSAGE:
+            info->type = 5;
+            break;
+        case FieldDescriptor::TYPE_BYTES:
+            info->type = 99;
+            break;
+        case FieldDescriptor::TYPE_UINT32:
+            info->type = 99;
+            break;
+        case FieldDescriptor::TYPE_ENUM:
+            info->type = 99;
+            break;
+        case FieldDescriptor::TYPE_SFIXED32:
+            info->type = 99;
+            break;
+        case FieldDescriptor::TYPE_SFIXED64:
+            info->type = 99;
+            break;
+        case FieldDescriptor::TYPE_SINT32:
+            info->type = 99;
+            break;
+        case FieldDescriptor::TYPE_SINT64:
+            info->type = 99;
+            break;
+    }
+    if (field->type() == FieldDescriptor::TYPE_MESSAGE)
+    {
+        SetLVString(&info->embeddedMessage, field->message_type()->name());
+    }
+    SetLVString(&info->fieldName, field->name());
+    info->protobufIndex = field->number();
     info->isRepeated = field->is_repeated();
-    return 0;
+    if (info->type == 99)
+    {
+        error = -2;
+    }
+    return error;
 }
