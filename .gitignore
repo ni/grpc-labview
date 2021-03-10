@@ -25,3 +25,6 @@ liblabview_query_client.so
 *.pb.h
 *_pb2.py
 *_pb2_grpc.py
+*.aliases
+*.lvlps
+labview source/Servers/Generated Server/
