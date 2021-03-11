@@ -115,6 +115,7 @@
 			<Item Name="Update Method Accessors.vi" Type="VI" URL="../Top Level API/Update Method Accessors.vi"/>
 			<Item Name="Update Method Getter.vi" Type="VI" URL="../Top Level API/Update Method Getter.vi"/>
 			<Item Name="Update Method Setter.vi" Type="VI" URL="../Top Level API/Update Method Setter.vi"/>
+			<Item Name="Update Methods Event Unbundlers.vi" Type="VI" URL="../Top Level API/Update Methods Event Unbundlers.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
