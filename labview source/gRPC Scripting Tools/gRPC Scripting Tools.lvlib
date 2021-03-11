@@ -178,6 +178,7 @@
 			<Item Name="Create Cluster Control.vi" Type="VI" URL="../VI API/Front Panel API/Create Cluster Control.vi"/>
 			<Item Name="Delete Control from Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Delete Control from Cluster.vi"/>
 			<Item Name="Find Control Index in Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Find Control Index in Cluster.vi"/>
+			<Item Name="Find Control Ref in Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Find Control Ref in Cluster.vi"/>
 			<Item Name="Add TypeDef to Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Add TypeDef to Cluster.vi"/>
 			<Item Name="Delete Cluster Controls.vi" Type="VI" URL="../VI API/Front Panel API/Delete Cluster Controls.vi"/>
 			<Item Name="Get Control (by Name).vi" Type="VI" URL="../VI API/Front Panel API/Get Control (by Name).vi"/>
