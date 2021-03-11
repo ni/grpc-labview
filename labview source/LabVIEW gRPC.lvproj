@@ -30,6 +30,9 @@
 			<Item Name="gRPC Scripting Tools.lvlib" Type="Library" URL="../gRPC Scripting Tools/gRPC Scripting Tools.lvlib"/>
 		</Item>
 		<Item Name="Servers" Type="Folder">
+			<Item Name="OOP Query Server" Type="Folder">
+				<Item Name="OOP Query Server.lvlib" Type="Library" URL="../Servers/OOP Query Server/OOP Query Server.lvlib"/>
+			</Item>
 			<Item Name="OOP Server" Type="Folder">
 				<Item Name="OOP Server.lvlib" Type="Library" URL="../Servers/OOP Server/OOP Server.lvlib"/>
 			</Item>
