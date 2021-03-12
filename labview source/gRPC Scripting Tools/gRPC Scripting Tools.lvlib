@@ -231,4 +231,6 @@
 		<Item Name="Hide Loader.vi" Type="VI" URL="../Animation API/Hide Loader.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
+	<Item Name="Create Message Getter (from Template).vi" Type="VI" URL="../Top Level API/Create Message Getter (from Template).vi"/>
+	<Item Name="Create Message Setter (from Template).vi" Type="VI" URL="../Top Level API/Create Message Setter (from Template).vi"/>
 </Library>
