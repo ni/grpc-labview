@@ -98,6 +98,8 @@
 			<Item Name="Generate RPC Messages.vi" Type="VI" URL="../Top Level API/Generate RPC Messages.vi"/>
 			<Item Name="Check Message Data Clusters.vi" Type="VI" URL="../Top Level API/Check Message Data Clusters.vi"/>
 			<Item Name="Create Message Data Cluster.vi" Type="VI" URL="../Top Level API/Create Message Data Cluster.vi"/>
+			<Item Name="Create Message Getter (from Template).vi" Type="VI" URL="../Top Level API/Create Message Getter (from Template).vi"/>
+			<Item Name="Create Message Setter (from Template).vi" Type="VI" URL="../Top Level API/Create Message Setter (from Template).vi"/>
 		</Item>
 		<Item Name="RPC Events" Type="Folder">
 			<Item Name="Populate gRPC Events.vi" Type="VI" URL="../Top Level API/Populate gRPC Events.vi"/>
@@ -231,6 +233,4 @@
 		<Item Name="Hide Loader.vi" Type="VI" URL="../Animation API/Hide Loader.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
-	<Item Name="Create Message Getter (from Template).vi" Type="VI" URL="../Top Level API/Create Message Getter (from Template).vi"/>
-	<Item Name="Create Message Setter (from Template).vi" Type="VI" URL="../Top Level API/Create Message Setter (from Template).vi"/>
 </Library>
