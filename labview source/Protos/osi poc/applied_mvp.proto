@@ -1,0 +1,53 @@
+syntax = "proto2";
+
+option optimize_for = SPEED;
+
+import "osi_common.proto";
+import "osi_detectedobject.proto";
+
+package osi3;
+
+message SensorData {
+    // The timestamp of the sensor data. Zero time is arbitrary but must be
+    // identical for all messages. Zero time does not need to coincide with
+    // the unix epoch. Recommended is the starting time point of the
+    // simulation.
+    //
+    // \note This is the point in time that the sensor data message becomes
+    // available to the rest of the system (i.e. the driving functions), so
+    // it corresponds with the sending time and thus takes the latency of
+    // internal processing of the sensor into account. Latencies of bus
+    // communications, etc., that occur after the sensor output have to be
+    // applied on top of this, if needed.
+    //
+    // The time that the actual measurement was performed (which will usually
+    // correspond with the timestamp of the \c GroundTruth the sensor model
+    // processed to arrive at these results) can be found in the additional
+    // field \c SensorData::last_measurement_time.
+    //
+    // For an ideal zero latency sensor the two timestamps would be the same
+    // and would correspond with the timestamp from the current \c GroundTruth
+    // message.
+    //
+    // For a sensor model that does not know its own internal latencies (e.g.
+    // a dumb sensor with no internal time concept), the two timestamps might
+    // also be identical, but delayed from the \c GroundTruth timestamp.
+    //
+    optional Timestamp timestamp = 1;
+
+    // The sensors estimated location of the host vehicle
+    //
+    // \note This value is only set by sensors that are able to
+    // provide an own estimation of the host vehicle location.
+    // \note Note that dimension and base_polygon need not be set.
+    // \note The parent frame of \c host_vehicle_location is the sensor frame.
+    //
+    optional BaseMoving host_vehicle_location = 2;
+
+    // The list of moving objects detected by the sensor as perceived by
+    // the sensor.
+    //
+    // \note OSI uses singular instead of plural for repeated field names.
+    //
+    repeated DetectedMovingObject moving_object = 3; 
+}
