@@ -236,4 +236,5 @@
 		<Item Name="Hide Loader.vi" Type="VI" URL="../Animation API/Hide Loader.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
+	<Item Name="Copy Template Files.vi" Type="VI" URL="../Top Level API/Copy Template Files.vi"/>
 </Library>
