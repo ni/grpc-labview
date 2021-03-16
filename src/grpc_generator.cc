@@ -112,6 +112,22 @@ LIBRARY_EXPORT int LVGetServices(LVProtoParser* parser, LV1DArrayHandle* service
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+void AddDependentMessages(const google::protobuf::FileDescriptor& descriptor, std::set<const google::protobuf::Descriptor*>& messages)
+{
+    auto count = descriptor.message_type_count();
+    for (int x=0; x<count; ++x)
+    {
+        messages.emplace(descriptor.message_type(x));
+    }
+    auto imported = descriptor.dependency_count();
+    for (int x=0; x<imported; ++x)
+    {
+        AddDependentMessages(*descriptor.dependency(x), messages);
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int LVGetMessages(LVProtoParser* parser, LV1DArrayHandle* messages)
 {
     if (parser == nullptr)
@@ -123,16 +139,21 @@ LIBRARY_EXPORT int LVGetMessages(LVProtoParser* parser, LV1DArrayHandle* message
         return -2;
     }
 
-    auto count = parser->m_FileDescriptor->message_type_count();
+    std::set<const google::protobuf::Descriptor*> allMessages;
+    AddDependentMessages(*parser->m_FileDescriptor, allMessages);
+
+    auto count = allMessages.size();
     if (LVNumericArrayResize(0x08, 1, messages, count * sizeof(Descriptor*)) != 0)
     {
         return -3;
     }
     (**messages)->cnt = count;
     const Descriptor** messageElements = (**messages)->bytes<const Descriptor*>();
-    for (int x=0; x<count; ++x)
+    int x=0;
+    for (auto& it: allMessages)
     {
-        messageElements[x] = parser->m_FileDescriptor->message_type(x);
+        messageElements[x] = it;
+        x += 1;
     }
     return 0;    
 }
@@ -252,7 +273,7 @@ LIBRARY_EXPORT int LVMessageName(Descriptor* descriptor, LStrHandle* name)
     {
         return -1;
     }
-    SetLVString(name, descriptor->name());
+    SetLVString(name, descriptor->full_name());
     return 0;
 }
 
@@ -343,7 +364,7 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
     }
     if (field->type() == FieldDescriptor::TYPE_MESSAGE)
     {
-        SetLVString(&info->embeddedMessage, field->message_type()->name());
+        SetLVString(&info->embeddedMessage, field->message_type()->full_name());
     }
     SetLVString(&info->fieldName, field->name());
     info->protobufIndex = field->number();
