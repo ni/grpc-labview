@@ -364,23 +364,19 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
             info->type = 1;
             break;
         case FieldDescriptor::TYPE_INT64:
-            AddFieldError(field, "Unsupported Type: TYPE_INT64");
-            info->type = 99;
+            info->type = 6;
             break;
         case FieldDescriptor::TYPE_UINT64:
-            AddFieldError(field, "Unsupported Type: TYPE_UINT64");
-            info->type = 99;
+            info->type = 8;
             break;
         case FieldDescriptor::TYPE_INT32:
             info->type = 0;
             break;
-        case FieldDescriptor::TYPE_FIXED64:
-            AddFieldError(field, "Unsupported Type: TYPE_FIXED64");
-            info->type = 99;
+        case FieldDescriptor::TYPE_UINT32:
+            info->type = 7;
             break;
-        case FieldDescriptor::TYPE_FIXED32:
-            AddFieldError(field, "Unsupported Type: TYPE_FIXED32");
-            info->type = 99;
+        case FieldDescriptor::TYPE_ENUM:
+            info->type = 9;
             break;
         case FieldDescriptor::TYPE_BOOL:
             info->type = 3;
@@ -391,16 +387,16 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
         case FieldDescriptor::TYPE_MESSAGE:
             info->type = 5;
             break;
+        case FieldDescriptor::TYPE_FIXED64:
+            AddFieldError(field, "Unsupported Type: TYPE_FIXED64");
+            info->type = 99;
+            break;
+        case FieldDescriptor::TYPE_FIXED32:
+            AddFieldError(field, "Unsupported Type: TYPE_FIXED32");
+            info->type = 99;
+            break;
         case FieldDescriptor::TYPE_BYTES:
             AddFieldError(field, "Unsupported Type: TYPE_BYTES");
-            info->type = 99;
-            break;
-        case FieldDescriptor::TYPE_UINT32:
-            AddFieldError(field, "Unsupported Type: TYPE_UINT32");
-            info->type = 99;
-            break;
-        case FieldDescriptor::TYPE_ENUM:
-            AddFieldError(field, "Unsupported Type: TYPE_ENUM");
             info->type = 99;
             break;
         case FieldDescriptor::TYPE_SFIXED32:
