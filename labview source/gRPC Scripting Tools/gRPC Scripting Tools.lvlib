@@ -127,6 +127,8 @@
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
 			<Item Name="Add Server Library to Project.vi" Type="VI" URL="../Top Level API/Add Server Library to Project.vi"/>
+			<Item Name="Copy Template Files.vi" Type="VI" URL="../Top Level API/Copy Template Files.vi"/>
+			<Item Name="Update Template Files.vi" Type="VI" URL="../Top Level API/Update Template Files.vi"/>
 		</Item>
 	</Item>
 	<Item Name="VI API" Type="Folder">
@@ -236,5 +238,4 @@
 		<Item Name="Hide Loader.vi" Type="VI" URL="../Animation API/Hide Loader.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
-	<Item Name="Copy Template Files.vi" Type="VI" URL="../Top Level API/Copy Template Files.vi"/>
 </Library>
