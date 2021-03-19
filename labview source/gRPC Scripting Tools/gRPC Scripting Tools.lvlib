@@ -126,12 +126,15 @@
 			<Item Name="Update RPC Method Template.vi" Type="VI" URL="../Top Level API/Update RPC Method Template.vi"/>
 			<Item Name="Update Bind RPC Template.vi" Type="VI" URL="../Top Level API/Update Bind RPC Template.vi"/>
 			<Item Name="Update RPC Template Accessors.vi" Type="VI" URL="../Top Level API/Update RPC Template Accessors.vi"/>
+			<Item Name="Update RPC Template Accessor.vi" Type="VI" URL="../Top Level API/Update RPC Template Accessor.vi"/>
+			<Item Name="Delete Method Template Files.vi" Type="VI" URL="../Top Level API/Delete Method Template Files.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
 			<Item Name="Add Server Library to Project.vi" Type="VI" URL="../Top Level API/Add Server Library to Project.vi"/>
 			<Item Name="Copy Template Files.vi" Type="VI" URL="../Top Level API/Copy Template Files.vi"/>
 			<Item Name="Update Template Files.vi" Type="VI" URL="../Top Level API/Update Template Files.vi"/>
+			<Item Name="Delete Template Files.vi" Type="VI" URL="../Top Level API/Delete Template Files.vi"/>
 		</Item>
 	</Item>
 	<Item Name="VI API" Type="Folder">
