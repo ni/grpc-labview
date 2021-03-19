@@ -22,6 +22,7 @@
 		<Item Name="Server" Type="Folder">
 			<Item Name="Create And Register Server Event.vim" Type="VI" URL="../Server API/Server/Create And Register Server Event.vim"/>
 			<Item Name="Create Server.vi" Type="VI" URL="../Server API/Server/Create Server.vi"/>
+			<Item Name="Get Server DLL Path.vi" Type="VI" URL="../Server API/Server/Get Server DLL Path.vi"/>
 			<Item Name="Register Message Metadata.vi" Type="VI" URL="../Server API/Server/Register Message Metadata.vi"/>
 			<Item Name="Start Server.vi" Type="VI" URL="../Server API/Server/Start Server.vi"/>
 			<Item Name="Stop Server.vi" Type="VI" URL="../Server API/Server/Stop Server.vi"/>

@@ -216,6 +216,9 @@
 		<Item Name="Message Element Type.ctl" Type="VI" URL="../TypeDefs/Message Element Type.ctl"/>
 	</Item>
 	<Item Name="Proto Parser API" Type="Folder">
+		<Item Name="dll" Type="Folder">
+			<Item Name="labview_grpc_generator.dll" Type="Document" URL="../Proto Parser API/dll/labview_grpc_generator.dll"/>
+		</Item>
 		<Item Name="ProtoGenerator.vi" Type="VI" URL="../Proto Parser API/ProtoGenerator.vi"/>
 		<Item Name="Load ProtoFile.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Load ProtoFile.vi"/>
 		<Item Name="Get ProtoParser DLL Directory.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get ProtoParser DLL Directory.vi"/>
