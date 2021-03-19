@@ -96,6 +96,13 @@
 			<Item Name="Update Messages MetaData.vi" Type="VI" URL="../Top Level API/Update Messages MetaData.vi"/>
 			<Item Name="Update Message Setter.vi" Type="VI" URL="../Top Level API/Update Message Setter.vi"/>
 			<Item Name="Generate RPC Messages.vi" Type="VI" URL="../Top Level API/Generate RPC Messages.vi"/>
+			<Item Name="Check Message Data Clusters.vi" Type="VI" URL="../Top Level API/Check Message Data Clusters.vi"/>
+			<Item Name="Create Message Data Cluster.vi" Type="VI" URL="../Top Level API/Create Message Data Cluster.vi"/>
+			<Item Name="Create Message Getter (from Template).vi" Type="VI" URL="../Top Level API/Create Message Getter (from Template).vi"/>
+			<Item Name="Create Message Setter (from Template).vi" Type="VI" URL="../Top Level API/Create Message Setter (from Template).vi"/>
+			<Item Name="Create Message Getter (from Accessor).vi" Type="VI" URL="../Top Level API/Create Message Getter (from Accessor).vi"/>
+			<Item Name="Create Message Setter (from Accessor).vi" Type="VI" URL="../Top Level API/Create Message Setter (from Accessor).vi"/>
+			<Item Name="Delete Message Template Files.vi" Type="VI" URL="../Top Level API/Delete Message Template Files.vi"/>
 		</Item>
 		<Item Name="RPC Events" Type="Folder">
 			<Item Name="Populate gRPC Events.vi" Type="VI" URL="../Top Level API/Populate gRPC Events.vi"/>
@@ -116,10 +123,18 @@
 			<Item Name="Update Method Getter.vi" Type="VI" URL="../Top Level API/Update Method Getter.vi"/>
 			<Item Name="Update Method Setter.vi" Type="VI" URL="../Top Level API/Update Method Setter.vi"/>
 			<Item Name="Update Methods Event Unbundlers.vi" Type="VI" URL="../Top Level API/Update Methods Event Unbundlers.vi"/>
+			<Item Name="Update RPC Method Template.vi" Type="VI" URL="../Top Level API/Update RPC Method Template.vi"/>
+			<Item Name="Update Bind RPC Template.vi" Type="VI" URL="../Top Level API/Update Bind RPC Template.vi"/>
+			<Item Name="Update RPC Template Accessors.vi" Type="VI" URL="../Top Level API/Update RPC Template Accessors.vi"/>
+			<Item Name="Update RPC Template Accessor.vi" Type="VI" URL="../Top Level API/Update RPC Template Accessor.vi"/>
+			<Item Name="Delete Method Template Files.vi" Type="VI" URL="../Top Level API/Delete Method Template Files.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
 			<Item Name="Add Server Library to Project.vi" Type="VI" URL="../Top Level API/Add Server Library to Project.vi"/>
+			<Item Name="Copy Template Files.vi" Type="VI" URL="../Top Level API/Copy Template Files.vi"/>
+			<Item Name="Update Template Files.vi" Type="VI" URL="../Top Level API/Update Template Files.vi"/>
+			<Item Name="Delete Template Files.vi" Type="VI" URL="../Top Level API/Delete Template Files.vi"/>
 		</Item>
 	</Item>
 	<Item Name="VI API" Type="Folder">
@@ -201,6 +216,9 @@
 		<Item Name="Message Element Type.ctl" Type="VI" URL="../TypeDefs/Message Element Type.ctl"/>
 	</Item>
 	<Item Name="Proto Parser API" Type="Folder">
+		<Item Name="dll" Type="Folder">
+			<Item Name="labview_grpc_generator.dll" Type="Document" URL="../Proto Parser API/dll/labview_grpc_generator.dll"/>
+		</Item>
 		<Item Name="ProtoGenerator.vi" Type="VI" URL="../Proto Parser API/ProtoGenerator.vi"/>
 		<Item Name="Load ProtoFile.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Load ProtoFile.vi"/>
 		<Item Name="Get ProtoParser DLL Directory.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get ProtoParser DLL Directory.vi"/>
