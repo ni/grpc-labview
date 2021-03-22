@@ -94,13 +94,13 @@ int ClusterElementSize(LVMessageMetadataType type, bool repeated)
     {
     case LVMessageMetadataType::BoolValue:
         return 1;
-    case LVMessageMetadataType::Enum:
+    case LVMessageMetadataType::EnumValue:
     case LVMessageMetadataType::Int32Value:
     case LVMessageMetadataType::UInt32Value:
     case LVMessageMetadataType::FloatValue:
         return 4;
-    case LVMessageMetadataType::Int64:
-    case LVMessageMetadataType::Uint64:
+    case LVMessageMetadataType::Int64Value:
+    case LVMessageMetadataType::UInt64Value:
     case LVMessageMetadataType::DoubleValue:
     case LVMessageMetadataType::StringValue:
     case LVMessageMetadataType::MessageValue:

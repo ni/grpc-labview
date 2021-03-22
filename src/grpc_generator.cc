@@ -3,6 +3,7 @@
 #include <google/protobuf/compiler/importer.h>
 #include <lv_interop.h>
 #include <sstream>
+#include <list>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
