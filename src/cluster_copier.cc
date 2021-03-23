@@ -91,6 +91,94 @@ void ClusterDataCopier::CopyInt32ToCluster(const shared_ptr<MessageElementMetada
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+void ClusterDataCopier::CopyUInt32ToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+{
+    if (metadata->isRepeated)
+    {        
+        auto repeatedUInt32 = static_pointer_cast<LVRepeatedUInt32MessageValue>(value);
+        if (repeatedUInt32->_value.size() != 0)
+        {
+            LVNumericArrayResize(0x03, 1, start, repeatedUInt32->_value.size());
+            auto array = *(LV1DArrayHandle*)start;
+            (*array)->cnt = repeatedUInt32->_value.size();
+            auto byteCount = repeatedUInt32->_value.size() * sizeof(uint32_t);
+            memcpy((*array)->bytes<int32_t>(), repeatedUInt32->_value.data(), byteCount);
+        }
+    }
+    else
+    {
+        *(int*)start = ((LVUInt32MessageValue*)value.get())->_value;
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void ClusterDataCopier::CopyEnumToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+{
+    if (metadata->isRepeated)
+    {        
+        auto repeatedEnum = static_pointer_cast<LVRepeatedEnumMessageValue>(value);
+        if (repeatedEnum->_value.size() != 0)
+        {
+            LVNumericArrayResize(0x03, 1, start, repeatedEnum->_value.size());
+            auto array = *(LV1DArrayHandle*)start;
+            (*array)->cnt = repeatedEnum->_value.size();
+            auto byteCount = repeatedEnum->_value.size() * sizeof(int32_t);
+            memcpy((*array)->bytes<int32_t>(), repeatedEnum->_value.data(), byteCount);
+        }
+    }
+    else
+    {
+        *(int*)start = ((LVEnumMessageValue*)value.get())->_value;
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void ClusterDataCopier::CopyInt64ToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+{
+    if (metadata->isRepeated)
+    {        
+        auto repeatedInt64 = static_pointer_cast<LVRepeatedInt64MessageValue>(value);
+        if (repeatedInt64->_value.size() != 0)
+        {
+            LVNumericArrayResize(0x03, 1, start, repeatedInt64->_value.size());
+            auto array = *(LV1DArrayHandle*)start;
+            (*array)->cnt = repeatedInt64->_value.size();
+            auto byteCount = repeatedInt64->_value.size() * sizeof(int64_t);
+            memcpy((*array)->bytes<int32_t>(), repeatedInt64->_value.data(), byteCount);
+        }
+    }
+    else
+    {
+        *(int*)start = ((LVInt64MessageValue*)value.get())->_value;
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void ClusterDataCopier::CopyUInt64ToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+{
+    if (metadata->isRepeated)
+    {        
+        auto repeatedUInt64 = static_pointer_cast<LVRepeatedUInt64MessageValue>(value);
+        if (repeatedUInt64->_value.size() != 0)
+        {
+            LVNumericArrayResize(0x03, 1, start, repeatedUInt64->_value.size());
+            auto array = *(LV1DArrayHandle*)start;
+            (*array)->cnt = repeatedUInt64->_value.size();
+            auto byteCount = repeatedUInt64->_value.size() * sizeof(uint64_t);
+            memcpy((*array)->bytes<int32_t>(), repeatedUInt64->_value.data(), byteCount);
+        }
+    }
+    else
+    {
+        *(int*)start = ((LVUInt64MessageValue*)value.get())->_value;
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void ClusterDataCopier::CopyBoolToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
@@ -194,6 +282,18 @@ void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
                 case LVMessageMetadataType::MessageValue:
                     CopyMessageToCluster(val.second, start, value);
                     break;
+                case LVMessageMetadataType::Int64Value:
+                    CopyInt64ToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::UInt32Value:
+                    CopyUInt32ToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::UInt64Value:
+                    CopyUInt64ToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::EnumValue:
+                    CopyEnumToCluster(val.second, start, value);
+                    break;
             }
         }
     }
@@ -273,6 +373,106 @@ void ClusterDataCopier::CopyInt32FromCluster(const shared_ptr<MessageElementMeta
     else
     {
         auto value = std::make_shared<LVInt32MessageValue>(metadata->protobufIndex, *(int*)start);
+        message._values.emplace(metadata->protobufIndex, value);
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void ClusterDataCopier::CopyUInt32FromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+{    
+    if (metadata->isRepeated)
+    {
+        auto array = *(LV1DArrayHandle*)start;
+        if (array && *array && ((*array)->cnt != 0))
+        {
+            auto count = (*array)->cnt;
+            auto repeatedValue = std::make_shared<LVRepeatedUInt32MessageValue>(metadata->protobufIndex);
+            message._values.emplace(metadata->protobufIndex, repeatedValue);
+            auto data = (*array)->bytes<uint32_t>();
+            repeatedValue->_value.Reserve(count);
+            auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
+            memcpy(dest, data, count * sizeof(uint32_t));
+        }
+    }
+    else
+    {
+        auto value = std::make_shared<LVUInt32MessageValue>(metadata->protobufIndex, *(uint32_t*)start);
+        message._values.emplace(metadata->protobufIndex, value);
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void ClusterDataCopier::CopyEnumFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+{    
+    if (metadata->isRepeated)
+    {
+        auto array = *(LV1DArrayHandle*)start;
+        if (array && *array && ((*array)->cnt != 0))
+        {
+            auto count = (*array)->cnt;
+            auto repeatedValue = std::make_shared<LVRepeatedEnumMessageValue>(metadata->protobufIndex);
+            message._values.emplace(metadata->protobufIndex, repeatedValue);
+            auto data = (*array)->bytes<int32_t>();
+            repeatedValue->_value.Reserve(count);
+            auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
+            memcpy(dest, data, count * sizeof(int32_t));
+        }
+    }
+    else
+    {
+        auto value = std::make_shared<LVEnumMessageValue>(metadata->protobufIndex, *(int32_t*)start);
+        message._values.emplace(metadata->protobufIndex, value);
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void ClusterDataCopier::CopyInt64FromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+{    
+    if (metadata->isRepeated)
+    {
+        auto array = *(LV1DArrayHandle*)start;
+        if (array && *array && ((*array)->cnt != 0))
+        {
+            auto count = (*array)->cnt;
+            auto repeatedValue = std::make_shared<LVRepeatedInt64MessageValue>(metadata->protobufIndex);
+            message._values.emplace(metadata->protobufIndex, repeatedValue);
+            auto data = (*array)->bytes<int64_t>();
+            repeatedValue->_value.Reserve(count);
+            auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
+            memcpy(dest, data, count * sizeof(int64_t));
+        }
+    }
+    else
+    {
+        auto value = std::make_shared<LVInt64MessageValue>(metadata->protobufIndex, *(int64_t*)start);
+        message._values.emplace(metadata->protobufIndex, value);
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void ClusterDataCopier::CopyUInt64FromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+{    
+    if (metadata->isRepeated)
+    {
+        auto array = *(LV1DArrayHandle*)start;
+        if (array && *array && ((*array)->cnt != 0))
+        {
+            auto count = (*array)->cnt;
+            auto repeatedValue = std::make_shared<LVRepeatedUInt64MessageValue>(metadata->protobufIndex);
+            message._values.emplace(metadata->protobufIndex, repeatedValue);
+            auto data = (*array)->bytes<uint64_t>();
+            repeatedValue->_value.Reserve(count);
+            auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
+            memcpy(dest, data, count * sizeof(uint64_t));
+        }
+    }
+    else
+    {
+        auto value = std::make_shared<LVUInt64MessageValue>(metadata->protobufIndex, *(uint64_t*)start);
         message._values.emplace(metadata->protobufIndex, value);
     }
 }
@@ -391,6 +591,18 @@ void ClusterDataCopier::CopyFromCluster(LVMessage& message, int8_t* cluster)
                 break;
             case LVMessageMetadataType::MessageValue:
                 CopyMessageFromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::Int64Value:
+                CopyInt64FromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::UInt32Value:
+                CopyUInt32FromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::UInt64Value:
+                CopyUInt64FromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::EnumValue:
+                CopyEnumFromCluster(val.second, start, message);
                 break;
         }
     }

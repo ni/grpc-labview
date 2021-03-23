@@ -2,6 +2,7 @@
 //---------------------------------------------------------------------
 #include <google/protobuf/compiler/importer.h>
 #include <lv_interop.h>
+#include <sstream>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -30,10 +31,31 @@ struct LVMessageField
 class ErrorCollector : public MultiFileErrorCollector
 {
 public:
-    void AddError(const std::string & filename, int line, int column, const std::string & message)
-    {            
-    }
+    void AddError(const std::string & filename, int line, int column, const std::string & message) override;
+    std::string GetLVErrorMessage();
+
+private:
+    std::list<string> _errors;
 };
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void ErrorCollector::AddError(const std::string & filename, int line, int column, const std::string & message)
+{
+    _errors.emplace_back(message);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+std::string ErrorCollector::GetLVErrorMessage()
+{
+    std::stringstream result;
+    for (auto& s: _errors)
+    {
+        result << s << std::endl;
+    }
+    return result.str();
+}
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -49,13 +71,20 @@ public:
     Importer m_Importer;
 
     const FileDescriptor* m_FileDescriptor;
+
+    static LVProtoParser* s_Parser;
 };
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LVProtoParser* LVProtoParser::s_Parser = nullptr;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LVProtoParser::LVProtoParser()
     : m_Importer(&m_SourceTree, &m_ErrorCollector)
 {    
+    s_Parser = this;
 }
 
 //---------------------------------------------------------------------
@@ -85,6 +114,19 @@ LIBRARY_EXPORT int LVImportProto(const char* filePath, const char* searchPath, L
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+LIBRARY_EXPORT int LVGetErrorString(LVProtoParser* parser, LStrHandle* error)
+{
+    if (parser == nullptr)
+    {
+        return -1;
+    }
+    auto errorMessage = parser->m_ErrorCollector.GetLVErrorMessage();
+    SetLVString(error, errorMessage);
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int LVGetServices(LVProtoParser* parser, LV1DArrayHandle* services)
 {
     if (parser == nullptr)
@@ -99,6 +141,7 @@ LIBRARY_EXPORT int LVGetServices(LVProtoParser* parser, LV1DArrayHandle* service
     auto count = parser->m_FileDescriptor->service_count();
     if (LVNumericArrayResize(0x08, 1, services, count * sizeof(ServiceDescriptor*)) != 0)
     {
+        parser->m_ErrorCollector.AddError("", 0, 0, "Failed to resize array");
         return -3;
     }
     (**services)->cnt = count;
@@ -299,6 +342,11 @@ LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, LV1DArrayHandle* fields)
     return 0;
 }
 
+void AddFieldError(FieldDescriptor* field, string message)
+{
+    LVProtoParser::s_Parser->m_ErrorCollector.AddError("", 0, 0, message);
+}
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
@@ -317,19 +365,19 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
             info->type = 1;
             break;
         case FieldDescriptor::TYPE_INT64:
-            info->type = 99;
+            info->type = 6;
             break;
         case FieldDescriptor::TYPE_UINT64:
-            info->type = 99;
+            info->type = 8;
             break;
         case FieldDescriptor::TYPE_INT32:
             info->type = 0;
             break;
-        case FieldDescriptor::TYPE_FIXED64:
-            info->type = 99;
+        case FieldDescriptor::TYPE_UINT32:
+            info->type = 7;
             break;
-        case FieldDescriptor::TYPE_FIXED32:
-            info->type = 99;
+        case FieldDescriptor::TYPE_ENUM:
+            info->type = 9;
             break;
         case FieldDescriptor::TYPE_BOOL:
             info->type = 3;
@@ -340,25 +388,32 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
         case FieldDescriptor::TYPE_MESSAGE:
             info->type = 5;
             break;
+        case FieldDescriptor::TYPE_FIXED64:
+            AddFieldError(field, "Unsupported Type: TYPE_FIXED64");
+            info->type = 99;
+            break;
+        case FieldDescriptor::TYPE_FIXED32:
+            AddFieldError(field, "Unsupported Type: TYPE_FIXED32");
+            info->type = 99;
+            break;
         case FieldDescriptor::TYPE_BYTES:
-            info->type = 99;
-            break;
-        case FieldDescriptor::TYPE_UINT32:
-            info->type = 99;
-            break;
-        case FieldDescriptor::TYPE_ENUM:
+            AddFieldError(field, "Unsupported Type: TYPE_BYTES");
             info->type = 99;
             break;
         case FieldDescriptor::TYPE_SFIXED32:
+            AddFieldError(field, "Unsupported Type: TYPE_SFIXED32");
             info->type = 99;
             break;
         case FieldDescriptor::TYPE_SFIXED64:
+            AddFieldError(field, "Unsupported Type: TYPE_SFIXED64");
             info->type = 99;
             break;
         case FieldDescriptor::TYPE_SINT32:
+            AddFieldError(field, "Unsupported Type: TYPE_SINT32");
             info->type = 99;
             break;
         case FieldDescriptor::TYPE_SINT64:
+            AddFieldError(field, "Unsupported Type: TYPE_SINT64");
             info->type = 99;
             break;
     }

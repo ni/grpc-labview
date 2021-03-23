@@ -19,6 +19,10 @@ private:
     static void CopyStringToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value);
     static void CopyMessageToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value);
     static void CopyInt32ToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value);
+    static void CopyUInt32ToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value);
+    static void CopyInt64ToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value);
+    static void CopyUInt64ToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value);
+    static void CopyEnumToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value);
     static void CopyBoolToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value);
     static void CopyDoubleToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value);
     static void CopyFloatToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value);
@@ -27,6 +31,10 @@ private:
     static void CopyMessageFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
     static void CopyBoolFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
     static void CopyInt32FromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
+    static void CopyUInt32FromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
+    static void CopyInt64FromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
+    static void CopyUInt64FromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
+    static void CopyEnumFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
     static void CopyDoubleFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
     static void CopyFloatFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
 };
