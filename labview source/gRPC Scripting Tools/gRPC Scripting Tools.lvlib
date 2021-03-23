@@ -103,6 +103,7 @@
 			<Item Name="Create Message Getter (from Accessor).vi" Type="VI" URL="../Top Level API/Create Message Getter (from Accessor).vi"/>
 			<Item Name="Create Message Setter (from Accessor).vi" Type="VI" URL="../Top Level API/Create Message Setter (from Accessor).vi"/>
 			<Item Name="Delete Message Template Files.vi" Type="VI" URL="../Top Level API/Delete Message Template Files.vi"/>
+			<Item Name="Set Message Field Representation.vi" Type="VI" URL="../Top Level API/Set Message Field Representation.vi"/>
 		</Item>
 		<Item Name="RPC Events" Type="Folder">
 			<Item Name="Populate gRPC Events.vi" Type="VI" URL="../Top Level API/Populate gRPC Events.vi"/>
