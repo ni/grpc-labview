@@ -220,7 +220,7 @@
 		<Item Name="dll" Type="Folder">
 			<Item Name="labview_grpc_generator.dll" Type="Document" URL="../Proto Parser API/dll/labview_grpc_generator.dll"/>
 		</Item>
-		<Item Name="ProtoGenerator.vi" Type="VI" URL="../Proto Parser API/ProtoGenerator.vi"/>
+		<Item Name="Proto Parser.vi" Type="VI" URL="../Proto Parser API/Proto Parser.vi"/>
 		<Item Name="Load ProtoFile.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Load ProtoFile.vi"/>
 		<Item Name="Get ProtoParser DLL Directory.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get ProtoParser DLL Directory.vi"/>
 		<Item Name="Get gRPC Services.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Services.vi"/>
