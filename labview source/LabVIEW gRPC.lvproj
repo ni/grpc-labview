@@ -12,37 +12,10 @@
 		<Property Name="server.vi.callsEnabled" Type="Bool">true</Property>
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
-		<Item Name="Clients" Type="Folder">
-			<Item Name="better_python_client" Type="Folder">
-				<Item Name="query_client.py" Type="Document" URL="../Clients/better_python_client/query_client.py"/>
-			</Item>
-			<Item Name="CPP client" Type="Folder">
-				<Item Name="CPP Client.exe" Type="Document" URL="../Clients/CPP client/CPP Client.exe"/>
-			</Item>
-			<Item Name="python_client" Type="Folder">
-				<Item Name="query_client.py" Type="Document" URL="../Clients/python_client/query_client.py"/>
-			</Item>
-		</Item>
-		<Item Name="gRPC interface" Type="Folder">
-			<Item Name="gprc-lvsupport.lvlib" Type="Library" URL="../gRPC interface/gprc-lvsupport.lvlib"/>
-		</Item>
 		<Item Name="Scripting Tools" Type="Folder">
 			<Item Name="gRPC Scripting Tools.lvlib" Type="Library" URL="../gRPC Scripting Tools/gRPC Scripting Tools.lvlib"/>
 		</Item>
 		<Item Name="Servers" Type="Folder">
-			<Item Name="OOP Query Server" Type="Folder">
-				<Item Name="OOP Query Server.lvlib" Type="Library" URL="../Servers/OOP Query Server/OOP Query Server.lvlib"/>
-			</Item>
-			<Item Name="OOP Server" Type="Folder">
-				<Item Name="OOP Server.lvlib" Type="Library" URL="../Servers/OOP Server/OOP Server.lvlib"/>
-			</Item>
-			<Item Name="Query Server" Type="Folder">
-				<Item Name="VIs" Type="Folder">
-					<Item Name="labview-grpc-query-server.lvlib" Type="Library" URL="../Servers/Query Server/VIs/labview-grpc-query-server.lvlib"/>
-					<Item Name="QueryServer_Serverid.ctl" Type="VI" URL="../Servers/Query Server/VIs/QueryServer_Serverid.ctl"/>
-				</Item>
-				<Item Name="ExampleQueryServer.vi" Type="VI" URL="../Servers/Query Server/ExampleQueryServer.vi"/>
-			</Item>
 			<Item Name="Template Server" Type="Folder">
 				<Item Name="Template Server.lvlib" Type="Library" URL="../Servers/Template Server/Template Server.lvlib"/>
 			</Item>
