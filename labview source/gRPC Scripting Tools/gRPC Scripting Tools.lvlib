@@ -217,6 +217,9 @@
 		<Item Name="Message Element Type.ctl" Type="VI" URL="../TypeDefs/Message Element Type.ctl"/>
 	</Item>
 	<Item Name="Proto Parser API" Type="Folder">
+		<Item Name="dll" Type="Folder">
+			<Item Name="labview_grpc_generator.dll" Type="Document" URL="../Proto Parser API/dll/labview_grpc_generator.dll"/>
+		</Item>
 		<Item Name="Proto Parser.vi" Type="VI" URL="../Proto Parser API/Proto Parser.vi"/>
 		<Item Name="Load ProtoFile.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Load ProtoFile.vi"/>
 		<Item Name="Get ProtoParser DLL Directory.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get ProtoParser DLL Directory.vi"/>
@@ -243,6 +246,33 @@
 		<Item Name="Get Subpanel Ref.vi" Type="VI" URL="../Animation API/Get Subpanel Ref.vi"/>
 		<Item Name="Display Loader.vi" Type="VI" URL="../Animation API/Display Loader.vi"/>
 		<Item Name="Hide Loader.vi" Type="VI" URL="../Animation API/Hide Loader.vi"/>
+	</Item>
+	<Item Name="Error Handling" Type="Folder">
+		<Item Name="Error 5001.vi" Type="VI" URL="../Error Handling/Error 5001.vi"/>
+		<Item Name="Error 5002.vi" Type="VI" URL="../Error Handling/Error 5002.vi"/>
+		<Item Name="Error 5003.vi" Type="VI" URL="../Error Handling/Error 5003.vi"/>
+		<Item Name="Error 5004.vi" Type="VI" URL="../Error Handling/Error 5004.vi"/>
+		<Item Name="Error 5005.vi" Type="VI" URL="../Error Handling/Error 5005.vi"/>
+		<Item Name="Error 5006.vi" Type="VI" URL="../Error Handling/Error 5006.vi"/>
+		<Item Name="Error 5007.vi" Type="VI" URL="../Error Handling/Error 5007.vi"/>
+		<Item Name="Error 5008.vi" Type="VI" URL="../Error Handling/Error 5008.vi"/>
+		<Item Name="Error 5009.vi" Type="VI" URL="../Error Handling/Error 5009.vi"/>
+		<Item Name="Error 5010.vi" Type="VI" URL="../Error Handling/Error 5010.vi"/>
+		<Item Name="Error 5011.vi" Type="VI" URL="../Error Handling/Error 5011.vi"/>
+		<Item Name="Error 5012.vi" Type="VI" URL="../Error Handling/Error 5012.vi"/>
+		<Item Name="Error 5013.vi" Type="VI" URL="../Error Handling/Error 5013.vi"/>
+		<Item Name="Error 5014.vi" Type="VI" URL="../Error Handling/Error 5014.vi"/>
+		<Item Name="Error 5015.vi" Type="VI" URL="../Error Handling/Error 5015.vi"/>
+		<Item Name="Error 5016.vi" Type="VI" URL="../Error Handling/Error 5016.vi"/>
+		<Item Name="Error 5017.vi" Type="VI" URL="../Error Handling/Error 5017.vi"/>
+		<Item Name="Error 5018.vi" Type="VI" URL="../Error Handling/Error 5018.vi"/>
+		<Item Name="Error 5019.vi" Type="VI" URL="../Error Handling/Error 5019.vi"/>
+		<Item Name="Error 5020.vi" Type="VI" URL="../Error Handling/Error 5020.vi"/>
+		<Item Name="Error 5021.vi" Type="VI" URL="../Error Handling/Error 5021.vi"/>
+		<Item Name="Error 5022.vi" Type="VI" URL="../Error Handling/Error 5022.vi"/>
+		<Item Name="Error 5023.vi" Type="VI" URL="../Error Handling/Error 5023.vi"/>
+		<Item Name="Error 5024.vi" Type="VI" URL="../Error Handling/Error 5024.vi"/>
+		<Item Name="Error 5025.vi" Type="VI" URL="../Error Handling/Error 5025.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
