@@ -28,3 +28,4 @@ liblabview_query_client.so
 *.aliases
 *.lvlps
 labview source/Servers/Generated Server/
+*.dll
