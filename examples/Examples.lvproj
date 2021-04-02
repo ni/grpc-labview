@@ -11,15 +11,6 @@
 		<Property Name="server.vi.callsEnabled" Type="Bool">true</Property>
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
-		<Item Name="Clients" Type="Folder">
-			<Item Name="Data Marshal Clients" Type="Folder">
-				<Item Name="Data Marshal Client.exe" Type="Document" URL="../Clients/Data Marshal Clients/Data Marshal Client.exe"/>
-			</Item>
-			<Item Name="Query Clients" Type="Folder">
-				<Item Name="Query Client.exe" Type="Document" URL="../Clients/Query Clients/Query Client.exe"/>
-				<Item Name="query_client.py" Type="Document" URL="../Clients/Query Clients/query_client.py"/>
-			</Item>
-		</Item>
 		<Item Name="Protos" Type="Folder">
 			<Item Name="data_marshal.proto" Type="Document" URL="../Protos/data_marshal.proto"/>
 			<Item Name="query_server.proto" Type="Document" URL="../Protos/query_server.proto"/>
