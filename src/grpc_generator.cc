@@ -128,6 +128,15 @@ LIBRARY_EXPORT int LVGetErrorString(LVProtoParser* parser, LStrHandle* error)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+std::string TransformMessageName(const std::string& messageName)
+{
+    std::string result = messageName;
+    std::replace(result.begin(), result.end(), '.', '_');
+    return result;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int LVGetServices(LVProtoParser* parser, LV1DArrayHandle* services)
 {
     if (parser == nullptr)
@@ -156,17 +165,33 @@ LIBRARY_EXPORT int LVGetServices(LVProtoParser* parser, LV1DArrayHandle* service
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void AddDependentMessages(const google::protobuf::FileDescriptor& descriptor, std::set<const google::protobuf::Descriptor*>& messages)
+void AddNestedMessages(const google::protobuf::Descriptor& descriptor, std::set<const google::protobuf::Descriptor*>& messages)
 {
-    auto count = descriptor.message_type_count();
+    auto count = descriptor.nested_type_count();
     for (int x=0; x<count; ++x)
     {
-        messages.emplace(descriptor.message_type(x));
+        auto current = descriptor.nested_type(x);        
+        AddNestedMessages(*current, messages);
+        messages.emplace(current);
     }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void AddDependentMessages(const google::protobuf::FileDescriptor& descriptor, std::set<const google::protobuf::Descriptor*>& messages)
+{
     auto imported = descriptor.dependency_count();
     for (int x=0; x<imported; ++x)
     {
         AddDependentMessages(*descriptor.dependency(x), messages);
+    }
+
+    auto count = descriptor.message_type_count();
+    for (int x=0; x<count; ++x)
+    {
+        auto current = descriptor.message_type(x);        
+        AddNestedMessages(*current, messages);
+        messages.emplace(current);
     }
 }
 
@@ -317,7 +342,7 @@ LIBRARY_EXPORT int LVMessageName(Descriptor* descriptor, LStrHandle* name)
     {
         return -1;
     }
-    SetLVString(name, descriptor->full_name());
+    SetLVString(name, TransformMessageName(descriptor->full_name()));
     return 0;
 }
 
@@ -420,7 +445,7 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
     }
     if (field->type() == FieldDescriptor::TYPE_MESSAGE)
     {
-        SetLVString(&info->embeddedMessage, field->message_type()->full_name());
+        SetLVString(&info->embeddedMessage, TransformMessageName(field->message_type()->full_name()));
     }
     SetLVString(&info->fieldName, field->name());
     info->protobufIndex = field->number();
