@@ -9,153 +9,14 @@ as a pattern to implement a gRPC service of your design.
 
 the project supports Windows, Linux, and Linux RT.
 
-## Build Status
-![Linux Build](https://github.com/ni/grpc-labview/workflows/Linux%20Build/badge.svg)
-![Windows x64 build](https://github.com/ni/grpc-labview/workflows/Windows%20x64%20build/badge.svg)
-![Windows x86 build](https://github.com/ni/grpc-labview/workflows/Windows%20x86%20build/badge.svg)
-
 ## Note: This project is not yet complete
 * Not all .proto data types are supported
 * The VI generated has not yet been implemneted - VIs need to be implemented by hand to match the .proto file
 * Extensive testing is not complete
 
-## Building on Windows
+## Creating a LabVIEW gRPC Server
 
-### Prerequisites
-To prepare for cmake + Microsoft Visual C++ compiler build
-- Install LabVIEW 2019
-- Install Visual Studio 2015, 2017, or 2019 (Visual C++ compiler will be used).
-- Install [Git](https://git-scm.com/).
-- Install [CMake](https://cmake.org/download/).
-
-
-### Building 64-bit
-
-**Launch "x64 Native Tools Command Prompt for Visual Studio"**
-
-Download the repo and update submodules, this will pull the gRPC components and all dependencies
-
-```
-> git clone https://github.com/ni/grpc-labview.git grpc-labview
-> cd grpc-labview
-> git submodule update --init --recursive
-```
-
-Build Debug
-```
-> mkdir build
-> cd build
-> cmake ..
-> cmake --build .
-```
-
-Build Release
-```
-> mkdir build
-> cd build
-> cmake ..
-> cmake --build . --config Release
-```
-### Building 32-bit
-
-**Launch "x86 Native Tools Command Prompt for Visual Studio"**
-
-Download the repo and update submodules, this will pull the gRPC components and all dependencies
-
-```
-> git clone https://github.com/ni/grpc-labview.git grpc-labview
-> cd grpc-labview
-> git submodule update --init --recursive
-```
-
-Build Debug
-```
-> mkdir build
-> cd build
-> cmake -A Win32 ..
-> cmake --build .
-```
-
-Build Release
-```
-> mkdir build
-> cd build
-> cmake -A Win32 ..
-> cmake --build . --config Release
-```
-
-## Building on Linux
-
-Download the repo and update submodules, this will pull the gRPC components and all dependencies
-
-```
-> git clone https://github.com/ni/grpc-labview.git grpc-labview
-> cd grpc-labview
-> git submodule update --init --recursive
-```
-
-Build Debug
-
-```
-> mkdir -p cmake/build
-> cd cmake/build
-> cmake ../..
-> make
-```
-
-Build Release
-
-```
-> mkdir -p cmake/build
-> cd cmake/build
-> cmake -DCMAKE_BUILD_TYPE=Release ../..
-> make
-```
-
-## Building on Linux RT
-
-Install required packages not installed by default
-
-```
-> opkg update
-> opkg install git
-> opkg install git-perltools
-> opkg install cmake
-> opkg install g++
-> opkg install g++-symlinks
-```
-
-Download the repo and update submodules, this will pull the gRPC components and all dependencies
-
-```
-> git clone https://github.com/ni/grpc-labview.git grpc-labview
-> cd grpc-labview
-> git submodule update --init --recursive
-```
-
-Build Debug
-
-```
-> mkdir -p cmake/build
-> cd cmake/build
-> cmake ../..
-> make
-```
-
-Build Release
-
-```
-> mkdir -p cmake/build
-> cd cmake/build
-> cmake -DCMAKE_BUILD_TYPE=Release ../..
-> make
-```
-
-## Creating a LabVIEW Server
-
-Copy the QueryServer_Template.vi to a new name of your choosing.  RPC methods are handled by LabVIEW user events.
-The template consumes all of the events and processes them in the event case.  You can choose to handle the events in
-any manner of your choosing.
+TODO
 
 ## Using the LabVIEW Client API
 
@@ -193,3 +54,7 @@ rm server.csr
 Clients then must connect using the server certificate that was generated (server.cer) otherwise the connection will fail.
 
 If you do not passing in a certificate then the server will use insecure gRPC.
+
+## Building the server binaries
+To build the binaries for the scripting tool or the gRPC server see [Building](src/Building.md) for instructions.
+
