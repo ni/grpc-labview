@@ -17,7 +17,13 @@ the project supports Windows, Linux, and Linux RT.
 
 ## Creating a LabVIEW gRPC Server
 
-Download and unzip a release onto your computer.  You can use the .proto scripting tool on Windows or Linux.
+1. (Windows Only) Download and install the latest [Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019](https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0).
+2. Navigate to the [Releases](https://github.com/ni/grpc-labview/releases) page.
+3. Download the latest Server Release `.zip` for the desired platform.
+4. Extract the contents of the `.zip` to a directory with read and write permissions.
+
+You can use the .proto scripting tool on Windows or Linux.
+
 Open the project LabVIEW gRPC.lvproj from the LabVIEW gRPC folder in LabVIEW 2019 or later:
 
 ![LabVIEW gRPC.lvproj](docs/images/grpc-server-project.png "LabVIEW gRPC.lvproj")
@@ -37,6 +43,13 @@ Once the project is generated you can implement each of the server RPC methods. 
 
 ![Generated Project](docs/images/generated-project.png "Generated Project")
 
+### There are two ways to implement the server from the generated code.
+
+* You can implement a `synchronous` server where all of the RPC methods are handled by a single event structure in 'Start Sync.vi`
+* You can implement an `asynchronus` server where each RPC method is handled by a corresponding LabVIEW Class method
+
+### Async Server Implementation
+
 Each method contains an event structure that registers for a event that is sent when the RPC call is received:
 
 ![RPC Implementation](docs/images/rpc-method.png "Method Implementation")
@@ -49,6 +62,17 @@ There are also several other events that are created
 When the server is started an instance of each of the RPC Method member VIs is run asynchronously to handle parallel calls to different RPC methods.
 
 In you method implementation to must use the Get RPC Method Get Input VI to get the RPC Request parameters and you must call the Set Output VI To set the RPC response of the method and to indicate that the RPC call has completed.
+
+### Run the Server
+
+* Open `Main.vi` from the project.
+* Select either `synchronous` or `asynchronous` with the `Enable Async` button
+* Fill in the Server Address which is in the form of `[address filter]:[port]`. Using `0.0.0.0:[port]` will allow connections from any computer
+* Fill in the path to certificate files if a TLS connection is required, see the section on SSL/TLS Support below for more imformation
+* Run the `Main.vi`
+
+![RPC Server Main](docs/images/server-main.png "Server Main")
+
 
 ## Using the LabVIEW Client API
 
