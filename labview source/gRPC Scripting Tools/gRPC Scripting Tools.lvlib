@@ -273,6 +273,7 @@
 		<Item Name="Error 5023.vi" Type="VI" URL="../Error Handling/Error 5023.vi"/>
 		<Item Name="Error 5024.vi" Type="VI" URL="../Error Handling/Error 5024.vi"/>
 		<Item Name="Error 5025.vi" Type="VI" URL="../Error Handling/Error 5025.vi"/>
+		<Item Name="Error 5026.vi" Type="VI" URL="../Error Handling/Error 5026.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
