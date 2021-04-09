@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 using namespace std;
+using namespace ::google::protobuf::internal;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -221,12 +222,12 @@ void LVMessage::Clear()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char *LVMessage::_InternalParse(const char *ptr, google::protobuf::internal::ParseContext *ctx)
+const char *LVMessage::_InternalParse(const char *ptr, ParseContext *ctx)
 {
     while (!ctx->Done(&ptr))
     {
         google::protobuf::uint32 tag;
-        ptr = google::protobuf::internal::ReadTag(ptr, &tag);
+        ptr = ReadTag(ptr, &tag);
         auto index = (tag >> 3);
         auto fieldInfo = _metadata->_mappedElements[index];
         LVMessageMetadataType dataType = fieldInfo->type;
@@ -269,18 +270,18 @@ const char *LVMessage::_InternalParse(const char *ptr, google::protobuf::interna
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char *LVMessage::ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx)
+const char *LVMessage::ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
 {
     if (fieldInfo.isRepeated)
     {
         auto v = std::make_shared<LVRepeatedBooleanMessageValue>(index);
-        ptr = google::protobuf::internal::PackedBoolParser(&(v->_value), ptr, ctx);
+        ptr = PackedBoolParser(&(v->_value), ptr, ctx);
         _values.emplace(index, v);
     }
     else
     {
         bool result;
-        ptr = google::protobuf::internal::ReadBOOL(ptr, &result);
+        ptr = ReadBOOL(ptr, &result);
         auto v = std::make_shared<LVBooleanMessageValue>(index, result);
         _values.emplace(index, v);
     }
@@ -289,18 +290,18 @@ const char *LVMessage::ParseBoolean(const MessageElementMetadata& fieldInfo, uin
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char *LVMessage::ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx)
+const char *LVMessage::ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
 {    
     if (fieldInfo.isRepeated)
     {
         auto v = std::make_shared<LVRepeatedInt32MessageValue>(index);
-        ptr = google::protobuf::internal::PackedInt32Parser(&(v->_value), ptr, ctx);
+        ptr = PackedInt32Parser(&(v->_value), ptr, ctx);
         _values.emplace(index, v);
     }
     else
     {
         int32_t result;
-        ptr = google::protobuf::internal::ReadINT32(ptr, &result);
+        ptr = ReadINT32(ptr, &result);
         auto v = std::make_shared<LVInt32MessageValue>(index, result);
         _values.emplace(index, v);
     }
@@ -309,18 +310,18 @@ const char *LVMessage::ParseInt32(const MessageElementMetadata& fieldInfo, uint3
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char *LVMessage::ParseUInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx)
+const char *LVMessage::ParseUInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
 {    
     if (fieldInfo.isRepeated)
     {
         auto v = std::make_shared<LVRepeatedUInt32MessageValue>(index);
-        ptr = google::protobuf::internal::PackedUInt32Parser(&(v->_value), ptr, ctx);
+        ptr = PackedUInt32Parser(&(v->_value), ptr, ctx);
         _values.emplace(index, v);
     }
     else
     {
         uint32_t result;
-        ptr = google::protobuf::internal::ReadUINT32(ptr, &result);
+        ptr = ReadUINT32(ptr, &result);
         auto v = std::make_shared<LVUInt32MessageValue>(index, result);
         _values.emplace(index, v);
     }
@@ -329,18 +330,18 @@ const char *LVMessage::ParseUInt32(const MessageElementMetadata& fieldInfo, uint
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char *LVMessage::ParseEnum(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx)
+const char *LVMessage::ParseEnum(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
 {    
     if (fieldInfo.isRepeated)
     {
         auto v = std::make_shared<LVRepeatedEnumMessageValue>(index);
-        ptr = google::protobuf::internal::PackedEnumParser(&(v->_value), ptr, ctx);
+        ptr = PackedEnumParser(&(v->_value), ptr, ctx);
         _values.emplace(index, v);
     }
     else
     {
         int32_t result;
-        ptr = google::protobuf::internal::ReadENUM(ptr, &result);
+        ptr = ReadENUM(ptr, &result);
         auto v = std::make_shared<LVEnumMessageValue>(index, result);
         _values.emplace(index, v);
     }
@@ -349,18 +350,18 @@ const char *LVMessage::ParseEnum(const MessageElementMetadata& fieldInfo, uint32
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char *LVMessage::ParseInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx)
+const char *LVMessage::ParseInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
 {    
     if (fieldInfo.isRepeated)
     {
         auto v = std::make_shared<LVRepeatedInt64MessageValue>(index);
-        ptr = google::protobuf::internal::PackedInt64Parser(&(v->_value), ptr, ctx);
+        ptr = PackedInt64Parser(&(v->_value), ptr, ctx);
         _values.emplace(index, v);
     }
     else
     {
         int64_t result;
-        ptr = google::protobuf::internal::ReadINT64(ptr, &result);
+        ptr = ReadINT64(ptr, &result);
         auto v = std::make_shared<LVInt64MessageValue>(index, result);
         _values.emplace(index, v);
     }
@@ -369,18 +370,18 @@ const char *LVMessage::ParseInt64(const MessageElementMetadata& fieldInfo, uint3
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char *LVMessage::ParseUInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx)
+const char *LVMessage::ParseUInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
 {    
     if (fieldInfo.isRepeated)
     {
         auto v = std::make_shared<LVRepeatedUInt64MessageValue>(index);
-        ptr = google::protobuf::internal::PackedUInt64Parser(&(v->_value), ptr, ctx);
+        ptr = PackedUInt64Parser(&(v->_value), ptr, ctx);
         _values.emplace(index, v);
     }
     else
     {
         uint64_t result;
-        ptr = google::protobuf::internal::ReadUINT64(ptr, &result);
+        ptr = ReadUINT64(ptr, &result);
         auto v = std::make_shared<LVUInt64MessageValue>(index, result);
         _values.emplace(index, v);
     }
@@ -389,18 +390,18 @@ const char *LVMessage::ParseUInt64(const MessageElementMetadata& fieldInfo, uint
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char *LVMessage::ParseFloat(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx)
+const char *LVMessage::ParseFloat(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
 {    
     if (fieldInfo.isRepeated)
     {
         auto v = std::make_shared<LVRepeatedFloatMessageValue>(index);
-        ptr = google::protobuf::internal::PackedFloatParser(&(v->_value), ptr, ctx);
+        ptr = PackedFloatParser(&(v->_value), ptr, ctx);
         _values.emplace(index, v);
     }
     else
     {
         float result;
-        ptr = google::protobuf::internal::ReadFLOAT(ptr, &result);
+        ptr = ReadFLOAT(ptr, &result);
         auto v = std::make_shared<LVFloatMessageValue>(index, result);
         _values.emplace(index, v);
     }
@@ -409,18 +410,18 @@ const char *LVMessage::ParseFloat(const MessageElementMetadata& fieldInfo, uint3
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char *LVMessage::ParseDouble(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx)
+const char *LVMessage::ParseDouble(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
 {    
     if (fieldInfo.isRepeated)
     {
         auto v = std::make_shared<LVRepeatedDoubleMessageValue>(index);
-        ptr = google::protobuf::internal::PackedDoubleParser(&(v->_value), ptr, ctx);
+        ptr = PackedDoubleParser(&(v->_value), ptr, ctx);
         _values.emplace(index, v);
     }
     else
     {
         double result;
-        ptr = google::protobuf::internal::ReadDOUBLE(ptr, &result);
+        ptr = ReadDOUBLE(ptr, &result);
         auto v = std::make_shared<LVDoubleMessageValue>(index, result);
         _values.emplace(index, v);
     }
@@ -429,7 +430,7 @@ const char *LVMessage::ParseDouble(const MessageElementMetadata& fieldInfo, uint
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx)
+const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
 {    
     if (fieldInfo.isRepeated)
     {
@@ -448,7 +449,7 @@ const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageEl
         do {
             ptr += 1;
             auto str = v->_value.Add();
-            ptr = google::protobuf::internal::InlineGreedyStringParser(str, ptr, ctx);
+            ptr = InlineGreedyStringParser(str, ptr, ctx);
             if (!ctx->DataAvailable(ptr))
             {
                 break;
@@ -458,7 +459,7 @@ const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageEl
     else
     {
         auto str = std::string();
-        ptr = google::protobuf::internal::InlineGreedyStringParser(&str, ptr, ctx);
+        ptr = InlineGreedyStringParser(&str, ptr, ctx);
         auto v = std::make_shared<LVStringMessageValue>(index, str);
         _values.emplace(index, v);
     }
@@ -482,7 +483,7 @@ bool LVMessage::ExpectTag(google::protobuf::uint32 tag, const char* ptr)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-const char *LVMessage::ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx)
+const char *LVMessage::ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
 {    
     auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
     if (fieldInfo.isRepeated)
@@ -541,7 +542,7 @@ size_t LVMessage::ByteSizeLong() const
     {
         totalSize += e.second->ByteSizeLong();
     }
-    int cachedSize = google::protobuf::internal::ToCachedSize(totalSize);
+    int cachedSize = ToCachedSize(totalSize);
     SetCachedSize(cachedSize);
     return totalSize;
 }
@@ -643,7 +644,7 @@ LVNestedMessageMessageValue::LVNestedMessageMessageValue(int protobufId, std::sh
 //---------------------------------------------------------------------
 size_t LVNestedMessageMessageValue::ByteSizeLong()
 {
-    return 1 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_value);
+    return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_MESSAGE) + WireFormatLite::MessageSize(*_value);
 }
 
 //---------------------------------------------------------------------
@@ -651,7 +652,7 @@ size_t LVNestedMessageMessageValue::ByteSizeLong()
 google::protobuf::uint8* LVNestedMessageMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
 {
     target = stream->EnsureSpace(target);
-    return google::protobuf::internal::WireFormatLite::InternalWriteMessage(_protobufId, *_value, target, stream);        
+    return WireFormatLite::InternalWriteMessage(_protobufId, *_value, target, stream);        
 }
 
 //---------------------------------------------------------------------
@@ -669,7 +670,7 @@ size_t LVRepeatedNestedMessageMessageValue::ByteSizeLong()
     totalSize += 1UL * _value.size();
     for (const auto& msg : _value)
     {
-        totalSize += google::protobuf::internal::WireFormatLite::MessageSize(*msg);
+        totalSize += WireFormatLite::MessageSize(*msg);
     }
     return totalSize;
 }
@@ -681,7 +682,7 @@ google::protobuf::uint8* LVRepeatedNestedMessageMessageValue::Serialize(google::
     for (unsigned int i = 0, n = static_cast<unsigned int>(_value.size()); i < n; i++)
     {
         target = stream->EnsureSpace(target);
-        target = google::protobuf::internal::WireFormatLite::InternalWriteMessage(_protobufId, *_value[i], target, stream);
+        target = WireFormatLite::InternalWriteMessage(_protobufId, *_value[i], target, stream);
     }
     return target;
 }
@@ -698,13 +699,14 @@ LVStringMessageValue::LVStringMessageValue(int protobufId, std::string& value) :
 //---------------------------------------------------------------------
 size_t LVStringMessageValue::ByteSizeLong()
 {
-    return 1 + google::protobuf::internal::WireFormatLite::StringSize(_value);
+    return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_STRING) + WireFormatLite::StringSize(_value);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 google::protobuf::uint8* LVStringMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
 {    
+    target = stream->EnsureSpace(target);
     return stream->WriteString(_protobufId, _value, target);
 }
 
@@ -720,10 +722,10 @@ LVRepeatedStringMessageValue::LVRepeatedStringMessageValue(int protobufId) :
 size_t LVRepeatedStringMessageValue::ByteSizeLong()
 {    
     size_t totalSize = 0;
-    totalSize += 1 * google::protobuf::internal::FromIntSize(_value.size());
+    totalSize += 1 * FromIntSize(_value.size());
     for (int i = 0, n = _value.size(); i < n; i++)
     {
-        totalSize += google::protobuf::internal::WireFormatLite::StringSize(_value.Get(i));
+        totalSize += WireFormatLite::StringSize(_value.Get(i));
     }
     return totalSize;
 }
@@ -752,7 +754,7 @@ LVBooleanMessageValue::LVBooleanMessageValue(int protobufId, bool value) :
 //---------------------------------------------------------------------
 size_t LVBooleanMessageValue::ByteSizeLong()
 {
-    return 1 + google::protobuf::internal::WireFormatLite::kBoolSize;    
+    return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_BOOL) + WireFormatLite::kBoolSize;    
 }
 
 //---------------------------------------------------------------------
@@ -760,7 +762,7 @@ size_t LVBooleanMessageValue::ByteSizeLong()
 google::protobuf::uint8* LVBooleanMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
 {    
     target = stream->EnsureSpace(target);
-    return google::protobuf::internal::WireFormatLite::WriteBoolToArray(_protobufId, _value, target);
+    return WireFormatLite::WriteBoolToArray(_protobufId, _value, target);
 }
 
 //---------------------------------------------------------------------
@@ -779,7 +781,8 @@ size_t LVRepeatedBooleanMessageValue::ByteSizeLong()
     size_t dataSize = 1UL * count;
     if (dataSize > 0)
     {
-        totalSize += 1 + google::protobuf::internal::WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
+        // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+        totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
     }
     totalSize += dataSize;
     return totalSize;
@@ -808,7 +811,7 @@ LVInt32MessageValue::LVInt32MessageValue(int protobufId, int value) :
 //---------------------------------------------------------------------
 size_t LVInt32MessageValue::ByteSizeLong()
 {
-    return 1 + google::protobuf::internal::WireFormatLite::Int32Size(_value);
+    return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_INT32) +  WireFormatLite::Int32Size(_value);
 }
 
 //---------------------------------------------------------------------
@@ -816,7 +819,7 @@ size_t LVInt32MessageValue::ByteSizeLong()
 google::protobuf::uint8* LVInt32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
 {    
     target = stream->EnsureSpace(target);
-    return google::protobuf::internal::WireFormatLite::WriteInt32ToArray(_protobufId, _value, target);
+    return WireFormatLite::WriteInt32ToArray(_protobufId, _value, target);
 }
 
 //---------------------------------------------------------------------
@@ -831,7 +834,7 @@ LVUInt32MessageValue::LVUInt32MessageValue(int protobufId, uint32_t value) :
 //---------------------------------------------------------------------
 size_t LVUInt32MessageValue::ByteSizeLong()
 {
-    return 1 + google::protobuf::internal::WireFormatLite::UInt32Size(_value);
+    return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_UINT32) +  WireFormatLite::UInt32Size(_value);
 }
 
 //---------------------------------------------------------------------
@@ -839,7 +842,7 @@ size_t LVUInt32MessageValue::ByteSizeLong()
 google::protobuf::uint8* LVUInt32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
 {    
     target = stream->EnsureSpace(target);
-    return google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(_protobufId, _value, target);
+    return WireFormatLite::WriteUInt32ToArray(_protobufId, _value, target);
 }
 
 //---------------------------------------------------------------------
@@ -854,7 +857,7 @@ LVEnumMessageValue::LVEnumMessageValue(int protobufId, int value) :
 //---------------------------------------------------------------------
 size_t LVEnumMessageValue::ByteSizeLong()
 {
-    return 1 + google::protobuf::internal::WireFormatLite::EnumSize(_value);
+    return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_ENUM) +  WireFormatLite::EnumSize(_value);
 }
 
 //---------------------------------------------------------------------
@@ -862,7 +865,7 @@ size_t LVEnumMessageValue::ByteSizeLong()
 google::protobuf::uint8* LVEnumMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
 {    
     target = stream->EnsureSpace(target);
-    return google::protobuf::internal::WireFormatLite::WriteEnumToArray(_protobufId, _value, target);
+    return WireFormatLite::WriteEnumToArray(_protobufId, _value, target);
 }
 
 //---------------------------------------------------------------------
@@ -877,7 +880,7 @@ LVInt64MessageValue::LVInt64MessageValue(int protobufId, int64_t value) :
 //---------------------------------------------------------------------
 size_t LVInt64MessageValue::ByteSizeLong()
 {
-    return 1 + google::protobuf::internal::WireFormatLite::Int64Size(_value);
+    return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_INT64) + WireFormatLite::Int64Size(_value);
 }
 
 //---------------------------------------------------------------------
@@ -885,7 +888,7 @@ size_t LVInt64MessageValue::ByteSizeLong()
 google::protobuf::uint8* LVInt64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
 {    
     target = stream->EnsureSpace(target);
-    return google::protobuf::internal::WireFormatLite::WriteInt64ToArray(_protobufId, _value, target);
+    return WireFormatLite::WriteInt64ToArray(_protobufId, _value, target);
 }
 
 //---------------------------------------------------------------------
@@ -900,7 +903,7 @@ LVUInt64MessageValue::LVUInt64MessageValue(int protobufId, uint64_t value) :
 //---------------------------------------------------------------------
 size_t LVUInt64MessageValue::ByteSizeLong()
 {
-    return 1 + google::protobuf::internal::WireFormatLite::UInt64Size(_value);
+    return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_UINT64) +  WireFormatLite::UInt64Size(_value);
 }
 
 //---------------------------------------------------------------------
@@ -908,7 +911,7 @@ size_t LVUInt64MessageValue::ByteSizeLong()
 google::protobuf::uint8* LVUInt64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
 {    
     target = stream->EnsureSpace(target);
-    return google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(_protobufId, _value, target);
+    return WireFormatLite::WriteUInt64ToArray(_protobufId, _value, target);
 }
 
 //---------------------------------------------------------------------
@@ -923,12 +926,13 @@ LVRepeatedInt32MessageValue::LVRepeatedInt32MessageValue(int protobufId) :
 size_t LVRepeatedInt32MessageValue::ByteSizeLong()
 {    
     size_t totalSize = 0;
-    size_t dataSize = google::protobuf::internal::WireFormatLite::Int32Size(_value);
+    size_t dataSize = WireFormatLite::Int32Size(_value);
     if (dataSize > 0)
     {
-        totalSize += 1 + google::protobuf::internal::WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
+        // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+        totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
     }
-    _cachedSize = google::protobuf::internal::ToCachedSize(dataSize);
+    _cachedSize = ToCachedSize(dataSize);
     totalSize += dataSize;
     return totalSize;
 }
@@ -956,12 +960,13 @@ LVRepeatedUInt32MessageValue::LVRepeatedUInt32MessageValue(int protobufId) :
 size_t LVRepeatedUInt32MessageValue::ByteSizeLong()
 {    
     size_t totalSize = 0;
-    size_t dataSize = google::protobuf::internal::WireFormatLite::UInt32Size(_value);
+    size_t dataSize = WireFormatLite::UInt32Size(_value);
     if (dataSize > 0)
     {
-        totalSize += 1 + google::protobuf::internal::WireFormatLite::UInt32Size(static_cast<google::protobuf::int32>(dataSize));
+        // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+        totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::UInt32Size(static_cast<google::protobuf::int32>(dataSize));
     }
-    _cachedSize = google::protobuf::internal::ToCachedSize(dataSize);
+    _cachedSize = ToCachedSize(dataSize);
     totalSize += dataSize;
     return totalSize;
 }
@@ -989,12 +994,13 @@ LVRepeatedEnumMessageValue::LVRepeatedEnumMessageValue(int protobufId) :
 size_t LVRepeatedEnumMessageValue::ByteSizeLong()
 {    
     size_t totalSize = 0;
-    size_t dataSize = google::protobuf::internal::WireFormatLite::EnumSize(_value);
+    size_t dataSize = WireFormatLite::EnumSize(_value);
     if (dataSize > 0)
     {
-        totalSize += 1 + google::protobuf::internal::WireFormatLite::EnumSize(static_cast<google::protobuf::int32>(dataSize));
+        // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+        totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::EnumSize(static_cast<google::protobuf::int32>(dataSize));
     }
-    _cachedSize = google::protobuf::internal::ToCachedSize(dataSize);
+    _cachedSize = ToCachedSize(dataSize);
     totalSize += dataSize;
     return totalSize;
 }
@@ -1022,12 +1028,13 @@ LVRepeatedInt64MessageValue::LVRepeatedInt64MessageValue(int protobufId) :
 size_t LVRepeatedInt64MessageValue::ByteSizeLong()
 {    
     size_t totalSize = 0;
-    size_t dataSize = google::protobuf::internal::WireFormatLite::Int64Size(_value);
+    size_t dataSize = WireFormatLite::Int64Size(_value);
     if (dataSize > 0)
     {
-        totalSize += 1 + google::protobuf::internal::WireFormatLite::Int64Size(static_cast<google::protobuf::int32>(dataSize));
+        // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+        totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int64Size(static_cast<google::protobuf::int32>(dataSize));
     }
-    _cachedSize = google::protobuf::internal::ToCachedSize(dataSize);
+    _cachedSize = ToCachedSize(dataSize);
     totalSize += dataSize;
     return totalSize;
 }
@@ -1055,12 +1062,13 @@ LVRepeatedUInt64MessageValue::LVRepeatedUInt64MessageValue(int protobufId) :
 size_t LVRepeatedUInt64MessageValue::ByteSizeLong()
 {    
     size_t totalSize = 0;
-    size_t dataSize = google::protobuf::internal::WireFormatLite::UInt64Size(_value);
+    size_t dataSize = WireFormatLite::UInt64Size(_value);
     if (dataSize > 0)
     {
-        totalSize += 1 + google::protobuf::internal::WireFormatLite::UInt64Size(static_cast<google::protobuf::int32>(dataSize));
+        // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+        totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::UInt64Size(static_cast<google::protobuf::int32>(dataSize));
     }
-    _cachedSize = google::protobuf::internal::ToCachedSize(dataSize);
+    _cachedSize = ToCachedSize(dataSize);
     totalSize += dataSize;
     return totalSize;
 }
@@ -1088,7 +1096,7 @@ LVFloatMessageValue::LVFloatMessageValue(int protobufId, float value) :
 //---------------------------------------------------------------------
 size_t LVFloatMessageValue::ByteSizeLong()
 {    
-    return 1 + google::protobuf::internal::WireFormatLite::kFloatSize;    
+    return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_STRING) + WireFormatLite::kFloatSize;    
 }
     
 //---------------------------------------------------------------------
@@ -1096,7 +1104,7 @@ size_t LVFloatMessageValue::ByteSizeLong()
 google::protobuf::uint8* LVFloatMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
 {    
     target = stream->EnsureSpace(target);
-    return google::protobuf::internal::WireFormatLite::WriteFloatToArray(_protobufId, _value, target);
+    return WireFormatLite::WriteFloatToArray(_protobufId, _value, target);
 }
 
 //---------------------------------------------------------------------
@@ -1115,7 +1123,8 @@ size_t LVRepeatedFloatMessageValue::ByteSizeLong()
     size_t dataSize = 4UL * count;
     if (dataSize > 0)
     {
-        totalSize += 1 + google::protobuf::internal::WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
+        // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+        totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
     }
     totalSize += dataSize;
     return totalSize;
@@ -1145,7 +1154,7 @@ LVDoubleMessageValue::LVDoubleMessageValue(int protobufId, double value) :
 //---------------------------------------------------------------------
 size_t LVDoubleMessageValue::ByteSizeLong()
 {    
-    return 1 + google::protobuf::internal::WireFormatLite::kDoubleSize;    
+    return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_DOUBLE) +  WireFormatLite::kDoubleSize;    
 }
 
 //---------------------------------------------------------------------
@@ -1153,7 +1162,7 @@ size_t LVDoubleMessageValue::ByteSizeLong()
 google::protobuf::uint8* LVDoubleMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
 {
     target = stream->EnsureSpace(target);
-    return google::protobuf::internal::WireFormatLite::WriteDoubleToArray(_protobufId, _value, target);
+    return WireFormatLite::WriteDoubleToArray(_protobufId, _value, target);
 }
 
 //---------------------------------------------------------------------
@@ -1172,7 +1181,8 @@ size_t LVRepeatedDoubleMessageValue::ByteSizeLong()
     size_t dataSize = 8UL * count;
     if (dataSize > 0)
     {
-        totalSize += 1 + google::protobuf::internal::WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
+        // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+        totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
     }
     totalSize += dataSize;
     return totalSize;
