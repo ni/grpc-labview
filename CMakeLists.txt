@@ -97,7 +97,7 @@ target_link_libraries(labview_grpc_generator
 #----------------------------------------------------------------------
 # Proto file
 #----------------------------------------------------------------------
-get_filename_component(qs_proto "examples/query_server/query_server.proto" ABSOLUTE)
+get_filename_component(qs_proto "examples/query_server/Protos/query_server.proto" ABSOLUTE)
 get_filename_component(qs_proto_path "${qs_proto}" PATH)
 
 #----------------------------------------------------------------------
