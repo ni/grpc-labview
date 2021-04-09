@@ -29,3 +29,5 @@ liblabview_query_client.so
 *.lvlps
 labview source/Servers/Generated Server/
 *.dll
+*.pdb
+
