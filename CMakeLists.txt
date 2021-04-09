@@ -137,7 +137,7 @@ target_link_libraries(example_client
 #----------------------------------------------------------------------
 # Proto file
 #----------------------------------------------------------------------
-get_filename_component(dm_proto "tests/data_marshal/data_marshal.proto" ABSOLUTE)
+get_filename_component(dm_proto "tests/Protos/data_marshal.proto" ABSOLUTE)
 get_filename_component(dm_proto_path "${dm_proto}" PATH)
 
 #----------------------------------------------------------------------
