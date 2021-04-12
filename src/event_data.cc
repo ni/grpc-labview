@@ -196,7 +196,7 @@ LVMessage::~LVMessage()
 google::protobuf::Message* LVMessage::New() const
 {
     assert(false); // not expected to be called
-    return NULL;
+    return nullptr;
 }
 
 //---------------------------------------------------------------------
@@ -1235,7 +1235,7 @@ GenericMethodData::GenericMethodData(CallData* call, ServerContext *context, std
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 ServerStartEventData::ServerStartEventData()
-    : EventData(NULL)
+    : EventData(nullptr)
 {
     serverStartStatus = 0;
 }
