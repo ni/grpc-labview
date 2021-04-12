@@ -217,8 +217,16 @@
 		<Item Name="Message Element Type.ctl" Type="VI" URL="../TypeDefs/Message Element Type.ctl"/>
 	</Item>
 	<Item Name="Proto Parser API" Type="Folder">
-		<Item Name="dll" Type="Folder">
-			<Item Name="labview_grpc_generator.dll" Type="Document" URL="../Proto Parser API/dll/labview_grpc_generator.dll"/>
+		<Item Name="Libraries" Type="Folder">
+			<Item Name="Linux" Type="Folder">
+				<Item Name="liblabview_grpc_generator.so" Type="Document" URL="../Proto Parser API/Libraries/Linux/liblabview_grpc_generator.so"/>
+			</Item>
+			<Item Name="Win32" Type="Folder">
+				<Item Name="labview_grpc_generator.dll" Type="Document" URL="../Proto Parser API/Libraries/Win32/labview_grpc_generator.dll"/>
+			</Item>
+			<Item Name="Win64" Type="Folder">
+				<Item Name="labview_grpc_generator.dll" Type="Document" URL="../Proto Parser API/Libraries/Win64/labview_grpc_generator.dll"/>
+			</Item>
 		</Item>
 		<Item Name="Proto Parser.vi" Type="VI" URL="../Proto Parser API/Proto Parser.vi"/>
 		<Item Name="Load ProtoFile.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Load ProtoFile.vi"/>
