@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <lv_interop.h>
+#include <iostream>
 #include <cstring>
 #include <memory>
 
@@ -19,8 +20,8 @@ typedef int (*PostLVUserEvent_T)(LVUserEventRef ref, void *data);
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-static NumericArrayResize_T NumericArrayResize;
-static PostLVUserEvent_T PostLVUserEvent;
+static NumericArrayResize_T NumericArrayResize = nullptr;
+static PostLVUserEvent_T PostLVUserEvent = nullptr;
 
 #ifdef _WIN32
 
@@ -28,17 +29,17 @@ static PostLVUserEvent_T PostLVUserEvent;
 //---------------------------------------------------------------------
 void InitCallbacks()
 {
-    if (NumericArrayResize != NULL)
+    if (NumericArrayResize != nullptr)
     {
         return;
     }
 
     auto lvModule = GetModuleHandle("LabVIEW.exe");
-    if (lvModule == NULL)
+    if (lvModule == nullptr)
     {
         lvModule = GetModuleHandle("lvffrt.dll");
     }
-    if (lvModule == NULL)
+    if (lvModule == nullptr)
     {
         lvModule = GetModuleHandle("lvrt.dll");
     }
@@ -52,18 +53,24 @@ void InitCallbacks()
 //---------------------------------------------------------------------
 void InitCallbacks()
 {
-    if (NumericArrayResize != NULL)
+    if (NumericArrayResize != nullptr)
     {
         return;
     }
 
-    auto lvModule = dlopen("labview", RTLD_NOLOAD);
-    if (lvModule == NULL)
+    auto lvModule = dlopen(nullptr, RTLD_LAZY);
+    if (lvModule != nullptr)
     {
-        lvModule = dlopen("liblvrt.so", RTLD_NOW);
+        NumericArrayResize = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
+        PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
     }
-    NumericArrayResize = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
-    PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
+    if (NumericArrayResize == nullptr)
+    {
+        cout << "Loading LabVIEW Runtime engine!" << endl;
+        lvModule = dlopen("liblvrt.so", RTLD_NOW);
+        NumericArrayResize = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
+        PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
+    }
 }
 
 #endif
@@ -96,7 +103,7 @@ void SetLVString(LStrHandle* lvString, string str)
 //---------------------------------------------------------------------
 string GetLVString(LStrHandle lvString)
 {    
-    if (lvString == NULL || *lvString == NULL)
+    if (lvString == nullptr || *lvString == nullptr)
     {
         return string();
     }

@@ -89,7 +89,7 @@ LIBRARY_EXPORT int32_t RegisterMessageMetadata(LVgRPCServerid* id, LVMessageMeta
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t RegisterServerEvent(LVgRPCServerid* id, const char* name, LVUserEventRef* item, const char* requestMessageName, const char* responseMessageName)
-{
+{    
     auto server = *(LabVIEWgRPCServer**)id;
 
     server->RegisterEvent(name, *item, requestMessageName, responseMessageName);
