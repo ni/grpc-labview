@@ -23,6 +23,22 @@ void OccurServerEvent(LVUserEventRef event, EventData* data)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+void OccurServerEvent(LVUserEventRef event, EventData* data, string eventMethodName)
+{
+    LStr* lvMethodName = (LStr*)malloc(sizeof(int32_t) + eventMethodName.length() + 1);
+    lvMethodName->cnt = eventMethodName.length();
+    memcpy(lvMethodName->str, eventMethodName.c_str(), eventMethodName.length());
+
+    GeneralMethodEventData eventData;
+    eventData.methodData = data;
+    eventData.methodName = &lvMethodName;
+    auto error = LVPostLVUserEvent(event, &eventData);
+
+    free(lvMethodName);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 std::shared_ptr<MessageMetadata> CreateMessageMetadata(IMessageElementMetadataOwner* metadataOwner, LVMessageMetadata* lvMetadata)
 {
     std::shared_ptr<MessageMetadata> metadata(new MessageMetadata());
@@ -93,6 +109,16 @@ LIBRARY_EXPORT int32_t RegisterServerEvent(LVgRPCServerid* id, const char* name,
     auto server = *(LabVIEWgRPCServer**)id;
 
     server->RegisterEvent(name, *item, requestMessageName, responseMessageName);
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t RegisterGenericMethodServerEvent(LVgRPCServerid* id, LVUserEventRef* item)
+{    
+    auto server = *(LabVIEWgRPCServer**)id;
+
+    server->RegisterGenericMethodEvent(*item);
     return 0;
 }
 

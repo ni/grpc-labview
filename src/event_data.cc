@@ -148,7 +148,7 @@ void CallData::Proceed(bool ok)
         auto name = _ctx.method();
 
         LVEventData eventData;
-        if (_server->FindEventData(name, eventData))
+        if (_server->FindEventData(name, eventData) || _server->HasGenericMethodEvent())
         {
             auto requestMetadata = _server->FindMetadata(eventData.requestMetadataName);
             auto responseMetadata = _server->FindMetadata(eventData.responseMetadataName);

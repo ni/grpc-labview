@@ -31,6 +31,7 @@
 			<Item Name="Write Call Response.vim" Type="VI" URL="../Server API/Message Requests/Write Call Response.vim"/>
 		</Item>
 		<Item Name="Server" Type="Folder">
+			<Item Name="Create And Register Generic Method Server Event.vi" Type="VI" URL="../Server API/Server/Create And Register Generic Method Server Event.vi"/>
 			<Item Name="Create And Register Server Event.vim" Type="VI" URL="../Server API/Server/Create And Register Server Event.vim"/>
 			<Item Name="Create Server.vi" Type="VI" URL="../Server API/Server/Create Server.vi"/>
 			<Item Name="Get Server DLL Path.vi" Type="VI" URL="../Server API/Server/Get Server DLL Path.vi"/>
@@ -39,6 +40,7 @@
 			<Item Name="Stop Server.vi" Type="VI" URL="../Server API/Server/Stop Server.vi"/>
 		</Item>
 		<Item Name="typeDefs" Type="Folder">
+			<Item Name="Generic Method Event Data.ctl" Type="VI" URL="../Server API/typeDefs/Generic Method Event Data.ctl"/>
 			<Item Name="gRPCId Cluster UE.ctl" Type="VI" URL="../Server API/typeDefs/gRPCId Cluster UE.ctl"/>
 			<Item Name="gRPCId Cluster.ctl" Type="VI" URL="../Server API/typeDefs/gRPCId Cluster.ctl"/>
 			<Item Name="grpcId.ctl" Type="VI" URL="../Server API/typeDefs/grpcId.ctl"/>

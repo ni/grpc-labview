@@ -593,16 +593,19 @@ public:
     void StopServer();
     void RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata);
     void RegisterEvent(string eventName, LVUserEventRef reference, string requestMessageName, string responseMessageName);
+    void RegisterGenericMethodEvent(LVUserEventRef item);
     void SendEvent(string name, EventData* data);
 
     bool FindEventData(string name, LVEventData& data);
     shared_ptr<MessageMetadata> FindMetadata(const string& name);
+    bool HasGenericMethodEvent();    
 
 private:
     mutex _mutex;
     unique_ptr<Server> _server;
-    map<string, LVEventData> _registeredServerMethods;
+    map<string, LVEventData> _registeredServerMethods;    
     map<string, shared_ptr<MessageMetadata>> _registeredMessageMetadata;
+    LVUserEventRef _genericMethodEvent;
     unique_ptr<grpc::AsyncGenericService> _rpcService;
     std::future<void> _runFuture;
     bool _shutdown;
@@ -729,4 +732,19 @@ struct LVServerEvent
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+#ifdef _PS_4
+#pragma pack (push, 1)
+#endif
+struct GeneralMethodEventData
+{
+    LStrHandle methodName;
+    EventData* methodData;
+};
+#ifdef _PS_4
+#pragma pack (pop)
+#endif
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void OccurServerEvent(LVUserEventRef event, EventData* data);
+void OccurServerEvent(LVUserEventRef event, EventData* data, string eventMethodName);

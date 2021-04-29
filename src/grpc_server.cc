@@ -22,7 +22,8 @@ using namespace std;
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LabVIEWgRPCServer::LabVIEWgRPCServer() :
-    _shutdown(false)
+    _shutdown(false),
+    _genericMethodEvent(0)
 {    
 }
 
@@ -47,12 +48,27 @@ void LabVIEWgRPCServer::RegisterEvent(string name, LVUserEventRef item, string r
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+void LabVIEWgRPCServer::RegisterGenericMethodEvent(LVUserEventRef item)
+{
+    lock_guard<mutex> lock(_mutex);
+    _genericMethodEvent = item;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void LabVIEWgRPCServer::SendEvent(string name, EventData *data)
 {
-    auto eventData = _registeredServerMethods.find(name);
-    if (eventData != _registeredServerMethods.end())
+    if (HasGenericMethodEvent())
     {
-        OccurServerEvent(eventData->second.event, data);
+        OccurServerEvent(_genericMethodEvent, data, name);
+    }
+    else
+    {
+        auto eventData = _registeredServerMethods.find(name);
+        if (eventData != _registeredServerMethods.end())
+        {
+            OccurServerEvent(eventData->second.event, data);
+        }
     }
 }
 
@@ -79,6 +95,14 @@ shared_ptr<MessageMetadata> LabVIEWgRPCServer::FindMetadata(const string& name)
         return (*it).second;
     }
     return nullptr;
+}
+
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+bool LabVIEWgRPCServer::HasGenericMethodEvent()
+{
+    return _genericMethodEvent != 0;
 }
 
 //---------------------------------------------------------------------
