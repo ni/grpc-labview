@@ -31,3 +31,4 @@ labview source/Servers/Generated Server/
 *.dll
 *.pdb
 
+*.so

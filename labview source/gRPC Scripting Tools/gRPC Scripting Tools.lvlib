@@ -129,6 +129,7 @@
 			<Item Name="Update RPC Template Accessors.vi" Type="VI" URL="../Top Level API/Update RPC Template Accessors.vi"/>
 			<Item Name="Update RPC Template Accessor.vi" Type="VI" URL="../Top Level API/Update RPC Template Accessor.vi"/>
 			<Item Name="Delete Method Template Files.vi" Type="VI" URL="../Top Level API/Delete Method Template Files.vi"/>
+			<Item Name="Create LV RPC Method Name.vi" Type="VI" URL="../Top Level API/Create LV RPC Method Name.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
