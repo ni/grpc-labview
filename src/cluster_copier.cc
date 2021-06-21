@@ -151,7 +151,7 @@ void ClusterDataCopier::CopyInt64ToCluster(const shared_ptr<MessageElementMetada
     }
     else
     {
-        *(int*)start = ((LVInt64MessageValue*)value.get())->_value;
+        *(int64_t*)start = ((LVInt64MessageValue*)value.get())->_value;
     }
 }
 
@@ -173,7 +173,7 @@ void ClusterDataCopier::CopyUInt64ToCluster(const shared_ptr<MessageElementMetad
     }
     else
     {
-        *(int*)start = ((LVUInt64MessageValue*)value.get())->_value;
+        *(uint64_t*)start = ((LVUInt64MessageValue*)value.get())->_value;
     }
 }
 
