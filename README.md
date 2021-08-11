@@ -14,6 +14,7 @@ The project supports Windows, Linux, and Linux RT.
 * The VI generated has not yet been implemneted - VIs need to be implemented by hand to match the .proto file
 * Extensive testing is not complete
 * The names of the various generated methods, events, and VIs are subject to change until the 1.0 release
+* This project is not supported by NI Technical Support
 
 ## Creating a LabVIEW gRPC Server
 
