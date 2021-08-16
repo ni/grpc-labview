@@ -130,6 +130,7 @@
 			<Item Name="Update RPC Template Accessor.vi" Type="VI" URL="../Top Level API/Update RPC Template Accessor.vi"/>
 			<Item Name="Delete Method Template Files.vi" Type="VI" URL="../Top Level API/Delete Method Template Files.vi"/>
 			<Item Name="Create LV RPC Method Name.vi" Type="VI" URL="../Top Level API/Create LV RPC Method Name.vi"/>
+			<Item Name="Update Server Start Async.vi" Type="VI" URL="../Top Level API/Update Server Start Async.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
@@ -145,10 +146,12 @@
 				<Item Name="Connect Case Selector Terminal.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Connect Case Selector Terminal.vi"/>
 				<Item Name="Create Case Structure Frames.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Create Case Structure Frames.vi"/>
 				<Item Name="Create Case Structure.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Create Case Structure.vi"/>
-				<Item Name="Get Case Struct Terminals.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Struct Terminals.vi"/>
+				<Item Name="Get Case Struct Tunnels.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Struct Tunnels.vi"/>
 				<Item Name="Set Default Case.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Set Default Case.vi"/>
 				<Item Name="Get Case Structure (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Structure (by Name).vi"/>
 				<Item Name="Get Case Structure Frame (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Structure Frame (by Name).vi"/>
+				<Item Name="Get Case Structure Frame Index (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Structure Frame Index (by Name).vi"/>
+				<Item Name="Find Frame Source Terminal (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Find Frame Source Terminal (by Name).vi"/>
 			</Item>
 			<Item Name="Constants" Type="Folder">
 				<Item Name="Enum" Type="Folder">
@@ -183,6 +186,7 @@
 			</Item>
 			<Item Name="BD CleanUp.vi" Type="VI" URL="../VI API/Block Diagram API/BD CleanUp.vi"/>
 			<Item Name="Get BD Reference.vi" Type="VI" URL="../VI API/Block Diagram API/Get BD Reference.vi"/>
+			<Item Name="Delete Diagram SubVIs.vi" Type="VI" URL="../VI API/Block Diagram API/Delete Diagram SubVIs.vi"/>
 		</Item>
 		<Item Name="Front Panel" Type="Folder">
 			<Item Name="Add Control to Cluster (from src ref).vi" Type="VI" URL="../VI API/Front Panel API/Add Control to Cluster (from src ref).vi"/>
@@ -209,6 +213,7 @@
 			<Item Name="Create VI.vi" Type="VI" URL="../VI API/General VI API/Create VI.vi"/>
 			<Item Name="Save VI at Path.vi" Type="VI" URL="../VI API/General VI API/Save VI at Path.vi"/>
 			<Item Name="SubVI Template.vit" Type="VI" URL="../VI API/General VI API/SubVI Template.vit"/>
+			<Item Name="Cleanup VI BD.vi" Type="VI" URL="../VI API/General VI API/Cleanup VI BD.vi"/>
 		</Item>
 	</Item>
 	<Item Name="TypeDefs" Type="Folder">
