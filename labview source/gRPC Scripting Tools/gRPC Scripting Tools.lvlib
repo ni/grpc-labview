@@ -81,6 +81,7 @@
 		<Item Name="Get ProjectItem Descendants (with Pattern).vi" Type="VI" URL="../Project API/Get ProjectItem Descendants (with Pattern).vi"/>
 		<Item Name="Get ProjectItem Descendants (with Type).vi" Type="VI" URL="../Project API/Get ProjectItem Descendants (with Type).vi"/>
 		<Item Name="Close Project.vi" Type="VI" URL="../Project API/Close Project.vi"/>
+		<Item Name="Get Target ref.vi" Type="VI" URL="../Project API/Get Target ref.vi"/>
 	</Item>
 	<Item Name="Top Level API" Type="Folder">
 		<Item Name="RPC Messages" Type="Folder">
@@ -131,6 +132,8 @@
 			<Item Name="Delete Method Template Files.vi" Type="VI" URL="../Top Level API/Delete Method Template Files.vi"/>
 			<Item Name="Create LV RPC Method Name.vi" Type="VI" URL="../Top Level API/Create LV RPC Method Name.vi"/>
 			<Item Name="Update Server Start Async.vi" Type="VI" URL="../Top Level API/Update Server Start Async.vi"/>
+			<Item Name="Get RPC Methods Paths.vi" Type="VI" URL="../Top Level API/Get RPC Methods Paths.vi"/>
+			<Item Name="Get RPC Methods Binds.vi" Type="VI" URL="../Top Level API/Get RPC Methods Binds.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Create Server from Template.vi" Type="VI" URL="../Top Level API/Create Server from Template.vi"/>
@@ -175,6 +178,8 @@
 				<Item Name="Set NamedBundler Input Count.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Set NamedBundler Input Count.vi"/>
 				<Item Name="Get NamedBundler Input.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get NamedBundler Input.vi"/>
 				<Item Name="Get NamedUnbundler.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get NamedUnbundler.vi"/>
+				<Item Name="Get Bundler.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get Bundler.vi"/>
+				<Item Name="Set Bundler Input Count.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Set Bundler Input Count.vi"/>
 			</Item>
 			<Item Name="Event Structure" Type="Folder">
 				<Item Name="Get Event Structure (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Event Structure/Get Event Structure (by Name).vi"/>
@@ -221,6 +226,7 @@
 		<Item Name="Message Element Metadata (Scripting).ctl" Type="VI" URL="../TypeDefs/Message Element Metadata (Scripting).ctl"/>
 		<Item Name="Message Metadata (Scripting).ctl" Type="VI" URL="../TypeDefs/Message Metadata (Scripting).ctl"/>
 		<Item Name="Message Element Type.ctl" Type="VI" URL="../TypeDefs/Message Element Type.ctl"/>
+		<Item Name="Project Settings.ctl" Type="VI" URL="../TypeDefs/Project Settings.ctl"/>
 	</Item>
 	<Item Name="Proto Parser API" Type="Folder">
 		<Item Name="Libraries" Type="Folder">
@@ -290,6 +296,8 @@
 		<Item Name="Error 5026.vi" Type="VI" URL="../Error Handling/Error 5026.vi"/>
 		<Item Name="Error 5027.vi" Type="VI" URL="../Error Handling/Error 5027.vi"/>
 		<Item Name="Error 5028.vi" Type="VI" URL="../Error Handling/Error 5028.vi"/>
+		<Item Name="Error 5029.vi" Type="VI" URL="../Error Handling/Error 5029.vi"/>
+		<Item Name="Error 5030.vi" Type="VI" URL="../Error Handling/Error 5030.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
