@@ -127,7 +127,9 @@ LIBRARY_EXPORT int32_t RegisterGenericMethodServerEvent(LVgRPCServerid* id, LVUs
 LIBRARY_EXPORT int32_t GetRequestData(LVgRPCid id, int8_t* lvRequest)
 {
     auto data = *(GenericMethodData**)id;
+    data->_call->ReadNext();
     ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
+    data->_call->ReadComplete();
     return 0;
 }
 

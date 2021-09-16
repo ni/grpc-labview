@@ -682,6 +682,8 @@ public:
     void Finish();
     bool IsCancelled();
     void CallFinished();
+    bool ReadNext();
+    void ReadComplete();
 
 private:
     bool ParseFromByteBuffer(const grpc::ByteBuffer& buffer, grpc::protobuf::Message& message);
@@ -700,7 +702,7 @@ private:
     std::shared_ptr<LVMessage> _request;
     std::shared_ptr<LVMessage> _response;
     bool _cancelled;
-
+    bool _requestDataReady;
 
     enum class CallStatus
     {
@@ -712,6 +714,21 @@ private:
         Finish
     };
     CallStatus _status;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+class ReadNextTag : CallDataBase
+{
+public:
+    ReadNextTag(CallData* callData);
+    void Proceed(bool ok) override;
+    bool Wait();
+
+private:
+    Semaphore _readCompleteSemaphore;
+    CallData* _callData;
+    bool _success;
 };
 
 //---------------------------------------------------------------------

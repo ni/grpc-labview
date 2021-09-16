@@ -16,7 +16,8 @@ CallData::CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService *service
     _stream(&_ctx),
     _status(CallStatus::Create),
     _writeSemaphore(0),
-    _cancelled(false)
+    _cancelled(false),
+    _requestDataReady(false)
 {
     Proceed(true);
 }
@@ -113,6 +114,41 @@ bool CallData::IsCancelled()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+bool CallData::ReadNext()
+{
+    if (_requestDataReady)
+    {
+        return true;
+    }
+    if (IsCancelled())
+    {
+        return false;
+    }
+    auto tag = new ReadNextTag(this);
+    _stream.Read(&_rb, tag);
+    if (!tag->Wait())
+    {
+        return false;
+    }
+    _request->Clear();
+    ParseFromByteBuffer(_rb, *_request);
+    _requestDataReady = true;
+    if (IsCancelled())
+    {
+        return false;
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void CallData::ReadComplete()
+{
+    _requestDataReady = false;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void CallData::Proceed(bool ok)
 {
     if (!ok)
@@ -155,6 +191,7 @@ void CallData::Proceed(bool ok)
             _request = std::make_shared<LVMessage>(requestMetadata);
             _response = std::make_shared<LVMessage>(responseMetadata);
             ParseFromByteBuffer(_rb, *_request);
+            _requestDataReady = true;
 
             _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
             _server->SendEvent(name, _methodData.get());
@@ -176,6 +213,30 @@ void CallData::Proceed(bool ok)
         assert(_status == CallStatus::Finish);
         delete this;
     }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+ReadNextTag::ReadNextTag(CallData* callData) :
+    _readCompleteSemaphore(0),
+    _success(false)
+{
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void ReadNextTag::Proceed(bool ok)
+{
+    _success = ok;
+    _readCompleteSemaphore.notify();
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+bool ReadNextTag::Wait()
+{
+    _readCompleteSemaphore.wait();
+    return _success;
 }
 
 //---------------------------------------------------------------------
