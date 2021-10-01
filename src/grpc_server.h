@@ -59,6 +59,7 @@ public:
     EventData(ServerContext* context);
 
 private:
+    bool _completed;
     mutex lockMutex;
     condition_variable lock;
 
@@ -607,7 +608,7 @@ private:
     map<string, shared_ptr<MessageMetadata>> _registeredMessageMetadata;
     LVUserEventRef _genericMethodEvent;
     unique_ptr<grpc::AsyncGenericService> _rpcService;
-    std::future<void> _runFuture;
+    unique_ptr<std::thread> _runThread;
     bool _shutdown;
 
 private:
@@ -615,6 +616,9 @@ private:
     void UpdateMetadataClusterLayout(std::shared_ptr<MessageMetadata>& metadata);
     void RunServer(string address, string serverCertificatePath, string serverKeyPath, ServerStartEventData* serverStarted);
     void HandleRpcs(grpc::ServerCompletionQueue *cq);
+
+private:
+    static void StaticRunServer(LabVIEWgRPCServer* server, string address, string serverCertificatePath, string serverKeyPath, ServerStartEventData* serverStarted);
 };
 
 //---------------------------------------------------------------------

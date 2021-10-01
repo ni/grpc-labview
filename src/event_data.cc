@@ -1262,7 +1262,8 @@ google::protobuf::uint8* LVRepeatedDoubleMessageValue::Serialize(google::protobu
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-EventData::EventData(ServerContext *_context)
+EventData::EventData(ServerContext *_context) :
+    _completed(false)
 {
     context = _context;
 }
@@ -1272,7 +1273,7 @@ EventData::EventData(ServerContext *_context)
 void EventData::WaitForComplete()
 {
     std::unique_lock<std::mutex> lck(lockMutex);
-    lock.wait(lck);
+    while (!_completed) lock.wait(lck);
 }
 
 //---------------------------------------------------------------------
@@ -1280,6 +1281,7 @@ void EventData::WaitForComplete()
 void EventData::NotifyComplete()
 {
     std::unique_lock<std::mutex> lck(lockMutex);
+    _completed = true;
     lock.notify_all();
 }
 

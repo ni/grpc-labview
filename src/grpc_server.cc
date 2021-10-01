@@ -230,7 +230,7 @@ int LabVIEWgRPCServer::Run(string address, string serverCertificatePath, string 
     FinalizeMetadata();
     
     auto serverStarted = new ServerStartEventData;
-    _runFuture = std::async(std::launch::async, [=]() { RunServer(address, serverCertificatePath, serverKeyPath, serverStarted); });
+    _runThread = std::make_unique<std::thread>(StaticRunServer, this, address, serverCertificatePath, serverKeyPath, serverStarted);
     serverStarted->WaitForComplete();
     auto result = serverStarted->serverStartStatus;
     delete serverStarted;
@@ -273,6 +273,18 @@ void LabVIEWgRPCServer::HandleRpcs(grpc::ServerCompletionQueue *cq)
             break;
         }
     }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LabVIEWgRPCServer::StaticRunServer(
+    LabVIEWgRPCServer* server,
+    string address,
+    string serverCertificatePath,
+    string serverKeyPath,
+    ServerStartEventData *serverStarted)
+{
+    server->RunServer(address, serverCertificatePath, serverKeyPath, serverStarted);
 }
 
 //---------------------------------------------------------------------
@@ -350,7 +362,8 @@ void LabVIEWgRPCServer::StopServer()
     {
         _server->Shutdown();
         _server->Wait();
-        _runFuture.wait();
+        _runThread->join();
+        //_runFuture.wait();
         _server = nullptr;
     }
 }
