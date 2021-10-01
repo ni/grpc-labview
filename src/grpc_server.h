@@ -34,10 +34,6 @@ using grpc::ServerContext;
 using grpc::Status;
 
 //---------------------------------------------------------------------
-//---------------------------------------------------------------------
-using namespace std;
-
-//---------------------------------------------------------------------
 // QueryServer LabVIEW definitions
 //---------------------------------------------------------------------
 typedef void* LVgRPCid;
@@ -60,8 +56,8 @@ public:
 
 private:
     bool _completed;
-    mutex lockMutex;
-    condition_variable lock;
+    std::mutex lockMutex;
+    std::condition_variable lock;
 
 public:
     ServerContext* context;
@@ -92,7 +88,7 @@ enum class LVMessageMetadataType
 class IMessageElementMetadataOwner
 {
 public:
-    virtual shared_ptr<MessageMetadata> FindMetadata(const string& name) = 0;
+    virtual std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) = 0;
 };
 
 //---------------------------------------------------------------------
@@ -107,15 +103,10 @@ public:
 
 public:
     IMessageElementMetadataOwner* _owner;
-
     std::string embeddedMessageName;
-    
     int protobufIndex;
-    
     int clusterOffset;
-
     LVMessageMetadataType type;    
-
     bool isRepeated;    
 };
 
@@ -150,6 +141,7 @@ public:
     {            
     }
 
+public:
     std::string messageName;
     int clusterSize;
     LVMessageMetadataList _elements;
@@ -344,6 +336,7 @@ public:
 public:
     uint64_t _value;    
 
+public:
     void* RawValue() override { return &_value; };
     size_t ByteSizeLong() override;
     google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
@@ -449,6 +442,7 @@ public:
 public:
     float _value;    
 
+public:
     void* RawValue() override { return &_value; };
     size_t ByteSizeLong() override;
     google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
@@ -464,6 +458,7 @@ public:
 public:
     google::protobuf::RepeatedField<float> _value;    
 
+public:
     void* RawValue() override { return &_value; };
     size_t ByteSizeLong() override;
     google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
@@ -479,6 +474,7 @@ public:
 public:
     double _value;    
 
+public:
     void* RawValue() override { return &_value; };
     size_t ByteSizeLong() override;
     google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
@@ -494,6 +490,7 @@ public:
 public:
     google::protobuf::RepeatedField<double> _value;    
 
+public:
     void* RawValue() override { return &_value; };
     size_t ByteSizeLong() override;
     google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
@@ -504,8 +501,7 @@ public:
 class LVMessage : public google::protobuf::Message
 {
 public:
-    LVMessage(shared_ptr<MessageMetadata> metadata);
-
+    LVMessage(std::shared_ptr<MessageMetadata> metadata);
     ~LVMessage();
 
     google::protobuf::Message* New() const final; 
@@ -531,7 +527,7 @@ public:
     google::protobuf::Metadata GetMetadata() const final;
 
 public:
-    std::map<int, shared_ptr<LVMessageValue>> _values;
+    std::map<int, std::shared_ptr<LVMessageValue>> _values;
     std::shared_ptr<MessageMetadata> _metadata;
 
 private:
@@ -580,8 +576,8 @@ public:
 struct LVEventData
 {
     LVUserEventRef event;
-    string requestMetadataName;
-    string responseMetadataName;
+    std::string requestMetadataName;
+    std::string responseMetadataName;
 };
 
 //---------------------------------------------------------------------
@@ -590,35 +586,35 @@ class LabVIEWgRPCServer : public IMessageElementMetadataOwner
 {
 public:
     LabVIEWgRPCServer();
-    int Run(string address, string serverCertificatePath, string serverKeyPath);
+    int Run(std::string address, std::string serverCertificatePath, std::string serverKeyPath);
     void StopServer();
     void RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata);
-    void RegisterEvent(string eventName, LVUserEventRef reference, string requestMessageName, string responseMessageName);
+    void RegisterEvent(std::string eventName, LVUserEventRef reference, std::string requestMessageName, std::string responseMessageName);
     void RegisterGenericMethodEvent(LVUserEventRef item);
-    void SendEvent(string name, EventData* data);
+    void SendEvent(std::string name, EventData* data);
 
-    bool FindEventData(string name, LVEventData& data);
-    shared_ptr<MessageMetadata> FindMetadata(const string& name);
+    bool FindEventData(std::string name, LVEventData& data);
+    std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name);
     bool HasGenericMethodEvent();    
 
 private:
-    mutex _mutex;
-    unique_ptr<Server> _server;
-    map<string, LVEventData> _registeredServerMethods;    
-    map<string, shared_ptr<MessageMetadata>> _registeredMessageMetadata;
+    std::mutex _mutex;
+    std::unique_ptr<Server> _server;
+    std::map<std::string, LVEventData> _registeredServerMethods;    
+    std::map<std::string, std::shared_ptr<MessageMetadata>> _registeredMessageMetadata;
     LVUserEventRef _genericMethodEvent;
-    unique_ptr<grpc::AsyncGenericService> _rpcService;
-    unique_ptr<std::thread> _runThread;
+    std::unique_ptr<grpc::AsyncGenericService> _rpcService;
+    std::unique_ptr<std::thread> _runThread;
     bool _shutdown;
 
 private:
     void FinalizeMetadata();
     void UpdateMetadataClusterLayout(std::shared_ptr<MessageMetadata>& metadata);
-    void RunServer(string address, string serverCertificatePath, string serverKeyPath, ServerStartEventData* serverStarted);
+    void RunServer(std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
     void HandleRpcs(grpc::ServerCompletionQueue *cq);
 
 private:
-    static void StaticRunServer(LabVIEWgRPCServer* server, string address, string serverCertificatePath, string serverKeyPath, ServerStartEventData* serverStarted);
+    static void StaticRunServer(LabVIEWgRPCServer* server, std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
 };
 
 //---------------------------------------------------------------------
@@ -768,4 +764,4 @@ struct GeneralMethodEventData
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 void OccurServerEvent(LVUserEventRef event, EventData* data);
-void OccurServerEvent(LVUserEventRef event, EventData* data, string eventMethodName);
+void OccurServerEvent(LVUserEventRef event, EventData* data, std::string eventMethodName);

@@ -12,10 +12,6 @@
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-using namespace std;
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 void OccurServerEvent(LVUserEventRef event, EventData* data)
 {
     auto error = LVPostLVUserEvent(event, &data);
@@ -23,7 +19,7 @@ void OccurServerEvent(LVUserEventRef event, EventData* data)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void OccurServerEvent(LVUserEventRef event, EventData* data, string eventMethodName)
+void OccurServerEvent(LVUserEventRef event, EventData* data, std::string eventMethodName)
 {
     LStr* lvMethodName = (LStr*)malloc(sizeof(int32_t) + eventMethodName.length() + 1);
     lvMethodName->cnt = eventMethodName.length();

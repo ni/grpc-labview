@@ -13,7 +13,6 @@
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
-using namespace std;
 using namespace queryserver;
 
 //---------------------------------------------------------------------
@@ -21,28 +20,28 @@ using namespace queryserver;
 class QueryClient
 {
 public:
-    QueryClient(shared_ptr<Channel> channel);
+    QueryClient(std::shared_ptr<Channel> channel);
 
 public:
-    void Invoke(const string& command, const string& parameters);
-    string Query(const string &command);
-    unique_ptr<grpc::ClientReader<ServerEvent>> Register(const string& eventName);
+    void Invoke(const std::string& command, const std::string& parameters);
+    std::string Query(const std::string &command);
+    std::unique_ptr<grpc::ClientReader<ServerEvent>> Register(const std::string& eventName);
 
 public:
     ClientContext m_context;
-    unique_ptr<QueryServer::Stub> m_Stub;
+    std::unique_ptr<QueryServer::Stub> m_Stub;
 };
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-QueryClient::QueryClient(shared_ptr<Channel> channel)
+QueryClient::QueryClient(std::shared_ptr<Channel> channel)
     : m_Stub(QueryServer::NewStub(channel))
 {        
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void QueryClient::Invoke(const string& command, const string& parameters)
+void QueryClient::Invoke(const std::string& command, const std::string& parameters)
 {
     InvokeRequest request;
     request.set_command(command);
@@ -53,13 +52,13 @@ void QueryClient::Invoke(const string& command, const string& parameters)
     Status status = m_Stub->Invoke(&context, request, &reply);
     if (!status.ok())
     {
-        cout << status.error_code() << ": " << status.error_message() << endl;
+        std::cout << status.error_code() << ": " << status.error_message() << std::endl;
     }
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-string QueryClient::Query(const string &command)
+std::string QueryClient::Query(const std::string &command)
 {
     QueryRequest request;
     request.set_query(command);
@@ -74,14 +73,14 @@ string QueryClient::Query(const string &command)
     }
     else
     {
-        cout << status.error_code() << ": " << status.error_message() << endl;
+        std::cout << status.error_code() << ": " << status.error_message() << std::endl;
         return "RPC failed";
     }
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-unique_ptr<grpc::ClientReader<ServerEvent>> QueryClient::Register(const string& eventName)
+std::unique_ptr<grpc::ClientReader<ServerEvent>> QueryClient::Register(const std::string& eventName)
 {
     RegistrationRequest request;
     request.set_eventname(eventName);
@@ -91,15 +90,15 @@ unique_ptr<grpc::ClientReader<ServerEvent>> QueryClient::Register(const string& 
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-string GetServerAddress(int argc, char** argv)
+std::string GetServerAddress(int argc, char** argv)
 {
-    string target_str;
-    string arg_str("--target");
+    std::string target_str;
+    std::string arg_str("--target");
     if (argc > 1)
     {
-        string arg_val = argv[1];
+        std::string arg_val = argv[1];
         size_t start_pos = arg_val.find(arg_str);
-        if (start_pos != string::npos)
+        if (start_pos != std::string::npos)
         {
             start_pos += arg_str.size();
             if (arg_val[start_pos] == '=')
@@ -108,13 +107,13 @@ string GetServerAddress(int argc, char** argv)
             }
             else
             {
-                cout << "The only correct argument syntax is --target=" << endl;
+                std::cout << "The only correct argument syntax is --target=" << std::endl;
                 return 0;
             }
         }
         else
         {
-            cout << "The only acceptable argument is --target=" << endl;
+            std::cout << "The only acceptable argument is --target=" << std::endl;
             return 0;
         }
     }
@@ -127,15 +126,15 @@ string GetServerAddress(int argc, char** argv)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-string GetCertPath(int argc, char** argv)
+std::string GetCertPath(int argc, char** argv)
 {
-    string cert_str;
-    string arg_str("--cert");
+    std::string cert_str;
+    std::string arg_str("--cert");
     if (argc > 2)
     {
-        string arg_val = argv[2];
+        std::string arg_val = argv[2];
         size_t start_pos = arg_val.find(arg_str);
-        if (start_pos != string::npos)
+        if (start_pos != std::string::npos)
         {
             start_pos += arg_str.size();
             if (arg_val[start_pos] == '=')
@@ -144,13 +143,13 @@ string GetCertPath(int argc, char** argv)
             }
             else
             {
-                cout << "The only correct argument syntax is --cert=" << endl;
+                std::cout << "The only correct argument syntax is --cert=" << std::endl;
                 return 0;
             }
         }
         else
         {
-            cout << "The only acceptable argument is --cert=" << endl;
+            std::cout << "The only acceptable argument is --cert=" << std::endl;
             return 0;
         }
     }
@@ -180,7 +179,7 @@ int main(int argc, char **argv)
     auto target_str = GetServerAddress(argc, argv);
     auto certificatePath = GetCertPath(argc, argv);
 
-    shared_ptr<grpc::ChannelCredentials> creds;
+    std::shared_ptr<grpc::ChannelCredentials> creds;
     if (!certificatePath.empty())
     {
         std::string cacert = read_keycert(certificatePath);
@@ -196,14 +195,14 @@ int main(int argc, char **argv)
     QueryClient client(channel);
 
     auto result = client.Query("Uptime");
-    cout << "Server uptime: " << result << endl;
+    std::cout << "Server uptime: " << result << std::endl;
 
     auto reader = client.Register("Heartbeat");
     int count = 0;
     ServerEvent event;
     while (reader->Read(&event))
     {
-        cout << "Server Event: " << event.eventdata() << endl;
+        std::cout << "Server Event: " << event.eventdata() << std::endl;
         count += 1;
         if (count == 10)
         {
@@ -211,5 +210,5 @@ int main(int argc, char **argv)
         }
     }
     Status status = reader->Finish();
-    cout << "Server notifications complete" << endl;
+    std::cout << "Server notifications complete" << std::endl;
 }

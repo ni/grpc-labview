@@ -4,7 +4,7 @@
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyStringToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+void ClusterDataCopier::CopyStringToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
     {        
@@ -38,11 +38,11 @@ struct LVCluster
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyMessageToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+void ClusterDataCopier::CopyMessageToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
     {
-        auto repeatedNested = static_pointer_cast<LVRepeatedNestedMessageMessageValue>(value);
+        auto repeatedNested = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>(value);
         if (repeatedNested->_value.size() != 0)
         {
             auto nestedMetadata = repeatedNested->_value.front()->_metadata;
@@ -69,11 +69,11 @@ void ClusterDataCopier::CopyMessageToCluster(const shared_ptr<MessageElementMeta
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyInt32ToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+void ClusterDataCopier::CopyInt32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
     {        
-        auto repeatedInt32 = static_pointer_cast<LVRepeatedInt32MessageValue>(value);
+        auto repeatedInt32 = std::static_pointer_cast<LVRepeatedInt32MessageValue>(value);
         if (repeatedInt32->_value.size() != 0)
         {
             LVNumericArrayResize(0x03, 1, start, repeatedInt32->_value.size());
@@ -91,11 +91,11 @@ void ClusterDataCopier::CopyInt32ToCluster(const shared_ptr<MessageElementMetada
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyUInt32ToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+void ClusterDataCopier::CopyUInt32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
     {        
-        auto repeatedUInt32 = static_pointer_cast<LVRepeatedUInt32MessageValue>(value);
+        auto repeatedUInt32 = std::static_pointer_cast<LVRepeatedUInt32MessageValue>(value);
         if (repeatedUInt32->_value.size() != 0)
         {
             LVNumericArrayResize(0x03, 1, start, repeatedUInt32->_value.size());
@@ -113,11 +113,11 @@ void ClusterDataCopier::CopyUInt32ToCluster(const shared_ptr<MessageElementMetad
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyEnumToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+void ClusterDataCopier::CopyEnumToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
     {        
-        auto repeatedEnum = static_pointer_cast<LVRepeatedEnumMessageValue>(value);
+        auto repeatedEnum = std::static_pointer_cast<LVRepeatedEnumMessageValue>(value);
         if (repeatedEnum->_value.size() != 0)
         {
             LVNumericArrayResize(0x03, 1, start, repeatedEnum->_value.size());
@@ -135,11 +135,11 @@ void ClusterDataCopier::CopyEnumToCluster(const shared_ptr<MessageElementMetadat
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyInt64ToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+void ClusterDataCopier::CopyInt64ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
     {        
-        auto repeatedInt64 = static_pointer_cast<LVRepeatedInt64MessageValue>(value);
+        auto repeatedInt64 = std::static_pointer_cast<LVRepeatedInt64MessageValue>(value);
         if (repeatedInt64->_value.size() != 0)
         {
             LVNumericArrayResize(0x03, 1, start, repeatedInt64->_value.size());
@@ -157,11 +157,11 @@ void ClusterDataCopier::CopyInt64ToCluster(const shared_ptr<MessageElementMetada
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyUInt64ToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+void ClusterDataCopier::CopyUInt64ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
     {        
-        auto repeatedUInt64 = static_pointer_cast<LVRepeatedUInt64MessageValue>(value);
+        auto repeatedUInt64 = std::static_pointer_cast<LVRepeatedUInt64MessageValue>(value);
         if (repeatedUInt64->_value.size() != 0)
         {
             LVNumericArrayResize(0x03, 1, start, repeatedUInt64->_value.size());
@@ -179,11 +179,11 @@ void ClusterDataCopier::CopyUInt64ToCluster(const shared_ptr<MessageElementMetad
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyBoolToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+void ClusterDataCopier::CopyBoolToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
     {        
-        auto repeatedBoolean = static_pointer_cast<LVRepeatedBooleanMessageValue>(value);
+        auto repeatedBoolean = std::static_pointer_cast<LVRepeatedBooleanMessageValue>(value);
         if (repeatedBoolean->_value.size() != 0)
         {
             LVNumericArrayResize(0x01, 1, start, repeatedBoolean->_value.size());
@@ -201,11 +201,11 @@ void ClusterDataCopier::CopyBoolToCluster(const shared_ptr<MessageElementMetadat
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyDoubleToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+void ClusterDataCopier::CopyDoubleToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
     {
-        auto repeatedDouble = static_pointer_cast<LVRepeatedDoubleMessageValue>(value);
+        auto repeatedDouble = std::static_pointer_cast<LVRepeatedDoubleMessageValue>(value);
         if (repeatedDouble->_value.size() != 0)
         {
             auto array = *(LV1DArrayHandle*)start;
@@ -224,11 +224,11 @@ void ClusterDataCopier::CopyDoubleToCluster(const shared_ptr<MessageElementMetad
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyFloatToCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, const shared_ptr<LVMessageValue>& value)
+void ClusterDataCopier::CopyFloatToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
     {
-        auto repeatedFloat = static_pointer_cast<LVRepeatedFloatMessageValue>(value);
+        auto repeatedFloat = std::static_pointer_cast<LVRepeatedFloatMessageValue>(value);
         if (repeatedFloat->_value.size() != 0)
         {
             LVNumericArrayResize(0x03, 1, start, repeatedFloat->_value.size());
@@ -251,7 +251,7 @@ void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
     for (auto val : message._metadata->_mappedElements)
     {
         auto start = cluster + val.second->clusterOffset;
-        shared_ptr<LVMessageValue> value;
+        std::shared_ptr<LVMessageValue> value;
         for (auto v : message._values)
         {
             if (v.second->_protobufId == val.second->protobufIndex)
@@ -301,7 +301,7 @@ void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyStringFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+void ClusterDataCopier::CopyStringFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
 {    
     if (metadata->isRepeated)
     {
@@ -329,7 +329,7 @@ void ClusterDataCopier::CopyStringFromCluster(const shared_ptr<MessageElementMet
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyBoolFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+void ClusterDataCopier::CopyBoolFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
 {    
     if (metadata->isRepeated)
     {
@@ -354,7 +354,7 @@ void ClusterDataCopier::CopyBoolFromCluster(const shared_ptr<MessageElementMetad
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyInt32FromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+void ClusterDataCopier::CopyInt32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
 {    
     if (metadata->isRepeated)
     {
@@ -379,7 +379,7 @@ void ClusterDataCopier::CopyInt32FromCluster(const shared_ptr<MessageElementMeta
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyUInt32FromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+void ClusterDataCopier::CopyUInt32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
 {    
     if (metadata->isRepeated)
     {
@@ -404,7 +404,7 @@ void ClusterDataCopier::CopyUInt32FromCluster(const shared_ptr<MessageElementMet
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyEnumFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+void ClusterDataCopier::CopyEnumFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
 {    
     if (metadata->isRepeated)
     {
@@ -429,7 +429,7 @@ void ClusterDataCopier::CopyEnumFromCluster(const shared_ptr<MessageElementMetad
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyInt64FromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+void ClusterDataCopier::CopyInt64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
 {    
     if (metadata->isRepeated)
     {
@@ -454,7 +454,7 @@ void ClusterDataCopier::CopyInt64FromCluster(const shared_ptr<MessageElementMeta
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyUInt64FromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+void ClusterDataCopier::CopyUInt64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
 {    
     if (metadata->isRepeated)
     {
@@ -479,7 +479,7 @@ void ClusterDataCopier::CopyUInt64FromCluster(const shared_ptr<MessageElementMet
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyDoubleFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+void ClusterDataCopier::CopyDoubleFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
 {    
     if (metadata->isRepeated)
     {
@@ -504,7 +504,7 @@ void ClusterDataCopier::CopyDoubleFromCluster(const shared_ptr<MessageElementMet
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyFloatFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+void ClusterDataCopier::CopyFloatFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
 {    
     if (metadata->isRepeated)
     {
@@ -529,7 +529,7 @@ void ClusterDataCopier::CopyFloatFromCluster(const shared_ptr<MessageElementMeta
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void ClusterDataCopier::CopyMessageFromCluster(const shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+void ClusterDataCopier::CopyMessageFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
 {    
     auto nestedMetadata = metadata->_owner->FindMetadata(metadata->embeddedMessageName);
 

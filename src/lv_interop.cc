@@ -11,10 +11,6 @@
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-using namespace std;
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 typedef int (*NumericArrayResize_T)(int32_t, int32_t, void* handle, size_t size);
 typedef int (*PostLVUserEvent_T)(LVUserEventRef ref, void *data);
 
@@ -91,7 +87,7 @@ int LVPostLVUserEvent(LVUserEventRef ref, void *data)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void SetLVString(LStrHandle* lvString, string str)
+void SetLVString(LStrHandle* lvString, std::string str)
 {
     auto length = str.length();    
     auto error = NumericArrayResize(0x01, 1, lvString, length);
@@ -101,16 +97,16 @@ void SetLVString(LStrHandle* lvString, string str)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-string GetLVString(LStrHandle lvString)
+std::string GetLVString(LStrHandle lvString)
 {    
     if (lvString == nullptr || *lvString == nullptr)
     {
-        return string();
+        return std::string();
     }
 
     auto count = (*lvString)->cnt;
     auto chars = (*lvString)->str;
 
-    string result(chars, count);
+    std::string result(chars, count);
     return result;
 }

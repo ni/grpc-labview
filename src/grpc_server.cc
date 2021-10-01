@@ -17,10 +17,6 @@ using grpc::Status;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-using namespace std;
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 LabVIEWgRPCServer::LabVIEWgRPCServer() :
     _shutdown(false),
     _genericMethodEvent(0)
@@ -31,32 +27,32 @@ LabVIEWgRPCServer::LabVIEWgRPCServer() :
 //---------------------------------------------------------------------
 void LabVIEWgRPCServer::RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata)
 {
-    lock_guard<mutex> lock(_mutex);
-
+    std::lock_guard<std::mutex> lock(_mutex);
+    
     _registeredMessageMetadata.insert({requestMetadata->messageName, requestMetadata});
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LabVIEWgRPCServer::RegisterEvent(string name, LVUserEventRef item, string requestMetadata, string responseMetadata)
+void LabVIEWgRPCServer::RegisterEvent(std::string name, LVUserEventRef item, std::string requestMetadata, std::string responseMetadata)
 {
-    lock_guard<mutex> lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
     LVEventData data = { item, requestMetadata, responseMetadata };
-    _registeredServerMethods.insert(pair<string, LVEventData>(name, data));
+    _registeredServerMethods.insert(std::pair<std::string, LVEventData>(name, data));
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 void LabVIEWgRPCServer::RegisterGenericMethodEvent(LVUserEventRef item)
 {
-    lock_guard<mutex> lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     _genericMethodEvent = item;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LabVIEWgRPCServer::SendEvent(string name, EventData *data)
+void LabVIEWgRPCServer::SendEvent(std::string name, EventData *data)
 {
     if (HasGenericMethodEvent())
     {
@@ -74,7 +70,7 @@ void LabVIEWgRPCServer::SendEvent(string name, EventData *data)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-bool LabVIEWgRPCServer::FindEventData(string name, LVEventData& data)
+bool LabVIEWgRPCServer::FindEventData(std::string name, LVEventData& data)
 {
     auto eventData = _registeredServerMethods.find(name);
     if (eventData != _registeredServerMethods.end())
@@ -87,7 +83,7 @@ bool LabVIEWgRPCServer::FindEventData(string name, LVEventData& data)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-shared_ptr<MessageMetadata> LabVIEWgRPCServer::FindMetadata(const string& name)
+std::shared_ptr<MessageMetadata> LabVIEWgRPCServer::FindMetadata(const std::string& name)
 {
     auto it = _registeredMessageMetadata.find(name);
     if (it != _registeredMessageMetadata.end())
@@ -225,7 +221,7 @@ void LabVIEWgRPCServer::FinalizeMetadata()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-int LabVIEWgRPCServer::Run(string address, string serverCertificatePath, string serverKeyPath)
+int LabVIEWgRPCServer::Run(std::string address, std::string serverCertificatePath, std::string serverKeyPath)
 {
     FinalizeMetadata();
     
@@ -279,9 +275,9 @@ void LabVIEWgRPCServer::HandleRpcs(grpc::ServerCompletionQueue *cq)
 //---------------------------------------------------------------------
 void LabVIEWgRPCServer::StaticRunServer(
     LabVIEWgRPCServer* server,
-    string address,
-    string serverCertificatePath,
-    string serverKeyPath,
+    std::string address,
+    std::string serverCertificatePath,
+    std::string serverKeyPath,
     ServerStartEventData *serverStarted)
 {
     server->RunServer(address, serverCertificatePath, serverKeyPath, serverStarted);
@@ -290,12 +286,12 @@ void LabVIEWgRPCServer::StaticRunServer(
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 void LabVIEWgRPCServer::RunServer(
-    string address,
-    string serverCertificatePath,
-    string serverKeyPath,
+    std::string address,
+    std::string serverCertificatePath,
+    std::string serverKeyPath,
     ServerStartEventData *serverStarted)
 {
-    string server_address;
+    std::string server_address;
     if (address.length() != 0)
     {
         server_address = address;
@@ -340,7 +336,7 @@ void LabVIEWgRPCServer::RunServer(
 
     if (_server != nullptr)
     {
-        cout << "Server listening on " << server_address << endl;
+        std::cout << "Server listening on " << server_address << std::endl;
         serverStarted->NotifyComplete();
 
         HandleRpcs(cq.get());
@@ -363,7 +359,6 @@ void LabVIEWgRPCServer::StopServer()
         _server->Shutdown();
         _server->Wait();
         _runThread->join();
-        //_runFuture.wait();
         _server = nullptr;
     }
 }

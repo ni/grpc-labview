@@ -4,8 +4,7 @@
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-using namespace std;
-using namespace ::google::protobuf::internal;
+using namespace google::protobuf::internal;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -241,7 +240,7 @@ bool ReadNextTag::Wait()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LVMessage::LVMessage(shared_ptr<MessageMetadata> metadata) : 
+LVMessage::LVMessage(std::shared_ptr<MessageMetadata> metadata) : 
     _metadata(metadata)
 {
 }
@@ -504,7 +503,7 @@ const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageEl
         }
         else
         {
-            v = static_pointer_cast<LVRepeatedStringMessageValue>((*it).second);
+            v = std::static_pointer_cast<LVRepeatedStringMessageValue>((*it).second);
         }
         ptr -= 1;
         do {
@@ -560,7 +559,7 @@ const char *LVMessage::ParseNestedMessage(google::protobuf::uint32 tag, const Me
             }
             else
             {
-                v = static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
+                v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
             }
             ptr += 1;
             auto nestedMessage = std::make_shared<LVMessage>(metadata);
