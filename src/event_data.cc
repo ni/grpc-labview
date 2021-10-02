@@ -23,32 +23,6 @@ CallData::CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService *service
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-bool CallData::ParseFromByteBuffer(const grpc::ByteBuffer& buffer, grpc::protobuf::Message& message)
-{
-    std::vector<grpc::Slice> slices;
-    buffer.Dump(&slices);
-    std::string buf;
-    buf.reserve(buffer.Length());
-    for (auto s = slices.begin(); s != slices.end(); s++)
-    {
-        buf.append(reinterpret_cast<const char *>(s->begin()), s->size());
-    }
-    return message.ParseFromString(buf);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-std::unique_ptr<grpc::ByteBuffer> CallData::SerializeToByteBuffer(
-    const grpc::protobuf::Message& message)
-{
-    std::string buf;
-    message.SerializeToString(&buf);
-    grpc::Slice slice(buf);
-    return std::unique_ptr<grpc::ByteBuffer>(new grpc::ByteBuffer(&slice, 1));
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 CallFinishedData::CallFinishedData(CallData* callData)
 {
     _call = callData;
@@ -69,7 +43,7 @@ bool CallData::Write()
     {
         return false;
     }
-    auto wb = SerializeToByteBuffer(*_response);
+    auto wb = _response->SerializeToByteBuffer();
     grpc::WriteOptions options;
     _status = CallStatus::Writing;
     _stream.Write(*wb, this);
@@ -129,8 +103,7 @@ bool CallData::ReadNext()
     {
         return false;
     }
-    _request->Clear();
-    ParseFromByteBuffer(_rb, *_request);
+    _request->ParseFromByteBuffer(_rb);
     _requestDataReady = true;
     if (IsCancelled())
     {
@@ -189,7 +162,7 @@ void CallData::Proceed(bool ok)
             auto responseMetadata = _server->FindMetadata(eventData.responseMetadataName);
             _request = std::make_shared<LVMessage>(requestMetadata);
             _response = std::make_shared<LVMessage>(responseMetadata);
-            ParseFromByteBuffer(_rb, *_request);
+            _request->ParseFromByteBuffer(_rb);
             _requestDataReady = true;
 
             _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
@@ -249,6 +222,33 @@ LVMessage::LVMessage(std::shared_ptr<MessageMetadata> metadata) :
 //---------------------------------------------------------------------
 LVMessage::~LVMessage()
 {
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+bool LVMessage::ParseFromByteBuffer(const grpc::ByteBuffer& buffer)
+{
+    Clear();
+
+    std::vector<grpc::Slice> slices;
+    buffer.Dump(&slices);
+    std::string buf;
+    buf.reserve(buffer.Length());
+    for (auto s = slices.begin(); s != slices.end(); s++)
+    {
+        buf.append(reinterpret_cast<const char *>(s->begin()), s->size());
+    }
+    return ParseFromString(buf);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+std::unique_ptr<grpc::ByteBuffer> LVMessage::SerializeToByteBuffer()
+{
+    std::string buf;
+    SerializeToString(&buf);
+    grpc::Slice slice(buf);
+    return std::unique_ptr<grpc::ByteBuffer>(new grpc::ByteBuffer(&slice, 1));
 }
 
 //---------------------------------------------------------------------

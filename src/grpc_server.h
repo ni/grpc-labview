@@ -526,6 +526,9 @@ public:
     void InternalSwap(LVMessage *other);
     google::protobuf::Metadata GetMetadata() const final;
 
+    bool ParseFromByteBuffer(const grpc::ByteBuffer& buffer);
+    std::unique_ptr<grpc::ByteBuffer> SerializeToByteBuffer();
+
 public:
     std::map<int, std::shared_ptr<LVMessageValue>> _values;
     std::shared_ptr<MessageMetadata> _metadata;
@@ -684,10 +687,6 @@ public:
     void CallFinished();
     bool ReadNext();
     void ReadComplete();
-
-private:
-    bool ParseFromByteBuffer(const grpc::ByteBuffer& buffer, grpc::protobuf::Message& message);
-    std::unique_ptr<grpc::ByteBuffer> SerializeToByteBuffer(const grpc::protobuf::Message& message);
 
 private:
     LabVIEWgRPCServer* _server;

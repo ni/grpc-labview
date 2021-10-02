@@ -607,3 +607,55 @@ void ClusterDataCopier::CopyFromCluster(LVMessage& message, int8_t* cluster)
         }
     }
 }
+
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+bool ClusterDataCopier::AnyBuilderAddValue(LVMessage& message, LVMessageMetadataType valueType, bool isRepeated, int protobufIndex, int8_t* value)
+{    
+    message._values.clear();
+    auto metadata = std::make_shared<MessageElementMetadata>(nullptr);
+    metadata->clusterOffset = 0;
+    metadata->embeddedMessageName = std::string();
+    metadata->isRepeated = isRepeated;
+    metadata->protobufIndex = protobufIndex;
+    metadata->type = valueType;
+
+    switch (valueType)
+    {
+        case LVMessageMetadataType::StringValue:
+            CopyStringFromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::BoolValue:
+            CopyBoolFromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::DoubleValue:
+            CopyDoubleFromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::FloatValue:
+            CopyFloatFromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::Int32Value:
+            CopyInt32FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::MessageValue:
+            return false;
+            break;
+        case LVMessageMetadataType::Int64Value:
+            CopyInt64FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::UInt32Value:
+            CopyUInt32FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::UInt64Value:
+            CopyUInt64FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::EnumValue:
+            CopyEnumFromCluster(metadata, value, message);
+            break;
+        default:
+            return false;
+            break;
+    }
+    return true;
+}

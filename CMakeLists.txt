@@ -71,6 +71,7 @@ add_library(labview_grpc_server SHARED
   src/cluster_copier.cc
   src/event_data.cc
   src/lv_interop.cc
+  src/any_support.cc
   )
 target_link_libraries(labview_grpc_server
    ${_REFLECTION}
