@@ -17,92 +17,6 @@ using grpc::Status;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LabVIEWgRPCServer::LabVIEWgRPCServer() :
-    _shutdown(false),
-    _genericMethodEvent(0)
-{    
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LabVIEWgRPCServer::RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata)
-{
-    std::lock_guard<std::mutex> lock(_mutex);
-    
-    _registeredMessageMetadata.insert({requestMetadata->messageName, requestMetadata});
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LabVIEWgRPCServer::RegisterEvent(std::string name, LVUserEventRef item, std::string requestMetadata, std::string responseMetadata)
-{
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    LVEventData data = { item, requestMetadata, responseMetadata };
-    _registeredServerMethods.insert(std::pair<std::string, LVEventData>(name, data));
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LabVIEWgRPCServer::RegisterGenericMethodEvent(LVUserEventRef item)
-{
-    std::lock_guard<std::mutex> lock(_mutex);
-    _genericMethodEvent = item;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LabVIEWgRPCServer::SendEvent(std::string name, EventData *data)
-{
-    if (HasGenericMethodEvent())
-    {
-        OccurServerEvent(_genericMethodEvent, data, name);
-    }
-    else
-    {
-        auto eventData = _registeredServerMethods.find(name);
-        if (eventData != _registeredServerMethods.end())
-        {
-            OccurServerEvent(eventData->second.event, data);
-        }
-    }
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-bool LabVIEWgRPCServer::FindEventData(std::string name, LVEventData& data)
-{
-    auto eventData = _registeredServerMethods.find(name);
-    if (eventData != _registeredServerMethods.end())
-    {
-        data = eventData->second;
-        return true;
-    }
-    return false;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-std::shared_ptr<MessageMetadata> LabVIEWgRPCServer::FindMetadata(const std::string& name)
-{
-    auto it = _registeredMessageMetadata.find(name);
-    if (it != _registeredMessageMetadata.end())
-    {
-        return (*it).second;
-    }
-    return nullptr;
-}
-
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-bool LabVIEWgRPCServer::HasGenericMethodEvent()
-{
-    return _genericMethodEvent != 0;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 int ClusterElementSize(LVMessageMetadataType type, bool repeated)
 {
 #ifndef _PS_4
@@ -175,7 +89,28 @@ int AlignClusterOffset(int clusterOffset, LVMessageMetadataType type, bool repea
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LabVIEWgRPCServer::UpdateMetadataClusterLayout(std::shared_ptr<MessageMetadata>& metadata)
+void MessageElementMetadataOwner::RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+    
+    _registeredMessageMetadata.insert({requestMetadata->messageName, requestMetadata});
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+std::shared_ptr<MessageMetadata> MessageElementMetadataOwner::FindMetadata(const std::string& name)
+{
+    auto it = _registeredMessageMetadata.find(name);
+    if (it != _registeredMessageMetadata.end())
+    {
+        return (*it).second;
+    }
+    return nullptr;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void MessageElementMetadataOwner::UpdateMetadataClusterLayout(std::shared_ptr<MessageMetadata>& metadata)
 {
     if (metadata->clusterSize != 0)
     {
@@ -210,7 +145,7 @@ void LabVIEWgRPCServer::UpdateMetadataClusterLayout(std::shared_ptr<MessageMetad
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LabVIEWgRPCServer::FinalizeMetadata()
+void MessageElementMetadataOwner::FinalizeMetadata()
 {
     for (auto metadata: _registeredMessageMetadata)
     {
@@ -218,6 +153,69 @@ void LabVIEWgRPCServer::FinalizeMetadata()
     }
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LabVIEWgRPCServer::LabVIEWgRPCServer() :
+    _shutdown(false),
+    _genericMethodEvent(0)
+{    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LabVIEWgRPCServer::RegisterEvent(std::string name, LVUserEventRef item, std::string requestMetadata, std::string responseMetadata)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    LVEventData data = { item, requestMetadata, responseMetadata };
+    _registeredServerMethods.insert(std::pair<std::string, LVEventData>(name, data));
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LabVIEWgRPCServer::RegisterGenericMethodEvent(LVUserEventRef item)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+    _genericMethodEvent = item;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void LabVIEWgRPCServer::SendEvent(std::string name, EventData *data)
+{
+    if (HasGenericMethodEvent())
+    {
+        OccurServerEvent(_genericMethodEvent, data, name);
+    }
+    else
+    {
+        auto eventData = _registeredServerMethods.find(name);
+        if (eventData != _registeredServerMethods.end())
+        {
+            OccurServerEvent(eventData->second.event, data);
+        }
+    }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+bool LabVIEWgRPCServer::FindEventData(std::string name, LVEventData& data)
+{
+    auto eventData = _registeredServerMethods.find(name);
+    if (eventData != _registeredServerMethods.end())
+    {
+        data = eventData->second;
+        return true;
+    }
+    return false;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+bool LabVIEWgRPCServer::HasGenericMethodEvent()
+{
+    return _genericMethodEvent != 0;
+}
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------

@@ -3,13 +3,32 @@
 #include <cluster_copier.h>
 #include <lv_interop.h>
 #include <google/protobuf/any.pb.h>
+#include <serialization_session.h>
+#include <lv_message.h>
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t CreateSerializationSession(LVgRPCid* sessionId)
+{
+    InitCallbacks();
+    auto session = new LabVIEWSerializationSession();
+    *sessionId = session;
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t FreeSerializationSession(LVgRPCid sessionId)
+{
+    auto session = (LabVIEWSerializationSession*)sessionId;
+    delete session;
+    return 0;
+}
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t PackToAny(LVgRPCid id, const char* messageType, int8_t* cluster, LVgRPCid* anyResult)
 {
-    auto any = new google::protobuf::Any();
-
     auto metadataOwner = (IMessageElementMetadataOwner*)id;
     auto metadata = metadataOwner->FindMetadata(messageType);
     if (metadata == nullptr)
@@ -22,6 +41,7 @@ LIBRARY_EXPORT int32_t PackToAny(LVgRPCid id, const char* messageType, int8_t* c
     std::string buffer;
     if (message.SerializeToString(&buffer))
     {
+        auto any = new google::protobuf::Any();
         any->set_value(buffer);
         any->set_type_url(messageType);
         *anyResult = any;
@@ -32,7 +52,32 @@ LIBRARY_EXPORT int32_t PackToAny(LVgRPCid id, const char* messageType, int8_t* c
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t FreeAny(LVgRPCid anyId, int8_t* lvRequest)
+LIBRARY_EXPORT int32_t PackToBuffer(LVgRPCid id, const char* messageType, int8_t* cluster, LV1DArrayHandle* lvBuffer)
+{
+    auto metadataOwner = (IMessageElementMetadataOwner*)id;
+    auto metadata = metadataOwner->FindMetadata(messageType);
+    if (metadata == nullptr)
+    {
+        return -2;
+    }
+
+    LVMessage message(metadata);
+    ClusterDataCopier::CopyFromCluster(message, cluster);
+    std::string buffer;
+    if (message.SerializeToString(&buffer))
+    {
+        LVNumericArrayResize(0x01, 1, lvBuffer, buffer.length());
+        (**lvBuffer)->cnt = buffer.length();
+        uint8_t* elements = (**lvBuffer)->bytes<uint8_t>();
+        memcpy(elements, buffer.c_str(), buffer.length());
+        return 0;
+    }
+    return -2;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t FreeAny(LVgRPCid anyId)
 {
     auto any = (google::protobuf::Any*)anyId;
     delete any;
@@ -53,6 +98,28 @@ LIBRARY_EXPORT int32_t UnpackFromAny(LVgRPCid id, LVgRPCid anyId, const char* me
     }  
     LVMessage message(metadata);
     if (message.ParseFromString(any->value()))
+    {
+        ClusterDataCopier::CopyToCluster(message, cluster);
+        return 0;
+    }
+    return -2;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t UnpackFromBuffer(LVgRPCid id, LV1DArrayHandle lvBuffer, const char* messageType, int8_t* cluster)
+{
+    auto metadataOwner = (IMessageElementMetadataOwner*)id;
+    auto metadata = metadataOwner->FindMetadata(messageType);
+
+    if (metadata == nullptr)
+    {
+        return -2;
+    }  
+    LVMessage message(metadata);
+    char* elements = (*lvBuffer)->bytes<char>();
+    std::string buffer(elements, (*lvBuffer)->cnt);
+    if (message.ParseFromString(buffer))
     {
         ClusterDataCopier::CopyToCluster(message, cluster);
         return 0;
@@ -101,6 +168,8 @@ LIBRARY_EXPORT int32_t IsAnyOfType(LVgRPCid anyId, const char* messageType)
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t AnyBuilderBegin(LVgRPCid* builderId)
 {   
+    InitCallbacks();
+
     auto metadata = std::make_shared<MessageMetadata>();
     auto rootMessage = new LVMessage(metadata);
     *builderId = rootMessage;
@@ -109,7 +178,7 @@ LIBRARY_EXPORT int32_t AnyBuilderBegin(LVgRPCid* builderId)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t AnyBuilderAddValue(LVgRPCid anyId, LVMessageMetadataType valueType, bool isRepeated, int protobufIndex, int8_t* value)
+LIBRARY_EXPORT int32_t AnyBuilderAddValue(LVgRPCid anyId, LVMessageMetadataType valueType, int isRepeated, int protobufIndex, int8_t* value)
 {
     auto message = (LVMessage*)anyId;
     ClusterDataCopier::AnyBuilderAddValue(*message, valueType, isRepeated, protobufIndex, value);
@@ -169,6 +238,25 @@ LIBRARY_EXPORT int32_t AnyBuilderBuild(LVgRPCid builderId, const char* typeUrl, 
         any->set_value(buffer);
         any->set_type_url(typeUrl);
         *anyId = any;
+        delete message;
+        return 0;
+    }
+    delete message;
+    return -2;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t AnyBuilderBuildToBuffer(LVgRPCid builderId, const char* typeUrl, LV1DArrayHandle* lvBuffer)
+{   
+    auto message = (LVMessage*)builderId;
+    std::string buffer;
+    if (message->SerializeToString(&buffer))
+    {
+        LVNumericArrayResize(0x01, 1, lvBuffer, buffer.length());
+        (**lvBuffer)->cnt = buffer.length();
+        uint8_t* elements = (**lvBuffer)->bytes<uint8_t>();
+        memcpy(elements, buffer.c_str(), buffer.length());
         delete message;
         return 0;
     }
