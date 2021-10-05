@@ -718,6 +718,29 @@ google::protobuf::uint8* LVNestedMessageMessageValue::Serialize(google::protobuf
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+// LVAnyMessageValue::LVAnyMessageValue(int protobufId, google::protobuf::Any* value) :
+//     LVMessageValue(protobufId),
+//     _value(value)
+// {    
+// }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+// size_t LVAnyMessageValue::ByteSizeLong()
+// {    
+//     return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_MESSAGE) + WireFormatLite::MessageSize(*_value);
+// }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+// google::protobuf::uint8* LVAnyMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+// {
+//     target = stream->EnsureSpace(target);
+//     return WireFormatLite::InternalWriteMessage(_protobufId, *_value, target, stream);        
+// }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LVRepeatedNestedMessageMessageValue::LVRepeatedNestedMessageMessageValue(int protobufId) :
     LVMessageValue(protobufId)
 {
@@ -747,6 +770,38 @@ google::protobuf::uint8* LVRepeatedNestedMessageMessageValue::Serialize(google::
     }
     return target;
 }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+// LVRepeatedAnyMessageMessageValue::LVRepeatedAnyMessageMessageValue(int protobufId) :
+//     LVMessageValue(protobufId)
+// {    
+// }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+// size_t LVRepeatedAnyMessageMessageValue::ByteSizeLong()
+// {    
+//     size_t totalSize = 0;
+//     totalSize += 1UL * _value.size();
+//     for (const auto& msg : _value)
+//     {
+//         totalSize += WireFormatLite::MessageSize(*msg);
+//     }
+//     return totalSize;
+// }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+// google::protobuf::uint8* LVRepeatedAnyMessageMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+// {
+//     for (unsigned int i = 0, n = static_cast<unsigned int>(_value.size()); i < n; i++)
+//     {
+//         target = stream->EnsureSpace(target);
+//         target = WireFormatLite::InternalWriteMessage(_protobufId, *_value[i], target, stream);
+//     }
+//     return target;
+// }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------

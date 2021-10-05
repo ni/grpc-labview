@@ -260,6 +260,7 @@
 		<Item Name="Get gRPC Method FullName.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Method FullName.vi"/>
 		<Item Name="Get ProtoFile Messages.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get ProtoFile Messages.vi"/>
 		<Item Name="Translate gRPC Method FullName.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Translate gRPC Method FullName.vi"/>
+		<Item Name="Get Message TypeUrl.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message TypeUrl.vi"/>
 	</Item>
 	<Item Name="Animation API" Type="Folder">
 		<Item Name="Animation.vi" Type="VI" URL="../Animation API/Animation.vi"/>

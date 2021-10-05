@@ -70,6 +70,35 @@ void ClusterDataCopier::CopyMessageToCluster(const std::shared_ptr<MessageElemen
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+// void ClusterDataCopier::CopyAnyToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+// {
+//     if (metadata->isRepeated)
+//     {
+//         auto repeatedNested = std::static_pointer_cast<LVRepeatedAnyMessageValue>(value);
+//         if (repeatedNested->_value.size() != 0)
+//         {
+//             LVNumericArrayResize(0x08, 1, start, repeatedNested->_value.size() * sizeof(int64_t));
+//             auto array = *(LV1DArrayHandle*)start;
+//             (*array)->cnt = repeatedNested->_value.size();
+//             int x = 0;
+//             for (auto v : repeatedNested->_value)
+//             {
+//                 int64_t reference = (int64_t)v;
+//                 auto lvElement = (*array)->bytes<int64_t>(x * sizeof(int64_t));
+//                 *lvElement = reference;
+//                 x += 1;
+//             }
+//         }
+//     }
+//     else
+//     {
+//         int64_t reference = (int64_t)((LVAnyMessageValue*)value.get())->_value.get();
+//         *((int64_t*)start) = reference;
+//     }
+// }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void ClusterDataCopier::CopyInt32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
     if (metadata->isRepeated)
@@ -295,6 +324,9 @@ void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
                 case LVMessageMetadataType::EnumValue:
                     CopyEnumToCluster(val.second, start, value);
                     break;
+                // case LVMessageMetadataType::Any:
+                //     CopyAnyToCluster(val.second, start, value);
+                //     break;
             }
         }
     }
@@ -566,6 +598,42 @@ void ClusterDataCopier::CopyMessageFromCluster(const std::shared_ptr<MessageElem
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+// void ClusterDataCopier::CopyAnyFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+// {    
+//     auto nestedMetadata = metadata->_owner->FindMetadata(metadata->embeddedMessageName);
+
+//     if (metadata->isRepeated)
+//     {
+//         auto array = *(LV1DArrayHandle*)start;
+//         if (array && *array && ((*array)->cnt != 0))
+//         {
+//             auto count = (*array)->cnt;
+//             if (count != 0)
+//             {
+//                 auto repeatedValue = std::make_shared<LVRepeatedAnyMessageValue>(metadata->protobufIndex);
+//                 message._values.emplace(metadata->protobufIndex, repeatedValue);
+
+//                 for (int x = 0; x < count; ++x)
+//                 {
+//                     auto data = (*array)->bytes<int64_t>(sizeof(int64_t) * x);
+//                     auto anyHandle = *(int64_t*)data;
+//                     auto anyValue = (google::protobuf::Any*)anyHandle;
+//                     repeatedValue->_value.push_back(anyValue);
+//                 }
+//             }
+//         }
+//     }
+//     else
+//     {
+//         auto anyHandle = *(int64_t*)start;
+//         auto anyValue = (google::protobuf::Any*)anyHandle;
+//         auto value = std::make_shared<LVAnyMessageValue>(metadata->protobufIndex, anyValue);
+//         message._values.emplace(metadata->protobufIndex, value);
+//     }
+// }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void ClusterDataCopier::CopyFromCluster(LVMessage& message, int8_t* cluster)
 {
     message._values.clear();
@@ -605,6 +673,9 @@ void ClusterDataCopier::CopyFromCluster(LVMessage& message, int8_t* cluster)
             case LVMessageMetadataType::EnumValue:
                 CopyEnumFromCluster(val.second, start, message);
                 break;
+            // case LVMessageMetadataType::Any:
+            //     CopyAnyFromCluster(val.second, start, message);
+            //     break;
         }
     }
 }
@@ -654,6 +725,9 @@ bool ClusterDataCopier::AnyBuilderAddValue(LVMessage& message, LVMessageMetadata
         case LVMessageMetadataType::EnumValue:
             CopyEnumFromCluster(metadata, value, message);
             break;
+        // case LVMessageMetadataType::Any:
+        //     CopyAnyFromCluster(metadata, value, message);
+        //     break;
         default:
             return false;
             break;

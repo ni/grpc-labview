@@ -10,16 +10,24 @@ class IMessageElementMetadataOwner;
 //---------------------------------------------------------------------
 enum class LVMessageMetadataType
 {
-    Int32Value,
-    FloatValue,
-    DoubleValue,
-    BoolValue,
-    StringValue,
-    MessageValue,
-    Int64Value,
-    UInt32Value,
-    UInt64Value,
-    EnumValue
+    Int32Value = 0,
+    FloatValue = 1,
+    DoubleValue = 2,
+    BoolValue = 3,
+    StringValue = 4,
+    MessageValue = 5,
+    Int64Value = 6,
+    UInt32Value = 7,
+    UInt64Value = 8,
+    EnumValue = 9,
+    Bytes = 10,
+    Fixed64 = 11,
+    Fixed32 = 12,
+    SFixed64 = 13,
+    SFixed32 = 14,
+    SInt64 = 15,
+    SInt32 = 16,
+    // Any = 17
 };
 
 //---------------------------------------------------------------------
@@ -74,6 +82,7 @@ public:
 
 public:
     std::string messageName;
+    std::string typeUrl;
     int clusterSize;
     LVMessageMetadataList _elements;
     LVMessageMetadataMap _mappedElements;

@@ -74,6 +74,20 @@ using LV1DArrayHandle = LV1DArray**;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+#ifdef _PS_4
+#pragma pack (push, 1)
+#endif
+struct LVAny
+{    
+    LStrHandle TypeUrl;
+    LV1DArrayHandle Bytes;
+};
+#ifdef _PS_4
+#pragma pack (pop)
+#endif
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void InitCallbacks();
 void SetLVString(LStrHandle* lvString, std::string str);
 std::string GetLVString(LStrHandle lvString);

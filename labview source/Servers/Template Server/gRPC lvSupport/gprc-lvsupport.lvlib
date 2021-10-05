@@ -27,9 +27,11 @@
 		<Item Name="Any Support" Type="Folder">
 			<Item Name="AnyBuilderAddValue.vim" Type="VI" URL="../Server API/Message Requests/AnyBuilderAddValue.vim"/>
 			<Item Name="AnyBuilderBegin.vi" Type="VI" URL="../Server API/Message Requests/AnyBuilderBegin.vi"/>
+			<Item Name="AnyBuilderBeginNestedMessage.vi" Type="VI" URL="../Server API/Message Requests/AnyBuilderBeginNestedMessage.vi"/>
+			<Item Name="AnyBuilderBeginRepeatedNestedMessage.vi" Type="VI" URL="../Server API/Message Requests/AnyBuilderBeginRepeatedNestedMessage.vi"/>
+			<Item Name="AnyBuilderBeginRepeatedNestedMessageElement.vi" Type="VI" URL="../Server API/Message Requests/AnyBuilderBeginRepeatedNestedMessageElement.vi"/>
 			<Item Name="AnyBuilderBuild.vi" Type="VI" URL="../Server API/Message Requests/AnyBuilderBuild.vi"/>
 			<Item Name="AnyBuilderBuildToBuffer.vi" Type="VI" URL="../Server API/Message Requests/AnyBuilderBuildToBuffer.vi"/>
-			<Item Name="FreeAnyReference.vi" Type="VI" URL="../Server API/FreeAnyReference.vi"/>
 			<Item Name="IsAnyOfType.vi" Type="VI" URL="../Server API/Message Requests/IsAnyOfType.vi"/>
 			<Item Name="PackToAny.vim" Type="VI" URL="../Server API/Message Requests/PackToAny.vim"/>
 			<Item Name="TryUnpackFromAny.vim" Type="VI" URL="../Server API/Message Requests/TryUnpackFromAny.vim"/>
@@ -59,6 +61,7 @@
 		</Item>
 	</Item>
 	<Item Name="typeDefs" Type="Folder">
+		<Item Name="Any.ctl" Type="VI" URL="../Server API/typeDefs/Any.ctl"/>
 		<Item Name="Generic Method Event Data.ctl" Type="VI" URL="../Server API/typeDefs/Generic Method Event Data.ctl"/>
 		<Item Name="gRPCId Cluster UE.ctl" Type="VI" URL="../Server API/typeDefs/gRPCId Cluster UE.ctl"/>
 		<Item Name="gRPCId Cluster.ctl" Type="VI" URL="../Server API/typeDefs/gRPCId Cluster.ctl"/>

@@ -41,6 +41,7 @@ std::shared_ptr<MessageMetadata> CreateMessageMetadata(IMessageElementMetadataOw
 
     auto name = GetLVString(lvMetadata->messageName);
     metadata->messageName = name;
+    metadata->typeUrl = name;
     int clusterOffset = 0;
     if (lvMetadata->elements != nullptr)
     {
@@ -68,6 +69,7 @@ std::shared_ptr<MessageMetadata> CreateMessageMetadata2(IMessageElementMetadataO
 
     auto name = GetLVString(lvMetadata->messageName);
     metadata->messageName = name;
+    metadata->typeUrl = GetLVString(lvMetadata->typeUrl);
     int clusterOffset = 0;
     if (lvMetadata->elements != nullptr)
     {
