@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <grpc_server.h>
+#include <lv_message.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -19,32 +20,6 @@ CallData::CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService *service
     _requestDataReady(false)
 {
     Proceed(true);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-bool CallData::ParseFromByteBuffer(const grpc::ByteBuffer& buffer, grpc::protobuf::Message& message)
-{
-    std::vector<grpc::Slice> slices;
-    buffer.Dump(&slices);
-    std::string buf;
-    buf.reserve(buffer.Length());
-    for (auto s = slices.begin(); s != slices.end(); s++)
-    {
-        buf.append(reinterpret_cast<const char *>(s->begin()), s->size());
-    }
-    return message.ParseFromString(buf);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-std::unique_ptr<grpc::ByteBuffer> CallData::SerializeToByteBuffer(
-    const grpc::protobuf::Message& message)
-{
-    std::string buf;
-    message.SerializeToString(&buf);
-    grpc::Slice slice(buf);
-    return std::unique_ptr<grpc::ByteBuffer>(new grpc::ByteBuffer(&slice, 1));
 }
 
 //---------------------------------------------------------------------
@@ -69,7 +44,7 @@ bool CallData::Write()
     {
         return false;
     }
-    auto wb = SerializeToByteBuffer(*_response);
+    auto wb = _response->SerializeToByteBuffer();
     grpc::WriteOptions options;
     _status = CallStatus::Writing;
     _stream.Write(*wb, this);
@@ -129,8 +104,7 @@ bool CallData::ReadNext()
     {
         return false;
     }
-    _request->Clear();
-    ParseFromByteBuffer(_rb, *_request);
+    _request->ParseFromByteBuffer(_rb);
     _requestDataReady = true;
     if (IsCancelled())
     {
@@ -189,7 +163,7 @@ void CallData::Proceed(bool ok)
             auto responseMetadata = _server->FindMetadata(eventData.responseMetadataName);
             _request = std::make_shared<LVMessage>(requestMetadata);
             _response = std::make_shared<LVMessage>(responseMetadata);
-            ParseFromByteBuffer(_rb, *_request);
+            _request->ParseFromByteBuffer(_rb);
             _requestDataReady = true;
 
             _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
@@ -253,6 +227,33 @@ LVMessage::~LVMessage()
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+bool LVMessage::ParseFromByteBuffer(const grpc::ByteBuffer& buffer)
+{
+    Clear();
+
+    std::vector<grpc::Slice> slices;
+    buffer.Dump(&slices);
+    std::string buf;
+    buf.reserve(buffer.Length());
+    for (auto s = slices.begin(); s != slices.end(); s++)
+    {
+        buf.append(reinterpret_cast<const char *>(s->begin()), s->size());
+    }
+    return ParseFromString(buf);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+std::unique_ptr<grpc::ByteBuffer> LVMessage::SerializeToByteBuffer()
+{
+    std::string buf;
+    SerializeToString(&buf);
+    grpc::Slice slice(buf);
+    return std::unique_ptr<grpc::ByteBuffer>(new grpc::ByteBuffer(&slice, 1));
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 google::protobuf::Message* LVMessage::New() const
 {
     assert(false); // not expected to be called
@@ -307,6 +308,9 @@ const char *LVMessage::_InternalParse(const char *ptr, ParseContext *ctx)
                 break;
             case LVMessageMetadataType::StringValue:
                 ptr = ParseString(tag, *fieldInfo, index, ptr, ctx);
+                break;
+            case LVMessageMetadataType::BytesValue:
+                ptr = ParseBytes(tag, *fieldInfo, index, ptr, ctx);
                 break;
             case LVMessageMetadataType::MessageValue:
                 ptr = ParseNestedMessage(tag, *fieldInfo, index, ptr, ctx);
@@ -528,6 +532,13 @@ const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageEl
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+const char *LVMessage::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+{
+    return ParseString(tag, fieldInfo, index, ptr, ctx);    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 bool LVMessage::ExpectTag(google::protobuf::uint32 tag, const char* ptr)
 {
     if (tag < 128)
@@ -717,6 +728,29 @@ google::protobuf::uint8* LVNestedMessageMessageValue::Serialize(google::protobuf
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+// LVAnyMessageValue::LVAnyMessageValue(int protobufId, google::protobuf::Any* value) :
+//     LVMessageValue(protobufId),
+//     _value(value)
+// {    
+// }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+// size_t LVAnyMessageValue::ByteSizeLong()
+// {    
+//     return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_MESSAGE) + WireFormatLite::MessageSize(*_value);
+// }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+// google::protobuf::uint8* LVAnyMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+// {
+//     target = stream->EnsureSpace(target);
+//     return WireFormatLite::InternalWriteMessage(_protobufId, *_value, target, stream);        
+// }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LVRepeatedNestedMessageMessageValue::LVRepeatedNestedMessageMessageValue(int protobufId) :
     LVMessageValue(protobufId)
 {
@@ -746,6 +780,38 @@ google::protobuf::uint8* LVRepeatedNestedMessageMessageValue::Serialize(google::
     }
     return target;
 }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+// LVRepeatedAnyMessageMessageValue::LVRepeatedAnyMessageMessageValue(int protobufId) :
+//     LVMessageValue(protobufId)
+// {    
+// }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+// size_t LVRepeatedAnyMessageMessageValue::ByteSizeLong()
+// {    
+//     size_t totalSize = 0;
+//     totalSize += 1UL * _value.size();
+//     for (const auto& msg : _value)
+//     {
+//         totalSize += WireFormatLite::MessageSize(*msg);
+//     }
+//     return totalSize;
+// }
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+// google::protobuf::uint8* LVRepeatedAnyMessageMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+// {
+//     for (unsigned int i = 0, n = static_cast<unsigned int>(_value.size()); i < n; i++)
+//     {
+//         target = stream->EnsureSpace(target);
+//         target = WireFormatLite::InternalWriteMessage(_protobufId, *_value[i], target, stream);
+//     }
+//     return target;
+// }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------

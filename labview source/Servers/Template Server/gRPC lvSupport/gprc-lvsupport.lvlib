@@ -23,6 +23,26 @@
 			<Item Name="labview_grpc_server.dll" Type="Document" URL="../Libraries/Win64/labview_grpc_server.dll"/>
 		</Item>
 	</Item>
+	<Item Name="Protobuf" Type="Folder">
+		<Item Name="Any Support" Type="Folder">
+			<Item Name="AnyBuilderAddValue.vim" Type="VI" URL="../Server API/Message Requests/AnyBuilderAddValue.vim"/>
+			<Item Name="AnyBuilderBegin.vi" Type="VI" URL="../Server API/Message Requests/AnyBuilderBegin.vi"/>
+			<Item Name="AnyBuilderBeginNestedMessage.vi" Type="VI" URL="../Server API/Message Requests/AnyBuilderBeginNestedMessage.vi"/>
+			<Item Name="AnyBuilderBeginRepeatedNestedMessage.vi" Type="VI" URL="../Server API/Message Requests/AnyBuilderBeginRepeatedNestedMessage.vi"/>
+			<Item Name="AnyBuilderBeginRepeatedNestedMessageElement.vi" Type="VI" URL="../Server API/Message Requests/AnyBuilderBeginRepeatedNestedMessageElement.vi"/>
+			<Item Name="AnyBuilderBuild.vi" Type="VI" URL="../Server API/Message Requests/AnyBuilderBuild.vi"/>
+			<Item Name="AnyBuilderBuildToBuffer.vi" Type="VI" URL="../Server API/Message Requests/AnyBuilderBuildToBuffer.vi"/>
+			<Item Name="IsAnyOfType.vi" Type="VI" URL="../Server API/Message Requests/IsAnyOfType.vi"/>
+			<Item Name="PackToAny.vim" Type="VI" URL="../Server API/Message Requests/PackToAny.vim"/>
+			<Item Name="TryUnpackFromAny.vim" Type="VI" URL="../Server API/Message Requests/TryUnpackFromAny.vim"/>
+			<Item Name="UnpackFromAny.vim" Type="VI" URL="../Server API/Message Requests/UnpackFromAny.vim"/>
+		</Item>
+		<Item Name="CompleteMetadataRegistration.vi" Type="VI" URL="../Server API/CompleteMetadataRegistration.vi"/>
+		<Item Name="CreateSerializationSession.vi" Type="VI" URL="../Server API/CreateSerializationSession.vi"/>
+		<Item Name="FreeSerializationSession.vi" Type="VI" URL="../Server API/FreeSerializationSession.vi"/>
+		<Item Name="PackToBuffer.vim" Type="VI" URL="../Server API/PackToBuffer.vim"/>
+		<Item Name="UnpackFromBuffer.vim" Type="VI" URL="../Server API/UnpackFromBuffer.vim"/>
+	</Item>
 	<Item Name="Server API" Type="Folder">
 		<Item Name="Message Requests" Type="Folder">
 			<Item Name="Complete Call.vi" Type="VI" URL="../Server API/Message Requests/Complete Call.vi"/>
@@ -39,14 +59,15 @@
 			<Item Name="Start Server.vi" Type="VI" URL="../Server API/Server/Start Server.vi"/>
 			<Item Name="Stop Server.vi" Type="VI" URL="../Server API/Server/Stop Server.vi"/>
 		</Item>
-		<Item Name="typeDefs" Type="Folder">
-			<Item Name="Generic Method Event Data.ctl" Type="VI" URL="../Server API/typeDefs/Generic Method Event Data.ctl"/>
-			<Item Name="gRPCId Cluster UE.ctl" Type="VI" URL="../Server API/typeDefs/gRPCId Cluster UE.ctl"/>
-			<Item Name="gRPCId Cluster.ctl" Type="VI" URL="../Server API/typeDefs/gRPCId Cluster.ctl"/>
-			<Item Name="grpcId.ctl" Type="VI" URL="../Server API/typeDefs/grpcId.ctl"/>
-			<Item Name="Message Element Metadata.ctl" Type="VI" URL="../Server API/typeDefs/Message Element Metadata.ctl"/>
-			<Item Name="Message Element Type.ctl" Type="VI" URL="../Server API/typeDefs/Message Element Type.ctl"/>
-			<Item Name="Message Metadata.ctl" Type="VI" URL="../Server API/typeDefs/Message Metadata.ctl"/>
-		</Item>
+	</Item>
+	<Item Name="typeDefs" Type="Folder">
+		<Item Name="Any.ctl" Type="VI" URL="../Server API/typeDefs/Any.ctl"/>
+		<Item Name="Generic Method Event Data.ctl" Type="VI" URL="../Server API/typeDefs/Generic Method Event Data.ctl"/>
+		<Item Name="gRPCId Cluster UE.ctl" Type="VI" URL="../Server API/typeDefs/gRPCId Cluster UE.ctl"/>
+		<Item Name="gRPCId Cluster.ctl" Type="VI" URL="../Server API/typeDefs/gRPCId Cluster.ctl"/>
+		<Item Name="grpcId.ctl" Type="VI" URL="../Server API/typeDefs/grpcId.ctl"/>
+		<Item Name="Message Element Metadata.ctl" Type="VI" URL="../Server API/typeDefs/Message Element Metadata.ctl"/>
+		<Item Name="Message Element Type.ctl" Type="VI" URL="../Server API/typeDefs/Message Element Type.ctl"/>
+		<Item Name="Message Metadata.ctl" Type="VI" URL="../Server API/typeDefs/Message Metadata.ctl"/>
 	</Item>
 </Library>

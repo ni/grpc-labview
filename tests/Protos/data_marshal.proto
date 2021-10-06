@@ -27,6 +27,10 @@ option objc_class_prefix = "LVQS";
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+import "google/protobuf/any.proto";
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 package queryserver;
 
 //---------------------------------------------------------------------
@@ -71,6 +75,9 @@ message TestDataTypesParameters {
   repeated float RepeatedFloatValue = 10;
   DataTypeTest nested = 11;
   repeated DataTypeTest repeatedNested = 12;
+  bytes rootBytes = 13;
+  repeated bytes repeatedBytes = 14;
+  google.protobuf.Any generic_value = 15;
 }
 
 //---------------------------------------------------------------------

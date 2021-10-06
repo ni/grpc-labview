@@ -41,6 +41,35 @@ std::shared_ptr<MessageMetadata> CreateMessageMetadata(IMessageElementMetadataOw
 
     auto name = GetLVString(lvMetadata->messageName);
     metadata->messageName = name;
+    metadata->typeUrl = name;
+    int clusterOffset = 0;
+    if (lvMetadata->elements != nullptr)
+    {
+        auto lvElement = (*lvMetadata->elements)->bytes<LVMesageElementMetadata>();
+        for (int x = 0; x < (*lvMetadata->elements)->cnt; ++x, ++lvElement)
+        {
+            auto element = std::make_shared<MessageElementMetadata>(metadataOwner);
+            element->embeddedMessageName = GetLVString(lvElement->embeddedMessageName);
+            element->protobufIndex = lvElement->protobufIndex;
+            element->type = (LVMessageMetadataType)lvElement->valueType;
+            element->isRepeated = lvElement->isRepeated;
+            metadata->_elements.push_back(element);
+            metadata->_mappedElements.emplace(element->protobufIndex, element);
+
+        }
+    }
+    return metadata;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+std::shared_ptr<MessageMetadata> CreateMessageMetadata2(IMessageElementMetadataOwner* metadataOwner, LVMessageMetadata2* lvMetadata)
+{
+    std::shared_ptr<MessageMetadata> metadata(new MessageMetadata());
+
+    auto name = GetLVString(lvMetadata->messageName);
+    metadata->messageName = name;
+    metadata->typeUrl = GetLVString(lvMetadata->typeUrl);
     int clusterOffset = 0;
     if (lvMetadata->elements != nullptr)
     {
@@ -92,9 +121,28 @@ LIBRARY_EXPORT int32_t LVStopServer(LVgRPCServerid* id)
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t RegisterMessageMetadata(LVgRPCServerid* id, LVMessageMetadata* lvMetadata)
 {    
-    auto server = *(LabVIEWgRPCServer**)id;
+    auto server = *(MessageElementMetadataOwner**)id;
     auto metadata = CreateMessageMetadata(server, lvMetadata);
     server->RegisterMetadata(metadata);
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t RegisterMessageMetadata2(LVgRPCServerid* id, LVMessageMetadata2* lvMetadata)
+{    
+    auto server = *(MessageElementMetadataOwner**)id;
+    auto metadata = CreateMessageMetadata2(server, lvMetadata);
+    server->RegisterMetadata(metadata);
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t CompleteMetadataRegistration(LVgRPCServerid* id)
+{    
+    auto server = *(MessageElementMetadataOwner**)id;
+    server->FinalizeMetadata();
     return 0;
 }
 

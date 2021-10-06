@@ -20,6 +20,12 @@
 				<Item Name="Template Server.lvlib" Type="Library" URL="../Servers/Template Server/Template Server.lvlib"/>
 			</Item>
 		</Item>
+		<Item Name="Tests" Type="Folder">
+			<Item Name="SimpleAnyBuilder.vi" Type="VI" URL="../../tests/Protobuf/SimpleAnyBuilder.vi"/>
+			<Item Name="SimpleAnyPackUnpack.vi" Type="VI" URL="../../tests/Protobuf/SimpleAnyPackUnpack.vi"/>
+			<Item Name="SimpleBuilder.vi" Type="VI" URL="../../tests/Protobuf/SimpleBuilder.vi"/>
+			<Item Name="SimplePackUnpack.vi" Type="VI" URL="../../tests/Protobuf/SimplePackUnpack.vi"/>
+		</Item>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="vi.lib" Type="Folder">
 				<Item Name="1D String Array to Delimited String.vi" Type="VI" URL="/&lt;vilib&gt;/AdvancedString/1D String Array to Delimited String.vi"/>

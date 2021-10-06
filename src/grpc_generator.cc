@@ -104,6 +104,16 @@ void LVProtoParser::Import(const std::string& filePath, const std::string& searc
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+LIBRARY_EXPORT int LVGetgRPCAPIVersion(int* version)
+{
+    InitCallbacks();
+
+    *version = 2;
+    return 0;    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int LVImportProto(const char* filePath, const char* searchPath, LVProtoParser** parser)
 {
     InitCallbacks();
@@ -348,6 +358,18 @@ LIBRARY_EXPORT int LVMessageName(Descriptor* descriptor, LStrHandle* name)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+LIBRARY_EXPORT int LVMessageTypeUrl(Descriptor* descriptor, LStrHandle* name)
+{
+    if (descriptor == nullptr)
+    {
+        return -1;
+    }
+    SetLVString(name, descriptor->full_name());
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, LV1DArrayHandle* fields)
 {
     if (descriptor == nullptr)
@@ -411,7 +433,14 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
         case FieldDescriptor::TYPE_STRING:
             info->type = 4;
             break;
+        case FieldDescriptor::TYPE_BYTES:
+            info->type = 10;
+            break;
         case FieldDescriptor::TYPE_MESSAGE:
+            // if (field->message_type()->full_name() == "google.protobuf.Any")
+            // {
+            //     info->type = 17;
+            // }
             info->type = 5;
             break;
         case FieldDescriptor::TYPE_FIXED64:
@@ -420,10 +449,6 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
             break;
         case FieldDescriptor::TYPE_FIXED32:
             AddFieldError(field, "Unsupported Type: TYPE_FIXED32");
-            info->type = 99;
-            break;
-        case FieldDescriptor::TYPE_BYTES:
-            AddFieldError(field, "Unsupported Type: TYPE_BYTES");
             info->type = 99;
             break;
         case FieldDescriptor::TYPE_SFIXED32:
