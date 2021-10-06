@@ -62,7 +62,7 @@ void InitCallbacks()
     }
     if (NumericArrayResize == nullptr)
     {
-        cout << "Loading LabVIEW Runtime engine!" << endl;
+        std::cout << "Loading LabVIEW Runtime engine!" << std::endl;
         lvModule = dlopen("liblvrt.so", RTLD_NOW);
         NumericArrayResize = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
         PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
