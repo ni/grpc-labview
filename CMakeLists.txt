@@ -111,9 +111,9 @@ set(qs_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/query_server.grpc.pb.h")
 add_custom_command(
   OUTPUT "${qs_proto_srcs}" "${qs_proto_hdrs}" "${qs_grpc_srcs}" "${qs_grpc_hdrs}"
   COMMAND ${_PROTOBUF_PROTOC}
-  ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
-    --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
-    -I "${qs_proto_path}"
+  ARGS --grpc_out="${CMAKE_CURRENT_BINARY_DIR}"
+    --cpp_out="${CMAKE_CURRENT_BINARY_DIR}"
+    -I="${qs_proto_path}"
     --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
     "${qs_proto}"
   DEPENDS "${qs_proto}")
@@ -151,9 +151,9 @@ set(dm_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/data_marshal.grpc.pb.h")
 add_custom_command(
   OUTPUT "${dm_proto_srcs}" "${dm_proto_hdrs}" "${dm_grpc_srcs}" "${dm_grpc_hdrs}"
   COMMAND ${_PROTOBUF_PROTOC}
-  ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
-    --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
-    -I "${dm_proto_path}"
+  ARGS --grpc_out="${CMAKE_CURRENT_BINARY_DIR}"
+    --cpp_out="${CMAKE_CURRENT_BINARY_DIR}"
+    -I="${dm_proto_path}"
     --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
     "${dm_proto}"
   DEPENDS "${dm_proto}")
