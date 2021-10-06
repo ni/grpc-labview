@@ -20,13 +20,13 @@ enum class LVMessageMetadataType
     UInt32Value = 7,
     UInt64Value = 8,
     EnumValue = 9,
-    Bytes = 10,
-    Fixed64 = 11,
-    Fixed32 = 12,
-    SFixed64 = 13,
-    SFixed32 = 14,
-    SInt64 = 15,
-    SInt32 = 16,
+    BytesValue = 10,
+    Fixed64Value = 11,
+    Fixed32Value = 12,
+    SFixed64Value = 13,
+    SFixed32Value = 14,
+    SInt64Value = 15,
+    SInt32Value = 16,
     // Any = 17
 };
 

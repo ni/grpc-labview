@@ -433,6 +433,9 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
         case FieldDescriptor::TYPE_STRING:
             info->type = 4;
             break;
+        case FieldDescriptor::TYPE_BYTES:
+            info->type = 10;
+            break;
         case FieldDescriptor::TYPE_MESSAGE:
             // if (field->message_type()->full_name() == "google.protobuf.Any")
             // {
@@ -446,10 +449,6 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
             break;
         case FieldDescriptor::TYPE_FIXED32:
             AddFieldError(field, "Unsupported Type: TYPE_FIXED32");
-            info->type = 99;
-            break;
-        case FieldDescriptor::TYPE_BYTES:
-            AddFieldError(field, "Unsupported Type: TYPE_BYTES");
             info->type = 99;
             break;
         case FieldDescriptor::TYPE_SFIXED32:

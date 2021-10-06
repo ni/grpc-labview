@@ -309,6 +309,9 @@ const char *LVMessage::_InternalParse(const char *ptr, ParseContext *ctx)
             case LVMessageMetadataType::StringValue:
                 ptr = ParseString(tag, *fieldInfo, index, ptr, ctx);
                 break;
+            case LVMessageMetadataType::BytesValue:
+                ptr = ParseBytes(tag, *fieldInfo, index, ptr, ctx);
+                break;
             case LVMessageMetadataType::MessageValue:
                 ptr = ParseNestedMessage(tag, *fieldInfo, index, ptr, ctx);
                 break;
@@ -525,6 +528,13 @@ const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageEl
         _values.emplace(index, v);
     }
     return ptr;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+const char *LVMessage::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+{
+    return ParseString(tag, fieldInfo, index, ptr, ctx);    
 }
 
 //---------------------------------------------------------------------
