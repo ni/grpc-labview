@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.5.1)
 project(labview-grpc-server C CXX)
 
 if(NOT MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 else()
   add_definitions(-D_WIN32_WINNT=0x600)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4267 /wd4244")
