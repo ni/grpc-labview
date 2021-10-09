@@ -15,7 +15,6 @@ find_package(Threads REQUIRED)
 
 #----------------------------------------------------------------------
 #----------------------------------------------------------------------
-project(check_for_sizeof_void_p C)
 message( ${CMAKE_SIZEOF_VOID_P} )
 
 #----------------------------------------------------------------------
@@ -59,6 +58,9 @@ add_library(labview_grpc_server SHARED
   src/cluster_copier.cc
   src/event_data.cc
   src/lv_interop.cc
+  src/lv_message.cc
+  src/lv_message_value.cc
+  src/message_element_metadata_owner.cc
   src/any_support.cc
   )
 target_link_libraries(labview_grpc_server
@@ -71,7 +73,7 @@ target_link_libraries(labview_grpc_server
 # server VIs from a .proto file
 #----------------------------------------------------------------------
 add_library(labview_grpc_generator SHARED
-  src/grpc_generator.cc
+  src/proto_parser.cc
   src/lv_interop.cc
   )
 target_link_libraries(labview_grpc_generator

@@ -36,22 +36,6 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-// class LVAnyMessageValue : public LVMessageValue
-// {
-// public:
-//     LVAnyMessageValue(int protobufId, google::protobuf::Any* value);
-
-// public:
-//     google::protobuf::Any* _value;
-
-// public:
-//     void* RawValue() override { return (void*)(_value); };
-//     size_t ByteSizeLong() override;
-//     google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
-// };
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 class LVRepeatedNestedMessageMessageValue : public LVMessageValue, public LVgRPCid
 {
 public:
@@ -65,22 +49,6 @@ public:
     size_t ByteSizeLong() override;
     google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
 };
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-// class LVRepeatedAnyMessageValue : public LVMessageValue
-// {
-// public:
-//     LVRepeatedAnyMessageValue(int protobufId);
-
-// public:
-//     std::vector<google::protobuf::Any*> _value;
-
-// public:
-//     void* RawValue() override { return &_value; };
-//     size_t ByteSizeLong() override;
-//     google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
-// };
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------

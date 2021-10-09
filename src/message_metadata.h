@@ -34,8 +34,7 @@ enum class LVMessageMetadataType
     SFixed64Value = 13,
     SFixed32Value = 14,
     SInt64Value = 15,
-    SInt32Value = 16,
-    // Any = 17
+    SInt32Value = 16
 };
 
 //---------------------------------------------------------------------

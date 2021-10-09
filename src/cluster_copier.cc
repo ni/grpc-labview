@@ -108,9 +108,6 @@ void ClusterDataCopier::CopyFromCluster(LVMessage& message, int8_t* cluster)
             case LVMessageMetadataType::EnumValue:
                 CopyEnumFromCluster(val.second, start, message);
                 break;
-            // case LVMessageMetadataType::Any:
-            //     CopyAnyFromCluster(val.second, start, message);
-            //     break;
         }
     }
 }
