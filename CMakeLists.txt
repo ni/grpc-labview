@@ -50,22 +50,10 @@ endif()
 include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src")
 
 #----------------------------------------------------------------------
-# LabVIEW client support to communicate with a gRPC server
-#----------------------------------------------------------------------
-add_library(labview_grpc_client SHARED
-   "src/grpc_client.cc"
-   ${qs_proto_srcs}
-   ${qs_grpc_srcs}
-   )
-target_link_libraries(labview_grpc_client
-   ${_REFLECTION}
-   ${_GRPC_GRPCPP}
-   ${_PROTOBUF_LIBPROTOBUF})
-
-#----------------------------------------------------------------------
-# LabVIEW server support for implementing the grpc server
+# LabVIEW support for grpc and protobuf
 #----------------------------------------------------------------------
 add_library(labview_grpc_server SHARED
+  src/grpc_client.cc
   src/grpc_server.cc
   src/grpc_interop.cc
   src/cluster_copier.cc

@@ -52,7 +52,7 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class LVRepeatedNestedMessageMessageValue : public LVMessageValue
+class LVRepeatedNestedMessageMessageValue : public LVMessageValue, public LVgRPCid
 {
 public:
     LVRepeatedNestedMessageMessageValue(int protobufId);

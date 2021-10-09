@@ -24,6 +24,13 @@ CallData::CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService *service
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+std::shared_ptr<MessageMetadata> CallData::FindMetadata(const std::string& name)
+{
+    return _server->FindMetadata(name);    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 CallFinishedData::CallFinishedData(CallData* callData)
 {
     _call = callData;
@@ -167,7 +174,7 @@ void CallData::Proceed(bool ok)
             _requestDataReady = true;
 
             _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
-            _server->SendEvent(name, _methodData.get());
+            _server->SendEvent(name, static_cast<LVgRPCid*>(_methodData.get()));
         }
         else
         {
@@ -1358,6 +1365,17 @@ GenericMethodData::GenericMethodData(CallData* call, ServerContext *context, std
     _call = call;
     _request = request;
     _response = response;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+std::shared_ptr<MessageMetadata> GenericMethodData::FindMetadata(const std::string& name)
+{
+    if (_call != nullptr)
+    {
+        return _call->FindMetadata(name);
+    }
+    return nullptr;
 }
 
 //---------------------------------------------------------------------

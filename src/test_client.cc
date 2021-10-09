@@ -221,6 +221,14 @@ void DoDataTypeTest(QueryClient& client)
     request.mutable_nested()->set_intvalue(4242);
     request.mutable_nested()->set_floatvalue(15.14f);
 
+    QueryResponse anyResponse;
+    anyResponse.set_message("This is a message");
+    anyResponse.set_status(42);
+
+    auto any = new google::protobuf::Any();
+    any->PackFrom(anyResponse, "PREFIX");
+    request.set_allocated_generic_value(any);
+
     auto nested = request.mutable_repeatednested()->Add();
     nested->set_boolvalaue(true);
     nested->set_floatvalue(1.1f);

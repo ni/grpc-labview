@@ -205,38 +205,36 @@ void ClusterDataCopier::CopyStringToCluster(const std::shared_ptr<MessageElement
 //---------------------------------------------------------------------
 void ClusterDataCopier::CopyBytesToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
-    if (metadata->isRepeated)
-    {        
-        auto repeatedString = static_cast<const LVRepeatedStringMessageValue&>(*value);
-        if (repeatedString._value.size() != 0)
-        {
-            LVNumericArrayResize(0x08, 1, start, repeatedString._value.size());
-            auto array = *(LV1DArrayHandle*)start;
-            (*array)->cnt = repeatedString._value.size();
-            int x = 0;
-            auto lvBytes = (*array)->bytes<LV1DArrayHandle>();
-            for (auto str : repeatedString._value)
-            {
-                *lvBytes = nullptr;
-                auto length = str.length();    
-                auto error = LVNumericArrayResize(0x01, 1, lvBytes, length);
-                memcpy((**lvBytes)->bytes<uint8_t>(), str.c_str(), length);
-                (**lvBytes)->cnt = (int)length;
-                lvBytes += 1;
-            }
-        }
-    }
-    else
-    {
-        auto lvBytes = (LV1DArrayHandle*)start;
-        auto str = ((LVStringMessageValue*)value.get())->_value;
-
-        *lvBytes = nullptr;
-        auto length = str.length();    
-        auto error = LVNumericArrayResize(0x01, 1, lvBytes, length);
-        memcpy((**lvBytes)->bytes<uint8_t>(), str.c_str(), length);
-        (**lvBytes)->cnt = (int)length;
-    }
+     if (metadata->isRepeated)
+     {        
+         //auto repeatedString = static_cast<const LVRepeatedStringMessageValue&>(*value);
+         //if (repeatedString._value.size() != 0)
+         //{
+         //    LVNumericArrayResize(0x08, 1, start, repeatedString._value.size());
+         //    auto array = *(LV1DArrayHandle*)start;
+         //    (*array)->cnt = repeatedString._value.size();
+         //    int x = 0;
+         //    auto lvBytes = (*array)->bytes<LV1DArrayHandle>();
+         //    for (auto str : repeatedString._value)
+         //    {
+         //        *lvBytes = nullptr;
+         //        auto length = str.length();    
+         //        auto error = LVNumericArrayResize(0x01, 1, lvBytes, length);
+         //        memcpy((**lvBytes)->bytes<uint8_t>(), str.c_str(), length);
+         //        (**lvBytes)->cnt = (int)length;
+         //        lvBytes += 1;
+         //    }
+         //}
+     }
+     else
+     {
+         auto str = ((LVStringMessageValue*)value.get())->_value;
+         auto length = str.length();
+         auto error = LVNumericArrayResize(0x01, 1, start, length);
+         auto lvBytes = *(LV1DArrayHandle*)start;
+         memcpy((*lvBytes)->bytes<uint8_t>(), str.c_str(), length);
+         (*lvBytes)->cnt = (int)length;
+     }
 }
 
 //---------------------------------------------------------------------
@@ -513,34 +511,37 @@ void ClusterDataCopier::CopyStringFromCluster(const std::shared_ptr<MessageEleme
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 void ClusterDataCopier::CopyBytesFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-{    
+{   
     if (metadata->isRepeated)
     {
-        auto array = *(LV1DArrayHandle*)start;
-        if (array && *array && ((*array)->cnt != 0))
-        {
-            auto repeatedStringValue = std::make_shared<LVRepeatedStringMessageValue>(metadata->protobufIndex);
-            message._values.emplace(metadata->protobufIndex, repeatedStringValue);
-            auto bytes = (*array)->bytes<LV1DArrayHandle>();
-            for (int x=0; x < (*array)->cnt; ++x)
-            {
-                auto count = (**bytes)->cnt;
-                auto chars = (**bytes)->bytes<char>();
+        //auto array = *(LV1DArrayHandle*)start;
+        //if (array && *array && ((*array)->cnt != 0))
+        //{
+        //    auto repeatedStringValue = std::make_shared<LVRepeatedStringMessageValue>(metadata->protobufIndex);
+        //    message._values.emplace(metadata->protobufIndex, repeatedStringValue);
+        //    auto bytes = (*array)->bytes<LV1DArrayHandle>();
+        //    for (int x=0; x < (*array)->cnt; ++x)
+        //    {
+        //        auto count = (**bytes)->cnt;
+        //        auto chars = (**bytes)->bytes<char>();
 
-                std::string result(chars, count);
-                repeatedStringValue->_value.Add(result);
-                bytes += 1;
-            }
-        }
+        //        std::string result(chars, count);
+        //        repeatedStringValue->_value.Add(result);
+        //        bytes += 1;
+        //    }
+        //}
     }
     else
     {
         auto bytes = (LV1DArrayHandle*)start;
-        auto count = (**bytes)->cnt;
-        auto chars = (**bytes)->bytes<char>();
-        std::string str(chars, count);
-        auto stringValue = std::make_shared<LVStringMessageValue>(metadata->protobufIndex, str);
-        message._values.emplace(metadata->protobufIndex, stringValue);
+        if (bytes && *bytes && **bytes)
+        {
+            auto count = (**bytes)->cnt;
+            auto chars = (**bytes)->bytes<char>();
+            std::string str(chars, count);
+            auto stringValue = std::make_shared<LVStringMessageValue>(metadata->protobufIndex, str);
+            message._values.emplace(metadata->protobufIndex, stringValue);
+        }
     }
 }
 
@@ -779,39 +780,3 @@ void ClusterDataCopier::CopyMessageFromCluster(const std::shared_ptr<MessageElem
         message._values.emplace(metadata->protobufIndex, value);
     }
 }
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-// void ClusterDataCopier::CopyAnyFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-// {    
-//     auto nestedMetadata = metadata->_owner->FindMetadata(metadata->embeddedMessageName);
-
-//     if (metadata->isRepeated)
-//     {
-//         auto array = *(LV1DArrayHandle*)start;
-//         if (array && *array && ((*array)->cnt != 0))
-//         {
-//             auto count = (*array)->cnt;
-//             if (count != 0)
-//             {
-//                 auto repeatedValue = std::make_shared<LVRepeatedAnyMessageValue>(metadata->protobufIndex);
-//                 message._values.emplace(metadata->protobufIndex, repeatedValue);
-
-//                 for (int x = 0; x < count; ++x)
-//                 {
-//                     auto data = (*array)->bytes<int64_t>(sizeof(int64_t) * x);
-//                     auto anyHandle = *(int64_t*)data;
-//                     auto anyValue = (google::protobuf::Any*)anyHandle;
-//                     repeatedValue->_value.push_back(anyValue);
-//                 }
-//             }
-//         }
-//     }
-//     else
-//     {
-//         auto anyHandle = *(int64_t*)start;
-//         auto anyValue = (google::protobuf::Any*)anyHandle;
-//         auto value = std::make_shared<LVAnyMessageValue>(metadata->protobufIndex, anyValue);
-//         message._values.emplace(metadata->protobufIndex, value);
-//     }
-// }

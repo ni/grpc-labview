@@ -63,6 +63,7 @@ message DataTypeTest {
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 message TestDataTypesParameters {
+  google.protobuf.Any generic_value = 15;
   string root = 1;
   repeated string RepeatedString = 2;
   repeated int32 RepeatedIntValue = 3;
@@ -77,7 +78,6 @@ message TestDataTypesParameters {
   repeated DataTypeTest repeatedNested = 12;
   bytes rootBytes = 13;
   repeated bytes repeatedBytes = 14;
-  google.protobuf.Any generic_value = 15;
 }
 
 //---------------------------------------------------------------------

@@ -22,6 +22,29 @@
 #endif
 
 //---------------------------------------------------------------------
+// LabVIEW gRPC definitions
+//---------------------------------------------------------------------
+class LVgRPCid
+{
+public:
+    template <typename T>
+    T* CastTo()
+    { 
+        if (IsValid())
+        {
+            return dynamic_cast<T*>(this); 
+        }
+        return nullptr;
+    }
+
+    bool IsValid() { return true; }
+
+protected:
+    LVgRPCid() { }
+    virtual ~LVgRPCid() { }
+};
+
+//---------------------------------------------------------------------
 // LabVIEW definitions
 //---------------------------------------------------------------------
 typedef int32_t MagicCookie;

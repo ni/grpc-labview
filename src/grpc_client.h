@@ -5,11 +5,12 @@
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-#include <message_metadata.h>
+#include <metadata_owner.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class LabVIEWSerializationSession : public MessageElementMetadataOwner, public LVgRPCid
+class LabVIEWgRPCClient : public MessageElementMetadataOwner, public LVgRPCid
 {
+public:
+    LabVIEWgRPCClient(const char* address, const char* serverCertificatePath, const char* serverKeyPath);
 };
-

@@ -12,14 +12,14 @@
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void OccurServerEvent(LVUserEventRef event, EventData* data)
+void OccurServerEvent(LVUserEventRef event, LVgRPCid* data)
 {
     auto error = LVPostLVUserEvent(event, &data);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void OccurServerEvent(LVUserEventRef event, EventData* data, std::string eventMethodName)
+void OccurServerEvent(LVUserEventRef event, LVgRPCid* data, std::string eventMethodName)
 {
     LStr* lvMethodName = (LStr*)malloc(sizeof(int32_t) + eventMethodName.length() + 1);
     lvMethodName->cnt = eventMethodName.length();
@@ -91,7 +91,7 @@ std::shared_ptr<MessageMetadata> CreateMessageMetadata2(IMessageElementMetadataO
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t LVCreateServer(LVgRPCServerid* id)
+LIBRARY_EXPORT int32_t LVCreateServer(LVgRPCid** id)
 {
     InitCallbacks();
     auto server = new LabVIEWgRPCServer();
@@ -101,17 +101,17 @@ LIBRARY_EXPORT int32_t LVCreateServer(LVgRPCServerid* id)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t LVStartServer(char* address, char* serverCertificatePath, char* serverKeyPath, LVgRPCServerid* id)
+LIBRARY_EXPORT int32_t LVStartServer(char* address, char* serverCertificatePath, char* serverKeyPath, LVgRPCid** id)
 {   
-    auto server = *(LabVIEWgRPCServer**)id;
+    auto server = (*id)->CastTo<LabVIEWgRPCServer>();
     return server->Run(address, serverCertificatePath, serverKeyPath);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t LVStopServer(LVgRPCServerid* id)
+LIBRARY_EXPORT int32_t LVStopServer(LVgRPCid** id)
 {
-    auto server = *(LabVIEWgRPCServer**)id;
+    auto server = (*id)->CastTo<LabVIEWgRPCServer>();
     server->StopServer();
     delete server;
     return 0;
@@ -119,9 +119,9 @@ LIBRARY_EXPORT int32_t LVStopServer(LVgRPCServerid* id)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t RegisterMessageMetadata(LVgRPCServerid* id, LVMessageMetadata* lvMetadata)
+LIBRARY_EXPORT int32_t RegisterMessageMetadata(LVgRPCid** id, LVMessageMetadata* lvMetadata)
 {    
-    auto server = *(MessageElementMetadataOwner**)id;
+    auto server = (*id)->CastTo<MessageElementMetadataOwner>();
     auto metadata = CreateMessageMetadata(server, lvMetadata);
     server->RegisterMetadata(metadata);
     return 0;
@@ -129,9 +129,9 @@ LIBRARY_EXPORT int32_t RegisterMessageMetadata(LVgRPCServerid* id, LVMessageMeta
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t RegisterMessageMetadata2(LVgRPCServerid* id, LVMessageMetadata2* lvMetadata)
+LIBRARY_EXPORT int32_t RegisterMessageMetadata2(LVgRPCid** id, LVMessageMetadata2* lvMetadata)
 {    
-    auto server = *(MessageElementMetadataOwner**)id;
+    auto server = (*id)->CastTo<MessageElementMetadataOwner>();
     auto metadata = CreateMessageMetadata2(server, lvMetadata);
     server->RegisterMetadata(metadata);
     return 0;
@@ -139,18 +139,18 @@ LIBRARY_EXPORT int32_t RegisterMessageMetadata2(LVgRPCServerid* id, LVMessageMet
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t CompleteMetadataRegistration(LVgRPCServerid* id)
-{    
-    auto server = *(MessageElementMetadataOwner**)id;
+LIBRARY_EXPORT int32_t CompleteMetadataRegistration(LVgRPCid** id)
+{        
+    auto server = (*id)->CastTo<MessageElementMetadataOwner>();
     server->FinalizeMetadata();
     return 0;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t RegisterServerEvent(LVgRPCServerid* id, const char* name, LVUserEventRef* item, const char* requestMessageName, const char* responseMessageName)
+LIBRARY_EXPORT int32_t RegisterServerEvent(LVgRPCid** id, const char* name, LVUserEventRef* item, const char* requestMessageName, const char* responseMessageName)
 {    
-    auto server = *(LabVIEWgRPCServer**)id;
+    auto server = (*id)->CastTo<LabVIEWgRPCServer>();
 
     server->RegisterEvent(name, *item, requestMessageName, responseMessageName);
     return 0;
@@ -158,9 +158,9 @@ LIBRARY_EXPORT int32_t RegisterServerEvent(LVgRPCServerid* id, const char* name,
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t RegisterGenericMethodServerEvent(LVgRPCServerid* id, LVUserEventRef* item)
+LIBRARY_EXPORT int32_t RegisterGenericMethodServerEvent(LVgRPCid** id, LVUserEventRef* item)
 {    
-    auto server = *(LabVIEWgRPCServer**)id;
+    auto server = (*id)->CastTo<LabVIEWgRPCServer>();
 
     server->RegisterGenericMethodEvent(*item);
     return 0;
@@ -168,9 +168,9 @@ LIBRARY_EXPORT int32_t RegisterGenericMethodServerEvent(LVgRPCServerid* id, LVUs
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t GetRequestData(LVgRPCid id, int8_t* lvRequest)
+LIBRARY_EXPORT int32_t GetRequestData(LVgRPCid** id, int8_t* lvRequest)
 {
-    auto data = *(GenericMethodData**)id;
+    auto data = (*id)->CastTo<GenericMethodData>();
     data->_call->ReadNext();
     ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
     data->_call->ReadComplete();
@@ -179,9 +179,9 @@ LIBRARY_EXPORT int32_t GetRequestData(LVgRPCid id, int8_t* lvRequest)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t SetResponseData(LVgRPCid id, int8_t* lvRequest)
+LIBRARY_EXPORT int32_t SetResponseData(LVgRPCid** id, int8_t* lvRequest)
 {
-    auto data = *(GenericMethodData**)id;
+    auto data = (*id)->CastTo<GenericMethodData>();
     ClusterDataCopier::CopyFromCluster(*data->_response, lvRequest);
     if (!data->_call->Write())
     {
@@ -192,9 +192,9 @@ LIBRARY_EXPORT int32_t SetResponseData(LVgRPCid id, int8_t* lvRequest)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t CloseServerEvent(LVgRPCid id)
+LIBRARY_EXPORT int32_t CloseServerEvent(LVgRPCid** id)
 {
-    GenericMethodData* data = *(GenericMethodData**)id;
+    auto data = (*id)->CastTo<GenericMethodData>();
     data->NotifyComplete();
     data->_call->Finish();    
     return 0;
@@ -202,8 +202,8 @@ LIBRARY_EXPORT int32_t CloseServerEvent(LVgRPCid id)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t IsCancelled(LVgRPCid id)
+LIBRARY_EXPORT int32_t IsCancelled(LVgRPCid** id)
 {
-    GenericMethodData* data = *(GenericMethodData**)id;
+    auto data = (*id)->CastTo<GenericMethodData>();
     return data->_call->IsCancelled();
 }

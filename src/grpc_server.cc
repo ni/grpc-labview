@@ -183,7 +183,7 @@ void LabVIEWgRPCServer::RegisterGenericMethodEvent(LVUserEventRef item)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void LabVIEWgRPCServer::SendEvent(std::string name, EventData *data)
+void LabVIEWgRPCServer::SendEvent(std::string name, LVgRPCid* data)
 {
     if (HasGenericMethodEvent())
     {

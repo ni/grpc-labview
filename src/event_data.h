@@ -12,7 +12,7 @@ using grpc::ServerContext;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class EventData
+class EventData : public LVgRPCid
 {
 public:
     EventData(ServerContext* context);

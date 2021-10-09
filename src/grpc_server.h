@@ -36,12 +36,6 @@ using grpc::ServerBuilder;
 using grpc::Status;
 
 //---------------------------------------------------------------------
-// QueryServer LabVIEW definitions
-//---------------------------------------------------------------------
-typedef void* LVgRPCid;
-typedef void* LVgRPCServerid;
-
-//---------------------------------------------------------------------
 //---------------------------------------------------------------------
 class LabVIEWgRPCServer;
 class LVMessage;
@@ -63,10 +57,11 @@ public:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class GenericMethodData : public EventData
+class GenericMethodData : public EventData, public IMessageElementMetadataOwner
 {
 public:
     GenericMethodData(CallData* call, ServerContext* context, std::shared_ptr<LVMessage> request, std::shared_ptr<LVMessage> response);
+    virtual std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
 
 public:
     CallData* _call;
@@ -85,7 +80,7 @@ struct LVEventData
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class LabVIEWgRPCServer : public MessageElementMetadataOwner
+class LabVIEWgRPCServer : public MessageElementMetadataOwner, public LVgRPCid
 {
 public:
     LabVIEWgRPCServer();
@@ -93,7 +88,7 @@ public:
     void StopServer();
     void RegisterEvent(std::string eventName, LVUserEventRef reference, std::string requestMessageName, std::string responseMessageName);
     void RegisterGenericMethodEvent(LVUserEventRef item);
-    void SendEvent(std::string name, EventData* data);
+    void SendEvent(std::string name, LVgRPCid* data);
 
     bool FindEventData(std::string name, LVEventData& data);
     bool HasGenericMethodEvent();    
@@ -137,10 +132,11 @@ private:
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class CallData : public CallDataBase
+class CallData : public CallDataBase, public IMessageElementMetadataOwner
 {
 public:
     CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService* service, grpc::ServerCompletionQueue* cq);
+    std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
     void Proceed(bool ok) override;
     bool Write();
     void Finish();
@@ -215,7 +211,7 @@ struct LVServerEvent
 struct GeneralMethodEventData
 {
     LStrHandle methodName;
-    EventData* methodData;
+    LVgRPCid* methodData;
 };
 #ifdef _PS_4
 #pragma pack (pop)
@@ -223,5 +219,5 @@ struct GeneralMethodEventData
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void OccurServerEvent(LVUserEventRef event, EventData* data);
-void OccurServerEvent(LVUserEventRef event, EventData* data, std::string eventMethodName);
+void OccurServerEvent(LVUserEventRef event, LVgRPCid* data);
+void OccurServerEvent(LVUserEventRef event, LVgRPCid* data, std::string eventMethodName);

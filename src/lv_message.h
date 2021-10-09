@@ -8,7 +8,7 @@
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-class LVMessage : public google::protobuf::Message
+class LVMessage : public google::protobuf::Message, public LVgRPCid
 {
 public:
     LVMessage(std::shared_ptr<MessageMetadata> metadata);
