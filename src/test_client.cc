@@ -226,7 +226,7 @@ void DoDataTypeTest(QueryClient& client)
     anyResponse.set_status(42);
 
     auto any = new google::protobuf::Any();
-    any->PackFrom(anyResponse, "PREFIX");
+    any->PackFrom(anyResponse);
     request.set_allocated_generic_value(any);
 
     auto nested = request.mutable_repeatednested()->Add();
@@ -256,6 +256,12 @@ void DoDataTypeTest(QueryClient& client)
     std::cout << response.rootdouble() << std::endl;
     std::cout << response.rootbool() << std::endl;
     std::cout << response.rootfloat() << std::endl;
+
+    QueryResponse genericResponse;
+    bool unpackedResult = response.generic_value().UnpackTo(&genericResponse);
+
+    std::cout << "Unpacked Result: " << unpackedResult << "Unpacked Any: " << genericResponse.message() << std::endl;
+
 
     for (int x = 0; x < response.mutable_repeateddoublevalue()->size(); ++x)
     {

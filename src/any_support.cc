@@ -61,7 +61,7 @@ LIBRARY_EXPORT int32_t PackToAny(LVgRPCid* id, const char* messageType, int8_t* 
         return -2;
     }
 
-    SetLVString(&lvAny->TypeUrl, metadata->typeUrl);
+    SetLVString(&lvAny->TypeUrl, "/" + metadata->typeUrl);
     return PackToBuffer(id, messageType, cluster, &lvAny->Bytes);
 }
 

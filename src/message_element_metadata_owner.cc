@@ -135,7 +135,14 @@ void MessageElementMetadataOwner::UpdateMetadataClusterLayout(std::shared_ptr<Me
         {                
             auto nestedMetadata = FindMetadata(element->embeddedMessageName);
             UpdateMetadataClusterLayout(nestedMetadata);
-            clusterOffset += nestedMetadata->clusterSize;
+            if (element->isRepeated)
+            {                
+                clusterOffset += ClusterElementSize(element->type, element->isRepeated);
+            }
+            else
+            {
+                clusterOffset += nestedMetadata->clusterSize;
+            }
         }
         else
         {
@@ -154,4 +161,3 @@ void MessageElementMetadataOwner::FinalizeMetadata()
         UpdateMetadataClusterLayout(metadata.second);
     }
 }
-

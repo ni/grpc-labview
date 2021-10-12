@@ -56,9 +56,6 @@ void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
                 case LVMessageMetadataType::EnumValue:
                     CopyEnumToCluster(val.second, start, value);
                     break;
-                // case LVMessageMetadataType::Any:
-                //     CopyAnyToCluster(val.second, start, value);
-                //     break;
             }
         }
     }
@@ -160,9 +157,6 @@ bool ClusterDataCopier::AnyBuilderAddValue(LVMessage& message, LVMessageMetadata
         case LVMessageMetadataType::EnumValue:
             CopyEnumFromCluster(metadata, value, message);
             break;        
-        // case LVMessageMetadataType::Any:
-        //     CopyAnyFromCluster(metadata, value, message);
-        //     break;
         default:
             return false;
             break;
@@ -202,36 +196,7 @@ void ClusterDataCopier::CopyStringToCluster(const std::shared_ptr<MessageElement
 //---------------------------------------------------------------------
 void ClusterDataCopier::CopyBytesToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
 {
-     if (metadata->isRepeated)
-     {        
-         //auto repeatedString = static_cast<const LVRepeatedStringMessageValue&>(*value);
-         //if (repeatedString._value.size() != 0)
-         //{
-         //    LVNumericArrayResize(0x08, 1, start, repeatedString._value.size());
-         //    auto array = *(LV1DArrayHandle*)start;
-         //    (*array)->cnt = repeatedString._value.size();
-         //    int x = 0;
-         //    auto lvBytes = (*array)->bytes<LV1DArrayHandle>();
-         //    for (auto str : repeatedString._value)
-         //    {
-         //        *lvBytes = nullptr;
-         //        auto length = str.length();    
-         //        auto error = LVNumericArrayResize(0x01, 1, lvBytes, length);
-         //        memcpy((**lvBytes)->bytes<uint8_t>(), str.c_str(), length);
-         //        (**lvBytes)->cnt = (int)length;
-         //        lvBytes += 1;
-         //    }
-         //}
-     }
-     else
-     {
-         auto str = ((LVStringMessageValue*)value.get())->_value;
-         auto length = str.length();
-         auto error = LVNumericArrayResize(0x01, 1, start, length);
-         auto lvBytes = *(LV1DArrayHandle*)start;
-         memcpy((*lvBytes)->bytes<uint8_t>(), str.c_str(), length);
-         (*lvBytes)->cnt = (int)length;
-     }
+    CopyStringToCluster(metadata, start, value);
 }
 
 //---------------------------------------------------------------------
@@ -509,37 +474,7 @@ void ClusterDataCopier::CopyStringFromCluster(const std::shared_ptr<MessageEleme
 //---------------------------------------------------------------------
 void ClusterDataCopier::CopyBytesFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
 {   
-    if (metadata->isRepeated)
-    {
-        //auto array = *(LV1DArrayHandle*)start;
-        //if (array && *array && ((*array)->cnt != 0))
-        //{
-        //    auto repeatedStringValue = std::make_shared<LVRepeatedStringMessageValue>(metadata->protobufIndex);
-        //    message._values.emplace(metadata->protobufIndex, repeatedStringValue);
-        //    auto bytes = (*array)->bytes<LV1DArrayHandle>();
-        //    for (int x=0; x < (*array)->cnt; ++x)
-        //    {
-        //        auto count = (**bytes)->cnt;
-        //        auto chars = (**bytes)->bytes<char>();
-
-        //        std::string result(chars, count);
-        //        repeatedStringValue->_value.Add(result);
-        //        bytes += 1;
-        //    }
-        //}
-    }
-    else
-    {
-        auto bytes = (LV1DArrayHandle*)start;
-        if (bytes && *bytes && **bytes)
-        {
-            auto count = (**bytes)->cnt;
-            auto chars = (**bytes)->bytes<char>();
-            std::string str(chars, count);
-            auto stringValue = std::make_shared<LVStringMessageValue>(metadata->protobufIndex, str);
-            message._values.emplace(metadata->protobufIndex, stringValue);
-        }
-    }
+    CopyStringFromCluster(metadata, start, message);
 }
 
 //---------------------------------------------------------------------
