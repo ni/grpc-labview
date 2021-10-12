@@ -11,6 +11,12 @@
 		<Property Name="server.vi.callsEnabled" Type="Bool">true</Property>
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
+		<Item Name="Protobuf" Type="Folder">
+			<Item Name="SimpleAnyBuilder.vi" Type="VI" URL="../Protobuf/SimpleAnyBuilder.vi"/>
+			<Item Name="SimpleAnyPackUnpack.vi" Type="VI" URL="../Protobuf/SimpleAnyPackUnpack.vi"/>
+			<Item Name="SimpleBuilder.vi" Type="VI" URL="../Protobuf/SimpleBuilder.vi"/>
+			<Item Name="SimplePackUnpack.vi" Type="VI" URL="../Protobuf/SimplePackUnpack.vi"/>
+		</Item>
 		<Item Name="Protos" Type="Folder">
 			<Item Name="data_marshal.proto" Type="Document" URL="../Protos/data_marshal.proto"/>
 		</Item>
@@ -24,6 +30,7 @@
 				<Item Name="Error Cluster From Error Code.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/Error Cluster From Error Code.vi"/>
 				<Item Name="Get LV Class Path.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/LVClass/Get LV Class Path.vi"/>
 			</Item>
+			<Item Name="Template Server.lvlib" Type="Library" URL="../../labview source/Servers/Template Server/Template Server.lvlib"/>
 		</Item>
 		<Item Name="Build Specifications" Type="Build"/>
 	</Item>
