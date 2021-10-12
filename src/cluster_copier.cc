@@ -114,7 +114,6 @@ void ClusterDataCopier::CopyFromCluster(LVMessage& message, int8_t* cluster)
 //---------------------------------------------------------------------
 bool ClusterDataCopier::AnyBuilderAddValue(LVMessage& message, LVMessageMetadataType valueType, bool isRepeated, int protobufIndex, int8_t* value)
 {    
-    message._values.clear();
     auto metadata = std::make_shared<MessageElementMetadata>(nullptr);
     metadata->clusterOffset = 0;
     metadata->embeddedMessageName = std::string();
