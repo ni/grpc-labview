@@ -85,43 +85,51 @@ const char *LVMessage::_InternalParse(const char *ptr, ParseContext *ctx)
         google::protobuf::uint32 tag;
         ptr = ReadTag(ptr, &tag);
         auto index = (tag >> 3);
-        auto fieldInfo = _metadata->_mappedElements[index];
-        LVMessageMetadataType dataType = fieldInfo->type;
-        switch (dataType)
+        auto fieldIt = _metadata->_mappedElements.find(index);
+        if (fieldIt != _metadata->_mappedElements.end())
         {
-            case LVMessageMetadataType::Int32Value:
-                ptr = ParseInt32(*fieldInfo, index, ptr, ctx);
-                break;
-            case LVMessageMetadataType::FloatValue:
-                ptr = ParseFloat(*fieldInfo, index, ptr, ctx);
-                break;
-            case LVMessageMetadataType::DoubleValue:
-                ptr = ParseDouble(*fieldInfo, index, ptr, ctx);
-                break;
-            case LVMessageMetadataType::BoolValue:
-                ptr = ParseBoolean(*fieldInfo, index, ptr, ctx);
-                break;
-            case LVMessageMetadataType::StringValue:
-                ptr = ParseString(tag, *fieldInfo, index, ptr, ctx);
-                break;
-            case LVMessageMetadataType::BytesValue:
-                ptr = ParseBytes(tag, *fieldInfo, index, ptr, ctx);
-                break;
-            case LVMessageMetadataType::MessageValue:
-                ptr = ParseNestedMessage(tag, *fieldInfo, index, ptr, ctx);
-                break;
-            case LVMessageMetadataType::Int64Value:
-                ptr = ParseInt64(*fieldInfo, index, ptr, ctx);
-                break;
-            case LVMessageMetadataType::UInt32Value:
-                ptr = ParseUInt32(*fieldInfo, index, ptr, ctx);
-                break;
-            case LVMessageMetadataType::UInt64Value:
-                ptr = ParseUInt64(*fieldInfo, index, ptr, ctx);
-                break;
-            case LVMessageMetadataType::EnumValue:
-                ptr = ParseEnum(*fieldInfo, index, ptr, ctx);
-                break;
+            auto fieldInfo = (*fieldIt).second;
+            LVMessageMetadataType dataType = fieldInfo->type;
+            switch (dataType)
+            {
+                case LVMessageMetadataType::Int32Value:
+                    ptr = ParseInt32(*fieldInfo, index, ptr, ctx);
+                    break;
+                case LVMessageMetadataType::FloatValue:
+                    ptr = ParseFloat(*fieldInfo, index, ptr, ctx);
+                    break;
+                case LVMessageMetadataType::DoubleValue:
+                    ptr = ParseDouble(*fieldInfo, index, ptr, ctx);
+                    break;
+                case LVMessageMetadataType::BoolValue:
+                    ptr = ParseBoolean(*fieldInfo, index, ptr, ctx);
+                    break;
+                case LVMessageMetadataType::StringValue:
+                    ptr = ParseString(tag, *fieldInfo, index, ptr, ctx);
+                    break;
+                case LVMessageMetadataType::BytesValue:
+                    ptr = ParseBytes(tag, *fieldInfo, index, ptr, ctx);
+                    break;
+                case LVMessageMetadataType::MessageValue:
+                    ptr = ParseNestedMessage(tag, *fieldInfo, index, ptr, ctx);
+                    break;
+                case LVMessageMetadataType::Int64Value:
+                    ptr = ParseInt64(*fieldInfo, index, ptr, ctx);
+                    break;
+                case LVMessageMetadataType::UInt32Value:
+                    ptr = ParseUInt32(*fieldInfo, index, ptr, ctx);
+                    break;
+                case LVMessageMetadataType::UInt64Value:
+                    ptr = ParseUInt64(*fieldInfo, index, ptr, ctx);
+                    break;
+                case LVMessageMetadataType::EnumValue:
+                    ptr = ParseEnum(*fieldInfo, index, ptr, ctx);
+                    break;
+            }
+        }
+        else
+        {
+            ptr = UnknownFieldParse(tag, &_unknownFields, ptr, ctx);
         }
     }
     return ptr;

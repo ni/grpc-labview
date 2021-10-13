@@ -45,6 +45,7 @@ public:
 
 private:
     mutable google::protobuf::internal::CachedSize _cached_size_;
+    google::protobuf::UnknownFieldSet _unknownFields;
 
     const char *ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
     const char *ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);

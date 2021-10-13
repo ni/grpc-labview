@@ -16,6 +16,7 @@
 			<Item Name="SimpleAnyPackUnpack.vi" Type="VI" URL="../Protobuf/SimpleAnyPackUnpack.vi"/>
 			<Item Name="SimpleBuilder.vi" Type="VI" URL="../Protobuf/SimpleBuilder.vi"/>
 			<Item Name="SimplePackUnpack.vi" Type="VI" URL="../Protobuf/SimplePackUnpack.vi"/>
+			<Item Name="TestParseWithUnknownFields.vi" Type="VI" URL="../Protobuf/TestParseWithUnknownFields.vi"/>
 		</Item>
 		<Item Name="Protos" Type="Folder">
 			<Item Name="data_marshal.proto" Type="Document" URL="../Protos/data_marshal.proto"/>
