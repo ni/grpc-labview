@@ -7,9 +7,12 @@
 //---------------------------------------------------------------------
 #include <message_metadata.h>
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class LabVIEWSerializationSession : public MessageElementMetadataOwner, public LVgRPCid
+namespace grpc_labview 
 {
-};
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class LabVIEWSerializationSession : public MessageElementMetadataOwner, public LVgRPCid
+    {
+    };
 
+}

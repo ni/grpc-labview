@@ -10,23 +10,25 @@
 //---------------------------------------------------------------------
 using grpc::ServerContext;
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class EventData : public LVgRPCid
+namespace grpc_labview 
 {
-public:
-    EventData(ServerContext* context);
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class EventData : public LVgRPCid
+    {
+    public:
+        EventData(ServerContext* context);
 
-private:
-    bool _completed;
-    std::mutex lockMutex;
-    std::condition_variable lock;
+    private:
+        bool _completed;
+        std::mutex lockMutex;
+        std::condition_variable lock;
 
-public:
-    ServerContext* context;
+    public:
+        ServerContext* context;
 
-public:
-    void WaitForComplete();
-    void NotifyComplete();
-};
-
+    public:
+        void WaitForComplete();
+        void NotifyComplete();
+    };
+}

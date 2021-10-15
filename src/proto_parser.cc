@@ -10,103 +10,107 @@
 using namespace google::protobuf::compiler;
 using namespace google::protobuf;
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-#ifdef _PS_4
-#pragma pack (push, 1)
-#endif
-struct LVMessageField
-{    
-    LStrHandle fieldName;
-    LStrHandle embeddedMessage;
-    int32_t protobufIndex;
-    int32_t type;
-    char isRepeated;
-};
-#ifdef _PS_4
-#pragma pack (pop)
-#endif
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class ErrorCollector : public MultiFileErrorCollector
+namespace grpc_labview
 {
-public:
-    void AddError(const std::string & filename, int line, int column, const std::string & message) override;
-    std::string GetLVErrorMessage();
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    #ifdef _PS_4
+    #pragma pack (push, 1)
+    #endif
+    struct LVMessageField
+    {    
+        LStrHandle fieldName;
+        LStrHandle embeddedMessage;
+        int32_t protobufIndex;
+        int32_t type;
+        char isRepeated;
+    };
+    #ifdef _PS_4
+    #pragma pack (pop)
+    #endif
 
-private:
-    std::list<string> _errors;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void ErrorCollector::AddError(const std::string & filename, int line, int column, const std::string & message)
-{
-    _errors.emplace_back(message);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-std::string ErrorCollector::GetLVErrorMessage()
-{
-    std::stringstream result;
-    for (auto& s: _errors)
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class ErrorCollector : public MultiFileErrorCollector
     {
-        result << s << std::endl;
+    public:
+        void AddError(const std::string & filename, int line, int column, const std::string & message) override;
+        std::string GetLVErrorMessage();
+
+    private:
+        std::list<string> _errors;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ErrorCollector::AddError(const std::string & filename, int line, int column, const std::string & message)
+    {
+        _errors.emplace_back(message);
     }
-    return result.str();
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    std::string ErrorCollector::GetLVErrorMessage()
+    {
+        std::stringstream result;
+        for (auto& s: _errors)
+        {
+            result << s << std::endl;
+        }
+        return result.str();
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class LVProtoParser
+    {
+    public:
+        LVProtoParser();
+        void Import(const std::string& filePath, const std::string& searchPath);
+
+    public:
+        DiskSourceTree m_SourceTree;
+        ErrorCollector m_ErrorCollector;
+        Importer m_Importer;
+
+        const FileDescriptor* m_FileDescriptor;
+
+        static LVProtoParser* s_Parser;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVProtoParser* LVProtoParser::s_Parser = nullptr;
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVProtoParser::LVProtoParser()
+        : m_Importer(&m_SourceTree, &m_ErrorCollector)
+    {    
+        s_Parser = this;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void LVProtoParser::Import(const std::string& filePath, const std::string& search)
+    {
+        std::string searchPath = search;
+        std::replace(searchPath.begin(), searchPath.end(), '\\', '/');
+        m_SourceTree.MapPath("", searchPath);
+        
+        std::string path = filePath;
+        std::replace(path.begin(), path.end(), '\\', '/');
+        
+        m_FileDescriptor = m_Importer.Import(path);
+    }
 }
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class LVProtoParser
-{
-public:
-    LVProtoParser();
-    void Import(const std::string& filePath, const std::string& searchPath);
-
-public:
-    DiskSourceTree m_SourceTree;
-    ErrorCollector m_ErrorCollector;
-    Importer m_Importer;
-
-    const FileDescriptor* m_FileDescriptor;
-
-    static LVProtoParser* s_Parser;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LVProtoParser* LVProtoParser::s_Parser = nullptr;
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LVProtoParser::LVProtoParser()
-    : m_Importer(&m_SourceTree, &m_ErrorCollector)
-{    
-    s_Parser = this;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void LVProtoParser::Import(const std::string& filePath, const std::string& search)
-{
-    std::string searchPath = search;
-    std::replace(searchPath.begin(), searchPath.end(), '\\', '/');
-    m_SourceTree.MapPath("", searchPath);
-    
-    std::string path = filePath;
-    std::replace(path.begin(), path.end(), '\\', '/');
-    
-    m_FileDescriptor = m_Importer.Import(path);
-}
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int LVGetgRPCAPIVersion(int* version)
 {
-    InitCallbacks();
+    grpc_labview::InitCallbacks();
 
     *version = 2;
     return 0;    
@@ -114,25 +118,25 @@ LIBRARY_EXPORT int LVGetgRPCAPIVersion(int* version)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVImportProto(const char* filePath, const char* searchPath, LVProtoParser** parser)
+LIBRARY_EXPORT int LVImportProto(const char* filePath, const char* searchPath, grpc_labview::LVProtoParser** parser)
 {
-    InitCallbacks();
+    grpc_labview::InitCallbacks();
 
-    *parser = new LVProtoParser();
+    *parser = new grpc_labview::LVProtoParser();
     (*parser)->Import(filePath, searchPath);
     return 0;    
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVGetErrorString(LVProtoParser* parser, LStrHandle* error)
+LIBRARY_EXPORT int LVGetErrorString(grpc_labview::LVProtoParser* parser, grpc_labview::LStrHandle* error)
 {
     if (parser == nullptr)
     {
         return -1;
     }
     auto errorMessage = parser->m_ErrorCollector.GetLVErrorMessage();
-    SetLVString(error, errorMessage);
+    grpc_labview::SetLVString(error, errorMessage);
     return 0;
 }
 
@@ -147,7 +151,7 @@ std::string TransformMessageName(const std::string& messageName)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVGetServices(LVProtoParser* parser, LV1DArrayHandle* services)
+LIBRARY_EXPORT int LVGetServices(grpc_labview::LVProtoParser* parser, grpc_labview::LV1DArrayHandle* services)
 {
     if (parser == nullptr)
     {
@@ -207,7 +211,7 @@ void AddDependentMessages(const google::protobuf::FileDescriptor& descriptor, st
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVGetMessages(LVProtoParser* parser, LV1DArrayHandle* messages)
+LIBRARY_EXPORT int LVGetMessages(grpc_labview::LVProtoParser* parser, grpc_labview::LV1DArrayHandle* messages)
 {
     if (parser == nullptr)
     {
@@ -222,7 +226,7 @@ LIBRARY_EXPORT int LVGetMessages(LVProtoParser* parser, LV1DArrayHandle* message
     AddDependentMessages(*parser->m_FileDescriptor, allMessages);
 
     auto count = allMessages.size();
-    if (LVNumericArrayResize(0x08, 1, messages, count * sizeof(Descriptor*)) != 0)
+    if (grpc_labview::LVNumericArrayResize(0x08, 1, messages, count * sizeof(Descriptor*)) != 0)
     {
         return -3;
     }
@@ -239,19 +243,19 @@ LIBRARY_EXPORT int LVGetMessages(LVProtoParser* parser, LV1DArrayHandle* message
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVGetServiceName(ServiceDescriptor* service, LStrHandle* name)
+LIBRARY_EXPORT int LVGetServiceName(ServiceDescriptor* service, grpc_labview::LStrHandle* name)
 {
     if (service == nullptr)
     {
         return -1;
     }
-    SetLVString(name, service->name());
+    grpc_labview::SetLVString(name, service->name());
     return 0;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVGetServiceMethods(ServiceDescriptor* service, LV1DArrayHandle* methods)
+LIBRARY_EXPORT int LVGetServiceMethods(ServiceDescriptor* service, grpc_labview::LV1DArrayHandle* methods)
 {
     if (service == nullptr)
     {
@@ -259,7 +263,7 @@ LIBRARY_EXPORT int LVGetServiceMethods(ServiceDescriptor* service, LV1DArrayHand
     }
     auto count = service->method_count();
     auto size = sizeof(ServiceDescriptor*);
-    if (LVNumericArrayResize(0x08, 1, methods, count * size) != 0)
+    if (grpc_labview::LVNumericArrayResize(0x08, 1, methods, count * size) != 0)
     {
         return -3;
     }
@@ -274,7 +278,7 @@ LIBRARY_EXPORT int LVGetServiceMethods(ServiceDescriptor* service, LV1DArrayHand
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVGetMethodName(MethodDescriptor* method, LStrHandle* name)
+LIBRARY_EXPORT int LVGetMethodName(MethodDescriptor* method, grpc_labview::LStrHandle* name)
 {
     if (method == nullptr)
     {
@@ -286,13 +290,13 @@ LIBRARY_EXPORT int LVGetMethodName(MethodDescriptor* method, LStrHandle* name)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVGetMethodFullName(MethodDescriptor* method, LStrHandle* name)
+LIBRARY_EXPORT int LVGetMethodFullName(MethodDescriptor* method, grpc_labview::LStrHandle* name)
 {
     if (method == nullptr)
     {
         return -1;
     }
-    SetLVString(name, method->full_name());
+    grpc_labview::SetLVString(name, method->full_name());
     return 0;
 }
 
@@ -346,7 +350,7 @@ LIBRARY_EXPORT int LVGetMethodOutput(MethodDescriptor* method, const Descriptor*
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVMessageName(Descriptor* descriptor, LStrHandle* name)
+LIBRARY_EXPORT int LVMessageName(Descriptor* descriptor, grpc_labview::LStrHandle* name)
 {
     if (descriptor == nullptr)
     {
@@ -358,7 +362,7 @@ LIBRARY_EXPORT int LVMessageName(Descriptor* descriptor, LStrHandle* name)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVMessageTypeUrl(Descriptor* descriptor, LStrHandle* name)
+LIBRARY_EXPORT int LVMessageTypeUrl(Descriptor* descriptor, grpc_labview::LStrHandle* name)
 {
     if (descriptor == nullptr)
     {
@@ -370,7 +374,7 @@ LIBRARY_EXPORT int LVMessageTypeUrl(Descriptor* descriptor, LStrHandle* name)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, LV1DArrayHandle* fields)
+LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, grpc_labview::LV1DArrayHandle* fields)
 {
     if (descriptor == nullptr)
     {
@@ -379,25 +383,27 @@ LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, LV1DArrayHandle* fields)
     auto count = descriptor->field_count();
     if (LVNumericArrayResize(0x08, 1, fields, count * sizeof(FieldDescriptor*)) != 0)
     {
-       return -3;
+    return -3;
     }
     (**fields)->cnt = count;
     auto fieldElements = (**fields)->bytes<const FieldDescriptor*>();
     for (int x=0; x<count; ++x)
     {
-       fieldElements[x] = descriptor->field(x);
+    fieldElements[x] = descriptor->field(x);
     }
     return 0;
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 void AddFieldError(FieldDescriptor* field, string message)
 {
-    LVProtoParser::s_Parser->m_ErrorCollector.AddError("", 0, 0, message);
+    grpc_labview::LVProtoParser::s_Parser->m_ErrorCollector.AddError("", 0, 0, message);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, LVMessageField* info)
+LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::LVMessageField* info)
 {
     if (field == nullptr)
     {

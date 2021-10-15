@@ -7,268 +7,271 @@
 //---------------------------------------------------------------------
 using namespace google::protobuf::internal;
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-CallData::CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService *service, grpc::ServerCompletionQueue *cq) :
-    _server(server), 
-    _service(service),
-    _cq(cq),
-    _stream(&_ctx),
-    _status(CallStatus::Create),
-    _writeSemaphore(0),
-    _cancelled(false),
-    _requestDataReady(false)
-{
-    Proceed(true);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-std::shared_ptr<MessageMetadata> CallData::FindMetadata(const std::string& name)
-{
-    return _server->FindMetadata(name);    
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-CallFinishedData::CallFinishedData(CallData* callData)
-{
-    _call = callData;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void CallFinishedData::Proceed(bool ok)
-{
-    _call->CallFinished();    
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-bool CallData::Write()
-{
-    if (IsCancelled())
+namespace grpc_labview
+{  
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    CallData::CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService *service, grpc::ServerCompletionQueue *cq) :
+        _server(server), 
+        _service(service),
+        _cq(cq),
+        _stream(&_ctx),
+        _status(CallStatus::Create),
+        _writeSemaphore(0),
+        _cancelled(false),
+        _requestDataReady(false)
     {
-        return false;
+        Proceed(true);
     }
-    auto wb = _response->SerializeToByteBuffer();
-    grpc::WriteOptions options;
-    _status = CallStatus::Writing;
-    _stream.Write(*wb, this);
-    _writeSemaphore.wait();
-    if (IsCancelled())
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    std::shared_ptr<MessageMetadata> CallData::FindMetadata(const std::string& name)
     {
-        return false;
+        return _server->FindMetadata(name);    
     }
-    return true;
-}
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void CallData::CallFinished()
-{
-    _cancelled = _ctx.IsCancelled();      
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void CallData::Finish()
-{
-    if (_status == CallStatus::PendingFinish)
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    CallFinishedData::CallFinishedData(CallData* callData)
     {
-        _status = CallStatus::Finish;
-        Proceed(false);
+        _call = callData;
     }
-    else
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void CallFinishedData::Proceed(bool ok)
     {
-        _status = CallStatus::Finish;
-        _stream.Finish(grpc::Status::OK, this);
+        _call->CallFinished();    
     }
-}
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-bool CallData::IsCancelled()
-{
-    return _cancelled;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-bool CallData::ReadNext()
-{
-    if (_requestDataReady)
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    bool CallData::Write()
     {
+        if (IsCancelled())
+        {
+            return false;
+        }
+        auto wb = _response->SerializeToByteBuffer();
+        grpc::WriteOptions options;
+        _status = CallStatus::Writing;
+        _stream.Write(*wb, this);
+        _writeSemaphore.wait();
+        if (IsCancelled())
+        {
+            return false;
+        }
         return true;
     }
-    if (IsCancelled())
-    {
-        return false;
-    }
-    auto tag = new ReadNextTag(this);
-    _stream.Read(&_rb, tag);
-    if (!tag->Wait())
-    {
-        return false;
-    }
-    _request->ParseFromByteBuffer(_rb);
-    _requestDataReady = true;
-    if (IsCancelled())
-    {
-        return false;
-    }
-    return true;
-}
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void CallData::ReadComplete()
-{
-    _requestDataReady = false;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void CallData::Proceed(bool ok)
-{
-    if (!ok)
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void CallData::CallFinished()
     {
-        if (_status != CallStatus::Finish)
+        _cancelled = _ctx.IsCancelled();      
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void CallData::Finish()
+    {
+        if (_status == CallStatus::PendingFinish)
         {
-            _status = CallStatus::PendingFinish;
-        }
-    }
-    if (_status == CallStatus::Create)
-    {
-        // As part of the initial CREATE state, we *request* that the system
-        // start processing SayHello requests. In this request, "this" acts are
-        // the tag uniquely identifying the request (so that different CallData
-        // instances can serve different requests concurrently), in this case
-        // the memory address of this CallData instance.
-        _service->RequestCall(&_ctx, &_stream, _cq, _cq, this);
-        _ctx.AsyncNotifyWhenDone(new CallFinishedData(this));
-        _status = CallStatus::Read;
-    }
-    else if (_status == CallStatus::Read)
-    {
-        // Spawn a new CallData instance to serve new clients while we process
-        // the one for this CallData. The instance will deallocate itself as
-        // part of its FINISH state.
-        new CallData(_server, _service, _cq);
-
-        _stream.Read(&_rb, this);
-        _status = CallStatus::Process;
-    }
-    else if (_status == CallStatus::Process)
-    {
-        auto name = _ctx.method();
-
-        LVEventData eventData;
-        if (_server->FindEventData(name, eventData) || _server->HasGenericMethodEvent())
-        {
-            auto requestMetadata = _server->FindMetadata(eventData.requestMetadataName);
-            auto responseMetadata = _server->FindMetadata(eventData.responseMetadataName);
-            _request = std::make_shared<LVMessage>(requestMetadata);
-            _response = std::make_shared<LVMessage>(responseMetadata);
-            _request->ParseFromByteBuffer(_rb);
-            _requestDataReady = true;
-
-            _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
-            _server->SendEvent(name, static_cast<LVgRPCid*>(_methodData.get()));
+            _status = CallStatus::Finish;
+            Proceed(false);
         }
         else
         {
-            _stream.Finish(grpc::Status::CANCELLED, this);
-        }       
+            _status = CallStatus::Finish;
+            _stream.Finish(grpc::Status::OK, this);
+        }
     }
-    else if (_status == CallStatus::Writing)
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    bool CallData::IsCancelled()
     {
-        _writeSemaphore.notify();
+        return _cancelled;
     }
-    else if (_status == CallStatus::PendingFinish)
-    {        
-    }
-    else
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    bool CallData::ReadNext()
     {
-        assert(_status == CallStatus::Finish);
-        delete this;
+        if (_requestDataReady)
+        {
+            return true;
+        }
+        if (IsCancelled())
+        {
+            return false;
+        }
+        auto tag = new ReadNextTag(this);
+        _stream.Read(&_rb, tag);
+        if (!tag->Wait())
+        {
+            return false;
+        }
+        _request->ParseFromByteBuffer(_rb);
+        _requestDataReady = true;
+        if (IsCancelled())
+        {
+            return false;
+        }
+        return true;
     }
-}
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-ReadNextTag::ReadNextTag(CallData* callData) :
-    _readCompleteSemaphore(0),
-    _success(false)
-{
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void ReadNextTag::Proceed(bool ok)
-{
-    _success = ok;
-    _readCompleteSemaphore.notify();
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-bool ReadNextTag::Wait()
-{
-    _readCompleteSemaphore.wait();
-    return _success;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-EventData::EventData(ServerContext *_context) :
-    _completed(false)
-{
-    context = _context;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void EventData::WaitForComplete()
-{
-    std::unique_lock<std::mutex> lck(lockMutex);
-    while (!_completed) lock.wait(lck);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void EventData::NotifyComplete()
-{
-    std::unique_lock<std::mutex> lck(lockMutex);
-    _completed = true;
-    lock.notify_all();
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-GenericMethodData::GenericMethodData(CallData* call, ServerContext *context, std::shared_ptr<LVMessage> request, std::shared_ptr<LVMessage> response)
-    : EventData(context)
-{
-    _call = call;
-    _request = request;
-    _response = response;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-std::shared_ptr<MessageMetadata> GenericMethodData::FindMetadata(const std::string& name)
-{
-    if (_call != nullptr)
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void CallData::ReadComplete()
     {
-        return _call->FindMetadata(name);
+        _requestDataReady = false;
     }
-    return nullptr;
-}
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-ServerStartEventData::ServerStartEventData()
-    : EventData(nullptr)
-{
-    serverStartStatus = 0;
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void CallData::Proceed(bool ok)
+    {
+        if (!ok)
+        {
+            if (_status != CallStatus::Finish)
+            {
+                _status = CallStatus::PendingFinish;
+            }
+        }
+        if (_status == CallStatus::Create)
+        {
+            // As part of the initial CREATE state, we *request* that the system
+            // start processing SayHello requests. In this request, "this" acts are
+            // the tag uniquely identifying the request (so that different CallData
+            // instances can serve different requests concurrently), in this case
+            // the memory address of this CallData instance.
+            _service->RequestCall(&_ctx, &_stream, _cq, _cq, this);
+            _ctx.AsyncNotifyWhenDone(new CallFinishedData(this));
+            _status = CallStatus::Read;
+        }
+        else if (_status == CallStatus::Read)
+        {
+            // Spawn a new CallData instance to serve new clients while we process
+            // the one for this CallData. The instance will deallocate itself as
+            // part of its FINISH state.
+            new CallData(_server, _service, _cq);
+
+            _stream.Read(&_rb, this);
+            _status = CallStatus::Process;
+        }
+        else if (_status == CallStatus::Process)
+        {
+            auto name = _ctx.method();
+
+            LVEventData eventData;
+            if (_server->FindEventData(name, eventData) || _server->HasGenericMethodEvent())
+            {
+                auto requestMetadata = _server->FindMetadata(eventData.requestMetadataName);
+                auto responseMetadata = _server->FindMetadata(eventData.responseMetadataName);
+                _request = std::make_shared<LVMessage>(requestMetadata);
+                _response = std::make_shared<LVMessage>(responseMetadata);
+                _request->ParseFromByteBuffer(_rb);
+                _requestDataReady = true;
+
+                _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
+                _server->SendEvent(name, static_cast<LVgRPCid*>(_methodData.get()));
+            }
+            else
+            {
+                _stream.Finish(grpc::Status::CANCELLED, this);
+            }       
+        }
+        else if (_status == CallStatus::Writing)
+        {
+            _writeSemaphore.notify();
+        }
+        else if (_status == CallStatus::PendingFinish)
+        {        
+        }
+        else
+        {
+            assert(_status == CallStatus::Finish);
+            delete this;
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    ReadNextTag::ReadNextTag(CallData* callData) :
+        _readCompleteSemaphore(0),
+        _success(false)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ReadNextTag::Proceed(bool ok)
+    {
+        _success = ok;
+        _readCompleteSemaphore.notify();
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    bool ReadNextTag::Wait()
+    {
+        _readCompleteSemaphore.wait();
+        return _success;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    EventData::EventData(ServerContext *_context) :
+        _completed(false)
+    {
+        context = _context;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void EventData::WaitForComplete()
+    {
+        std::unique_lock<std::mutex> lck(lockMutex);
+        while (!_completed) lock.wait(lck);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void EventData::NotifyComplete()
+    {
+        std::unique_lock<std::mutex> lck(lockMutex);
+        _completed = true;
+        lock.notify_all();
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    GenericMethodData::GenericMethodData(CallData* call, ServerContext *context, std::shared_ptr<LVMessage> request, std::shared_ptr<LVMessage> response)
+        : EventData(context)
+    {
+        _call = call;
+        _request = request;
+        _response = response;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    std::shared_ptr<MessageMetadata> GenericMethodData::FindMetadata(const std::string& name)
+    {
+        if (_call != nullptr)
+        {
+            return _call->FindMetadata(name);
+        }
+        return nullptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    ServerStartEventData::ServerStartEventData()
+        : EventData(nullptr)
+    {
+        serverStartStatus = 0;
+    }
 }

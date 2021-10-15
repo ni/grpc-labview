@@ -7,10 +7,13 @@
 //---------------------------------------------------------------------
 #include <metadata_owner.h>
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class LabVIEWgRPCClient : public MessageElementMetadataOwner, public LVgRPCid
+namespace grpc_labview 
 {
-public:
-    LabVIEWgRPCClient(const char* address, const char* serverCertificatePath, const char* serverKeyPath);
-};
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class LabVIEWgRPCClient : public MessageElementMetadataOwner, public LVgRPCid
+    {
+    public:
+        LabVIEWgRPCClient(const char* address, const char* serverCertificatePath, const char* serverKeyPath);
+    };
+}

@@ -35,189 +35,193 @@ using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::Status;
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class LabVIEWgRPCServer;
-class LVMessage;
-class CallData;
-class MessageElementMetadata;
-struct MessageMetadata;
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class ServerStartEventData : public EventData
+namespace grpc_labview 
 {
-public:
-    ServerStartEventData();
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class LabVIEWgRPCServer;
+    class LVMessage;
+    class CallData;
+    class MessageElementMetadata;
+    struct MessageMetadata;
 
-public:
-    int serverStartStatus;
-};
-
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class GenericMethodData : public EventData, public IMessageElementMetadataOwner
-{
-public:
-    GenericMethodData(CallData* call, ServerContext* context, std::shared_ptr<LVMessage> request, std::shared_ptr<LVMessage> response);
-    virtual std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
-
-public:
-    CallData* _call;
-    std::shared_ptr<LVMessage> _request;
-    std::shared_ptr<LVMessage> _response;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-struct LVEventData
-{
-    LVUserEventRef event;
-    std::string requestMetadataName;
-    std::string responseMetadataName;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class LabVIEWgRPCServer : public MessageElementMetadataOwner, public LVgRPCid
-{
-public:
-    LabVIEWgRPCServer();
-    int Run(std::string address, std::string serverCertificatePath, std::string serverKeyPath);
-    void StopServer();
-    void RegisterEvent(std::string eventName, LVUserEventRef reference, std::string requestMessageName, std::string responseMessageName);
-    void RegisterGenericMethodEvent(LVUserEventRef item);
-    void SendEvent(std::string name, LVgRPCid* data);
-
-    bool FindEventData(std::string name, LVEventData& data);
-    bool HasGenericMethodEvent();    
-
-private:
-    std::mutex _mutex;
-    std::unique_ptr<Server> _server;
-    std::map<std::string, LVEventData> _registeredServerMethods;    
-    LVUserEventRef _genericMethodEvent;
-    std::unique_ptr<grpc::AsyncGenericService> _rpcService;
-    std::unique_ptr<std::thread> _runThread;
-    bool _shutdown;
-
-private:
-    void RunServer(std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
-    void HandleRpcs(grpc::ServerCompletionQueue *cq);
-
-private:
-    static void StaticRunServer(LabVIEWgRPCServer* server, std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class CallDataBase
-{
-public:
-    virtual void Proceed(bool ok) = 0;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class CallFinishedData : CallDataBase
-{
-public:
-    CallFinishedData(CallData* callData);
-    void Proceed(bool ok) override;
-
-private:
-    CallData* _call;
-};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class CallData : public CallDataBase, public IMessageElementMetadataOwner
-{
-public:
-    CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService* service, grpc::ServerCompletionQueue* cq);
-    std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
-    void Proceed(bool ok) override;
-    bool Write();
-    void Finish();
-    bool IsCancelled();
-    void CallFinished();
-    bool ReadNext();
-    void ReadComplete();
-
-private:
-    LabVIEWgRPCServer* _server;
-    grpc::AsyncGenericService* _service;
-    grpc::ServerCompletionQueue* _cq;
-    grpc::GenericServerContext _ctx;
-    grpc::GenericServerAsyncReaderWriter _stream;
-    grpc::ByteBuffer _rb;
-
-    Semaphore _writeSemaphore;
-    std::shared_ptr<GenericMethodData> _methodData;
-    std::shared_ptr<LVMessage> _request;
-    std::shared_ptr<LVMessage> _response;
-    bool _cancelled;
-    bool _requestDataReady;
-
-    enum class CallStatus
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class ServerStartEventData : public EventData
     {
-        Create,
-        Read,
-        Writing,
-        Process,
-        PendingFinish,
-        Finish
+    public:
+        ServerStartEventData();
+
+    public:
+        int serverStartStatus;
     };
-    CallStatus _status;
-};
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-class ReadNextTag : CallDataBase
-{
-public:
-    ReadNextTag(CallData* callData);
-    void Proceed(bool ok) override;
-    bool Wait();
 
-private:
-    Semaphore _readCompleteSemaphore;
-    CallData* _callData;
-    bool _success;
-};
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class GenericMethodData : public EventData, public IMessageElementMetadataOwner
+    {
+    public:
+        GenericMethodData(CallData* call, ServerContext* context, std::shared_ptr<LVMessage> request, std::shared_ptr<LVMessage> response);
+        virtual std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-struct LVRegistrationRequest
-{
-    LStrHandle eventName;
-};
+    public:
+        CallData* _call;
+        std::shared_ptr<LVMessage> _request;
+        std::shared_ptr<LVMessage> _response;
+    };
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-struct LVServerEvent
-{
-    LStrHandle eventData;
-    int32_t serverId;
-    int32_t status;
-};
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    struct LVEventData
+    {
+        LVUserEventRef event;
+        std::string requestMetadataName;
+        std::string responseMetadataName;
+    };
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-#ifdef _PS_4
-#pragma pack (push, 1)
-#endif
-struct GeneralMethodEventData
-{
-    LStrHandle methodName;
-    LVgRPCid* methodData;
-};
-#ifdef _PS_4
-#pragma pack (pop)
-#endif
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class LabVIEWgRPCServer : public MessageElementMetadataOwner, public LVgRPCid
+    {
+    public:
+        LabVIEWgRPCServer();
+        int Run(std::string address, std::string serverCertificatePath, std::string serverKeyPath);
+        void StopServer();
+        void RegisterEvent(std::string eventName, LVUserEventRef reference, std::string requestMessageName, std::string responseMessageName);
+        void RegisterGenericMethodEvent(LVUserEventRef item);
+        void SendEvent(std::string name, LVgRPCid* data);
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void OccurServerEvent(LVUserEventRef event, LVgRPCid* data);
-void OccurServerEvent(LVUserEventRef event, LVgRPCid* data, std::string eventMethodName);
+        bool FindEventData(std::string name, LVEventData& data);
+        bool HasGenericMethodEvent();    
+
+    private:
+        std::mutex _mutex;
+        std::unique_ptr<Server> _server;
+        std::map<std::string, LVEventData> _registeredServerMethods;    
+        LVUserEventRef _genericMethodEvent;
+        std::unique_ptr<grpc::AsyncGenericService> _rpcService;
+        std::unique_ptr<std::thread> _runThread;
+        bool _shutdown;
+        int _listeningPort;
+
+    private:
+        void RunServer(std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
+        void HandleRpcs(grpc::ServerCompletionQueue *cq);
+
+    private:
+        static void StaticRunServer(LabVIEWgRPCServer* server, std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class CallDataBase
+    {
+    public:
+        virtual void Proceed(bool ok) = 0;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class CallFinishedData : CallDataBase
+    {
+    public:
+        CallFinishedData(CallData* callData);
+        void Proceed(bool ok) override;
+
+    private:
+        CallData* _call;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class CallData : public CallDataBase, public IMessageElementMetadataOwner
+    {
+    public:
+        CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService* service, grpc::ServerCompletionQueue* cq);
+        std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
+        void Proceed(bool ok) override;
+        bool Write();
+        void Finish();
+        bool IsCancelled();
+        void CallFinished();
+        bool ReadNext();
+        void ReadComplete();
+
+    private:
+        LabVIEWgRPCServer* _server;
+        grpc::AsyncGenericService* _service;
+        grpc::ServerCompletionQueue* _cq;
+        grpc::GenericServerContext _ctx;
+        grpc::GenericServerAsyncReaderWriter _stream;
+        grpc::ByteBuffer _rb;
+
+        Semaphore _writeSemaphore;
+        std::shared_ptr<GenericMethodData> _methodData;
+        std::shared_ptr<LVMessage> _request;
+        std::shared_ptr<LVMessage> _response;
+        bool _cancelled;
+        bool _requestDataReady;
+
+        enum class CallStatus
+        {
+            Create,
+            Read,
+            Writing,
+            Process,
+            PendingFinish,
+            Finish
+        };
+        CallStatus _status;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class ReadNextTag : CallDataBase
+    {
+    public:
+        ReadNextTag(CallData* callData);
+        void Proceed(bool ok) override;
+        bool Wait();
+
+    private:
+        Semaphore _readCompleteSemaphore;
+        CallData* _callData;
+        bool _success;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    struct LVRegistrationRequest
+    {
+        LStrHandle eventName;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    struct LVServerEvent
+    {
+        LStrHandle eventData;
+        int32_t serverId;
+        int32_t status;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    #ifdef _PS_4
+    #pragma pack (push, 1)
+    #endif
+    struct GeneralMethodEventData
+    {
+        LStrHandle methodName;
+        LVgRPCid* methodData;
+    };
+    #ifdef _PS_4
+    #pragma pack (pop)
+    #endif
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void OccurServerEvent(LVUserEventRef event, LVgRPCid* data);
+    void OccurServerEvent(LVUserEventRef event, LVgRPCid* data, std::string eventMethodName);
+}
