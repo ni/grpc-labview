@@ -17,7 +17,7 @@ namespace grpc_labview
     #ifdef _PS_4
     #pragma pack (push, 1)
     #endif
-    struct LVMessageField
+    struct MessageFieldCluster
     {    
         LStrHandle fieldName;
         LStrHandle embeddedMessage;
@@ -103,6 +103,54 @@ namespace grpc_labview
         
         m_FileDescriptor = m_Importer.Import(path);
     }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    std::string TransformMessageName(const std::string& messageName)
+    {
+        std::string result = messageName;
+        std::replace(result.begin(), result.end(), '.', '_');
+        return result;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void AddFieldError(FieldDescriptor* field, string message)
+    {
+        grpc_labview::LVProtoParser::s_Parser->m_ErrorCollector.AddError("", 0, 0, message);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void AddNestedMessages(const google::protobuf::Descriptor& descriptor, std::set<const google::protobuf::Descriptor*>& messages)
+    {
+        auto count = descriptor.nested_type_count();
+        for (int x=0; x<count; ++x)
+        {
+            auto current = descriptor.nested_type(x);        
+            AddNestedMessages(*current, messages);
+            messages.emplace(current);
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void AddDependentMessages(const google::protobuf::FileDescriptor& descriptor, std::set<const google::protobuf::Descriptor*>& messages)
+    {
+        auto imported = descriptor.dependency_count();
+        for (int x=0; x<imported; ++x)
+        {
+            AddDependentMessages(*descriptor.dependency(x), messages);
+        }
+
+        auto count = descriptor.message_type_count();
+        for (int x=0; x<count; ++x)
+        {
+            auto current = descriptor.message_type(x);        
+            AddNestedMessages(*current, messages);
+            messages.emplace(current);
+        }
+    }
 }
 
 
@@ -142,15 +190,6 @@ LIBRARY_EXPORT int LVGetErrorString(grpc_labview::LVProtoParser* parser, grpc_la
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-std::string TransformMessageName(const std::string& messageName)
-{
-    std::string result = messageName;
-    std::replace(result.begin(), result.end(), '.', '_');
-    return result;
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 LIBRARY_EXPORT int LVGetServices(grpc_labview::LVProtoParser* parser, grpc_labview::LV1DArrayHandle* services)
 {
     if (parser == nullptr)
@@ -179,38 +218,6 @@ LIBRARY_EXPORT int LVGetServices(grpc_labview::LVProtoParser* parser, grpc_labvi
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void AddNestedMessages(const google::protobuf::Descriptor& descriptor, std::set<const google::protobuf::Descriptor*>& messages)
-{
-    auto count = descriptor.nested_type_count();
-    for (int x=0; x<count; ++x)
-    {
-        auto current = descriptor.nested_type(x);        
-        AddNestedMessages(*current, messages);
-        messages.emplace(current);
-    }
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-void AddDependentMessages(const google::protobuf::FileDescriptor& descriptor, std::set<const google::protobuf::Descriptor*>& messages)
-{
-    auto imported = descriptor.dependency_count();
-    for (int x=0; x<imported; ++x)
-    {
-        AddDependentMessages(*descriptor.dependency(x), messages);
-    }
-
-    auto count = descriptor.message_type_count();
-    for (int x=0; x<count; ++x)
-    {
-        auto current = descriptor.message_type(x);        
-        AddNestedMessages(*current, messages);
-        messages.emplace(current);
-    }
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 LIBRARY_EXPORT int LVGetMessages(grpc_labview::LVProtoParser* parser, grpc_labview::LV1DArrayHandle* messages)
 {
     if (parser == nullptr)
@@ -223,7 +230,7 @@ LIBRARY_EXPORT int LVGetMessages(grpc_labview::LVProtoParser* parser, grpc_labvi
     }
 
     std::set<const google::protobuf::Descriptor*> allMessages;
-    AddDependentMessages(*parser->m_FileDescriptor, allMessages);
+    grpc_labview::AddDependentMessages(*parser->m_FileDescriptor, allMessages);
 
     auto count = allMessages.size();
     if (grpc_labview::NumericArrayResize(0x08, 1, messages, count * sizeof(Descriptor*)) != 0)
@@ -356,7 +363,7 @@ LIBRARY_EXPORT int LVMessageName(Descriptor* descriptor, grpc_labview::LStrHandl
     {
         return -1;
     }
-    SetLVString(name, TransformMessageName(descriptor->full_name()));
+    SetLVString(name, grpc_labview::TransformMessageName(descriptor->full_name()));
     return 0;
 }
 
@@ -396,14 +403,7 @@ LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, grpc_labview::LV1DArrayHa
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void AddFieldError(FieldDescriptor* field, string message)
-{
-    grpc_labview::LVProtoParser::s_Parser->m_ErrorCollector.AddError("", 0, 0, message);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::LVMessageField* info)
+LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFieldCluster* info)
 {
     if (field == nullptr)
     {
@@ -443,40 +443,36 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::LVMessageFi
             info->type = 10;
             break;
         case FieldDescriptor::TYPE_MESSAGE:
-            // if (field->message_type()->full_name() == "google.protobuf.Any")
-            // {
-            //     info->type = 17;
-            // }
             info->type = 5;
             break;
         case FieldDescriptor::TYPE_FIXED64:
-            AddFieldError(field, "Unsupported Type: TYPE_FIXED64");
+            grpc_labview::AddFieldError(field, "Unsupported Type: TYPE_FIXED64");
             info->type = 99;
             break;
         case FieldDescriptor::TYPE_FIXED32:
-            AddFieldError(field, "Unsupported Type: TYPE_FIXED32");
+            grpc_labview::AddFieldError(field, "Unsupported Type: TYPE_FIXED32");
             info->type = 99;
             break;
         case FieldDescriptor::TYPE_SFIXED32:
-            AddFieldError(field, "Unsupported Type: TYPE_SFIXED32");
+            grpc_labview::AddFieldError(field, "Unsupported Type: TYPE_SFIXED32");
             info->type = 99;
             break;
         case FieldDescriptor::TYPE_SFIXED64:
-            AddFieldError(field, "Unsupported Type: TYPE_SFIXED64");
+            grpc_labview::AddFieldError(field, "Unsupported Type: TYPE_SFIXED64");
             info->type = 99;
             break;
         case FieldDescriptor::TYPE_SINT32:
-            AddFieldError(field, "Unsupported Type: TYPE_SINT32");
+            grpc_labview::AddFieldError(field, "Unsupported Type: TYPE_SINT32");
             info->type = 99;
             break;
         case FieldDescriptor::TYPE_SINT64:
-            AddFieldError(field, "Unsupported Type: TYPE_SINT64");
+            grpc_labview::AddFieldError(field, "Unsupported Type: TYPE_SINT64");
             info->type = 99;
             break;
     }
     if (field->type() == FieldDescriptor::TYPE_MESSAGE)
     {
-        SetLVString(&info->embeddedMessage, TransformMessageName(field->message_type()->full_name()));
+        SetLVString(&info->embeddedMessage, grpc_labview::TransformMessageName(field->message_type()->full_name()));
     }
     SetLVString(&info->fieldName, field->name());
     info->protobufIndex = field->number();
