@@ -11,7 +11,7 @@ namespace grpc_labview
 {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class LabVIEWgRPCClient : public MessageElementMetadataOwner, public LVgRPCid
+    class LabVIEWgRPCClient : public MessageElementMetadataOwner, public gRPCid
     {
     public:
         LabVIEWgRPCClient(const char* address, const char* serverCertificatePath, const char* serverKeyPath);

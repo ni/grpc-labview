@@ -16,7 +16,7 @@ typedef int (*PostLVUserEvent_T)(grpc_labview::LVUserEventRef ref, void *data);
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-static NumericArrayResize_T NumericArrayResize = nullptr;
+static NumericArrayResize_T NumericArrayResizeImp = nullptr;
 static PostLVUserEvent_T PostLVUserEvent = nullptr;
 
 #ifdef _WIN32
@@ -41,7 +41,7 @@ namespace grpc_labview
         {
             lvModule = GetModuleHandle("lvrt.dll");
         }
-        NumericArrayResize = (NumericArrayResize_T)GetProcAddress(lvModule, "NumericArrayResize");
+        NumericArrayResizeImp = (NumericArrayResize_T)GetProcAddress(lvModule, "NumericArrayResize");
         PostLVUserEvent = (PostLVUserEvent_T)GetProcAddress(lvModule, "PostLVUserEvent");
     }
 
@@ -75,14 +75,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    int LVNumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size)
+    int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size)
     {    
-        return NumericArrayResize(typeCode, numDims, handle, size);
+        return NumericArrayResizeImp(typeCode, numDims, handle, size);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    int LVPostLVUserEvent(LVUserEventRef ref, void *data)
+    int PostUserEvent(LVUserEventRef ref, void *data)
     {
         return PostLVUserEvent(ref, data);    
     }

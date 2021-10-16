@@ -26,7 +26,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     // LabVIEW gRPC definitions
     //---------------------------------------------------------------------
-    class LVgRPCid
+    class gRPCid
     {
     public:
         template <typename T>
@@ -42,8 +42,8 @@ namespace grpc_labview
         bool IsValid() { return true; }
 
     protected:
-        LVgRPCid() { }
-        virtual ~LVgRPCid() { }
+        gRPCid() { }
+        virtual ~gRPCid() { }
     };
 
     //---------------------------------------------------------------------
@@ -102,7 +102,7 @@ namespace grpc_labview
     #ifdef _PS_4
     #pragma pack (push, 1)
     #endif
-    struct LVAny
+    struct AnyCluster
     {    
         LStrHandle TypeUrl;
         LV1DArrayHandle Bytes;
@@ -116,6 +116,6 @@ namespace grpc_labview
     void InitCallbacks();
     void SetLVString(LStrHandle* lvString, std::string str);
     std::string GetLVString(LStrHandle lvString);
-    int LVNumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size);
-    int LVPostLVUserEvent(LVUserEventRef ref, void *data);
+    int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size);
+    int PostUserEvent(LVUserEventRef ref, void *data);
 }

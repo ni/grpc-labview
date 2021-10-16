@@ -11,7 +11,7 @@ namespace grpc_labview
 {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class LabVIEWSerializationSession : public MessageElementMetadataOwner, public LVgRPCid
+    class LabVIEWSerializationSession : public MessageElementMetadataOwner, public gRPCid
     {
     };
 

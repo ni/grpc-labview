@@ -10,7 +10,7 @@ namespace grpc_labview
 {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class LVMessage : public google::protobuf::Message, public LVgRPCid
+    class LVMessage : public google::protobuf::Message, public gRPCid
     {
     public:
         LVMessage(std::shared_ptr<MessageMetadata> metadata);

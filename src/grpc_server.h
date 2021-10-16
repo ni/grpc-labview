@@ -82,15 +82,16 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class LabVIEWgRPCServer : public MessageElementMetadataOwner, public LVgRPCid
+    class LabVIEWgRPCServer : public MessageElementMetadataOwner, public gRPCid
     {
     public:
         LabVIEWgRPCServer();
         int Run(std::string address, std::string serverCertificatePath, std::string serverKeyPath);
+        int ListeningPort();
         void StopServer();
         void RegisterEvent(std::string eventName, LVUserEventRef reference, std::string requestMessageName, std::string responseMessageName);
         void RegisterGenericMethodEvent(LVUserEventRef item);
-        void SendEvent(std::string name, LVgRPCid* data);
+        void SendEvent(std::string name, gRPCid* data);
 
         bool FindEventData(std::string name, LVEventData& data);
         bool HasGenericMethodEvent();    
@@ -214,7 +215,7 @@ namespace grpc_labview
     struct GeneralMethodEventData
     {
         LStrHandle methodName;
-        LVgRPCid* methodData;
+        gRPCid* methodData;
     };
     #ifdef _PS_4
     #pragma pack (pop)
@@ -222,6 +223,6 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void OccurServerEvent(LVUserEventRef event, LVgRPCid* data);
-    void OccurServerEvent(LVUserEventRef event, LVgRPCid* data, std::string eventMethodName);
+    void OccurServerEvent(LVUserEventRef event, gRPCid* data);
+    void OccurServerEvent(LVUserEventRef event, gRPCid* data, std::string eventMethodName);
 }

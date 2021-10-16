@@ -45,7 +45,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void LabVIEWgRPCServer::SendEvent(std::string name, LVgRPCid* data)
+    void LabVIEWgRPCServer::SendEvent(std::string name, gRPCid* data)
     {
         if (HasGenericMethodEvent())
         {
@@ -79,6 +79,13 @@ namespace grpc_labview
     bool LabVIEWgRPCServer::HasGenericMethodEvent()
     {
         return _genericMethodEvent != 0;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    int LabVIEWgRPCServer::ListeningPort()
+    {        
+        return _listeningPort;
     }
 
     //---------------------------------------------------------------------

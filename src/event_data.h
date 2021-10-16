@@ -14,7 +14,7 @@ namespace grpc_labview
 {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class EventData : public LVgRPCid
+    class EventData : public gRPCid
     {
     public:
         EventData(ServerContext* context);

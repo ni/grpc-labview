@@ -14,7 +14,7 @@ namespace grpc_labview
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t CreateClient(const char* address, const char* serverCertificatePath, const char* serverKeyPath, grpc_labview::LVgRPCid** clientId)
+LIBRARY_EXPORT int32_t CreateClient(const char* address, const char* serverCertificatePath, const char* serverKeyPath, grpc_labview::gRPCid** clientId)
 {
     grpc_labview::InitCallbacks();
 
@@ -26,24 +26,24 @@ LIBRARY_EXPORT int32_t CreateClient(const char* address, const char* serverCerti
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientUnaryCall(grpc_labview::LVgRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName, int8_t* request, int8_t* response)
+LIBRARY_EXPORT int32_t ClientUnaryCall(grpc_labview::gRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName, int8_t* request, int8_t* response)
 {    
     return 0;    
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(grpc_labview::LVgRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName)
+LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(grpc_labview::gRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName)
 {
     return 0;    
 }
 
-LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(grpc_labview::LVgRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName)
+LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(grpc_labview::gRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName)
 {    
     return 0;    
 }
 
-LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(grpc_labview::LVgRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName)
+LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(grpc_labview::gRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName)
 {
     return 0;    
 }

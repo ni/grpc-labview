@@ -38,7 +38,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class LVRepeatedNestedMessageMessageValue : public LVMessageValue, public LVgRPCid
+    class LVRepeatedNestedMessageMessageValue : public LVMessageValue, public gRPCid
     {
     public:
         LVRepeatedNestedMessageMessageValue(int protobufId);

@@ -173,7 +173,7 @@ namespace grpc_labview {
             auto repeatedString = static_cast<const LVRepeatedStringMessageValue&>(*value);
             if (repeatedString._value.size() != 0)
             {
-                LVNumericArrayResize(0x08, 1, start, repeatedString._value.size());
+                NumericArrayResize(0x08, 1, start, repeatedString._value.size());
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedString._value.size();
                 int x = 0;
@@ -217,7 +217,7 @@ namespace grpc_labview {
                 auto nestedMetadata = repeatedNested->_value.front()->_metadata;
                 auto clusterSize = nestedMetadata->clusterSize;
 
-                LVNumericArrayResize(0x08, 1, start, repeatedNested->_value.size() * clusterSize);
+                NumericArrayResize(0x08, 1, start, repeatedNested->_value.size() * clusterSize);
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedNested->_value.size();
                 int x = 0;
@@ -238,35 +238,6 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    // void ClusterDataCopier::CopyAnyToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
-    // {
-    //     if (metadata->isRepeated)
-    //     {
-    //         auto repeatedNested = std::static_pointer_cast<LVRepeatedAnyMessageValue>(value);
-    //         if (repeatedNested->_value.size() != 0)
-    //         {
-    //             LVNumericArrayResize(0x08, 1, start, repeatedNested->_value.size() * sizeof(int64_t));
-    //             auto array = *(LV1DArrayHandle*)start;
-    //             (*array)->cnt = repeatedNested->_value.size();
-    //             int x = 0;
-    //             for (auto v : repeatedNested->_value)
-    //             {
-    //                 int64_t reference = (int64_t)v;
-    //                 auto lvElement = (*array)->bytes<int64_t>(x * sizeof(int64_t));
-    //                 *lvElement = reference;
-    //                 x += 1;
-    //             }
-    //         }
-    //     }
-    //     else
-    //     {
-    //         int64_t reference = (int64_t)((LVAnyMessageValue*)value.get())->_value.get();
-    //         *((int64_t*)start) = reference;
-    //     }
-    // }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
     void ClusterDataCopier::CopyInt32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
@@ -274,7 +245,7 @@ namespace grpc_labview {
             auto repeatedInt32 = std::static_pointer_cast<LVRepeatedInt32MessageValue>(value);
             if (repeatedInt32->_value.size() != 0)
             {
-                LVNumericArrayResize(0x03, 1, start, repeatedInt32->_value.size());
+                NumericArrayResize(0x03, 1, start, repeatedInt32->_value.size());
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedInt32->_value.size();
                 auto byteCount = repeatedInt32->_value.size() * sizeof(int32_t);
@@ -296,7 +267,7 @@ namespace grpc_labview {
             auto repeatedUInt32 = std::static_pointer_cast<LVRepeatedUInt32MessageValue>(value);
             if (repeatedUInt32->_value.size() != 0)
             {
-                LVNumericArrayResize(0x03, 1, start, repeatedUInt32->_value.size());
+                NumericArrayResize(0x03, 1, start, repeatedUInt32->_value.size());
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedUInt32->_value.size();
                 auto byteCount = repeatedUInt32->_value.size() * sizeof(uint32_t);
@@ -318,7 +289,7 @@ namespace grpc_labview {
             auto repeatedEnum = std::static_pointer_cast<LVRepeatedEnumMessageValue>(value);
             if (repeatedEnum->_value.size() != 0)
             {
-                LVNumericArrayResize(0x03, 1, start, repeatedEnum->_value.size());
+                NumericArrayResize(0x03, 1, start, repeatedEnum->_value.size());
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedEnum->_value.size();
                 auto byteCount = repeatedEnum->_value.size() * sizeof(int32_t);
@@ -340,7 +311,7 @@ namespace grpc_labview {
             auto repeatedInt64 = std::static_pointer_cast<LVRepeatedInt64MessageValue>(value);
             if (repeatedInt64->_value.size() != 0)
             {
-                LVNumericArrayResize(0x03, 1, start, repeatedInt64->_value.size());
+                NumericArrayResize(0x03, 1, start, repeatedInt64->_value.size());
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedInt64->_value.size();
                 auto byteCount = repeatedInt64->_value.size() * sizeof(int64_t);
@@ -362,7 +333,7 @@ namespace grpc_labview {
             auto repeatedUInt64 = std::static_pointer_cast<LVRepeatedUInt64MessageValue>(value);
             if (repeatedUInt64->_value.size() != 0)
             {
-                LVNumericArrayResize(0x03, 1, start, repeatedUInt64->_value.size());
+                NumericArrayResize(0x03, 1, start, repeatedUInt64->_value.size());
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedUInt64->_value.size();
                 auto byteCount = repeatedUInt64->_value.size() * sizeof(uint64_t);
@@ -384,7 +355,7 @@ namespace grpc_labview {
             auto repeatedBoolean = std::static_pointer_cast<LVRepeatedBooleanMessageValue>(value);
             if (repeatedBoolean->_value.size() != 0)
             {
-                LVNumericArrayResize(0x01, 1, start, repeatedBoolean->_value.size());
+                NumericArrayResize(0x01, 1, start, repeatedBoolean->_value.size());
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedBoolean->_value.size();
                 auto byteCount = repeatedBoolean->_value.size() * sizeof(bool);
@@ -407,7 +378,7 @@ namespace grpc_labview {
             if (repeatedDouble->_value.size() != 0)
             {
                 auto array = *(LV1DArrayHandle*)start;
-                LVNumericArrayResize(0x0A, 1, start, repeatedDouble->_value.size());
+                NumericArrayResize(0x0A, 1, start, repeatedDouble->_value.size());
                 array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedDouble->_value.size();
                 auto byteCount = repeatedDouble->_value.size() * sizeof(double);
@@ -429,7 +400,7 @@ namespace grpc_labview {
             auto repeatedFloat = std::static_pointer_cast<LVRepeatedFloatMessageValue>(value);
             if (repeatedFloat->_value.size() != 0)
             {
-                LVNumericArrayResize(0x03, 1, start, repeatedFloat->_value.size());
+                NumericArrayResize(0x03, 1, start, repeatedFloat->_value.size());
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedFloat->_value.size();
                 auto byteCount = repeatedFloat->_value.size() * sizeof(float);

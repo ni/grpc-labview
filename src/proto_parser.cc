@@ -163,7 +163,7 @@ LIBRARY_EXPORT int LVGetServices(grpc_labview::LVProtoParser* parser, grpc_labvi
     }
 
     auto count = parser->m_FileDescriptor->service_count();
-    if (LVNumericArrayResize(0x08, 1, services, count * sizeof(ServiceDescriptor*)) != 0)
+    if (NumericArrayResize(0x08, 1, services, count * sizeof(ServiceDescriptor*)) != 0)
     {
         parser->m_ErrorCollector.AddError("", 0, 0, "Failed to resize array");
         return -3;
@@ -226,7 +226,7 @@ LIBRARY_EXPORT int LVGetMessages(grpc_labview::LVProtoParser* parser, grpc_labvi
     AddDependentMessages(*parser->m_FileDescriptor, allMessages);
 
     auto count = allMessages.size();
-    if (grpc_labview::LVNumericArrayResize(0x08, 1, messages, count * sizeof(Descriptor*)) != 0)
+    if (grpc_labview::NumericArrayResize(0x08, 1, messages, count * sizeof(Descriptor*)) != 0)
     {
         return -3;
     }
@@ -263,7 +263,7 @@ LIBRARY_EXPORT int LVGetServiceMethods(ServiceDescriptor* service, grpc_labview:
     }
     auto count = service->method_count();
     auto size = sizeof(ServiceDescriptor*);
-    if (grpc_labview::LVNumericArrayResize(0x08, 1, methods, count * size) != 0)
+    if (grpc_labview::NumericArrayResize(0x08, 1, methods, count * size) != 0)
     {
         return -3;
     }
@@ -381,7 +381,7 @@ LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, grpc_labview::LV1DArrayHa
         return -1;
     }
     auto count = descriptor->field_count();
-    if (LVNumericArrayResize(0x08, 1, fields, count * sizeof(FieldDescriptor*)) != 0)
+    if (NumericArrayResize(0x08, 1, fields, count * sizeof(FieldDescriptor*)) != 0)
     {
     return -3;
     }
