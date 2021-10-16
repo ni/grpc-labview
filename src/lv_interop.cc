@@ -27,7 +27,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void InitCallbacks()
     {
-        if (NumericArrayResize != nullptr)
+        if (NumericArrayResizeImp != nullptr)
         {
             return;
         }
