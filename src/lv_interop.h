@@ -118,4 +118,5 @@ namespace grpc_labview
     std::string GetLVString(LStrHandle lvString);
     int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size);
     int PostUserEvent(LVUserEventRef ref, void *data);
+    int SignalOccurrence(MagicCookie occurrence);
 }

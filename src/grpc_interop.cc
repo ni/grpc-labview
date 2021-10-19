@@ -144,6 +144,10 @@ LIBRARY_EXPORT int32_t RegisterMessageMetadata(grpc_labview::gRPCid** id, grpc_l
 LIBRARY_EXPORT int32_t RegisterMessageMetadata2(grpc_labview::gRPCid** id, grpc_labview::LVMessageMetadata2* lvMetadata)
 {    
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
+    if (server == nullptr)
+    {
+        return -1;
+    }
     auto metadata = CreateMessageMetadata2(server, lvMetadata);
     server->RegisterMetadata(metadata);
     return 0;
@@ -154,6 +158,10 @@ LIBRARY_EXPORT int32_t RegisterMessageMetadata2(grpc_labview::gRPCid** id, grpc_
 LIBRARY_EXPORT int32_t CompleteMetadataRegistration(grpc_labview::gRPCid** id)
 {        
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
+    if (server == nullptr)
+    {
+        return -1;
+    }
     server->FinalizeMetadata();
     return 0;
 }
@@ -163,6 +171,10 @@ LIBRARY_EXPORT int32_t CompleteMetadataRegistration(grpc_labview::gRPCid** id)
 LIBRARY_EXPORT int32_t RegisterServerEvent(grpc_labview::gRPCid** id, const char* name, grpc_labview::LVUserEventRef* item, const char* requestMessageName, const char* responseMessageName)
 {    
     auto server = (*id)->CastTo<grpc_labview::LabVIEWgRPCServer>();
+    if (server == nullptr)
+    {
+        return -1;
+    }
 
     server->RegisterEvent(name, *item, requestMessageName, responseMessageName);
     return 0;
@@ -173,6 +185,10 @@ LIBRARY_EXPORT int32_t RegisterServerEvent(grpc_labview::gRPCid** id, const char
 LIBRARY_EXPORT int32_t RegisterGenericMethodServerEvent(grpc_labview::gRPCid** id, grpc_labview::LVUserEventRef* item)
 {    
     auto server = (*id)->CastTo<grpc_labview::LabVIEWgRPCServer>();
+    if (server == nullptr)
+    {
+        return -1;
+    }
 
     server->RegisterGenericMethodEvent(*item);
     return 0;
