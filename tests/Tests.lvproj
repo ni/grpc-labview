@@ -21,15 +21,12 @@
 		<Item Name="Protos" Type="Folder">
 			<Item Name="data_marshal.proto" Type="Document" URL="../Protos/data_marshal.proto"/>
 		</Item>
-		<Item Name="Servers" Type="Folder">
-			<Item Name="Data Marshal Server" Type="Folder">
-				<Item Name="Data Marshal Server.lvlib" Type="Library" URL="../Servers/Data Marshal Server/Data Marshal Server.lvlib"/>
-			</Item>
+		<Item Name="TestDataMarshal" Type="Folder">
+			<Item Name="TestDataMarshal.lvlib" Type="Library" URL="../Servers/TestDataMarshal/TestDataMarshal.lvlib"/>
 		</Item>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="vi.lib" Type="Folder">
 				<Item Name="Error Cluster From Error Code.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/Error Cluster From Error Code.vi"/>
-				<Item Name="Get LV Class Path.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/LVClass/Get LV Class Path.vi"/>
 			</Item>
 			<Item Name="Template Server.lvlib" Type="Library" URL="../../labview source/Servers/Template Server/Template Server.lvlib"/>
 		</Item>
