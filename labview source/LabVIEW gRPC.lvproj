@@ -3,6 +3,7 @@
 	<Property Name="NI.LV.All.SourceOnly" Type="Bool">true</Property>
 	<Property Name="NI.Project.Description" Type="Str"></Property>
 	<Item Name="My Computer" Type="My Computer">
+		<Property Name="NI.SortType" Type="Int">3</Property>
 		<Property Name="server.app.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="server.control.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="server.tcp.enabled" Type="Bool">false</Property>
@@ -18,6 +19,11 @@
 		<Item Name="Servers" Type="Folder">
 			<Item Name="Template Server" Type="Folder">
 				<Item Name="Template Server.lvlib" Type="Library" URL="../Servers/Template Server/Template Server.lvlib"/>
+			</Item>
+		</Item>
+		<Item Name="Clients" Type="Folder">
+			<Item Name="Template Client" Type="Folder">
+				<Item Name="Template Client.lvlib" Type="Library" URL="../Clients/Template Client/Template Client.lvlib"/>
 			</Item>
 		</Item>
 		<Item Name="Dependencies" Type="Dependencies">
