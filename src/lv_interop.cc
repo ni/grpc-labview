@@ -21,10 +21,11 @@ static NumericArrayResize_T NumericArrayResizeImp = nullptr;
 static PostLVUserEvent_T PostLVUserEvent = nullptr;
 static Occur_T Occur = nullptr;
 
-#ifdef _WIN32
-
 namespace grpc_labview
 {
+
+#ifdef _WIN32
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void InitCallbacks()
@@ -48,13 +49,13 @@ namespace grpc_labview
         Occur = (Occur_T)GetProcAddress(lvModule, "Occur");
     }
 
-    #else
+#else
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void InitCallbacks()
     {
-        if (NumericArrayResize != nullptr)
+        if (NumericArrayResizeImp != nullptr)
         {
             return;
         }
@@ -62,7 +63,7 @@ namespace grpc_labview
         auto lvModule = dlopen(nullptr, RTLD_LAZY);
         if (lvModule != nullptr)
         {
-            NumericArrayResize = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
+            NumericArrayResizeImp = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
             PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
             Occur = (Occur_T)dlsym(lvModule, "Occur");
         }
@@ -70,13 +71,13 @@ namespace grpc_labview
         {
             std::cout << "Loading LabVIEW Runtime engine!" << std::endl;
             lvModule = dlopen("liblvrt.so", RTLD_NOW);
-            NumericArrayResize = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
+            NumericArrayResizeImp = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
             PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
             Occur = (Occur_T)dlsym(lvModule, "Occur");
         }
     }
 
-    #endif
+#endif
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
