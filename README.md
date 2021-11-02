@@ -40,3 +40,6 @@ See [Certificates](docs/Certificates.md) for more information.
 ## Building the server binaries
 To build the binaries for the scripting tool or the gRPC server see [Building](docs/Building.md) for instructions.
 
+## Contributing
+Contributions to grpc-labview are welcome from all. See [Contributing](Contributing.md) for instructions.
+
