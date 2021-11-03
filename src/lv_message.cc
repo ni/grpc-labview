@@ -24,6 +24,13 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    google::protobuf::UnknownFieldSet& LVMessage::UnknownFields()
+    {
+        return _unknownFields;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     bool LVMessage::ParseFromByteBuffer(const grpc::ByteBuffer& buffer)
     {
         Clear();

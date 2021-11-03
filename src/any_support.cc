@@ -8,6 +8,56 @@
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+class UnpackedElements : public grpc_labview::gRPCid
+{
+public:
+    UnpackedElements(grpc_labview::LVMessage* message);    
+    int32_t GetElement(int protobufIndex, grpc_labview::LVMessageMetadataType valueType, int isRepeated, int8_t* buffer);
+
+private:
+   std::shared_ptr<grpc_labview::LVMessage> _message;
+};
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+UnpackedElements::UnpackedElements(grpc_labview::LVMessage* message)
+{
+    _message = std::shared_ptr<grpc_labview::LVMessage>(message);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+int32_t UnpackedElements::GetElement(int protobufIndex, grpc_labview::LVMessageMetadataType valueType, int isRepeated, int8_t* buffer)
+{
+    auto field = _message->UnknownFields().field(protobufIndex);
+    switch (valueType)
+    {
+        case grpc_labview::LVMessageMetadataType::Int32Value:
+            *(int32_t*)buffer = field.fixed32();
+            break;
+        case grpc_labview::LVMessageMetadataType::FloatValue:
+        case grpc_labview::LVMessageMetadataType::DoubleValue:
+        case grpc_labview::LVMessageMetadataType::BoolValue:
+        case grpc_labview::LVMessageMetadataType::StringValue:
+        case grpc_labview::LVMessageMetadataType::MessageValue:
+        case grpc_labview::LVMessageMetadataType::Int64Value:
+        case grpc_labview::LVMessageMetadataType::UInt32Value:
+        case grpc_labview::LVMessageMetadataType::UInt64Value:
+        case grpc_labview::LVMessageMetadataType::EnumValue:
+        case grpc_labview::LVMessageMetadataType::BytesValue:
+        case grpc_labview::LVMessageMetadataType::Fixed64Value:
+        case grpc_labview::LVMessageMetadataType::Fixed32Value:
+        case grpc_labview::LVMessageMetadataType::SFixed64Value:
+        case grpc_labview::LVMessageMetadataType::SFixed32Value:
+        case grpc_labview::LVMessageMetadataType::SInt64Value:
+        case grpc_labview::LVMessageMetadataType::SInt32Value:
+            break;
+    }    
+    return 0; 
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t CreateSerializationSession(grpc_labview::gRPCid** sessionId)
 {
     grpc_labview::InitCallbacks();
@@ -67,6 +117,23 @@ LIBRARY_EXPORT int32_t PackToAny(grpc_labview::gRPCid* id, const char* messageTy
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t UnpackElementsFromBuffer(grpc_labview::LV1DArrayHandle lvBuffer, grpc_labview::gRPCid** unpackedElements)
+{
+    char* elements = (*lvBuffer)->bytes<char>();
+    std::string buffer(elements, (*lvBuffer)->cnt);
+
+    auto message = new grpc_labview::LVMessage(nullptr);
+    if (message->ParseFromString(buffer))
+    {
+        auto wrapper = new UnpackedElements(message);
+        *unpackedElements = wrapper;
+        return 0;
+    }
+    return -2;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t UnpackFromBuffer(grpc_labview::gRPCid* id, grpc_labview::LV1DArrayHandle lvBuffer, const char* messageType, int8_t* cluster)
 {
     auto metadataOwner = id->CastTo<grpc_labview::IMessageElementMetadataOwner>();
@@ -85,6 +152,13 @@ LIBRARY_EXPORT int32_t UnpackFromBuffer(grpc_labview::gRPCid* id, grpc_labview::
         return 0;
     }
     return -2;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t UnpackElementsFromAny(grpc_labview::AnyCluster* anyCluster, grpc_labview::gRPCid** elements)
+{
+    return UnpackElementsFromBuffer(anyCluster->Bytes, elements);
 }
 
 //---------------------------------------------------------------------
@@ -124,6 +198,32 @@ LIBRARY_EXPORT int32_t IsAnyOfType(grpc_labview::gRPCid* id, grpc_labview::AnyCl
         return -1;
     }
     return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t GetUnpackedElement(grpc_labview::gRPCid* id, int protobufIndex, grpc_labview::LVMessageMetadataType valueType, int isRepeated, int8_t* buffer)
+{
+    auto unpackedElements = id->CastTo<UnpackedElements>();
+    unpackedElements->GetElement(protobufIndex, valueType, isRepeated, buffer);
+    return 0; 
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t GetUnpackedMessageElement(grpc_labview::gRPCid* id, int protobufIndex, int8_t* buffer)
+{    
+    return 0; 
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t FreeUnpackedElements(grpc_labview::gRPCid* id)
+{
+    auto unpackedElements = id->CastTo<UnpackedElements>();
+    delete unpackedElements;
+
+    return 0; 
 }
 
 //---------------------------------------------------------------------
