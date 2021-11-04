@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-29 00:29:27" Modified_Date="2021-10-29 00:40:49" Creator="navin" Comments="" ID="74f1e3e26450a7fb2395eb2cd29c0593">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-29 00:29:27" Modified_Date="2021-11-03 20:39:41" Creator="navin" Comments="" ID="8b3746f0d1ec9f83fc9e22a26ef08124">
   <Library_General_Settings>
     <Package_File_Name>NI_lib_gRPC_Server_and_Client_Template</Package_File_Name>
-    <Library_Version>0.3.0.7</Library_Version>
+    <Library_Version>0.3.0.8</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>..\build</Library_Output_Folder>
@@ -131,14 +131,8 @@ This library also provides a scripting tool to auto generate the server and clie
         <Path>build spec</Path>
       </Exclusions>
       <Exclusions>
-        <Path>build</Path>
-      </Exclusions>
-      <Exclusions>
         <Path>Client Server Support.lvproj</Path>
       </Exclusions>
-      <Compile_Exclusions>
-        <Path/>
-      </Compile_Exclusions>
       <Place_Folder_Contents>
         <Path/>
       </Place_Folder_Contents>
