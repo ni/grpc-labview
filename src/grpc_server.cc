@@ -194,15 +194,15 @@ namespace grpc_labview
         {
             creds = grpc::InsecureServerCredentials();
         }
-
-        // Listen on the given address without any authentication mechanism.
         builder.AddListeningPort(server_address, creds, &_listeningPort);
+        builder.SetMaxSendMessageSize(-1);
+        builder.SetMaxReceiveMessageSize(-1);
+
         _rpcService = std::unique_ptr<grpc::AsyncGenericService>(new grpc::AsyncGenericService());
         builder.RegisterAsyncGenericService(_rpcService.get());
         auto cq = builder.AddCompletionQueue();
-        // Finally assemble the server.
-        _server = builder.BuildAndStart();
 
+        _server = builder.BuildAndStart();
         if (_server != nullptr)
         {
             std::cout << "Server listening on " << server_address << std::endl;
