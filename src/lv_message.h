@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <message_value.h>
+#include <message_metadata.h>
 
 namespace grpc_labview 
 {
@@ -15,6 +16,8 @@ namespace grpc_labview
     public:
         LVMessage(std::shared_ptr<MessageMetadata> metadata);
         ~LVMessage();
+
+        google::protobuf::UnknownFieldSet& UnknownFields();
 
         google::protobuf::Message* New() const final; 
         void SharedCtor();

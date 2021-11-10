@@ -24,12 +24,16 @@
 			<Item Name="IsAnyOfType.vi" Type="VI" URL="../Server API/Message Requests/IsAnyOfType.vi"/>
 			<Item Name="PackToAny.vim" Type="VI" URL="../Server API/Message Requests/PackToAny.vim"/>
 			<Item Name="TryUnpackFromAny.vim" Type="VI" URL="../Server API/Message Requests/TryUnpackFromAny.vim"/>
+			<Item Name="UnpackFieldsFromAny.vi" Type="VI" URL="../Server API/UnpackFieldsFromAny.vi"/>
 			<Item Name="UnpackFromAny.vim" Type="VI" URL="../Server API/Message Requests/UnpackFromAny.vim"/>
 		</Item>
 		<Item Name="CompleteMetadataRegistration.vi" Type="VI" URL="../Server API/CompleteMetadataRegistration.vi"/>
 		<Item Name="CreateSerializationSession.vi" Type="VI" URL="../Server API/CreateSerializationSession.vi"/>
 		<Item Name="FreeSerializationSession.vi" Type="VI" URL="../Server API/FreeSerializationSession.vi"/>
+		<Item Name="FreeUnpackedFields.vi" Type="VI" URL="../Server API/FreeUnpackedFields.vi"/>
+		<Item Name="GetUnpackedField.vim" Type="VI" URL="../Server API/GetUnpackedField.vim"/>
 		<Item Name="PackToBuffer.vim" Type="VI" URL="../Server API/PackToBuffer.vim"/>
+		<Item Name="UnpackFieldsFromBuffer.vi" Type="VI" URL="../Server API/UnpackFieldsFromBuffer.vi"/>
 		<Item Name="UnpackFromBuffer.vim" Type="VI" URL="../Server API/UnpackFromBuffer.vim"/>
 	</Item>
 	<Item Name="Server API" Type="Folder">
