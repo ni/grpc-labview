@@ -4,24 +4,29 @@
 
 1. (Windows Only) Download and install the latest [Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019](https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0).
 2. Navigate to the [Releases](https://github.com/ni/grpc-labview/releases) page.
-3. Download the latest Server Release `.zip` for the desired platform.
+3. Download the latest Server Release `grpc-labview.zip`.
 4. Extract the contents of the `.zip` to a directory with read and write permissions.
+5. Install the vi package `ni_lib_grpc_server_and_client_template-x.y.z.vip` and `ni_lib_labview_grpc_library-x.y.z.vip`
 
 ## Server Creation
 
 You can use the .proto scripting tool on Windows or Linux.
 
-Open the project LabVIEW gRPC.lvproj from the LabVIEW gRPC folder in LabVIEW 2019 or later:
+Create a new LabVIEW project or open an existing project.
 
-![LabVIEW gRPC.lvproj](images/grpc-server-project.png "LabVIEW gRPC.lvproj")
+Launch the scripting tool from the `Tools >> gRPC >> Open gRPC Server-Client Code Generation VI...` menu item.
 
-Then open Main.vi from the project under Scripting Tools/gRPC Scripting Tools.lvlib:
+![Hello World.lvproj](images/grpc-scripting-menu.png "Hello World.lvproj")
+
+Enter desired proto file and project.
 
 ![main.vi](images/grpc-scripting-main.png "Main.vi")
 
-* Select the .proto file you want to parse
-* Select the LabVIEW project you want the server VIs added to
-* Pick a name for the gRPC server
+* Select the .proto file  to parse
+* Select the LabVIEW project to update
+* (Optional) Enter a target name
+* Enter a library name for the gRPC server
+* Select to generate gRPC Server or gRPC Client code
 * Run the VI to generate the server
 
 You can generate multiple proto files and add them to the same LabVIEW project.  You can also regenerate the same proto file into the same project with the same server name and the existing VIs will be updated to match the proto file. Code you add will not be touched.
@@ -58,4 +63,4 @@ In you method implementation to must use the Get RPC Method Get Input VI to get 
 * Fill in the path to certificate files if a TLS connection is required, see the section on SSL/TLS Support below for more imformation
 * Run the `Main.vi`
 
-![RPC Server Main](docs/images/server-main.png "Server Main")
+![RPC Server Main](images/server-main.png "Server Main")
