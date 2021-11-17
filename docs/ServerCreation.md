@@ -58,4 +58,4 @@ In you method implementation to must use the Get RPC Method Get Input VI to get 
 * Fill in the path to certificate files if a TLS connection is required, see the section on SSL/TLS Support below for more imformation
 * Run the `Main.vi`
 
-![RPC Server Main](docs/images/server-main.png "Server Main")
+![RPC Server Main](images/server-main.png "Server Main")
