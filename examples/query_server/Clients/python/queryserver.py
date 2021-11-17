@@ -11,8 +11,9 @@
 #   if you are using anaconda
 #     > conda install grpcio-tools
 #
-# Generate the python API from the gRPC definition (.ptoto) files
+# Generate the python API from the gRPC definition (.proto) files
 #   > python -m grpc_tools.protoc -I.. --python_out=. --grpc_python_out=. ../query_server.proto
+#   > python -m grpc_tools.protoc -I../../Protos --python_out=. --grpc_python_out=. ../../Protos/query_server.proto
 #
 # Update the server address in this file to match where the LabVIEW server is running
 #
