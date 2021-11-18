@@ -268,6 +268,7 @@
 		<Item Name="Hide Loader.vi" Type="VI" URL="../Animation API/Hide Loader.vi"/>
 	</Item>
 	<Item Name="Error Handling" Type="Folder">
+		<Property Name="NI.SortType" Type="Int">1</Property>
 		<Item Name="Error 5001.vi" Type="VI" URL="../Error Handling/Error 5001.vi"/>
 		<Item Name="Error 5002.vi" Type="VI" URL="../Error Handling/Error 5002.vi"/>
 		<Item Name="Error 5003.vi" Type="VI" URL="../Error Handling/Error 5003.vi"/>
@@ -299,6 +300,7 @@
 		<Item Name="Error 5029.vi" Type="VI" URL="../Error Handling/Error 5029.vi"/>
 		<Item Name="Error 5030.vi" Type="VI" URL="../Error Handling/Error 5030.vi"/>
 		<Item Name="Error 5031.vi" Type="VI" URL="../Error Handling/Error 5031.vi"/>
+		<Item Name="Error 5032.vi" Type="VI" URL="../Error Handling/Error 5032.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
