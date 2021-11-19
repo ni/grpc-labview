@@ -13,7 +13,7 @@
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
 		<Item Name="Clients" Type="Folder">
 			<Item Name="Python client" Type="Folder">
-				<Item Name="queryserver.py" Type="Document" URL="../Clients/Python client/queryserver.py"/>
+				<Item Name="queryserver.py" Type="Document" URL="../Clients/python/queryserver.py"/>
 			</Item>
 		</Item>
 		<Item Name="Protos" Type="Folder">
