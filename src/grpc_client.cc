@@ -311,7 +311,7 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, g
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId, grpc_labview::MagicCookie* occurrence, int8_t* requestCluster, grpc_labview::LStrHandle* errorMessage, grpc_labview::AnyCluster* errorDetailsCluster)
+LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId, int8_t* responseCluster)
 {
     auto call = callId->CastTo<grpc_labview::ClientCall>();
     if (!call)
@@ -319,23 +319,8 @@ LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId
         return -1;
     }
 
-    int32_t result = 0;
-    if (call->status.ok())
-    {
-        grpc_labview::ClusterDataCopier::CopyToCluster(*call->response.get(), requestCluster);
-    }
-    else
-    {
-        result = -(1000 + call->status.error_code());
-        if (errorMessage != nullptr)
-        {
-            grpc_labview::SetLVString(errorMessage, call->status.error_message());
-        }
-        if (errorDetailsCluster != nullptr)
-        {
-        }
-    }
-    return result;
+    grpc_labview::ClusterDataCopier::CopyToCluster(*call->response.get(), responseCluster);
+    return 0;
 }
 
 //---------------------------------------------------------------------
@@ -353,7 +338,7 @@ LIBRARY_EXPORT int32_t ClientWriteToStream(grpc_labview::gRPCid* callId, int8_t*
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(grpc_labview::gRPCid* callId)
+LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(grpc_labview::gRPCid* callId, grpc_labview::LStrHandle* errorMessage, grpc_labview::AnyCluster* errorDetailsCluster)
 {
     auto call = callId->CastTo<grpc_labview::ClientCall>();
     if (!call)
