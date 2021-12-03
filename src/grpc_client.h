@@ -34,6 +34,9 @@ namespace grpc_labview
     class ClientCall : public gRPCid
     {
     public:
+        virtual ~ClientCall();
+        
+    public:
         MagicCookie occurrence;
         grpc::ClientContext context;
         std::shared_ptr<LVMessage> request;
@@ -44,25 +47,58 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class ServerStreamingClientCall : public ClientCall
+    class StreamWriter
+    {
+    public:
+        virtual bool Write(LVMessage* message) = 0;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class StreamReader
+    {
+    public:
+        std::future<int> _readFuture;
+
+    public:
+        virtual bool Read(LVMessage* message) = 0;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class ServerStreamingClientCall : public ClientCall, public StreamReader
     {        
+    public:
+        ~ServerStreamingClientCall() override;
+        bool Read(LVMessage* message) override;
+
     public:
         std::shared_ptr<grpc_impl::ClientReaderInterface<grpc_labview::LVMessage>> _reader;
     };
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class ClientStreamingClientCall : public ClientCall
+    class ClientStreamingClientCall : public ClientCall, public StreamWriter
     {        
     public:
+        ~ClientStreamingClientCall();
+
+        bool Write(LVMessage* message) override;
+
         std::shared_ptr<grpc_impl::ClientWriterInterface<grpc_labview::LVMessage>> _writer;
+
     };
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class BidiStreamingClientCall : public ClientCall
+    class BidiStreamingClientCall : public ClientCall, public StreamReader, public StreamWriter
     {       
     public:
+        ~BidiStreamingClientCall();
+
+        bool Read(LVMessage* message) override;
+        bool Write(LVMessage* message) override;
+
         std::shared_ptr<grpc_impl::ClientReaderWriterInterface<grpc_labview::LVMessage, grpc_labview::LVMessage>> _readerWriter;
     };
 }
