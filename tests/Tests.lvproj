@@ -17,6 +17,7 @@
 			<Item Name="SimpleBuilder.vi" Type="VI" URL="../Protobuf/SimpleBuilder.vi"/>
 			<Item Name="SimplePackUnpack.vi" Type="VI" URL="../Protobuf/SimplePackUnpack.vi"/>
 			<Item Name="TestParseWithUnknownFields.vi" Type="VI" URL="../Protobuf/TestParseWithUnknownFields.vi"/>
+			<Item Name="TestUnpackFields.vi" Type="VI" URL="../Protobuf/TestUnpackFields.vi"/>
 		</Item>
 		<Item Name="Protos" Type="Folder">
 			<Item Name="data_marshal.proto" Type="Document" URL="../Protos/data_marshal.proto"/>
@@ -26,9 +27,13 @@
 		</Item>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="vi.lib" Type="Folder">
+				<Item Name="Application Directory.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/file.llb/Application Directory.vi"/>
 				<Item Name="Error Cluster From Error Code.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/Error Cluster From Error Code.vi"/>
 				<Item Name="gprc-lvsupport-release.lvlib" Type="Library" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/gprc-lvsupport-release.lvlib"/>
+				<Item Name="NI_Data Type.lvlib" Type="Library" URL="/&lt;vilib&gt;/Utility/Data Type/NI_Data Type.lvlib"/>
+				<Item Name="NI_FileType.lvlib" Type="Library" URL="/&lt;vilib&gt;/Utility/lvfile.llb/NI_FileType.lvlib"/>
 			</Item>
+			<Item Name="gprc-lvsupport.lvlib" Type="Library" URL="../../labview source/gRPC lv Support/gprc-lvsupport.lvlib"/>
 		</Item>
 		<Item Name="Build Specifications" Type="Build"/>
 	</Item>
