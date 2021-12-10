@@ -33,6 +33,62 @@ namespace grpc_labview
         }
         Channel = grpc::CreateChannel(address, creds);
     }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    ClientCall::~ClientCall()
+    {        
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    ServerStreamingClientCall::~ServerStreamingClientCall()
+    {
+        _reader->Finish();
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    bool ServerStreamingClientCall::Read(LVMessage* message)
+    {
+        bool result = _reader->Read(message);
+        return result;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    ClientStreamingClientCall::~ClientStreamingClientCall()
+    {
+        _writer->Finish();
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    bool ClientStreamingClientCall::Write(LVMessage* message)
+    {
+        return _writer->Write(*message);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    BidiStreamingClientCall::~BidiStreamingClientCall()
+    {
+        _readerWriter->Finish();
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    bool BidiStreamingClientCall::Read(LVMessage* message)
+    {
+        return _readerWriter->Read(message);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    bool BidiStreamingClientCall::Write(LVMessage* message)
+    {
+        return _readerWriter->Write(*message);
+    }
 }
 
 //---------------------------------------------------------------------
@@ -102,7 +158,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(grpc_labview::gRPCid* clientId, grpc_labv
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t CompleteClientUnaryCall(grpc_labview::gRPCid* callId, int8_t* responseCluster)
+LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(grpc_labview::gRPCid* callId, int8_t* responseCluster, grpc_labview::LStrHandle* errorMessage, grpc_labview::AnyCluster* errorDetailsCluster)
 {
     auto call = callId->CastTo<grpc_labview::ClientCall>();
     if (!call)
@@ -118,11 +174,24 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall(grpc_labview::gRPCid* callId, int
     else
     {
         result = -(1000 + call->status.error_code());
+        if (errorMessage != nullptr)
+        {
+            grpc_labview::SetLVString(errorMessage, call->status.error_message());
+        }
+        if (errorDetailsCluster != nullptr)
+        {
+        }
     }
     delete call;
     return result;
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t CompleteClientUnaryCall(grpc_labview::gRPCid* callId, int8_t* responseCluster)
+{
+    return CompleteClientUnaryCall2(callId, responseCluster, nullptr, nullptr);
+}
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -217,4 +286,76 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(grpc_labview::gRPCid* client
     auto readerWriter = grpc_impl::internal::ClientReaderWriterFactory<grpc_labview::LVMessage, grpc_labview::LVMessage>::Create(client->Channel.get(), method, &clientCall->context);
     clientCall->_readerWriter = std::shared_ptr<grpc_impl::ClientReaderWriterInterface<grpc_labview::LVMessage, grpc_labview::LVMessage>>(readerWriter);
     return 0;    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, grpc_labview::MagicCookie* occurrencePtr)
+{
+    auto reader = callId->CastTo<grpc_labview::StreamReader>();
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
+    auto occurrence = *occurrencePtr;
+
+    reader->_readFuture = std::async(
+        std::launch::async, 
+        [=]() 
+        {
+            call->response->Clear();
+            auto result = reader->Read(call->response.get());
+            grpc_labview::SignalOccurrence(occurrence);
+            return result;
+        });
+
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId, int* success, int8_t* responseCluster)
+{
+    auto reader = callId->CastTo<grpc_labview::StreamReader>();
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
+    if (!call)
+    {
+        return -1;
+    }
+
+    *success = reader->_readFuture.get();
+    if (reader->_readFuture.get())
+    {
+        grpc_labview::ClusterDataCopier::CopyToCluster(*call->response.get(), responseCluster);
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t ClientWriteToStream(grpc_labview::gRPCid* callId, int8_t* requestCluster, int* success)
+{
+    auto writer = callId->CastTo<grpc_labview::StreamWriter>();
+    if (!writer)
+    {
+        return -1;
+    }
+    auto clientCall = callId->CastTo<grpc_labview::ClientCall>();
+    if (!clientCall)
+    {
+        return -1;
+    }
+    grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->request.get(), requestCluster);
+    *success = writer->Write(clientCall->request.get());
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(grpc_labview::gRPCid* callId, grpc_labview::LStrHandle* errorMessage, grpc_labview::AnyCluster* errorDetailsCluster)
+{
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
+    if (!call)
+    {
+        return -1;
+    }
+    delete call;
+    return 0;
 }

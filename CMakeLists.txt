@@ -46,7 +46,7 @@ endif()
 #----------------------------------------------------------------------
 # Include generated *.pb.h files
 #----------------------------------------------------------------------
-include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src" "./third_party/grpc")
 
 #----------------------------------------------------------------------
 # LabVIEW support for grpc and protobuf
@@ -150,7 +150,7 @@ add_custom_command(
   DEPENDS "${dm_proto}")
 
 #----------------------------------------------------------------------
-# Test application
+# Test client application
 #----------------------------------------------------------------------
 add_executable(test_client
   "src/test_client.cc"
@@ -161,3 +161,16 @@ target_link_libraries(test_client
    ${_REFLECTION}
    ${_GRPC_GRPCPP}
    ${_PROTOBUF_LIBPROTOBUF})
+
+#----------------------------------------------------------------------
+# Test server application
+#----------------------------------------------------------------------
+add_executable(test_server
+"src/test_server.cc"
+${dm_proto_srcs}
+${dm_grpc_srcs}
+)
+target_link_libraries(test_server
+ ${_REFLECTION}
+ ${_GRPC_GRPCPP}
+ ${_PROTOBUF_LIBPROTOBUF})
