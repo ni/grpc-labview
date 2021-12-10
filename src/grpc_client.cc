@@ -301,9 +301,9 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, g
         [=]() 
         {
             call->response->Clear();
-            reader->Read(call->response.get());
+            auto result = reader->Read(call->response.get());
             grpc_labview::SignalOccurrence(occurrence);
-            return 0;
+            return result;
         });
 
     return 0;
@@ -311,28 +311,39 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, g
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId, int8_t* responseCluster)
+LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId, int* success, int8_t* responseCluster)
 {
+    auto reader = callId->CastTo<grpc_labview::StreamReader>();
     auto call = callId->CastTo<grpc_labview::ClientCall>();
     if (!call)
     {
         return -1;
     }
 
-    grpc_labview::ClusterDataCopier::CopyToCluster(*call->response.get(), responseCluster);
+    *success = reader->_readFuture.get();
+    if (reader->_readFuture.get())
+    {
+        grpc_labview::ClusterDataCopier::CopyToCluster(*call->response.get(), responseCluster);
+    }
     return 0;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientWriteToStream(grpc_labview::gRPCid* callId, int8_t* requestCluster)
+LIBRARY_EXPORT int32_t ClientWriteToStream(grpc_labview::gRPCid* callId, int8_t* requestCluster, int* success)
 {
     auto writer = callId->CastTo<grpc_labview::StreamWriter>();
+    if (!writer)
+    {
+        return -1;
+    }
     auto clientCall = callId->CastTo<grpc_labview::ClientCall>();
-
+    if (!clientCall)
+    {
+        return -1;
+    }
     grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->request.get(), requestCluster);
-    writer->Write(clientCall->request.get());
-
+    *success = writer->Write(clientCall->request.get());
     return 0;
 }
 

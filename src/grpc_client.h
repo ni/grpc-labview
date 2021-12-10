@@ -58,7 +58,7 @@ namespace grpc_labview
     class StreamReader
     {
     public:
-        std::future<int> _readFuture;
+        std::future<bool> _readFuture;
 
     public:
         virtual bool Read(LVMessage* message) = 0;
