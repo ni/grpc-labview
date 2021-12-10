@@ -12,6 +12,7 @@
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
 		<Item Name="Client" Type="Folder">
+			<Item Name="TestClientStreaming.vi" Type="VI" URL="../Client/TestClientStreaming.vi"/>
 			<Item Name="TestServerStreaming.vi" Type="VI" URL="../Client/TestServerStreaming.vi"/>
 		</Item>
 		<Item Name="Protobuf" Type="Folder">

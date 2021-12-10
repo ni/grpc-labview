@@ -35,13 +35,14 @@ namespace grpc_labview
     {
     public:
         virtual ~ClientCall();
+        virtual void Finish();
         
     public:
-        MagicCookie occurrence;
-        grpc::ClientContext context;
-        std::shared_ptr<LVMessage> request;
-        std::shared_ptr<LVMessage> response;
-        grpc::Status status;
+        MagicCookie _occurrence;
+        grpc::ClientContext _context;
+        std::shared_ptr<LVMessage> _request;
+        std::shared_ptr<LVMessage> _response;
+        grpc::Status _status;
         std::future<int> _runFuture;
     };
 
@@ -51,6 +52,7 @@ namespace grpc_labview
     {
     public:
         virtual bool Write(LVMessage* message) = 0;
+        virtual void WritesComplete() = 0;
     };
 
     //---------------------------------------------------------------------
@@ -71,7 +73,7 @@ namespace grpc_labview
     public:
         ~ServerStreamingClientCall() override;
         bool Read(LVMessage* message) override;
-
+        void Finish() override;
     public:
         std::shared_ptr<grpc_impl::ClientReaderInterface<grpc_labview::LVMessage>> _reader;
     };
@@ -82,11 +84,14 @@ namespace grpc_labview
     {        
     public:
         ~ClientStreamingClientCall();
-
+        void Finish() override;
         bool Write(LVMessage* message) override;
+        void WritesComplete() override;
 
+    public:
         std::shared_ptr<grpc_impl::ClientWriterInterface<grpc_labview::LVMessage>> _writer;
-
+    private:
+        bool _writesComplete;
     };
 
     //---------------------------------------------------------------------
@@ -95,10 +100,14 @@ namespace grpc_labview
     {       
     public:
         ~BidiStreamingClientCall();
-
+        void Finish() override;
+        void WritesComplete() override;
         bool Read(LVMessage* message) override;
         bool Write(LVMessage* message) override;
 
+    public:
         std::shared_ptr<grpc_impl::ClientReaderWriterInterface<grpc_labview::LVMessage, grpc_labview::LVMessage>> _readerWriter;
+    private:
+        bool _writesComplete;
     };
 }
