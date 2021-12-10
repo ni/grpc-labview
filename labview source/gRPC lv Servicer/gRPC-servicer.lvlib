@@ -9,5 +9,5 @@
 
 </Property>
 	<Item Name="Servicer.lvclass" Type="LVClass" URL="../Servicer/Servicer.lvclass"/>
-	<Item Name="iService.lvclass" Type="LVClass" URL="../iService/iService.lvclass"/>
+	<Item Name="ServiceBase.lvclass" Type="LVClass" URL="../ServiceBase/ServiceBase.lvclass"/>
 </Library>
