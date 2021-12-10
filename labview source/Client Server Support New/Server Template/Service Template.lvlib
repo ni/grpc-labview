@@ -9,11 +9,8 @@
 
 </Property>
 	<Item Name="RPC Messages" Type="Folder">
-		<Item Name="End RPC Call" Type="Folder">
-			<Item Name="End RPC Call.vi" Type="VI" URL="../RPC Messages/End RPC Call.vi"/>
-		</Item>
 		<Item Name="package_templatemessage" Type="Folder">
-			<Item Name="package_templatemessage_Data.ctl" Type="VI" URL="../RPC Messages/package_templatemessage_Data.ctl"/>
+			<Item Name="package_templatemessage.ctl" Type="VI" URL="../RPC Messages/package_templatemessage.ctl"/>
 			<Item Name="Get package_templatemessage.vi" Type="VI" URL="../RPC Messages/Get package_templatemessage.vi"/>
 			<Item Name="Set package_templatemessage.vi" Type="VI" URL="../RPC Messages/Set package_templatemessage.vi"/>
 		</Item>
