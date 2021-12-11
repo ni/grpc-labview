@@ -42,9 +42,21 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    void ClientCall::Finish()
+    {        
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     ServerStreamingClientCall::~ServerStreamingClientCall()
     {
-        _reader->Finish();
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ServerStreamingClientCall::Finish()
+    {
+        _status = _reader->Finish();
     }
 
     //---------------------------------------------------------------------
@@ -59,23 +71,59 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     ClientStreamingClientCall::~ClientStreamingClientCall()
     {
-        _writer->Finish();
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    void ClientStreamingClientCall::Finish()
+    {
+        WritesComplete();
+        _status = _writer->Finish();
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ClientStreamingClientCall::WritesComplete()
+    {
+        if (!_writesComplete)
+        {
+            _writesComplete = true;
+           _writer->WritesDone();
+        }
+    }
+    
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     bool ClientStreamingClientCall::Write(LVMessage* message)
     {
-        return _writer->Write(*message);
+        return _writer->Write(*message);        
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     BidiStreamingClientCall::~BidiStreamingClientCall()
     {
-        _readerWriter->Finish();
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void BidiStreamingClientCall::Finish()
+    {
+        WritesComplete();
+        _status = _readerWriter->Finish();
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void BidiStreamingClientCall::WritesComplete()
+    {
+        if (!_writesComplete)
+        {
+            _writesComplete = true;
+           _readerWriter->WritesDone();
+        }
+    }
+    
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool BidiStreamingClientCall::Read(LVMessage* message)
@@ -138,19 +186,19 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(grpc_labview::gRPCid* clientId, grpc_labv
 
     auto clientCall = new grpc_labview::ClientCall();
     *callId = clientCall;
-    clientCall->occurrence = *occurrence;
-    clientCall->request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
-    clientCall->response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
+    clientCall->_occurrence = *occurrence;
+    clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+    clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 
-    grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->request.get(), requestCluster);
+    grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->_request.get(), requestCluster);
 
     clientCall->_runFuture = std::async(
         std::launch::async, 
         [=]() 
         {
             grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::NORMAL_RPC);
-            clientCall->status = grpc::internal::BlockingUnaryCall(client->Channel.get(), method, &clientCall->context, *clientCall->request.get(), clientCall->response.get());
-            grpc_labview::SignalOccurrence(clientCall->occurrence);
+            clientCall->_status = grpc::internal::BlockingUnaryCall(client->Channel.get(), method, &clientCall->_context, *clientCall->_request.get(), clientCall->_response.get());
+            grpc_labview::SignalOccurrence(clientCall->_occurrence);
             return 0;
         });
     return 0;
@@ -167,16 +215,16 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(grpc_labview::gRPCid* callId, in
     }
 
     int32_t result = 0;
-    if (call->status.ok())
+    if (call->_status.ok())
     {
-        grpc_labview::ClusterDataCopier::CopyToCluster(*call->response.get(), responseCluster);
+        grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
     }
     else
     {
-        result = -(1000 + call->status.error_code());
+        result = -(1000 + call->_status.error_code());
         if (errorMessage != nullptr)
         {
-            grpc_labview::SetLVString(errorMessage, call->status.error_message());
+            grpc_labview::SetLVString(errorMessage, call->_status.error_message());
         }
         if (errorDetailsCluster != nullptr)
         {
@@ -215,11 +263,11 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(grpc_labview::gRPCid* clie
 
     auto clientCall = new grpc_labview::ClientStreamingClientCall();
     *callId = clientCall;
-    clientCall->request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
-    clientCall->response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
+    clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+    clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::CLIENT_STREAMING);
-    auto writer = grpc_impl::internal::ClientWriterFactory<grpc_labview::LVMessage>::Create(client->Channel.get(), method, &clientCall->context, clientCall->response.get());
+    auto writer = grpc_impl::internal::ClientWriterFactory<grpc_labview::LVMessage>::Create(client->Channel.get(), method, &clientCall->_context, clientCall->_response.get());
     clientCall->_writer = std::shared_ptr<grpc_impl::ClientWriterInterface<grpc_labview::LVMessage>>(writer);
     return 0;    
 }
@@ -246,13 +294,13 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(grpc_labview::gRPCid* clie
 
     auto clientCall = new grpc_labview::ServerStreamingClientCall();
     *callId = clientCall;
-    clientCall->request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
-    clientCall->response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
+    clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+    clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 
-    grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->request.get(), requestCluster);
+    grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->_request.get(), requestCluster);
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::SERVER_STREAMING);
-    auto reader = grpc_impl::internal::ClientReaderFactory<grpc_labview::LVMessage>::Create<grpc_labview::LVMessage>(client->Channel.get(), method, &clientCall->context, *clientCall->request.get());
+    auto reader = grpc_impl::internal::ClientReaderFactory<grpc_labview::LVMessage>::Create<grpc_labview::LVMessage>(client->Channel.get(), method, &clientCall->_context, *clientCall->_request.get());
     clientCall->_reader = std::shared_ptr<grpc_impl::ClientReader<grpc_labview::LVMessage>>(reader);
     return 0;    
 }
@@ -279,11 +327,11 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(grpc_labview::gRPCid* client
 
     auto clientCall = new grpc_labview::BidiStreamingClientCall();
     *callId = clientCall;
-    clientCall->request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
-    clientCall->response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
+    clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+    clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::BIDI_STREAMING);
-    auto readerWriter = grpc_impl::internal::ClientReaderWriterFactory<grpc_labview::LVMessage, grpc_labview::LVMessage>::Create(client->Channel.get(), method, &clientCall->context);
+    auto readerWriter = grpc_impl::internal::ClientReaderWriterFactory<grpc_labview::LVMessage, grpc_labview::LVMessage>::Create(client->Channel.get(), method, &clientCall->_context);
     clientCall->_readerWriter = std::shared_ptr<grpc_impl::ClientReaderWriterInterface<grpc_labview::LVMessage, grpc_labview::LVMessage>>(readerWriter);
     return 0;    
 }
@@ -300,8 +348,8 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, g
         std::launch::async, 
         [=]() 
         {
-            call->response->Clear();
-            auto result = reader->Read(call->response.get());
+            call->_response->Clear();
+            auto result = reader->Read(call->_response.get());
             grpc_labview::SignalOccurrence(occurrence);
             return result;
         });
@@ -323,7 +371,7 @@ LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId
     *success = reader->_readFuture.get();
     if (reader->_readFuture.get())
     {
-        grpc_labview::ClusterDataCopier::CopyToCluster(*call->response.get(), responseCluster);
+        grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
     }
     return 0;
 }
@@ -342,8 +390,38 @@ LIBRARY_EXPORT int32_t ClientWriteToStream(grpc_labview::gRPCid* callId, int8_t*
     {
         return -1;
     }
-    grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->request.get(), requestCluster);
-    *success = writer->Write(clientCall->request.get());
+    grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->_request.get(), requestCluster);
+    *success = writer->Write(clientCall->_request.get());
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t ClientWritesComplete(grpc_labview::gRPCid* callId)
+{
+    auto writer = callId->CastTo<grpc_labview::StreamWriter>();
+    if (!writer)
+    {
+        return -1;
+    }
+    writer->WritesComplete();
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpc_labview::gRPCid* callId, int8_t* responseCluster, grpc_labview::LStrHandle* errorMessage, grpc_labview::AnyCluster* errorDetailsCluster)
+{
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
+    if (!call)
+    {
+        return -1;
+    }
+    call->Finish();
+    if (call->_status.ok())
+    {
+        grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
+    }
+    delete call;
     return 0;
 }
 
@@ -356,6 +434,7 @@ LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(grpc_labview::gRPCid* callId,
     {
         return -1;
     }
+    call->Finish();   
     delete call;
     return 0;
 }

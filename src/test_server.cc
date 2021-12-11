@@ -27,6 +27,7 @@ public:
     grpc::Status Invoke(grpc::ServerContext* context, const queryserver::InvokeRequest* request, queryserver::InvokeResponse* response) override;
     grpc::Status Query(grpc::ServerContext* context, const queryserver::QueryRequest* request, queryserver::QueryResponse* response) override;
     grpc::Status Register(grpc::ServerContext* context, const queryserver::RegistrationRequest* request, grpc::ServerWriter<queryserver::ServerEvent>* writer) override;
+    grpc::Status ClientStream(grpc::ServerContext* context, grpc::ServerReader<::queryserver::RegistrationRequest>* reader, queryserver::ServerEvent* response) override;
 };
 
 //---------------------------------------------------------------------
@@ -57,6 +58,21 @@ grpc::Status DataMarshalTestServer::Register(grpc::ServerContext* context, const
     event.set_eventdata("Done");
     event.set_status(0);
     writer->WriteLast(event, ::grpc::WriteOptions());
+    return Status::OK;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+grpc::Status DataMarshalTestServer::ClientStream(grpc::ServerContext* context, grpc::ServerReader<::queryserver::RegistrationRequest>* reader, queryserver::ServerEvent* response)
+{
+    queryserver::RegistrationRequest request;
+    int count = 0;
+    while (reader->Read(&request))
+    {
+        count += 1;
+    }
+    response->set_status(count);
+    response->set_eventdata("Test Complete");
     return Status::OK;
 }
 

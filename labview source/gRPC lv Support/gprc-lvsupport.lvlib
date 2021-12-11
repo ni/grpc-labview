@@ -11,10 +11,12 @@
 		<Item Name="Client Begin Bidirectional Streaming Call.vi" Type="VI" URL="../Client API/Client Begin Bidirectional Streaming Call.vi"/>
 		<Item Name="Client Begin Client Streaming Call.vi" Type="VI" URL="../Client API/Client Begin Client Streaming Call.vi"/>
 		<Item Name="Client Begin Server Streaming Call.vim" Type="VI" URL="../Client API/Client Begin Server Streaming Call.vim"/>
+		<Item Name="Client Complete Client Streaming Call.vim" Type="VI" URL="../Client API/Client Complete Client Streaming Call.vim"/>
 		<Item Name="Client Complete Streaming Call.vi" Type="VI" URL="../Client API/Client Complete Streaming Call.vi"/>
 		<Item Name="Client Read From Stream.vim" Type="VI" URL="../Client API/Client Read From Stream.vim"/>
 		<Item Name="Client Unary Call.vim" Type="VI" URL="../Client API/Client Unary Call.vim"/>
 		<Item Name="Client Write To Stream.vim" Type="VI" URL="../Client API/Client Write To Stream.vim"/>
+		<Item Name="Client Writes Complete.vi" Type="VI" URL="../Client API/Client Writes Complete.vi"/>
 		<Item Name="Close Client.vi" Type="VI" URL="../Client API/Close Client.vi"/>
 		<Item Name="Create Client.vi" Type="VI" URL="../Client API/Create Client.vi"/>
 	</Item>
