@@ -16,8 +16,5 @@
 		</Item>
 		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../RPC Messages/Register gRPC Messages.vi"/>
 	</Item>
-	<Item Name="RPC Service" Type="Folder">
-		<Item Name="ServiceName.lvclass" Type="LVClass" URL="../RPC Service/ServiceName/ServiceName.lvclass"/>
-	</Item>
 	<Item Name="Run Service.vi" Type="VI" URL="../Run Service.vi"/>
 </Library>
