@@ -40,6 +40,8 @@ service QueryServer {
   rpc Invoke (InvokeRequest) returns (InvokeResponse) {}
   rpc Query (QueryRequest) returns (QueryResponse) {}
   rpc Register (RegistrationRequest) returns (stream ServerEvent) {}
+  rpc ClientStream (stream RegistrationRequest) returns (ServerEvent) {}
+  rpc BidiStream (stream RegistrationRequest) returns (ServerEvent) {}
 
   rpc TestDataTypes(TestDataTypesParameters) returns (TestDataTypesParameters) {}
 }
