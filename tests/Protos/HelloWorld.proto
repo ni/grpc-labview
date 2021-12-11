@@ -12,13 +12,13 @@ package queryserverplus;
 service HelloWorld {
   rpc addRequest (myRequest) returns (myResponse) {}
   rpc deleteRequest (myRequest) returns (myResponse) {}
+  rpc newRequest (myRequest) returns (myResponse) {}
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 message myRequest {
   string command = 1;
-  string parameter = 2;
 }
 
 //---------------------------------------------------------------------
