@@ -17,11 +17,14 @@
 			<Item Name="gRPC Template Creation Utility.lvlib" Type="Library" URL="../gRPC Scripting Tools/gRPC Template Creation Utility.lvlib"/>
 			<Item Name="Open gRPC Server-Client Code Generation VI.vi" Type="VI" URL="../gRPC Scripting Tools/Open gRPC Server-Client Code Generation VI.vi"/>
 		</Item>
-		<Item Name="Template" Type="Folder">
+		<Item Name="Server Template" Type="Folder">
 			<Item Name="Service Class" Type="Folder">
 				<Item Name="ServiceName Template.lvclass" Type="LVClass" URL="../Server Template/RPC Service/ServiceName/ServiceName Template.lvclass"/>
 			</Item>
 			<Item Name="Service Template.lvlib" Type="Library" URL="../Server Template/Service Template.lvlib"/>
+		</Item>
+		<Item Name="Client Template" Type="Folder">
+			<Item Name="Client Template.lvlib" Type="Library" URL="../Client Template/Client Template.lvlib"/>
 		</Item>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="vi.lib" Type="Folder">
