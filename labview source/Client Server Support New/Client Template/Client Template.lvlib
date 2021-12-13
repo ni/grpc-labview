@@ -18,8 +18,8 @@
 		<Item Name="End ClientStreamTemplate.vi" Type="VI" URL="../RPC Service/End ClientStreamTemplate.vi"/>
 		<Item Name="Begin ServerStreamTemplate.vi" Type="VI" URL="../RPC Service/Begin ServerStreamTemplate.vi"/>
 		<Item Name="ReadStream ServerStreamTemplate.vi" Type="VI" URL="../RPC Service/ReadStream ServerStreamTemplate.vi"/>
-		<Item Name="Begin BidirectionalStreamTemplate.vi" Type="VI" URL="../RPC Service/Begin BidirectionalStreamTemplate.vi"/>
 		<Item Name="End ServerStreamTemplate.vi" Type="VI" URL="../RPC Service/End ServerStreamTemplate.vi"/>
+		<Item Name="Begin BidirectionalStreamTemplate.vi" Type="VI" URL="../RPC Service/Begin BidirectionalStreamTemplate.vi"/>
 		<Item Name="End BidirectionalStreamTemplate.vi" Type="VI" URL="../RPC Service/End BidirectionalStreamTemplate.vi"/>
 	</Item>
 	<Item Name="Client API" Type="Folder">
