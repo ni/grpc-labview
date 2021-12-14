@@ -13,7 +13,7 @@ service HelloWorld {
   rpc clientServerGreet (myRequest) returns (myResponse) {}
   rpc clientContinousGreet (stream myRequest) returns (myResponse) {}
   rpc serverContinousGreet (myRequest) returns (stream myResponse) {}
-  rpc bothContinousGreet (stream myRequest) returns (stream myRequest) {}
+  rpc bothContinousGreet (stream myRequest) returns (stream myResponse) {}
 }
 
 //---------------------------------------------------------------------
@@ -25,5 +25,5 @@ message myRequest {
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 message myResponse {
-  sring messageout = 1;
+  string messageout = 1;
 }
