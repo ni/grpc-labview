@@ -139,6 +139,8 @@
 			<Item Name="Update Server Start Async.vi" Type="VI" URL="../Top Level API/Update Server Start Async.vi"/>
 			<Item Name="Get RPC Methods Paths.vi" Type="VI" URL="../Top Level API/Get RPC Methods Paths.vi"/>
 			<Item Name="Get RPC Methods Binds.vi" Type="VI" URL="../Top Level API/Get RPC Methods Binds.vi"/>
+			<Item Name="Get RPC Service Name from Method Namespace.vi" Type="VI" URL="../Top Level API/Get RPC Service Name from Method Namespace.vi"/>
+			<Item Name="Get RPC Type.vi" Type="VI" URL="../Top Level API/Get RPC Type.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Create Server Library from Template.vi" Type="VI" URL="../Top Level API/Create Server Library from Template.vi"/>
@@ -155,7 +157,6 @@
 			<Item Name="Generate RPC Client Methods.vi" Type="VI" URL="../Top Level API/Generate RPC Client Methods.vi"/>
 			<Item Name="Update RPC Client Method Constants.vi" Type="VI" URL="../Top Level API/Update RPC Client Method Constants.vi"/>
 			<Item Name="Update RPC Client Method Controls.vi" Type="VI" URL="../Top Level API/Update RPC Client Method Controls.vi"/>
-			<Item Name="Update RPC Client Methods.vi" Type="VI" URL="../Top Level API/Update RPC Client Methods.vi"/>
 		</Item>
 	</Item>
 	<Item Name="VI API" Type="Folder">
@@ -243,6 +244,7 @@
 		<Item Name="Message Metadata (Scripting).ctl" Type="VI" URL="../TypeDefs/Message Metadata (Scripting).ctl"/>
 		<Item Name="Message Element Type.ctl" Type="VI" URL="../TypeDefs/Message Element Type.ctl"/>
 		<Item Name="Project Settings.ctl" Type="VI" URL="../TypeDefs/Project Settings.ctl"/>
+		<Item Name="RPC Method Types.ctl" Type="VI" URL="../TypeDefs/RPC Method Types.ctl"/>
 	</Item>
 	<Item Name="Proto Parser API" Type="Folder">
 		<Item Name="Proto Parser.vi" Type="VI" URL="../Proto Parser API/Proto Parser.vi"/>

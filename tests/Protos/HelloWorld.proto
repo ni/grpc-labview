@@ -10,19 +10,20 @@ package queryserverplus;
 // The test service definition.
 //---------------------------------------------------------------------
 service HelloWorld {
-  rpc addRequest (myRequest) returns (myResponse) {}
-  rpc deleteRequest (myRequest) returns (myResponse) {}
-  rpc newRequest (myRequest) returns (myResponse) {}
+  rpc clientServerGreet (myRequest) returns (myResponse) {}
+  rpc clientContinousGreet (stream myRequest) returns (myResponse) {}
+  rpc serverContinousGreet (myRequest) returns (stream myResponse) {}
+  rpc bothContinousGreet (stream myRequest) returns (stream myResponse) {}
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 message myRequest {
-  string command = 1;
+  string messagein = 1;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 message myResponse {
-  int32 status = 1;
+  string messageout = 1;
 }
