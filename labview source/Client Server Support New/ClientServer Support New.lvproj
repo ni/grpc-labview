@@ -15,7 +15,7 @@
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
 		<Item Name="gRPC Scripting Tools" Type="Folder">
 			<Item Name="gRPC Template Creation Utility.lvlib" Type="Library" URL="../gRPC Scripting Tools/gRPC Template Creation Utility.lvlib"/>
-			<Item Name="Open gRPC Server-Client Code Generation VI.vi" Type="VI" URL="../gRPC Scripting Tools/Open gRPC Server-Client Code Generation VI.vi"/>
+			<Item Name="Open gRPC Server-Client [2] - Code Generator.vi" Type="VI" URL="../gRPC Scripting Tools/Open gRPC Server-Client [2] - Code Generator.vi"/>
 		</Item>
 		<Item Name="Server Template" Type="Folder">
 			<Item Name="Service Class" Type="Folder">
