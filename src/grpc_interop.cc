@@ -107,6 +107,10 @@ LIBRARY_EXPORT int32_t LVCreateServer(grpc_labview::gRPCid** id)
 LIBRARY_EXPORT int32_t LVStartServer(char* address, char* serverCertificatePath, char* serverKeyPath, grpc_labview::gRPCid** id)
 {   
     auto server = (*id)->CastTo<grpc_labview::LabVIEWgRPCServer>();
+    if (server == nullptr)
+    {
+        return -1;
+    }
     return server->Run(address, serverCertificatePath, serverKeyPath);
 }
 
@@ -115,6 +119,10 @@ LIBRARY_EXPORT int32_t LVStartServer(char* address, char* serverCertificatePath,
 LIBRARY_EXPORT int32_t LVGetServerListeningPort(grpc_labview::gRPCid** id, int* listeningPort)
 {   
     auto server = (*id)->CastTo<grpc_labview::LabVIEWgRPCServer>();
+    if (server == nullptr)
+    {
+        return -1;
+    }
     *listeningPort = server->ListeningPort();
     return 0;
 }
@@ -124,6 +132,10 @@ LIBRARY_EXPORT int32_t LVGetServerListeningPort(grpc_labview::gRPCid** id, int* 
 LIBRARY_EXPORT int32_t LVStopServer(grpc_labview::gRPCid** id)
 {
     auto server = (*id)->CastTo<grpc_labview::LabVIEWgRPCServer>();
+    if (server == nullptr)
+    {
+        return -1;
+    }
     server->StopServer();
     delete server;
     return 0;
@@ -134,6 +146,10 @@ LIBRARY_EXPORT int32_t LVStopServer(grpc_labview::gRPCid** id)
 LIBRARY_EXPORT int32_t RegisterMessageMetadata(grpc_labview::gRPCid** id, grpc_labview::LVMessageMetadata* lvMetadata)
 {    
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
+    if (server == nullptr)
+    {
+        return -1;
+    }
     auto metadata = CreateMessageMetadata(server, lvMetadata);
     server->RegisterMetadata(metadata);
     return 0;
@@ -199,10 +215,17 @@ LIBRARY_EXPORT int32_t RegisterGenericMethodServerEvent(grpc_labview::gRPCid** i
 LIBRARY_EXPORT int32_t GetRequestData(grpc_labview::gRPCid** id, int8_t* lvRequest)
 {
     auto data = (*id)->CastTo<grpc_labview::GenericMethodData>();
-    data->_call->ReadNext();
-    grpc_labview::ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
-    data->_call->ReadComplete();
-    return 0;
+    if (data == nullptr)
+    {
+        return -1;
+    }
+    if (data->_call->ReadNext())
+    {
+        grpc_labview::ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
+        data->_call->ReadComplete();
+        return 0;
+    }
+    return -2;
 }
 
 //---------------------------------------------------------------------
@@ -210,10 +233,14 @@ LIBRARY_EXPORT int32_t GetRequestData(grpc_labview::gRPCid** id, int8_t* lvReque
 LIBRARY_EXPORT int32_t SetResponseData(grpc_labview::gRPCid** id, int8_t* lvRequest)
 {
     auto data = (*id)->CastTo<grpc_labview::GenericMethodData>();
+    if (data == nullptr)
+    {
+        return -1;
+    }
     grpc_labview::ClusterDataCopier::CopyFromCluster(*data->_response, lvRequest);
     if (!data->_call->Write())
     {
-        return -1;
+        return -2;
     }
     return 0;
 }
@@ -223,6 +250,10 @@ LIBRARY_EXPORT int32_t SetResponseData(grpc_labview::gRPCid** id, int8_t* lvRequ
 LIBRARY_EXPORT int32_t CloseServerEvent(grpc_labview::gRPCid** id)
 {
     auto data = (*id)->CastTo<grpc_labview::GenericMethodData>();
+    if (data == nullptr)
+    {
+        return -1;
+    }
     data->NotifyComplete();
     data->_call->Finish();    
     return 0;
@@ -233,5 +264,9 @@ LIBRARY_EXPORT int32_t CloseServerEvent(grpc_labview::gRPCid** id)
 LIBRARY_EXPORT int32_t IsCancelled(grpc_labview::gRPCid** id)
 {
     auto data = (*id)->CastTo<grpc_labview::GenericMethodData>();
+    if (data == nullptr)
+    {
+        return -1;
+    }
     return data->_call->IsCancelled();
 }
