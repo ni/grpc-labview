@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-11-19 18:41:05" Modified_Date="2021-12-14 19:16:50" Creator="navin" Comments="" ID="b138b464d73f59910e92f56f539ad83e">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-11-19 18:41:05" Modified_Date="2021-12-16 08:19:12" Creator="navin" Comments="" ID="9e138b30b1b73dde0c5db1b8ad3d206c">
   <Library_General_Settings>
     <Package_File_Name>NI_lib_LabVIEW_gRPC_Servicer</Package_File_Name>
-    <Library_Version>0.3.0.8</Library_Version>
+    <Library_Version>0.4.5.3</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>..\build</Library_Output_Folder>
@@ -186,6 +186,7 @@
       <close_labview_before_install>false</close_labview_before_install>
       <restart_labview_after_install>false</restart_labview_after_install>
       <skip_mass_compile_after_install>false</skip_mass_compile_after_install>
+      <install_into_global_environment>false</install_into_global_environment>
     </LabVIEW>
     <VI_Docs>
       <Edit_VI_Description>false</Edit_VI_Description>
@@ -243,7 +244,7 @@
         <Path>..\Servicer</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>21D5A3193754980E57CDEEB6A24586BD</GUID>
+      <GUID>DB72B7ADB0389529C1DB1A533C74CB77</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -292,7 +293,7 @@
         <Path>..\iService\Server API</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>D79B5D8532ED1F6287B04EF7C4174447</GUID>
+      <GUID>9DCA02EA6C56C9077FA482D98A93B156</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -355,7 +356,7 @@
         <Path>..\Servicer\Run Servicer.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>BFFB3EFDB5080E72EA219576D1BE8249</GUID>
+      <GUID>F113ED702996F9538F85E9603C951786</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>1</Parent_Palette_Index>
@@ -404,7 +405,7 @@
         <Path>..\ServiceBase\Accessors\Read Server Stop.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>B219C9A67DC2EA7D1D75B4B0F156C44F</GUID>
+      <GUID>D48C1E9D456D498CEFB89BDAD065D9FE</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>1</Parent_Palette_Index>
@@ -509,7 +510,7 @@
         <Path>..\ServiceBase\Server API\Start.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>B2419403BAAC399CF6A316C30F1FB513</GUID>
+      <GUID>82269087DD63432525907373EA979BBC</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>2</Parent_Palette_Index>
@@ -600,7 +601,7 @@
         <Path>..\Servicer\Accessors\Server State</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>ABA2C763AAFAB312F219C3C17E250934</GUID>
+      <GUID>417740A159E30CC624A7ADE9D3E6646B</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>2</Parent_Palette_Index>
@@ -677,7 +678,7 @@
         <Path>..\Servicer\Server API\Stop Server.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>98FFBD7CBAA8F36181879B88418E528B</GUID>
+      <GUID>B0CC19F8DA8A69146AEF120DD61C5CC3</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>5</Parent_Palette_Index>
@@ -726,7 +727,7 @@
         <Path>..\Servicer\Accessors\gRPC ID\Set gRPC ID.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>6D4C14D06897A9AD30FF4DBB9B3DFCCD</GUID>
+      <GUID>9B3159920CD4BBF9DDB944D2D9A53954</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>5</Parent_Palette_Index>
@@ -775,7 +776,7 @@
         <Path>..\Servicer\Accessors\Server Address\Set Server Address.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>073F9B5FB454966E738BF83DF74B17A8</GUID>
+      <GUID>A5B4340AD680E0AC2010E63F49DE8746</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>5</Parent_Palette_Index>
@@ -824,7 +825,7 @@
         <Path>..\Servicer\Accessors\Server Certificate File\Set Server Certificate File.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>B7F158E1CB1B7EAE9605C2BBA64D28F3</GUID>
+      <GUID>5A6FD0FA1E354F25D6439AAB9F6A7D1F</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>5</Parent_Palette_Index>
@@ -873,7 +874,7 @@
         <Path>..\Servicer\Accessors\Server Key File\Set Server Key File.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>EB8A4572F18C55ADAECD9E71C19C8E6D</GUID>
+      <GUID>A53DA0AA0180877C5A8044C7ACA6DEA8</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>5</Parent_Palette_Index>
@@ -950,7 +951,7 @@
         <Path>..\Servicer\Accessors\Server State\Set Server State.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>1A6E53FE6EF4C71E025767155B8EF32B</GUID>
+      <GUID>C211BCCE28878B42B433E036007878E5</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>11</Parent_Palette_Index>
@@ -999,7 +1000,7 @@
         <Path>..\Servicer\Accessors\Server State\State Ref\Set Server State Ref.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>498F9282C4AC34D7CDA3904F6A7D0F8D</GUID>
+      <GUID>BC687472C95FF7BA65ADDC4267B1D9C1</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>11</Parent_Palette_Index>
@@ -1048,7 +1049,7 @@
         <Path>..\Servicer\Accessors\Server State\State UE\Set Server State UE.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>BE11DECA80A5C52C71515A1573A78C9F</GUID>
+      <GUID>E387B91FAEDF3FCE6B4717900B65C63E</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>
