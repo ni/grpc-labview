@@ -311,7 +311,7 @@ namespace grpc_labview {
             auto repeatedInt64 = std::static_pointer_cast<LVRepeatedInt64MessageValue>(value);
             if (repeatedInt64->_value.size() != 0)
             {
-                NumericArrayResize(0x03, 1, start, repeatedInt64->_value.size());
+                NumericArrayResize(0x04, 1, start, repeatedInt64->_value.size());
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedInt64->_value.size();
                 auto byteCount = repeatedInt64->_value.size() * sizeof(int64_t);

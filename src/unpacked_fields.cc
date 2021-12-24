@@ -79,6 +79,23 @@ namespace grpc_labview
                 }
                 break;
             case LVMessageMetadataType::DoubleValue:
+                if (isRepeated)
+                {
+                    auto destArray = (grpc_labview::LV1DArrayHandle*)buffer;
+                    auto value = field->length_delimited();
+                    auto count = value.size() / sizeof(double_t);
+                    if (count > 0)
+                    {
+                        grpc_labview::NumericArrayResize(0x0A, 1, destArray, count);
+                        (**destArray)->cnt = count;
+                        memcpy((**destArray)->bytes<double_t>(), value.c_str(), value.size());
+                    }
+                }
+                else
+                {
+                    *(double_t*)buffer = field->fixed64();
+                }
+                break;
             case LVMessageMetadataType::Fixed64Value:
             case LVMessageMetadataType::SFixed64Value:
                 if (isRepeated)
