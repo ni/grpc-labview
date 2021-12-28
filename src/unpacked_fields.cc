@@ -16,7 +16,7 @@ namespace grpc_labview
         int32_t GetField(int protobufIndex, LVMessageMetadataType valueType, int isRepeated, int8_t* buffer);
 
     private:
-    std::shared_ptr<LVMessage> _message;
+        std::shared_ptr<LVMessage> _message;
     };
 
     //---------------------------------------------------------------------
@@ -24,6 +24,47 @@ namespace grpc_labview
     UnpackedFields::UnpackedFields(grpc_labview::LVMessage* message)
     {
         _message = std::shared_ptr<LVMessage>(message);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void Copy64BitField(bool isRepeated, int typeCode, const google::protobuf::UnknownField* field, int8_t* buffer)
+    {
+        if (isRepeated)
+        {
+            auto destArray = (grpc_labview::LV1DArrayHandle*)buffer;
+            auto value = field->length_delimited();
+            auto count = value.size() / sizeof(double_t);
+            if (count > 0)
+            {
+                grpc_labview::NumericArrayResize(typeCode, 1, destArray, count);
+                (**destArray)->cnt = count;
+                memcpy((**destArray)->bytes<double_t>(), value.c_str(), value.size());
+            }
+        }
+        else
+        {
+            *(double_t*)buffer = field->fixed64();
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void CopyFixed32BitValueField(bool isRepeated, int typeCode, const google::protobuf::UnknownField* field, int8_t* buffer)
+    {
+        if (isRepeated)
+        {
+            auto destArray = (grpc_labview::LV1DArrayHandle*)buffer;
+            auto value = field->length_delimited();
+            auto count = value.size() / sizeof(uint32_t);
+            grpc_labview::NumericArrayResize(typeCode, 1, destArray, count);
+            (**destArray)->cnt = count;
+            memcpy((**destArray)->bytes<uint32_t>(), value.c_str(), value.size());
+        }
+        else
+        {
+            *(uint32_t*)buffer = field->fixed32();
+        }
     }
 
     //---------------------------------------------------------------------
@@ -40,6 +81,10 @@ namespace grpc_labview
             }
         }
         if (field == nullptr)
+        {
+            return -1;
+        }
+        if (field->number() != protobufIndex)
         {
             return -1;
         }
@@ -62,55 +107,18 @@ namespace grpc_labview
                 *(uint64_t*)buffer = field->varint();
                 break;
             case LVMessageMetadataType::FloatValue:
+                CopyFixed32BitValueField(isRepeated, 0x09, field, buffer);
+                break;
             case LVMessageMetadataType::Fixed32Value:
             case LVMessageMetadataType::SFixed32Value:
-                if (isRepeated)
-                {
-                    auto destArray = (grpc_labview::LV1DArrayHandle*)buffer;
-                    auto value = field->length_delimited();
-                    auto count = value.size() / sizeof(uint32_t);
-                    grpc_labview::NumericArrayResize(0x03, 1, destArray, count);
-                    (**destArray)->cnt = count;
-                    memcpy((**destArray)->bytes<uint32_t>(), value.c_str(), value.size());
-                }
-                else
-                {
-                    *(uint32_t*)buffer = field->fixed32();
-                }
+                CopyFixed32BitValueField(isRepeated, 0x03, field, buffer);
                 break;
             case LVMessageMetadataType::DoubleValue:
-                if (isRepeated)
-                {
-                    auto destArray = (grpc_labview::LV1DArrayHandle*)buffer;
-                    auto value = field->length_delimited();
-                    auto count = value.size() / sizeof(double_t);
-                    if (count > 0)
-                    {
-                        grpc_labview::NumericArrayResize(0x0A, 1, destArray, count);
-                        (**destArray)->cnt = count;
-                        memcpy((**destArray)->bytes<double_t>(), value.c_str(), value.size());
-                    }
-                }
-                else
-                {
-                    *(double_t*)buffer = field->fixed64();
-                }
+                Copy64BitField(isRepeated, 0x0A, field, buffer);
                 break;
             case LVMessageMetadataType::Fixed64Value:
             case LVMessageMetadataType::SFixed64Value:
-                if (isRepeated)
-                {
-                    auto destArray = (grpc_labview::LV1DArrayHandle*)buffer;
-                    auto value = field->length_delimited();
-                    auto count = value.size() / sizeof(uint64_t);
-                    grpc_labview::NumericArrayResize(0x03, 1, destArray, count);
-                    (**destArray)->cnt = count;
-                    memcpy((**destArray)->bytes<uint64_t>(), value.c_str(), value.size());
-                }
-                else
-                {
-                    *(uint64_t*)buffer = field->fixed64();
-                }
+                Copy64BitField(isRepeated, 0x04, field, buffer);
                 break;
             case LVMessageMetadataType::StringValue:
                 if (isRepeated)
