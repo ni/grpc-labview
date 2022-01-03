@@ -5,10 +5,9 @@
 This tutorial provides a basic LabVIEW programmer’s introduction to working with gRPC.
 
 By walking through this example you’ll learn how to:
-
-    Define a service in a .proto file.
-    Generate server and client code using the LabVIEW Server-Client Code Generator.
-    Use the LabVIEW gRPC API to write a simple client and server for your service.
+* Define a service in a .proto file.
+* Generate server and client code using the LabVIEW Server-Client Code Generator.
+* Use the LabVIEW gRPC API to write a simple client and server for your service.
 
 It assumes that you have read the [Introduction to gRPC](https://grpc.io/docs/what-is-grpc/introduction/) and are familiar with [protocol buffers](https://developers.google.com/protocol-buffers/docs/overview). You can find out more in the [proto3 language guide](https://developers.google.com/protocol-buffers/docs/proto3).
 
@@ -46,36 +45,36 @@ Then you define `rpc` methods inside your service definition, specifying their r
 
 * A *simple RPC* where the client sends a request to the server using the stub and waits for a response to come back, just like a normal function call.
 
-    ```proto
-    // Obtains the feature at a given position.
-    rpc GetFeature(Point) returns (Feature) {}
-    ```
+```proto
+// Obtains the feature at a given position.
+rpc GetFeature(Point) returns (Feature) {}
+```
 
 * A *response-streaming RPC* where the client sends a request to the server and gets a stream to read a sequence of messages back. The client reads from the returned stream until there are no more messages. As you can see in the example, you specify a response-streaming method by placing the `stream` keyword before the response type.
 
-    ```proto
-    // Obtains the Features available within the given Rectangle.  Results are
-    // streamed rather than returned at once (e.g. in a response message with a
-    // repeated field), as the rectangle may cover a large area and contain a
-    // huge number of features.
-    rpc ListFeatures(Rectangle) returns (stream Feature) {}
-    ```
+```proto
+// Obtains the Features available within the given Rectangle.  Results are
+// streamed rather than returned at once (e.g. in a response message with a
+// repeated field), as the rectangle may cover a large area and contain a
+// huge number of features.
+rpc ListFeatures(Rectangle) returns (stream Feature) {}
+```
 
 * A *request-streaming RPC* where the client writes a sequence of messages and sends them to the server, again using a provided stream. Once the client has finished writing the messages, it waits for the server to read them all and return its response. You specify a request-streaming method by placing the `stream` keyword before the request type.
 
-    ```proto
-    // Accepts a stream of Points on a route being traversed, returning a
-    // RouteSummary when traversal is completed.
-    rpc RecordRoute(stream Point) returns (RouteSummary) {}
-    ```
+```proto
+// Accepts a stream of Points on a route being traversed, returning a
+// RouteSummary when traversal is completed.
+rpc RecordRoute(stream Point) returns (RouteSummary) {}
+```
 
 * A *bidirectionally-streaming RPC* where both sides send a sequence of messages using a read-write stream. The two streams operate independently, so clients and servers can read and write in whatever order they like: for example, the server could wait to receive all the client messages before writing its responses, or it could alternately read a message then write a message, or some other combination of reads and writes. The order of messages in each stream is preserved. You specify this type of method by placing the `stream` keyword before both the request and the response.
 
-    ```proto
-    // Accepts a stream of RouteNotes sent while a route is being traversed,
-    // while receiving other RouteNotes (e.g. from other users).
-    rpc RouteChat(stream RouteNote) returns (stream RouteNote) {}
-    ```
+```proto
+// Accepts a stream of RouteNotes sent while a route is being traversed,
+// while receiving other RouteNotes (e.g. from other users).
+rpc RouteChat(stream RouteNote) returns (stream RouteNote) {}
+```
 
 Your `.proto` file also contains protocol buffer message type definitions for all the request and response types used in our service methods - for example, here’s the `Point` message type:
 

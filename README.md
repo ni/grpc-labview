@@ -1,11 +1,6 @@
 # gRPC Support for LabVIEW
 
-This repo contains necessary C++ code and support VIs to implement a gRPC server in LabVIEW.
-
-Open `examples/query_server/Query Server.lvproj` for examples on creating a query server. `/examples/query_server/Protos/query_server.proto` defines a simple query service example that can be used for a variety of purposes.
-
-You can either use the service as defined to implement a generic server via gPRC or use the implementation
-as a pattern to implement a gRPC service of your design.
+This repo contains necessary C++ code and support VIs to implement a gRPC server and client in LabVIEW. You can either use the service as defined to implement a generic server via gPRC or use the implementation as a pattern to implement a gRPC service of your design.
 
 The project supports Windows, Linux, and Linux RT.
 
@@ -15,25 +10,25 @@ LabVIEW source is saved with __LabVIEW 2019__.
 
 ## Note: This project is not yet complete
 * Not all .proto data types are supported
-* The VI generated has not yet been implemneted - VIs need to be implemented by hand to match the .proto file
+* The VI generated has not been fully implemented when updating the generated code with the .proto - VIs need to be implemented by hand to match the .proto file in certain cases
 * Extensive testing is not complete
 * The names of the various generated methods, events, and VIs are subject to change until the 1.0 release
 * This project is not supported by NI Technical Support
 
-## Creating a LabVIEW gRPC Server
+## User Guide
 
-Step-by-step examples can be found in the [Creating a Server](docs/ServerCreation.md) guide
+If you would like to use LabVIEW gRPC in your project and want to where to start: [Quick Start](docs/QuickStart.md) and [Basic Tutorial](docs/BasicsTutorial.md) is a great place to start. This covers step by step guide on,
+* how to create a simple proto
+* generate the server code
+* generate the client code
+* make modification to the generated code
+* run the server and client program
 
 ### Examples
 
 Example servers are located in the examples foldes in the releases.
-* QueryServer - Example server which implements a Query / Invoke / Event API
-
-The examples include a python client that can be used to communicate with the example servers.
-
-## Using the LabVIEW Client API
-
-Coming Soon
+* helloworld - Example server and client program which implements a simple Unary method. You can run this LabVIEW program along with Python server or client as well
+* route_guide - Example server and client program which implement unary, server streaming, client streaming and bidirectional functions
 
 ## SSL/TLS Support
 
