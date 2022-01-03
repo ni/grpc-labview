@@ -24,7 +24,7 @@ To install gRPC tools:
 
 *Note: Install LabVIEW gRPC from above, before continuing with below steps*
 
-1. Install the following packages,
+1. Install the following tool packages,
     1. `ni_lib_labview_grpc_servicer-x.x.x.x.vip`
     2. `ni_lib_grpc_server_and_client_template[2]-x.x.x.x.vip`
 
@@ -170,5 +170,5 @@ Just like we did before, from the `examples/helloworld` directory:
 ## What's next
 
 * Learn how gRPC works in [Introduction to gRPC](https://grpc.io/docs/what-is-grpc/introduction/) and [Core concepts](https://grpc.io/docs/what-is-grpc/core-concepts/).
-* Work through the [Basic tutorial]().
-* Explore the [API reference]().
+* Work through the [Basic tutorial](BasicsTutorial.md).
+* Explore the [API reference](APIreference.md).
