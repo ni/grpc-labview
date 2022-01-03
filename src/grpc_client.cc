@@ -367,9 +367,9 @@ LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId
     {
         return -1;
     }
-
+    reader->_readFuture.wait();
     *success = reader->_readFuture.get();
-    if (reader->_readFuture.get())
+    if (*success)
     {
         grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
     }
@@ -405,23 +405,44 @@ LIBRARY_EXPORT int32_t ClientWritesComplete(grpc_labview::gRPCid* callId)
         return -1;
     }
     writer->WritesComplete();
+    return 0;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpc_labview::gRPCid* callId, int8_t* responseCluster, grpc_labview::LStrHandle* errorMessage, grpc_labview::AnyCluster* errorDetailsCluster)
+LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(grpc_labview::gRPCid* callId, int8_t* responseCluster, grpc_labview::LStrHandle* errorMessage, grpc_labview::AnyCluster* errorDetailsCluster)
+{    
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
+    if (!call)
+    {
+        return -1;
+    }
+    if (call->_status.ok())
+    {
+        grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
+    }
+    delete call;
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpc_labview::gRPCid* callId, grpc_labview::MagicCookie* occurrencePtr)
 {
     auto call = callId->CastTo<grpc_labview::ClientCall>();
     if (!call)
     {
         return -1;
     }
-    call->Finish();
-    if (call->_status.ok())
-    {
-        grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
-    }
-    delete call;
+    auto occurrence = *occurrencePtr;
+    call->_runFuture = std::async(
+        std::launch::async, 
+        [=]() 
+        {
+            call->Finish();
+            grpc_labview::SignalOccurrence(occurrence);
+            return 0;
+        });
     return 0;
 }
 

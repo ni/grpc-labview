@@ -89,6 +89,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     const char *LVMessage::_InternalParse(const char *ptr, ParseContext *ctx)
     {
+        assert(ptr != nullptr);
         while (!ctx->Done(&ptr))
         {
             google::protobuf::uint32 tag;
@@ -97,6 +98,7 @@ namespace grpc_labview
             if (_metadata == nullptr)
             {
                 ptr = UnknownFieldParse(tag, &_unknownFields, ptr, ctx);
+                assert(ptr != nullptr);
             }
             else
             {
@@ -141,10 +143,12 @@ namespace grpc_labview
                             ptr = ParseEnum(*fieldInfo, index, ptr, ctx);
                             break;
                     }
+                    assert(ptr != nullptr);
                 }
                 else
                 {
                     ptr = UnknownFieldParse(tag, &_unknownFields, ptr, ctx);
+                    assert(ptr != nullptr);
                 }
             }
         }
@@ -399,7 +403,7 @@ namespace grpc_labview
                 {
                     break;
                 }
-            } while (ExpectTag(26, ptr));
+            } while (ExpectTag(tag, ptr));
         }
         else
         {
