@@ -143,7 +143,7 @@ This is where the human-written parts of the application is present.
 
 3. In the EventStructure, goto the case called `helloworld_Greeter_SayHelloAgain gRPC UE` (If not present, create the case) and implement the new method like this:
 
-![Say Hello Again Server Code implementation](images/Greeter HelloAgain Server Code Snippet.png "Say Hello Again Server Code implementation")
+![Say Hello Again Server Code implementation](images/HelloAgain Server Code.png "Say Hello Again Server Code implementation")
 
 ### Update the client
 
@@ -153,7 +153,7 @@ From the same project,
 
 2. Call the new method like this:
 
-![Say Hello Again Client Code implementation](images/Greeter HelloAgain Client Code Snippet.png "Say Hello Again Client Code implementation")
+![Say Hello Again Client Code implementation](images/HelloAgain Client Code.png "Say Hello Again Client Code implementation")
 
 ### Run!
 
