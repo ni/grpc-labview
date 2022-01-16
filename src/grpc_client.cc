@@ -417,12 +417,24 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(grpc_labview::gRP
     {
         return -1;
     }
+    int32_t result = 0;
     if (call->_status.ok())
     {
         grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
     }
+    else
+    {
+        result = -(1000 + call->_status.error_code());
+        if (errorMessage != nullptr)
+        {
+            grpc_labview::SetLVString(errorMessage, call->_status.error_message());
+        }
+        if (errorDetailsCluster != nullptr)
+        {
+        }
+    }
     delete call;
-    return 0;
+    return result;
 }
 
 //---------------------------------------------------------------------
@@ -455,7 +467,19 @@ LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(grpc_labview::gRPCid* callId,
     {
         return -1;
     }
-    call->Finish();   
+    call->Finish();
+    int32_t result;   
+    if (!call->_status.ok())
+    {
+        result = -(1000 + call->_status.error_code());
+        if (errorMessage != nullptr)
+        {
+            grpc_labview::SetLVString(errorMessage, call->_status.error_message());
+        }
+        if (errorDetailsCluster != nullptr)
+        {
+        }
+    }
     delete call;
-    return 0;
+    return result;
 }

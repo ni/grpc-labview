@@ -73,6 +73,7 @@
 			<Item Name="Register Message Metadata.vi" Type="VI" URL="../Server API/Server/Register Message Metadata.vi"/>
 			<Item Name="Start Server.vi" Type="VI" URL="../Server API/Server/Start Server.vi"/>
 			<Item Name="Stop Server.vi" Type="VI" URL="../Server API/Server/Stop Server.vi"/>
+			<Item Name="TranslateGrpcError.vi" Type="VI" URL="../Server API/TranslateGrpcError.vi"/>
 		</Item>
 	</Item>
 	<Item Name="typeDefs" Type="Folder">
