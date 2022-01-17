@@ -71,6 +71,7 @@
 			<Item Name="Create Server.vi" Type="VI" URL="../Server API/Server/Create Server.vi"/>
 			<Item Name="Get Server DLL Path.vi" Type="VI" URL="../Server API/Server/Get Server DLL Path.vi"/>
 			<Item Name="Register Message Metadata.vi" Type="VI" URL="../Server API/Server/Register Message Metadata.vi"/>
+			<Item Name="Set Call Status.vi" Type="VI" URL="../Server API/Set Call Status.vi"/>
 			<Item Name="Start Server.vi" Type="VI" URL="../Server API/Server/Start Server.vi"/>
 			<Item Name="Stop Server.vi" Type="VI" URL="../Server API/Server/Stop Server.vi"/>
 			<Item Name="TranslateGrpcError.vi" Type="VI" URL="../Server API/TranslateGrpcError.vi"/>
@@ -79,6 +80,7 @@
 	<Item Name="typeDefs" Type="Folder">
 		<Item Name="Any.ctl" Type="VI" URL="../Server API/typeDefs/Any.ctl"/>
 		<Item Name="Generic Method Event Data.ctl" Type="VI" URL="../Server API/typeDefs/Generic Method Event Data.ctl"/>
+		<Item Name="gRPC Status Code.ctl" Type="VI" URL="../Server API/typeDefs/gRPC Status Code.ctl"/>
 		<Item Name="gRPCId Cluster UE.ctl" Type="VI" URL="../Server API/typeDefs/gRPCId Cluster UE.ctl"/>
 		<Item Name="gRPCId Cluster.ctl" Type="VI" URL="../Server API/typeDefs/gRPCId Cluster.ctl"/>
 		<Item Name="grpcId.ctl" Type="VI" URL="../Server API/typeDefs/grpcId.ctl"/>

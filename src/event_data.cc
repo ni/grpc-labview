@@ -19,7 +19,8 @@ namespace grpc_labview
         _status(CallStatus::Create),
         _writeSemaphore(0),
         _cancelled(false),
-        _requestDataReady(false)
+        _requestDataReady(false),
+        _callStatus(grpc::Status::OK)
     {
         Proceed(true);
     }
@@ -67,6 +68,20 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    void CallData::SetCallStatusError(std::string errorMessage)
+    {
+        _callStatus = grpc::Status(grpc::StatusCode::INTERNAL, errorMessage);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void CallData::SetCallStatusError(grpc::StatusCode statusCode, std::string errorMessage)
+    {
+        _callStatus = grpc::Status(statusCode, errorMessage);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void CallData::CallFinished()
     {
         _cancelled = _ctx.IsCancelled();      
@@ -84,7 +99,7 @@ namespace grpc_labview
         else
         {
             _status = CallStatus::Finish;
-            _stream.Finish(grpc::Status::OK, this);
+            _stream.Finish(_callStatus, this);
         }
     }
 

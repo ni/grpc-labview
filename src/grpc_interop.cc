@@ -261,6 +261,19 @@ LIBRARY_EXPORT int32_t CloseServerEvent(grpc_labview::gRPCid** id)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t SetCallStatus(grpc_labview::gRPCid** id, int grpcErrorCode, const char* errorMessage)
+{    
+    auto data = (*id)->CastTo<grpc_labview::GenericMethodData>();
+    if (data == nullptr)
+    {
+        return -1;
+    }
+    data->_call->SetCallStatusError((grpc::StatusCode)grpcErrorCode, errorMessage);
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t IsCancelled(grpc_labview::gRPCid** id)
 {
     auto data = (*id)->CastTo<grpc_labview::GenericMethodData>();

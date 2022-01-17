@@ -4,6 +4,7 @@
 #include <google/protobuf/any.pb.h>
 #include <lv_message.h>
 #include <message_metadata.h>
+#include <math.h>
 
 namespace grpc_labview
 {

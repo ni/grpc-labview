@@ -148,6 +148,8 @@ namespace grpc_labview
         void CallFinished();
         bool ReadNext();
         void ReadComplete();
+        void SetCallStatusError(std::string errorMessage);
+        void SetCallStatusError(grpc::StatusCode statusCode, std::string errorMessage);
 
     private:
         LabVIEWgRPCServer* _server;
@@ -156,11 +158,13 @@ namespace grpc_labview
         grpc::GenericServerContext _ctx;
         grpc::GenericServerAsyncReaderWriter _stream;
         grpc::ByteBuffer _rb;
+        grpc::Status _callStatus;
 
         Semaphore _writeSemaphore;
         std::shared_ptr<GenericMethodData> _methodData;
         std::shared_ptr<LVMessage> _request;
         std::shared_ptr<LVMessage> _response;
+
         bool _cancelled;
         bool _requestDataReady;
 
