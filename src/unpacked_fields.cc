@@ -45,7 +45,7 @@ namespace grpc_labview
         }
         else
         {
-            *(double_t*)buffer = field->fixed64();
+            *(uint64_t*)buffer = field->fixed64();
         }
     }
 
