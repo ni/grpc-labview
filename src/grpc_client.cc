@@ -186,18 +186,20 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(grpc_labview::gRPCid* clientId, grpc_labv
 
     auto clientCall = new grpc_labview::ClientCall();
     *callId = clientCall;
+    clientCall->_client = client;
+    clientCall->_methodName = methodName;
     clientCall->_occurrence = *occurrence;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 
-    grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->_request.get(), requestCluster);
+    grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->_request.get(), requestCluster);   
 
     clientCall->_runFuture = std::async(
         std::launch::async, 
-        [=]() 
+        [clientCall]() 
         {
-            grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::NORMAL_RPC);
-            clientCall->_status = grpc::internal::BlockingUnaryCall(client->Channel.get(), method, &clientCall->_context, *clientCall->_request.get(), clientCall->_response.get());
+            grpc::internal::RpcMethod method(clientCall->_methodName.c_str(), grpc::internal::RpcMethod::NORMAL_RPC);
+            clientCall->_status = grpc::internal::BlockingUnaryCall(clientCall->_client->Channel.get(), method, &clientCall->_context, *clientCall->_request.get(), clientCall->_response.get());
             grpc_labview::SignalOccurrence(clientCall->_occurrence);
             return 0;
         });
@@ -346,7 +348,7 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, g
 
     reader->_readFuture = std::async(
         std::launch::async, 
-        [=]() 
+        [call, reader, occurrence]() 
         {
             call->_response->Clear();
             auto result = reader->Read(call->_response.get());
@@ -449,7 +451,7 @@ LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpc_labview::gRPCid* c
     auto occurrence = *occurrencePtr;
     call->_runFuture = std::async(
         std::launch::async, 
-        [=]() 
+        [call, occurrence]() 
         {
             call->Finish();
             grpc_labview::SignalOccurrence(occurrence);

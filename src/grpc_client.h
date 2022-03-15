@@ -38,6 +38,8 @@ namespace grpc_labview
         virtual void Finish();
         
     public:
+        grpc_labview::LabVIEWgRPCClient* _client;
+        std::string _methodName;
         MagicCookie _occurrence;
         grpc::ClientContext _context;
         std::shared_ptr<LVMessage> _request;
