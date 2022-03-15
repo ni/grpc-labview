@@ -8,7 +8,7 @@
 #include <metadata_owner.h>
 #include <grpcpp/grpcpp.h>
 #include <lv_message.h>
-#include <grpcpp/impl/codegen/sync_stream_impl.h>
+#include <grpcpp/impl/codegen/sync_stream.h>
 #include <future>
 
 namespace grpc_labview 
@@ -77,7 +77,7 @@ namespace grpc_labview
         bool Read(LVMessage* message) override;
         void Finish() override;
     public:
-        std::shared_ptr<grpc_impl::ClientReaderInterface<grpc_labview::LVMessage>> _reader;
+        std::shared_ptr<grpc::ClientReaderInterface<grpc_labview::LVMessage>> _reader;
     };
 
     //---------------------------------------------------------------------
@@ -91,7 +91,7 @@ namespace grpc_labview
         void WritesComplete() override;
 
     public:
-        std::shared_ptr<grpc_impl::ClientWriterInterface<grpc_labview::LVMessage>> _writer;
+        std::shared_ptr<grpc::ClientWriterInterface<grpc_labview::LVMessage>> _writer;
     private:
         bool _writesComplete;
     };
@@ -108,7 +108,7 @@ namespace grpc_labview
         bool Write(LVMessage* message) override;
 
     public:
-        std::shared_ptr<grpc_impl::ClientReaderWriterInterface<grpc_labview::LVMessage, grpc_labview::LVMessage>> _readerWriter;
+        std::shared_ptr<grpc::ClientReaderWriterInterface<grpc_labview::LVMessage, grpc_labview::LVMessage>> _readerWriter;
     private:
         bool _writesComplete;
     };

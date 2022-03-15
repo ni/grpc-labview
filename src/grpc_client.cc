@@ -269,8 +269,8 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(grpc_labview::gRPCid* clie
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::CLIENT_STREAMING);
-    auto writer = grpc_impl::internal::ClientWriterFactory<grpc_labview::LVMessage>::Create(client->Channel.get(), method, &clientCall->_context, clientCall->_response.get());
-    clientCall->_writer = std::shared_ptr<grpc_impl::ClientWriterInterface<grpc_labview::LVMessage>>(writer);
+    auto writer = grpc::internal::ClientWriterFactory<grpc_labview::LVMessage>::Create(client->Channel.get(), method, &clientCall->_context, clientCall->_response.get());
+    clientCall->_writer = std::shared_ptr<grpc::ClientWriterInterface<grpc_labview::LVMessage>>(writer);
     return 0;    
 }
 
@@ -302,8 +302,8 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(grpc_labview::gRPCid* clie
     grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->_request.get(), requestCluster);
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::SERVER_STREAMING);
-    auto reader = grpc_impl::internal::ClientReaderFactory<grpc_labview::LVMessage>::Create<grpc_labview::LVMessage>(client->Channel.get(), method, &clientCall->_context, *clientCall->_request.get());
-    clientCall->_reader = std::shared_ptr<grpc_impl::ClientReader<grpc_labview::LVMessage>>(reader);
+    auto reader = grpc::internal::ClientReaderFactory<grpc_labview::LVMessage>::Create<grpc_labview::LVMessage>(client->Channel.get(), method, &clientCall->_context, *clientCall->_request.get());
+    clientCall->_reader = std::shared_ptr<grpc::ClientReader<grpc_labview::LVMessage>>(reader);
     return 0;    
 }
 
@@ -333,8 +333,8 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(grpc_labview::gRPCid* client
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::BIDI_STREAMING);
-    auto readerWriter = grpc_impl::internal::ClientReaderWriterFactory<grpc_labview::LVMessage, grpc_labview::LVMessage>::Create(client->Channel.get(), method, &clientCall->_context);
-    clientCall->_readerWriter = std::shared_ptr<grpc_impl::ClientReaderWriterInterface<grpc_labview::LVMessage, grpc_labview::LVMessage>>(readerWriter);
+    auto readerWriter = grpc::internal::ClientReaderWriterFactory<grpc_labview::LVMessage, grpc_labview::LVMessage>::Create(client->Channel.get(), method, &clientCall->_context);
+    clientCall->_readerWriter = std::shared_ptr<grpc::ClientReaderWriterInterface<grpc_labview::LVMessage, grpc_labview::LVMessage>>(readerWriter);
     return 0;    
 }
 

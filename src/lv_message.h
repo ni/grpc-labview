@@ -6,6 +6,7 @@
 //---------------------------------------------------------------------
 #include <message_value.h>
 #include <message_metadata.h>
+#include <google/protobuf/message.h>
 
 namespace grpc_labview 
 {
@@ -19,7 +20,7 @@ namespace grpc_labview
 
         google::protobuf::UnknownFieldSet& UnknownFields();
 
-        google::protobuf::Message* New() const final; 
+        Message* New(google::protobuf::Arena* arena) const override;
         void SharedCtor();
         void SharedDtor();
         void ArenaDtor(void* object);
@@ -28,8 +29,8 @@ namespace grpc_labview
         void Clear()  final;
         bool IsInitialized() const final;
 
-        const char* _InternalParse(const char *ptr, google::protobuf::internal::ParseContext *ctx)  override;
-        google::protobuf::uint8 *_InternalSerialize(google::protobuf::uint8 *target, google::protobuf::io::EpsCopyOutputStream *stream) const override;
+        const char* _InternalParse(const char *ptr, google::protobuf::internal::ParseContext *ctx)  override final;
+        google::protobuf::uint8* _InternalSerialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override final;
         void SetCachedSize(int size) const final;
         int GetCachedSize(void) const final;
         size_t ByteSizeLong() const final;

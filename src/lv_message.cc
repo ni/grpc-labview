@@ -58,7 +58,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::Message* LVMessage::New() const
+    google::protobuf::Message* LVMessage::New(google::protobuf::Arena* arena) const
     {
         assert(false); // not expected to be called
         return nullptr;
