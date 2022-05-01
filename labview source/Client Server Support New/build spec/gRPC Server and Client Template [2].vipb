@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-29 00:29:27" Modified_Date="2022-01-03 13:27:03" Creator="navin" Comments="" ID="1ae7cc37d31f4279f8fb3a14e21d4bdb">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-29 00:29:27" Modified_Date="2022-04-30 13:20:35" Creator="navin" Comments="" ID="a88adfe6e1a2bb6b602cf0b9afc83c03">
   <Library_General_Settings>
     <Package_File_Name>NI_lib_gRPC_Server_and_Client_Template[2]</Package_File_Name>
-    <Library_Version>0.4.5.7</Library_Version>
+    <Library_Version>0.4.7.1</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>..\build</Library_Output_Folder>
@@ -202,6 +202,7 @@ This library also provides a scripting tool to auto generate the server and clie
       <close_labview_before_install>false</close_labview_before_install>
       <restart_labview_after_install>false</restart_labview_after_install>
       <skip_mass_compile_after_install>false</skip_mass_compile_after_install>
+      <install_into_global_environment>false</install_into_global_environment>
     </LabVIEW>
     <VI_Docs>
       <Edit_VI_Description>false</Edit_VI_Description>
