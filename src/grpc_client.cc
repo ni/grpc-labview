@@ -470,7 +470,7 @@ LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(grpc_labview::gRPCid* callId,
         return -1;
     }
     call->Finish();
-    int32_t result;   
+    int32_t result = 0;   
     if (!call->_status.ok())
     {
         result = -(1000 + call->_status.error_code());
