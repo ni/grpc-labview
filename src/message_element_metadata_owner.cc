@@ -78,7 +78,7 @@ namespace grpc_labview {
         {
             return 0;
         }
-        auto multiple = ClusterElementSize(type, repeated);    
+        auto multiple = ClusterElementSize(type, repeated);
         int remainder = abs(clusterOffset) % multiple;
         if (remainder == 0)
         {
@@ -95,7 +95,7 @@ namespace grpc_labview {
     void MessageElementMetadataOwner::RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata)
     {
         std::lock_guard<std::mutex> lock(_mutex);
-        
+
         _registeredMessageMetadata.insert({requestMetadata->messageName, requestMetadata});
     }
 
@@ -118,26 +118,20 @@ namespace grpc_labview {
         if (metadata->clusterSize != 0)
         {
             return;
-        }    
+        }
         int clusterOffset = 0;
         for (auto element: metadata->_elements)
         {
             auto elementType = element->type;
             auto nestedElement = element;
-            while (elementType == LVMessageMetadataType::MessageValue)
-            {
-                auto nestedMetadata = FindMetadata(element->embeddedMessageName);
-                auto nestedElement = nestedMetadata->_elements.front();
-                elementType = nestedElement->type;
-            }    
             clusterOffset = AlignClusterOffset(clusterOffset, element->type, element->isRepeated);
             element->clusterOffset = clusterOffset;
             if (element->type == LVMessageMetadataType::MessageValue)
-            {                
+            {
                 auto nestedMetadata = FindMetadata(element->embeddedMessageName);
                 UpdateMetadataClusterLayout(nestedMetadata);
                 if (element->isRepeated)
-                {                
+                {
                     clusterOffset += ClusterElementSize(element->type, element->isRepeated);
                 }
                 else
