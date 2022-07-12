@@ -101,6 +101,8 @@ namespace grpc_labview
         delete serverStarted;
         if (result == -1)
         {
+            // If we weren't able to start the gRPC server then the _runThread has nothing to do.
+            // So do an immediate join on the thread.
             _runThread->join();
         }
         return result;
