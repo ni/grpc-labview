@@ -99,6 +99,10 @@ namespace grpc_labview
         serverStarted->WaitForComplete();
         auto result = serverStarted->serverStartStatus;
         delete serverStarted;
+        if (result == -1)
+        {
+            _runThread->join();
+        }
         return result;
     }
 
