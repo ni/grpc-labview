@@ -6,6 +6,8 @@
 #include <cluster_copier.h>
 #include <grpcpp/impl/codegen/client_context.h>
 #include <grpcpp/impl/codegen/client_unary_call.h>
+#include <ctime>
+#include <chrono>
 
 namespace grpc_labview
 {
@@ -32,6 +34,17 @@ namespace grpc_labview
             creds = grpc::InsecureChannelCredentials();
         }
         Channel = grpc::CreateChannel(address, creds);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    ClientCall::ClientCall(int32_t timeoutMs)
+    {
+        if (timeoutMs >= 0)
+        {
+            auto deadline = std::chrono::system_clock::now() + std::chrono::milliseconds(timeoutMs);
+            this->_context.set_deadline(deadline);
+        }
     }
 
     //---------------------------------------------------------------------
@@ -166,7 +179,7 @@ LIBRARY_EXPORT int32_t CloseClient(grpc_labview::gRPCid* clientId)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientUnaryCall(grpc_labview::gRPCid* clientId, grpc_labview::MagicCookie* occurrence, const char* methodName, const char* requestMessageName, const char* responseMessageName, int8_t* requestCluster, grpc_labview::gRPCid** callId)
+LIBRARY_EXPORT int32_t ClientUnaryCall(grpc_labview::gRPCid* clientId, grpc_labview::MagicCookie* occurrence, const char* methodName, const char* requestMessageName, const char* responseMessageName, int8_t* requestCluster, grpc_labview::gRPCid** callId, int32_t timeoutMs)
 {
     auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
@@ -184,7 +197,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(grpc_labview::gRPCid* clientId, grpc_labv
         return -3;
     }
 
-    auto clientCall = new grpc_labview::ClientCall();
+    auto clientCall = new grpc_labview::ClientCall(timeoutMs);
     *callId = clientCall;
     clientCall->_client = client;
     clientCall->_methodName = methodName;
@@ -245,7 +258,7 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall(grpc_labview::gRPCid* callId, int
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(grpc_labview::gRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName, grpc_labview::gRPCid** callId)
+LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(grpc_labview::gRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName, grpc_labview::gRPCid** callId, int32_t timeoutMs)
 {
     auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
@@ -263,7 +276,7 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(grpc_labview::gRPCid* clie
         return -3;
     }
 
-    auto clientCall = new grpc_labview::ClientStreamingClientCall();
+    auto clientCall = new grpc_labview::ClientStreamingClientCall(timeoutMs);
     *callId = clientCall;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
@@ -276,7 +289,7 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(grpc_labview::gRPCid* clie
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(grpc_labview::gRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName, int8_t* requestCluster, grpc_labview::gRPCid** callId)
+LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(grpc_labview::gRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName, int8_t* requestCluster, grpc_labview::gRPCid** callId, int32_t timeoutMs)
 {    
     auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
@@ -294,7 +307,7 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(grpc_labview::gRPCid* clie
         return -3;
     }
 
-    auto clientCall = new grpc_labview::ServerStreamingClientCall();
+    auto clientCall = new grpc_labview::ServerStreamingClientCall(timeoutMs);
     *callId = clientCall;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
@@ -309,7 +322,7 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(grpc_labview::gRPCid* clie
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(grpc_labview::gRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName, grpc_labview::gRPCid** callId)
+LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(grpc_labview::gRPCid* clientId, const char* methodName, const char* requestMessageName, const char* responseMessageName, grpc_labview::gRPCid** callId, int32_t timeoutMs)
 {
     auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
@@ -327,7 +340,7 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(grpc_labview::gRPCid* client
         return -3;
     }
 
-    auto clientCall = new grpc_labview::BidiStreamingClientCall();
+    auto clientCall = new grpc_labview::BidiStreamingClientCall(timeoutMs);
     *callId = clientCall;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
@@ -450,8 +463,8 @@ LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpc_labview::gRPCid* c
     }
     auto occurrence = *occurrencePtr;
     call->_runFuture = std::async(
-        std::launch::async, 
-        [call, occurrence]() 
+        std::launch::async,
+        [call, occurrence]()
         {
             call->Finish();
             grpc_labview::SignalOccurrence(occurrence);
