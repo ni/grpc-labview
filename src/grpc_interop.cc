@@ -92,13 +92,16 @@ namespace grpc_labview
     }
 }
 
+int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId);
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t LVCreateServer(grpc_labview::gRPCid** id)
 {
     grpc_labview::InitCallbacks();
     auto server = new grpc_labview::LabVIEWgRPCServer();
-    *id = server;   
+    *id = server;
+    grpc_labview::RegisterCleanupProc(ServerCleanupProc, server);
     return 0;
 }
 
@@ -137,8 +140,15 @@ LIBRARY_EXPORT int32_t LVStopServer(grpc_labview::gRPCid** id)
         return -1;
     }
     server->StopServer();
+
+    grpc_labview::DeregisterCleanupProc(ServerCleanupProc, *id);
     delete server;
     return 0;
+}
+
+int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId)
+{
+    return LVStopServer(&serverId);
 }
 
 //---------------------------------------------------------------------
@@ -255,7 +265,7 @@ LIBRARY_EXPORT int32_t CloseServerEvent(grpc_labview::gRPCid** id)
         return -1;
     }
     data->NotifyComplete();
-    data->_call->Finish();    
+    data->_call->Finish();
     return 0;
 }
 

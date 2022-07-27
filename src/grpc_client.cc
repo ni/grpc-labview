@@ -152,6 +152,8 @@ namespace grpc_labview
     }
 }
 
+int32_t ClientCleanUpProc(grpc_labview::gRPCid* clientId);
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t CreateClient(const char* address, const char* certificatePath, grpc_labview::gRPCid** clientId)
@@ -161,6 +163,7 @@ LIBRARY_EXPORT int32_t CreateClient(const char* address, const char* certificate
     auto client = new grpc_labview::LabVIEWgRPCClient();
     client->Connect(address, certificatePath);
     *clientId = client;
+    grpc_labview::RegisterCleanupProc(ClientCleanUpProc, *clientId);
     return 0;
 }
 
@@ -173,8 +176,24 @@ LIBRARY_EXPORT int32_t CloseClient(grpc_labview::gRPCid* clientId)
     {
         return -1;
     }
+    grpc_labview::DeregisterCleanupProc(ClientCleanUpProc, clientId);
     delete client;
     return 0;
+}
+
+int32_t ClientCleanUpProc(grpc_labview::gRPCid* clientId)
+{
+    auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
+    if (!client)
+    {
+        return -1;
+    }
+
+    for (auto activeclientCall = client->ActiveClientCalls.begin(); activeclientCall != client->ActiveClientCalls.end(); activeclientCall++)
+    {
+        (*activeclientCall)->_context.TryCancel();
+    }
+    return CloseClient(clientId);
 }
 
 //---------------------------------------------------------------------
@@ -216,6 +235,8 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(grpc_labview::gRPCid* clientId, grpc_labv
             grpc_labview::SignalOccurrence(clientCall->_occurrence);
             return 0;
         });
+
+    client->ActiveClientCalls.push_back(clientCall);
     return 0;
 }
 
@@ -245,6 +266,7 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(grpc_labview::gRPCid* callId, in
         {
         }
     }
+    call->_client->ActiveClientCalls.remove(call);
     delete call;
     return result;
 }
@@ -278,12 +300,15 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(grpc_labview::gRPCid* clie
 
     auto clientCall = new grpc_labview::ClientStreamingClientCall(timeoutMs);
     *callId = clientCall;
+    clientCall->_client = client;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::CLIENT_STREAMING);
     auto writer = grpc::internal::ClientWriterFactory<grpc_labview::LVMessage>::Create(client->Channel.get(), method, &clientCall->_context, clientCall->_response.get());
     clientCall->_writer = std::shared_ptr<grpc::ClientWriterInterface<grpc_labview::LVMessage>>(writer);
+
+    client->ActiveClientCalls.push_back(clientCall);
     return 0;    
 }
 
@@ -309,6 +334,7 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(grpc_labview::gRPCid* clie
 
     auto clientCall = new grpc_labview::ServerStreamingClientCall(timeoutMs);
     *callId = clientCall;
+    clientCall->_client = client;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 
@@ -317,6 +343,8 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(grpc_labview::gRPCid* clie
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::SERVER_STREAMING);
     auto reader = grpc::internal::ClientReaderFactory<grpc_labview::LVMessage>::Create<grpc_labview::LVMessage>(client->Channel.get(), method, &clientCall->_context, *clientCall->_request.get());
     clientCall->_reader = std::shared_ptr<grpc::ClientReader<grpc_labview::LVMessage>>(reader);
+
+    client->ActiveClientCalls.push_back(clientCall);
     return 0;    
 }
 
@@ -342,13 +370,16 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(grpc_labview::gRPCid* client
 
     auto clientCall = new grpc_labview::BidiStreamingClientCall(timeoutMs);
     *callId = clientCall;
+    clientCall->_client = client;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::BIDI_STREAMING);
     auto readerWriter = grpc::internal::ClientReaderWriterFactory<grpc_labview::LVMessage, grpc_labview::LVMessage>::Create(client->Channel.get(), method, &clientCall->_context);
     clientCall->_readerWriter = std::shared_ptr<grpc::ClientReaderWriterInterface<grpc_labview::LVMessage, grpc_labview::LVMessage>>(readerWriter);
-    return 0;    
+
+    client->ActiveClientCalls.push_back(clientCall);
+    return 0;
 }
 
 //---------------------------------------------------------------------
@@ -448,6 +479,8 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(grpc_labview::gRP
         {
         }
     }
+
+    call->_client->ActiveClientCalls.remove(call);
     delete call;
     return result;
 }
@@ -495,6 +528,8 @@ LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(grpc_labview::gRPCid* callId,
         {
         }
     }
+
+    call->_client->ActiveClientCalls.remove(call);
     delete call;
     return result;
 }

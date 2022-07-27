@@ -9,17 +9,22 @@
 #include <dlfcn.h>
 #endif
 
+static int kCleanOnRemove = 0;
+static int kCleanOnIdle = 2;
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 typedef int (*NumericArrayResize_T)(int32_t, int32_t, void* handle, size_t size);
 typedef int (*PostLVUserEvent_T)(grpc_labview::LVUserEventRef ref, void *data);
 typedef int (*Occur_T)(grpc_labview::MagicCookie occurrence);
+typedef int32_t(*RTSetCleanupProc_T)(grpc_labview::CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* data, int32_t mode);
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 static NumericArrayResize_T NumericArrayResizeImp = nullptr;
 static PostLVUserEvent_T PostLVUserEvent = nullptr;
 static Occur_T Occur = nullptr;
+static RTSetCleanupProc_T RTSetCleanupProc = nullptr;
 
 namespace grpc_labview
 {
@@ -47,6 +52,7 @@ namespace grpc_labview
         NumericArrayResizeImp = (NumericArrayResize_T)GetProcAddress(lvModule, "NumericArrayResize");
         PostLVUserEvent = (PostLVUserEvent_T)GetProcAddress(lvModule, "PostLVUserEvent");
         Occur = (Occur_T)GetProcAddress(lvModule, "Occur");
+        RTSetCleanupProc = (RTSetCleanupProc_T)GetProcAddress(lvModule, "RTSetCleanupProc");
     }
 
 #else
@@ -74,6 +80,7 @@ namespace grpc_labview
             NumericArrayResizeImp = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
             PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
             Occur = (Occur_T)dlsym(lvModule, "Occur");
+            RTSetCleanupProc = (RTSetCleanupProc_T)dlsym(lvModule, "RTSetCleanupProc");
         }
     }
 
@@ -124,5 +131,19 @@ namespace grpc_labview
 
         std::string result(chars, count);
         return result;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, gRPCid* data)
+    {
+        return RTSetCleanupProc(cleanUpProc, data, kCleanOnIdle);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, gRPCid* data)
+    {
+        return RTSetCleanupProc(cleanUpProc, data, kCleanOnRemove);
     }
 }
