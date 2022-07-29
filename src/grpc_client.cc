@@ -189,9 +189,9 @@ int32_t ClientCleanUpProc(grpc_labview::gRPCid* clientId)
         return -1;
     }
 
-    for (auto activeclientCall = client->ActiveClientCalls.begin(); activeclientCall != client->ActiveClientCalls.end(); activeclientCall++)
+    for (auto activeClientCall = client->ActiveClientCalls.begin(); activeClientCall != client->ActiveClientCalls.end(); activeClientCall++)
     {
-        (*activeclientCall)->_context.TryCancel();
+        (*activeClientCall)->_context.TryCancel();
     }
     return CloseClient(clientId);
 }

@@ -9,7 +9,10 @@
 #include <dlfcn.h>
 #endif
 
+// Value passed to the RTSetCleanupProc to remove the clean up proc for the VI.
 static int kCleanOnRemove = 0;
+// Value passed to the RTSetCleanUpProc to register a cleanup proc for a VI which
+// gets called when the VI state changes to Idle.
 static int kCleanOnIdle = 2;
 
 //---------------------------------------------------------------------
@@ -17,7 +20,7 @@ static int kCleanOnIdle = 2;
 typedef int (*NumericArrayResize_T)(int32_t, int32_t, void* handle, size_t size);
 typedef int (*PostLVUserEvent_T)(grpc_labview::LVUserEventRef ref, void *data);
 typedef int (*Occur_T)(grpc_labview::MagicCookie occurrence);
-typedef int32_t(*RTSetCleanupProc_T)(grpc_labview::CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* data, int32_t mode);
+typedef int32_t(*RTSetCleanupProc_T)(grpc_labview::CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id, int32_t mode);
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -135,15 +138,15 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, gRPCid* data)
+    int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, gRPCid* id)
     {
-        return RTSetCleanupProc(cleanUpProc, data, kCleanOnIdle);
+        return RTSetCleanupProc(cleanUpProc, id, kCleanOnIdle);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, gRPCid* data)
+    int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, gRPCid* id)
     {
-        return RTSetCleanupProc(cleanUpProc, data, kCleanOnRemove);
+        return RTSetCleanupProc(cleanUpProc, id, kCleanOnRemove);
     }
 }
