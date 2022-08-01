@@ -52,6 +52,7 @@ namespace grpc_labview
     typedef int32_t MagicCookie;
     typedef MagicCookie LVRefNum;
     typedef MagicCookie LVUserEventRef;
+    typedef int32_t(*CleanupProcPtr)(gRPCid* id);
 
     struct LStr {
         int32_t cnt; /* number of bytes that follow */
@@ -119,4 +120,6 @@ namespace grpc_labview
     int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size);
     int PostUserEvent(LVUserEventRef ref, void *data);
     int SignalOccurrence(MagicCookie occurrence);
+    int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
+    int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
 }
