@@ -10,12 +10,14 @@
 #include <lv_message.h>
 #include <grpcpp/impl/codegen/sync_stream.h>
 #include <future>
+#include <list>
 
 namespace grpc_labview 
 {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     class LVMessage;
+    class ClientCall;
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -27,6 +29,7 @@ namespace grpc_labview
 
     public:
         std::shared_ptr<grpc::Channel> Channel;
+        std::list<ClientCall*> ActiveClientCalls;
     };
 
     //---------------------------------------------------------------------
