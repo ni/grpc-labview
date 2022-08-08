@@ -1,16 +1,18 @@
-# Building the Scripting and Server binaries
+# Build Instructions
 
-This document covers building the binaries for various operation systems.
+## Building the Scripting and Server binaries
+
+This section covers building the binaries for various operation systems.
 You only need to build the binaries if you wish to contribute to the C++ source or if you need binaries for a OS that is not supported by default.
 
-## Build Status
+### Build Status
 ![Linux Build](https://github.com/ni/grpc-labview/workflows/Linux%20Build/badge.svg)
 ![Windows x64 build](https://github.com/ni/grpc-labview/workflows/Windows%20x64%20build/badge.svg)
 ![Windows x86 build](https://github.com/ni/grpc-labview/workflows/Windows%20x86%20build/badge.svg)
 
-## Building on Windows
+### Building on Windows
 
-### Prerequisites
+#### Prerequisites
 To prepare for cmake + Microsoft Visual C++ compiler build
 - Install LabVIEW 2019
 - Install Visual Studio 2015, 2017, or 2019 (Visual C++ compiler will be used).
@@ -18,7 +20,7 @@ To prepare for cmake + Microsoft Visual C++ compiler build
 - Install [CMake](https://cmake.org/download/).
 
 
-### Building 64-bit
+#### Building 64-bit
 
 **Launch "x64 Native Tools Command Prompt for Visual Studio"**
 
@@ -45,7 +47,7 @@ Build Release
 > cmake ..
 > cmake --build . --config Release
 ```
-### Building 32-bit
+#### Building 32-bit
 
 **Launch "x86 Native Tools Command Prompt for Visual Studio"**
 
@@ -73,7 +75,7 @@ Build Release
 > cmake --build . --config Release
 ```
 
-## Building on Linux
+### Building on Linux
 
 Download the repo and update submodules, this will pull the gRPC components and all dependencies
 
@@ -101,7 +103,7 @@ Build Release
 > make
 ```
 
-## Building on Linux RT
+### Building on Linux RT
 
 Install required packages not installed by default
 
@@ -140,3 +142,51 @@ Build Release
 > make
 ```
 
+## Building the VIP files for LV Support, LV Servicer and Client and Server templates
+
+This section covers building the VIP files from the labview source so that you can install them for a supported version of LabVIEW (2019 or Higher).
+
+You would need to build the VIP files if you make changes to the LabVIEW pieces of the grpc-labview repository.
+
+** Building of VIP files using the instructions below is only supported on Windows **
+
+### Prerequisites
+
+- Install LabVIEW 2019 32 bit
+- Install JKI VI Package Manager. You would need Community or Pro edition to build VIP files.
+- Install VI Package Manager API for LabVIEW. (Download [location](https://www.ni.com/en-in/support/downloads/tools-network/download.vi-package-manager-api.html#374501))
+- Install Python 3.7 or Higher
+
+** Apart from these you would need the Prerequisites for building the binaries as well if you use the --buildcpp option described below. **
+
+### Building VIP files
+
+Download the repo. Run the command below to build the VIP files.
+
+```
+> python build-it\build.py --target <BUILD_TARGET> [--pathToBinaries <PATH_TO_PREBUILT_BINARIES>] [--buildcpp]
+```
+
+The accepted vaues for BUILD_TARGET are:
+- Win32
+- Win64
+- All
+
+If you choose to build for Win32 or Win64 target you can specify the *--buildcpp* option to indicate that you want to build the C++ binaries first and then use them to build VIP files. If you don't specify this option it is assumed that the required binaries are already built accoriding to the steps described above.
+
+If you choose to build "All" target then you need to specify a folder where we can find the pre built binaries for all the supported targets using the *--pathToBinaries** option. We expect the folder specified to have the following structure.
+
+```
+- <TOP_LEVEL_FOLDER>
+    - LabVIEW gRPC Server
+        - Libraries
+            - Win32
+            - Win64
+            - Linux
+            - LinuxRT
+    - LabVIEW gRPC Generator
+        - Libraries
+            - Win32
+            - Win64
+            - Linux
+```
