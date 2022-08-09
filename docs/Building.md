@@ -153,6 +153,7 @@ You would need to build the VIP files if you make changes to the LabVIEW pieces 
 ### Prerequisites
 
 - Install LabVIEW 2019 32 bit
+- Install LabVIEW CLI
 - Install JKI VI Package Manager. You would need Community or Pro edition to build VIP files.
 - Install VI Package Manager API for LabVIEW. (Download [location](https://www.ni.com/en-in/support/downloads/tools-network/download.vi-package-manager-api.html#374501))
 - Install Python 3.7 or Higher
