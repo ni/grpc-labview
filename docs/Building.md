@@ -175,7 +175,7 @@ The accepted vaues for BUILD_TARGET are:
 
 If you choose to build for Win32 or Win64 target you can specify the *--buildcpp* option to indicate that you want to build the C++ binaries first and then use them to build VIP files. If you don't specify this option it is assumed that the required binaries are already built accoriding to the steps described above.
 
-If you choose to build "All" target then you need to specify a folder where we can find the pre built binaries for all the supported targets using the *--pathToBinaries** option. We expect the folder specified to have the following structure.
+If you choose to build "All" target then you need to specify a folder where we can find the pre built binaries for all the supported targets using the *--pathToBinaries** option. The --buildcpp option would be ignored in this mode even if specified.  We expect the folder specified to have the following structure.
 
 ```
 - <TOP_LEVEL_FOLDER>
