@@ -70,18 +70,10 @@ namespace grpc_labview
             return;
         }
 
-        // try to load liblvrt.so
-        auto lvModule = dlopen("liblvrt.so", RTLD_NOLOAD);
-        if (lvModule != nullptr)
-        {
-            // if loading liblvrt.so fails, use RTLD_DEFAULT and assume these export symbols are already in memory
-            lvModule = RTLD_DEFAULT;
-        }
-
-        NumericArrayResizeImp = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
-        PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
-        Occur = (Occur_T)dlsym(lvModule, "Occur");
-        RTSetCleanupProc = (RTSetCleanupProc_T)dlsym(lvModule, "RTSetCleanupProc");
+        NumericArrayResizeImp = (NumericArrayResize_T)dlsym(RTLD_DEFAULT, "NumericArrayResize");
+        PostLVUserEvent = (PostLVUserEvent_T)dlsym(RTLD_DEFAULT, "PostLVUserEvent");
+        Occur = (Occur_T)dlsym(RTLD_DEFAULT, "Occur");
+        RTSetCleanupProc = (RTSetCleanupProc_T)dlsym(RTLD_DEFAULT, "RTSetCleanupProc");
 
         if (NumericArrayResizeImp == nullptr ||
             PostLVUserEvent == nullptr ||
