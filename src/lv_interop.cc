@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstring>
 #include <memory>
+#include <grpcpp/grpcpp.h>
 
 #ifndef _WIN32
 #include <dlfcn.h>
@@ -69,21 +70,25 @@ namespace grpc_labview
             return;
         }
 
-        auto lvModule = dlopen(nullptr, RTLD_LAZY);
+        // try to load liblvrt.so
+        auto lvModule = dlopen("liblvrt.so", RTLD_NOLOAD);
         if (lvModule != nullptr)
         {
-            NumericArrayResizeImp = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
-            PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
-            Occur = (Occur_T)dlsym(lvModule, "Occur");
+            // if loading liblvrt.so fails, use RTLD_DEFAULT and assume these export symbols are already in memory
+            lvModule = RTLD_DEFAULT;
         }
-        if (NumericArrayResize == nullptr)
+
+        NumericArrayResizeImp = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
+        PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
+        Occur = (Occur_T)dlsym(lvModule, "Occur");
+        RTSetCleanupProc = (RTSetCleanupProc_T)dlsym(lvModule, "RTSetCleanupProc");
+
+        if (NumericArrayResizeImp == nullptr ||
+            PostLVUserEvent == nullptr ||
+            Occur == nullptr ||
+            RTSetCleanupProc == nullptr)
         {
-            std::cout << "Loading LabVIEW Runtime engine!" << std::endl;
-            lvModule = dlopen("liblvrt.so", RTLD_NOW);
-            NumericArrayResizeImp = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
-            PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
-            Occur = (Occur_T)dlsym(lvModule, "Occur");
-            RTSetCleanupProc = (RTSetCleanupProc_T)dlsym(lvModule, "RTSetCleanupProc");
+            exit(grpc::StatusCode::INTERNAL);
         }
     }
 
