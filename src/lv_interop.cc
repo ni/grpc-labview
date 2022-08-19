@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstring>
 #include <memory>
+#include <grpcpp/grpcpp.h>
 
 #ifndef _WIN32
 #include <dlfcn.h>
@@ -69,21 +70,17 @@ namespace grpc_labview
             return;
         }
 
-        auto lvModule = dlopen(nullptr, RTLD_LAZY);
-        if (lvModule != nullptr)
+        NumericArrayResizeImp = (NumericArrayResize_T)dlsym(RTLD_DEFAULT, "NumericArrayResize");
+        PostLVUserEvent = (PostLVUserEvent_T)dlsym(RTLD_DEFAULT, "PostLVUserEvent");
+        Occur = (Occur_T)dlsym(RTLD_DEFAULT, "Occur");
+        RTSetCleanupProc = (RTSetCleanupProc_T)dlsym(RTLD_DEFAULT, "RTSetCleanupProc");
+
+        if (NumericArrayResizeImp == nullptr ||
+            PostLVUserEvent == nullptr ||
+            Occur == nullptr ||
+            RTSetCleanupProc == nullptr)
         {
-            NumericArrayResizeImp = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
-            PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
-            Occur = (Occur_T)dlsym(lvModule, "Occur");
-        }
-        if (NumericArrayResize == nullptr)
-        {
-            std::cout << "Loading LabVIEW Runtime engine!" << std::endl;
-            lvModule = dlopen("liblvrt.so", RTLD_NOW);
-            NumericArrayResizeImp = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
-            PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
-            Occur = (Occur_T)dlsym(lvModule, "Occur");
-            RTSetCleanupProc = (RTSetCleanupProc_T)dlsym(lvModule, "RTSetCleanupProc");
+            exit(grpc::StatusCode::INTERNAL);
         }
     }
 
