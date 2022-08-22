@@ -61,6 +61,13 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    void ClientCall::Cancel()
+    {
+        _context.TryCancel();
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     ServerStreamingClientCall::~ServerStreamingClientCall()
     {
     }
@@ -517,6 +524,34 @@ LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(grpc_labview::gRPCid* callId,
     }
     call->Finish();
     int32_t result = 0;   
+    if (!call->_status.ok())
+    {
+        result = -(1000 + call->_status.error_code());
+        if (errorMessage != nullptr)
+        {
+            grpc_labview::SetLVString(errorMessage, call->_status.error_message());
+        }
+        if (errorDetailsCluster != nullptr)
+        {
+        }
+    }
+
+    call->_client->ActiveClientCalls.remove(call);
+    delete call;
+    return result;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t ClientCancelStreamingCall(grpc_labview::gRPCid* callId, grpc_labview::LStrHandle* errorMessage, grpc_labview::AnyCluster* errorDetailsCluster)
+{
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
+    if (!call)
+    {
+        return -1;
+    }
+    call->Cancel();
+    int32_t result = 0;
     if (!call->_status.ok())
     {
         result = -(1000 + call->_status.error_code());
