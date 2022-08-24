@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <string>
+#include <memory>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -40,10 +41,9 @@ namespace grpc_labview
         }
 
         bool IsValid() { return true; }
-
+        virtual ~gRPCid() { }
     protected:
         gRPCid() { }
-        virtual ~gRPCid() { }
     };
 
     int AlignClusterOffset(int clusterOffset, int alignmentRequirement);
