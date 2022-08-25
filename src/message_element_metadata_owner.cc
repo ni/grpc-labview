@@ -69,6 +69,16 @@ namespace grpc_labview {
         return 0;
     }
 
+    int AlignClusterOffset(int clusterOffset, int alignmentRequirement)
+    {
+        int remainder = abs(clusterOffset) % alignmentRequirement;
+        if (remainder == 0)
+        {
+            return clusterOffset;
+        }
+        return clusterOffset + alignmentRequirement - remainder;
+    }
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     int AlignClusterOffset(int clusterOffset, LVMessageMetadataType type, bool repeated)
@@ -78,13 +88,8 @@ namespace grpc_labview {
         {
             return 0;
         }
-        auto multiple = ClusterElementSize(type, repeated);    
-        int remainder = abs(clusterOffset) % multiple;
-        if (remainder == 0)
-        {
-            return clusterOffset;
-        }
-        return clusterOffset + multiple - remainder;
+        auto multiple = ClusterElementSize(type, repeated);
+        return AlignClusterOffset(clusterOffset, multiple);
     #else
         return clusterOffset;
     #endif
@@ -120,37 +125,58 @@ namespace grpc_labview {
             return;
         }    
         int clusterOffset = 0;
+        int maxAlignmentRequirement = 0;
         for (auto element: metadata->_elements)
         {
-            auto elementType = element->type;
-            auto nestedElement = element;
-            while (elementType == LVMessageMetadataType::MessageValue)
+            if (element->type == LVMessageMetadataType::MessageValue)
             {
                 auto nestedMetadata = FindMetadata(element->embeddedMessageName);
-                auto nestedElement = nestedMetadata->_elements.front();
-                elementType = nestedElement->type;
-            }    
-            clusterOffset = AlignClusterOffset(clusterOffset, element->type, element->isRepeated);
-            element->clusterOffset = clusterOffset;
-            if (element->type == LVMessageMetadataType::MessageValue)
-            {                
-                auto nestedMetadata = FindMetadata(element->embeddedMessageName);
                 UpdateMetadataClusterLayout(nestedMetadata);
+                int alignmentRequirement = 0;
+                int elementSize = 0;
                 if (element->isRepeated)
-                {                
-                    clusterOffset += ClusterElementSize(element->type, element->isRepeated);
+                {
+                    elementSize = ClusterElementSize(element->type, element->isRepeated);
+                    // This should be the alignmentRequirement of the LV1DArray struct which should be 4 (contains int32 and int8)
+                    alignmentRequirement = 4;
                 }
                 else
                 {
-                    clusterOffset += nestedMetadata->clusterSize;
+                    alignmentRequirement = nestedMetadata->alignmentRequirement;
+                    elementSize = nestedMetadata->clusterSize;
+                }
+                clusterOffset = AlignClusterOffset(clusterOffset, alignmentRequirement);
+                element->clusterOffset = clusterOffset;
+                clusterOffset += elementSize;
+                if (maxAlignmentRequirement < alignmentRequirement)
+                {
+                    maxAlignmentRequirement = alignmentRequirement;
                 }
             }
             else
             {
-                clusterOffset += ClusterElementSize(element->type, element->isRepeated);
+                clusterOffset = AlignClusterOffset(clusterOffset, element->type, element->isRepeated);
+                element->clusterOffset = clusterOffset;
+                int alignmentRequirement = 0;
+                auto elementSize = ClusterElementSize(element->type, element->isRepeated);
+                clusterOffset += elementSize;
+                if (element->isRepeated)
+                {
+                    // This should be the alignmentRequirement of the LV1DArray struct which should be 4 (contains int32 and int8)
+                    alignmentRequirement = 4;
+                }
+                else
+                {
+                    alignmentRequirement = elementSize;
+                }
+                if (maxAlignmentRequirement < alignmentRequirement)
+                {
+                    maxAlignmentRequirement = alignmentRequirement;
+                }
             }
         }
-        metadata->clusterSize = AlignClusterOffset(clusterOffset, LVMessageMetadataType::StringValue, true);
+        metadata->alignmentRequirement = maxAlignmentRequirement;
+        metadata->clusterSize = AlignClusterOffset(clusterOffset, maxAlignmentRequirement);
     }
 
     //---------------------------------------------------------------------
