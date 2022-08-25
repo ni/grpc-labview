@@ -40,6 +40,7 @@ namespace grpc_labview
         ClientCall(int32_t timeoutMs);
         virtual ~ClientCall();
         virtual void Finish();
+        void Cancel();
         
     public:
         grpc_labview::LabVIEWgRPCClient* _client;
