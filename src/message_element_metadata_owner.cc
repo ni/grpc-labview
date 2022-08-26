@@ -136,9 +136,7 @@ namespace grpc_labview {
                 int elementSize = 0;
                 if (element->isRepeated)
                 {
-                    elementSize = ClusterElementSize(element->type, element->isRepeated);
-                    // This should be the alignmentRequirement of the LV1DArray struct which should be 4 (contains int32 and int8)
-                    alignmentRequirement = 4;
+                    alignmentRequirement = elementSize = ClusterElementSize(element->type, element->isRepeated);
                 }
                 else
                 {
@@ -157,21 +155,11 @@ namespace grpc_labview {
             {
                 clusterOffset = AlignClusterOffset(clusterOffset, element->type, element->isRepeated);
                 element->clusterOffset = clusterOffset;
-                int alignmentRequirement = 0;
-                auto elementSize = ClusterElementSize(element->type, element->isRepeated);
+                int elementSize = ClusterElementSize(element->type, element->isRepeated);
                 clusterOffset += elementSize;
-                if (element->isRepeated)
+                if (maxAlignmentRequirement < elementSize)
                 {
-                    // This should be the alignmentRequirement of the LV1DArray struct which should be 4 (contains int32 and int8)
-                    alignmentRequirement = 4;
-                }
-                else
-                {
-                    alignmentRequirement = elementSize;
-                }
-                if (maxAlignmentRequirement < alignmentRequirement)
-                {
-                    maxAlignmentRequirement = alignmentRequirement;
+                    maxAlignmentRequirement = elementSize;
                 }
             }
         }
