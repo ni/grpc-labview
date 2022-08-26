@@ -93,6 +93,20 @@ namespace grpc_labview
             return (T*)(rawBytes + byteOffset);
     #endif
         }
+
+        void* bytes(int byteOffset, int byteAlignment)
+        {
+#ifndef _PS_4
+            int reminder = 4 % byteAlignment;
+            if (reminder == 0)
+            {
+                return (void*)(rawBytes + byteOffset);
+            }
+            return (void*)(rawBytes + byteAlignment - reminder + byteOffset); // 8-byte aligned data
+#else
+            return (void*)(rawBytes + byteOffset);
+#endif
+        }
     };
 
     using LV1DArrayPtr = LV1DArray*;
