@@ -35,7 +35,7 @@ jobs:
     - name: Tar Build Artifacts
       if: ${{ github.ref == 'refs/heads/master' }}
       run: >-
-        tar -czvf labview-grpc-server-windows-x86.tar.gz ${GITHUB_WORKSPACE}/cmake/build/Release/labview_grpc_server.dll
+        tar -czvf labview-grpc-server-windows-x86.tar.gz ${{runner.workspace}}\grpc-labview\build\Release\labview_grpc_server.dll
     
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v2
