@@ -667,7 +667,7 @@ namespace grpc_labview {
 
                     for (int x = 0; x < count; ++x)
                     {
-                        auto data = (LVCluster**)(*array)->bytes(nestedMetadata->clusterSize * x, nestedMetadata->alignmentRequirement);
+                        auto data = (LVCluster*)(*array)->bytes(nestedMetadata->clusterSize * x, nestedMetadata->alignmentRequirement);
                         auto nested = std::make_shared<LVMessage>(nestedMetadata);
                         repeatedValue->_value.push_back(nested);
                         CopyFromCluster(*nested, (int8_t*)data);

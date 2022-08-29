@@ -146,4 +146,18 @@ namespace grpc_labview
     {
         return RTSetCleanupProc(cleanUpProc, id, kCleanOnRemove);
     }
+
+    int AlignClusterOffset(int clusterOffset, int alignmentRequirement)
+    {
+#ifndef _PS_4
+        int remainder = abs(clusterOffset) % alignmentRequirement;
+        if (remainder == 0)
+        {
+            return clusterOffset;
+        }
+        return clusterOffset + alignmentRequirement - remainder;
+#else
+        return clusterOffset;
+#endif
+    }
 }

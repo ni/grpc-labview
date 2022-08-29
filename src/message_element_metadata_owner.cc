@@ -20,32 +20,9 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     int ClusterElementSize(LVMessageMetadataType type, bool repeated)
     {
-    #ifndef _PS_4
         if (repeated)
         {
-            return 8;
-        }
-        switch (type)
-        {
-        case LVMessageMetadataType::BoolValue:
-            return 1;
-        case LVMessageMetadataType::EnumValue:
-        case LVMessageMetadataType::Int32Value:
-        case LVMessageMetadataType::UInt32Value:
-        case LVMessageMetadataType::FloatValue:
-            return 4;
-        case LVMessageMetadataType::Int64Value:
-        case LVMessageMetadataType::UInt64Value:
-        case LVMessageMetadataType::DoubleValue:
-        case LVMessageMetadataType::StringValue:
-        case LVMessageMetadataType::BytesValue:
-        case LVMessageMetadataType::MessageValue:
-            return 8;
-        }
-    #else
-        if (repeated)
-        {
-            return 4;
+            return sizeof(void*);
         }
         switch (type)
         {
@@ -56,43 +33,28 @@ namespace grpc_labview {
         case LVMessageMetadataType::EnumValue:
         case LVMessageMetadataType::FloatValue:
             return 4;
-        case LVMessageMetadataType::StringValue:
-        case LVMessageMetadataType::BytesValue:
-        case LVMessageMetadataType::MessageValue:
-            return 4;
         case LVMessageMetadataType::Int64Value:
         case LVMessageMetadataType::UInt64Value:
         case LVMessageMetadataType::DoubleValue:
             return 8;
+        case LVMessageMetadataType::StringValue:
+        case LVMessageMetadataType::BytesValue:
+        case LVMessageMetadataType::MessageValue:
+            return sizeof(void*);
         }
-    #endif
         return 0;
-    }
-
-    int AlignClusterOffset(int clusterOffset, int alignmentRequirement)
-    {
-        int remainder = abs(clusterOffset) % alignmentRequirement;
-        if (remainder == 0)
-        {
-            return clusterOffset;
-        }
-        return clusterOffset + alignmentRequirement - remainder;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     int AlignClusterOffset(int clusterOffset, LVMessageMetadataType type, bool repeated)
     {
-    #ifndef _PS_4
         if (clusterOffset == 0)
         {
             return 0;
         }
         auto multiple = ClusterElementSize(type, repeated);
         return AlignClusterOffset(clusterOffset, multiple);
-    #else
-        return clusterOffset;
-    #endif
     }
 
     //---------------------------------------------------------------------

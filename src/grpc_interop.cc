@@ -47,7 +47,8 @@ namespace grpc_labview
         int clusterOffset = 0;
         if (lvMetadata->elements != nullptr)
         {
-            auto lvElement = (*lvMetadata->elements)->bytes<LVMesageElementMetadata>();
+            // byteAlignment for LVMesageElementMetadata would be the size of its largest element which is a LStrHandle
+            auto lvElement = (LVMesageElementMetadata*)(*lvMetadata->elements)->bytes(0, sizeof(LStrHandle));
             for (int x = 0; x < (*lvMetadata->elements)->cnt; ++x, ++lvElement)
             {
                 auto element = std::make_shared<MessageElementMetadata>(metadataOwner);
@@ -75,7 +76,8 @@ namespace grpc_labview
         int clusterOffset = 0;
         if (lvMetadata->elements != nullptr)
         {
-            auto lvElement = (*lvMetadata->elements)->bytes<LVMesageElementMetadata>();
+            // byteAlignment for LVMesageElementMetadata would be the size of its largest element which is a LStrHandle
+            auto lvElement = (LVMesageElementMetadata*)(*lvMetadata->elements)->bytes(0, sizeof(LStrHandle));
             for (int x = 0; x < (*lvMetadata->elements)->cnt; ++x, ++lvElement)
             {
                 auto element = std::make_shared<MessageElementMetadata>(metadataOwner);
