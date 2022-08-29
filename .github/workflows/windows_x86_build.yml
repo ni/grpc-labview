@@ -1,6 +1,8 @@
 name: Windows x86 build
 
-on: [push]
+on:
+  workflow_call:
+  workflow_dispatch:
 
 env:
   BUILD_TYPE: Release

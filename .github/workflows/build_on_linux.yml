@@ -1,6 +1,8 @@
 name: Linux Build
 
-on: [push]
+on:
+  workflow_call:
+  workflow_dispatch:
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
