@@ -1,6 +1,8 @@
 name: RT Build
 
-on: [push]
+on:
+  workflow_call:
+  workflow_dispatch:
 
 env:
   CMAKE_VERSION: 3.18.3
