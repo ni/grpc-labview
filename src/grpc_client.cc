@@ -168,6 +168,7 @@ LIBRARY_EXPORT int32_t CreateClient(const char* address, const char* certificate
     grpc_labview::InitCallbacks();
 
     auto client = new grpc_labview::LabVIEWgRPCClient();
+    grpc_labview::gClientTokenManager.RegisterPointer(client);
     client->Connect(address, certificatePath);
     *clientId = grpc_labview::gClientTokenManager.RegisterPointer(client);
     grpc_labview::RegisterCleanupProc(ClientCleanUpProc, client);
