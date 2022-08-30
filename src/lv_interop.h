@@ -46,6 +46,8 @@ namespace grpc_labview
         virtual ~gRPCid() { }
     };
 
+    int AlignClusterOffset(int clusterOffset, int alignmentRequirement);
+
     //---------------------------------------------------------------------
     // LabVIEW definitions
     //---------------------------------------------------------------------
@@ -69,29 +71,20 @@ namespace grpc_labview
         template<typename T>
         T* bytes()
         {
-    #ifndef _PS_4
-            if (sizeof(T) < 8)
-            {
-                return (T*)rawBytes;
-            }
-            return (T*)(rawBytes + 4); // 8-byte aligned data
-    #else
-            return (T*)rawBytes;
-    #endif
+            static_assert(!std::is_class<T>::value, "T must not be a struct/class type.");
+            return (T*)(bytes(0, sizeof(T)));
         }
 
         template<typename T>
         T* bytes(int byteOffset)
         {
-    #ifndef _PS_4
-            if (sizeof(T) < 8)
-            {
-                return (T*)(rawBytes + byteOffset);
-            }
-            return (T*)(rawBytes + 4 + byteOffset); // 8-byte aligned data
-    #else
-            return (T*)(rawBytes + byteOffset);
-    #endif
+            static_assert(!std::is_class<T>::value, "T must not be a struct/class type.");
+            return (T*)(bytes(byteOffset, sizeof(T)));
+        }
+
+        void* bytes(int byteOffset, int byteAlignment)
+        {
+            return (void*)(rawBytes + AlignClusterOffset(4, byteAlignment) - 4 + byteOffset);
         }
     };
 
