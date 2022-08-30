@@ -191,7 +191,7 @@ namespace grpc_labview
                 _requestDataReady = true;
 
                 _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
-                gClientTokenManager.RegisterPointer(_methodData.get());
+                gPointerManager.RegisterPointer(_methodData.get());
                 _server->SendEvent(name, static_cast<gRPCid*>(_methodData.get()));
             }
             else

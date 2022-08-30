@@ -26,7 +26,7 @@
 namespace grpc_labview 
 {
     class gRPCid;
-    extern PointerManager<gRPCid> gClientTokenManager;
+    extern PointerManager<gRPCid> gPointerManager;
 
     //---------------------------------------------------------------------
     // LabVIEW gRPC definitions
@@ -40,7 +40,7 @@ namespace grpc_labview
         template <typename T>
         std::shared_ptr<T> CastTo()
         {
-            return gClientTokenManager.TryCastTo<T>(this);
+            return gPointerManager.TryCastTo<T>(this);
         }
 
         virtual ~gRPCid() { }

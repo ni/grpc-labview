@@ -168,9 +168,9 @@ LIBRARY_EXPORT int32_t CreateClient(const char* address, const char* certificate
     grpc_labview::InitCallbacks();
 
     auto client = new grpc_labview::LabVIEWgRPCClient();
-    grpc_labview::gClientTokenManager.RegisterPointer(client);
+    grpc_labview::gPointerManager.RegisterPointer(client);
     client->Connect(address, certificatePath);
-    *clientId = grpc_labview::gClientTokenManager.RegisterPointer(client);
+    *clientId = grpc_labview::gPointerManager.RegisterPointer(client);
     grpc_labview::RegisterCleanupProc(ClientCleanUpProc, client);
     return 0;
 }
@@ -197,7 +197,7 @@ LIBRARY_EXPORT int32_t CloseClient(grpc_labview::gRPCid* clientId)
     }
 
     CloseClient(client.get());
-    grpc_labview::gClientTokenManager.UnregisterPointer(clientId);
+    grpc_labview::gPointerManager.UnregisterPointer(clientId);
     return 0;
 }
 
@@ -245,7 +245,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     }
 
     auto clientCall = new grpc_labview::ClientCall(timeoutMs);
-    *callId = grpc_labview::gClientTokenManager.RegisterPointer(clientCall);
+    *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client.get();
     clientCall->_methodName = methodName;
     clientCall->_occurrence = *occurrence;
@@ -336,7 +336,7 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(
     }
 
     auto clientCall = new grpc_labview::ClientStreamingClientCall(timeoutMs);
-    *callId = grpc_labview::gClientTokenManager.RegisterPointer(clientCall);
+    *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client.get();
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
@@ -377,7 +377,7 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
     }
 
     auto clientCall = new grpc_labview::ServerStreamingClientCall(timeoutMs);
-    *callId = grpc_labview::gClientTokenManager.RegisterPointer(clientCall);
+    *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client.get();
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
@@ -419,7 +419,7 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(
     }
 
     auto clientCall = new grpc_labview::BidiStreamingClientCall(timeoutMs);
-    *callId = grpc_labview::gClientTokenManager.RegisterPointer(clientCall);
+    *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client.get();
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
@@ -535,7 +535,7 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
     }
 
     call->_client->ActiveClientCalls.remove(call.get());
-    grpc_labview::gClientTokenManager.UnregisterPointer(callId);
+    grpc_labview::gPointerManager.UnregisterPointer(callId);
     return result;
 }
 
@@ -575,7 +575,7 @@ LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(
 
     // We've already got a shared_ptr for this token, so calling DestroyToken now
     // will just prevent any other API calls from grabbing the pointer.
-    grpc_labview::gClientTokenManager.UnregisterPointer(callId);
+    grpc_labview::gPointerManager.UnregisterPointer(callId);
 
     call->Finish();
     int32_t result = 0;   
@@ -610,7 +610,7 @@ LIBRARY_EXPORT int32_t ClientCancelCall(
 
     // We've already got a shared_ptr for this token, so calling DestroyToken now
     // will just prevent any other API calls from grabbing the pointer.
-    grpc_labview::gClientTokenManager.UnregisterPointer(callId);
+    grpc_labview::gPointerManager.UnregisterPointer(callId);
     call->Cancel();
 
     int32_t result = 0;

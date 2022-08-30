@@ -102,7 +102,7 @@ LIBRARY_EXPORT int32_t LVCreateServer(grpc_labview::gRPCid** id)
 {
     grpc_labview::InitCallbacks();
     auto server = new grpc_labview::LabVIEWgRPCServer();
-    grpc_labview::gClientTokenManager.RegisterPointer(server);
+    grpc_labview::gPointerManager.RegisterPointer(server);
     *id = server;
     grpc_labview::RegisterCleanupProc(ServerCleanupProc, server);
     return 0;
@@ -145,7 +145,7 @@ LIBRARY_EXPORT int32_t LVStopServer(grpc_labview::gRPCid** id)
     server->StopServer();
 
     grpc_labview::DeregisterCleanupProc(ServerCleanupProc, *id);
-    grpc_labview::gClientTokenManager.UnregisterPointer(server.get());
+    grpc_labview::gPointerManager.UnregisterPointer(server.get());
     return 0;
 }
 

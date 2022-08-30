@@ -12,7 +12,7 @@ LIBRARY_EXPORT int32_t CreateSerializationSession(grpc_labview::gRPCid** session
 {
     grpc_labview::InitCallbacks();
     auto session = new grpc_labview::LabVIEWSerializationSession();
-    grpc_labview::gClientTokenManager.RegisterPointer(session);
+    grpc_labview::gPointerManager.RegisterPointer(session);
     *sessionId = session;
     return 0;
 }
@@ -22,7 +22,7 @@ LIBRARY_EXPORT int32_t CreateSerializationSession(grpc_labview::gRPCid** session
 LIBRARY_EXPORT int32_t FreeSerializationSession(grpc_labview::gRPCid* sessionId)
 {
     auto session = sessionId->CastTo<grpc_labview::LabVIEWSerializationSession>();
-    grpc_labview::gClientTokenManager.UnregisterPointer(sessionId);
+    grpc_labview::gPointerManager.UnregisterPointer(sessionId);
     return 0;
 }
 
@@ -135,7 +135,7 @@ LIBRARY_EXPORT int32_t AnyBuilderBegin(grpc_labview::gRPCid** builderId)
 
     auto metadata = std::make_shared<grpc_labview::MessageMetadata>();
     auto rootMessage = new grpc_labview::LVMessage(metadata);
-    grpc_labview::gClientTokenManager.RegisterPointer(rootMessage);
+    grpc_labview::gPointerManager.RegisterPointer(rootMessage);
     *builderId = rootMessage;
     return 0; 
 }
@@ -194,7 +194,7 @@ LIBRARY_EXPORT int32_t AnyBuilderBeginRepeatedNestedMessageElement(grpc_labview:
 LIBRARY_EXPORT int32_t AnyBuilderBuildToBuffer(grpc_labview::gRPCid* builderId, const char* typeUrl, grpc_labview::LV1DArrayHandle* lvBuffer)
 {   
     auto message = builderId->CastTo<grpc_labview::LVMessage>();
-    grpc_labview::gClientTokenManager.UnregisterPointer(builderId);
+    grpc_labview::gPointerManager.UnregisterPointer(builderId);
     std::string buffer;
     if (message->SerializeToString(&buffer))
     {
