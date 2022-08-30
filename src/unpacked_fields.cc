@@ -155,6 +155,7 @@ LIBRARY_EXPORT int32_t UnpackFieldsFromBuffer(grpc_labview::LV1DArrayHandle lvBu
     if (message->ParseFromString(buffer))
     {
         auto fields = new grpc_labview::UnpackedFields(message);
+        grpc_labview::gClientTokenManager.RegisterPointer(fields);
         *unpackedFieldsRef = fields;
         return 0;
     }
@@ -192,12 +193,6 @@ LIBRARY_EXPORT int32_t GetUnpackedMessageField(grpc_labview::gRPCid* id, int pro
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t FreeUnpackedFields(grpc_labview::gRPCid* id)
 {
-    if (id == nullptr)
-    {
-        return -1;
-    }
-    auto unpackedFields = id->CastTo<grpc_labview::UnpackedFields>();
-    delete unpackedFields;
+    grpc_labview::gClientTokenManager.UnregisterPointer(id);
     return 0; 
 }
-

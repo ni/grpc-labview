@@ -8,10 +8,6 @@
 #include <grpcpp/impl/codegen/client_unary_call.h>
 #include <ctime>
 #include <chrono>
-#include <token_manager.h>
-
-grpc_labview::TokenManager<grpc_labview::gRPCid> gClientTokenManager;
-typedef grpc_labview::TokenManager<grpc_labview::gRPCid>::token_type grpcApiClientToken;
 
 namespace grpc_labview
 {
@@ -167,13 +163,13 @@ int32_t ClientCleanUpProc(grpc_labview::gRPCid* clientId);
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t CreateClient(const char* address, const char* certificatePath, grpcApiClientToken* clientTokenOut)
+LIBRARY_EXPORT int32_t CreateClient(const char* address, const char* certificatePath, grpc_labview::gRPCid** clientId)
 {
     grpc_labview::InitCallbacks();
 
     auto client = new grpc_labview::LabVIEWgRPCClient();
     client->Connect(address, certificatePath);
-    *clientTokenOut = gClientTokenManager.CreateTokenForPtr(client);
+    *clientId = grpc_labview::gClientTokenManager.RegisterPointer(client);
     grpc_labview::RegisterCleanupProc(ClientCleanUpProc, client);
     return 0;
 }
@@ -191,16 +187,16 @@ int32_t CloseClient(grpc_labview::LabVIEWgRPCClient* client)
     return 0;
 }
 
-LIBRARY_EXPORT int32_t CloseClient(grpcApiClientToken clientToken)
+LIBRARY_EXPORT int32_t CloseClient(grpc_labview::gRPCid* clientId)
 {
-    auto client = gClientTokenManager.GetPtrForToken<grpc_labview::LabVIEWgRPCClient>(clientToken);
+    auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
     {
         return -1;
     }
 
     CloseClient(client.get());
-    gClientTokenManager.DestroyTokenForPtr(clientToken);
+    grpc_labview::gClientTokenManager.UnregisterPointer(clientId);
     return 0;
 }
 
@@ -216,23 +212,22 @@ int32_t ClientCleanUpProc(grpc_labview::gRPCid* clientId)
     {
         (*activeClientCall)->_context.TryCancel();
     }
-    return CloseClient(client);
+    return CloseClient(client.get());
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t ClientUnaryCall(
-    grpcApiClientToken clientToken,
+    grpc_labview::gRPCid* clientId,
     grpc_labview::MagicCookie* occurrence,
     const char* methodName,
     const char* requestMessageName,
     const char* responseMessageName,
     int8_t* requestCluster,
-    grpcApiClientToken* callIdOut,
+    grpc_labview::gRPCid** callId,
     int32_t timeoutMs)
 {
-    int32_t status = 0;
-    auto client = gClientTokenManager.GetPtrForToken<grpc_labview::LabVIEWgRPCClient>(clientToken);
+    auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
     {
         return -1;
@@ -249,7 +244,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     }
 
     auto clientCall = new grpc_labview::ClientCall(timeoutMs);
-    *callIdOut = gClientTokenManager.CreateTokenForPtr(clientCall);
+    *callId = grpc_labview::gClientTokenManager.RegisterPointer(clientCall);
     clientCall->_client = client.get();
     clientCall->_methodName = methodName;
     clientCall->_occurrence = *occurrence;
@@ -275,12 +270,12 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
-    grpcApiClientToken callId,
+    grpc_labview::gRPCid* callId,
     int8_t* responseCluster,
     grpc_labview::LStrHandle* errorMessage,
     grpc_labview::AnyCluster* errorDetailsCluster)
 {
-    auto call = gClientTokenManager.GetPtrForToken<grpc_labview::ClientCall>(callId);
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
     if (!call)
     {
         return -1;
@@ -308,7 +303,7 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t CompleteClientUnaryCall(grpcApiClientToken callId, int8_t* responseCluster)
+LIBRARY_EXPORT int32_t CompleteClientUnaryCall(grpc_labview::gRPCid* callId, int8_t* responseCluster)
 {
     return CompleteClientUnaryCall2(callId, responseCluster, nullptr, nullptr);
 }
@@ -316,14 +311,14 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall(grpcApiClientToken callId, int8_t
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(
-    grpcApiClientToken clientId,
+    grpc_labview::gRPCid* clientId,
     const char* methodName,
     const char* requestMessageName,
     const char* responseMessageName,
-    grpcApiClientToken* callIdOut,
+    grpc_labview::gRPCid** callId,
     int32_t timeoutMs)
 {
-    auto client = gClientTokenManager.GetPtrForToken<grpc_labview::LabVIEWgRPCClient>(clientId);
+    auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
     {
         return -1;
@@ -340,7 +335,7 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(
     }
 
     auto clientCall = new grpc_labview::ClientStreamingClientCall(timeoutMs);
-    *callIdOut = gClientTokenManager.CreateTokenForPtr(clientCall);
+    *callId = grpc_labview::gClientTokenManager.RegisterPointer(clientCall);
     clientCall->_client = client.get();
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
@@ -356,15 +351,15 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
-    grpcApiClientToken clientId,
+    grpc_labview::gRPCid* clientId,
     const char* methodName,
     const char* requestMessageName,
     const char* responseMessageName,
     int8_t* requestCluster,
-    grpcApiClientToken* callIdOut,
+    grpc_labview::gRPCid** callId,
     int32_t timeoutMs)
 {    
-    auto client = gClientTokenManager.GetPtrForToken<grpc_labview::LabVIEWgRPCClient>(clientId);
+    auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
     {
         return -1;
@@ -381,7 +376,7 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
     }
 
     auto clientCall = new grpc_labview::ServerStreamingClientCall(timeoutMs);
-    *callIdOut = gClientTokenManager.CreateTokenForPtr(clientCall);
+    *callId = grpc_labview::gClientTokenManager.RegisterPointer(clientCall);
     clientCall->_client = client.get();
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
@@ -399,14 +394,14 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(
-    grpcApiClientToken clientId,
+    grpc_labview::gRPCid* clientId,
     const char* methodName,
     const char* requestMessageName,
     const char* responseMessageName,
-    grpcApiClientToken* callIdOut,
+    grpc_labview::gRPCid** callId,
     int32_t timeoutMs)
 {
-    auto client = gClientTokenManager.GetPtrForToken<grpc_labview::LabVIEWgRPCClient>(clientId);
+    auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
     {
         return -1;
@@ -423,7 +418,7 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(
     }
 
     auto clientCall = new grpc_labview::BidiStreamingClientCall(timeoutMs);
-    *callIdOut = gClientTokenManager.CreateTokenForPtr(clientCall);
+    *callId = grpc_labview::gClientTokenManager.RegisterPointer(clientCall);
     clientCall->_client = client.get();
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
@@ -438,19 +433,10 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpcApiClientToken callId, grpc_labview::MagicCookie* occurrencePtr)
+LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, grpc_labview::MagicCookie* occurrencePtr)
 {
-    auto reader = gClientTokenManager.GetPtrForToken<grpc_labview::StreamReader>(callId);
-    if (!reader)
-    {
-        return -1;
-    }
-    auto call = gClientTokenManager.GetPtrForToken<grpc_labview::ClientCall>(callId);
-    if (!call)
-    {
-        return -2;
-    }
-
+    auto reader = callId->CastTo<grpc_labview::StreamReader>();
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
     auto occurrence = *occurrencePtr;
 
     reader->_readFuture = std::async(
@@ -468,20 +454,14 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpcApiClientToken callId, grpc
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpcApiClientToken callId, int* success, int8_t* responseCluster)
+LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId, int* success, int8_t* responseCluster)
 {
-    auto reader = gClientTokenManager.GetPtrForToken<grpc_labview::StreamReader>(callId);
-    if (!reader)
+    auto reader = callId->CastTo<grpc_labview::StreamReader>();
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
+    if (!call)
     {
         return -1;
     }
-
-    auto call = gClientTokenManager.GetPtrForToken<grpc_labview::ClientCall>(callId);
-    if (!call)
-    {
-        return -2;
-    }
-
     reader->_readFuture.wait();
     *success = reader->_readFuture.get();
     if (*success)
@@ -493,15 +473,14 @@ LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpcApiClientToken callId, i
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientWriteToStream(grpcApiClientToken callId, int8_t* requestCluster, int* success)
+LIBRARY_EXPORT int32_t ClientWriteToStream(grpc_labview::gRPCid* callId, int8_t* requestCluster, int* success)
 {
-    auto writer = gClientTokenManager.GetPtrForToken<grpc_labview::StreamWriter>(callId);
+    auto writer = callId->CastTo<grpc_labview::StreamWriter>();
     if (!writer)
     {
         return -1;
     }
-
-    auto clientCall = gClientTokenManager.GetPtrForToken<grpc_labview::ClientCall>(callId);
+    auto clientCall = callId->CastTo<grpc_labview::ClientCall>();
     if (!clientCall)
     {
         return -2;
@@ -513,9 +492,9 @@ LIBRARY_EXPORT int32_t ClientWriteToStream(grpcApiClientToken callId, int8_t* re
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientWritesComplete(grpcApiClientToken callId)
+LIBRARY_EXPORT int32_t ClientWritesComplete(grpc_labview::gRPCid* callId)
 {
-    auto writer = gClientTokenManager.GetPtrForToken<grpc_labview::StreamWriter>(callId);
+    auto writer = callId->CastTo<grpc_labview::StreamWriter>();
     if (!writer)
     {
         return -1;
@@ -527,17 +506,16 @@ LIBRARY_EXPORT int32_t ClientWritesComplete(grpcApiClientToken callId)
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
-    grpcApiClientToken callId,
+    grpc_labview::gRPCid* callId,
     int8_t* responseCluster,
     grpc_labview::LStrHandle* errorMessage,
     grpc_labview::AnyCluster* errorDetailsCluster)
 {    
-    auto call = gClientTokenManager.GetPtrForToken<grpc_labview::ClientCall>(callId);
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
     if (!call)
     {
         return -1;
     }
-
     int32_t result = 0;
     if (call->_status.ok())
     {
@@ -556,15 +534,15 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
     }
 
     call->_client->ActiveClientCalls.remove(call.get());
-    gClientTokenManager.DestroyTokenForPtr(callId);
+    grpc_labview::gClientTokenManager.UnregisterPointer(callId);
     return result;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpcApiClientToken callId, grpc_labview::MagicCookie* occurrencePtr)
+LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpc_labview::gRPCid* callId, grpc_labview::MagicCookie* occurrencePtr)
 {
-    auto call = gClientTokenManager.GetPtrForToken<grpc_labview::ClientCall>(callId);
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
     if (!call)
     {
         return -1;
@@ -584,11 +562,11 @@ LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpcApiClientToken call
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(
-    grpcApiClientToken callId,
+    grpc_labview::gRPCid* callId,
     grpc_labview::LStrHandle* errorMessage,
     grpc_labview::AnyCluster* errorDetailsCluster)
 {
-    auto call = gClientTokenManager.GetPtrForToken<grpc_labview::ClientCall>(callId);
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
     if (!call)
     {
         return -1;
@@ -596,7 +574,7 @@ LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(
 
     // We've already got a shared_ptr for this token, so calling DestroyToken now
     // will just prevent any other API calls from grabbing the pointer.
-    gClientTokenManager.DestroyTokenForPtr(callId);
+    grpc_labview::gClientTokenManager.UnregisterPointer(callId);
 
     call->Finish();
     int32_t result = 0;   
@@ -619,11 +597,11 @@ LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t ClientCancelCall(
-    grpcApiClientToken callId,
+    grpc_labview::gRPCid* callId,
     grpc_labview::LStrHandle* errorMessage,
     grpc_labview::AnyCluster* errorDetailsCluster)
 {
-    auto call = gClientTokenManager.GetPtrForToken<grpc_labview::ClientCall>(callId);
+    auto call = callId->CastTo<grpc_labview::ClientCall>();
     if (!call)
     {
         return -1;
@@ -631,7 +609,7 @@ LIBRARY_EXPORT int32_t ClientCancelCall(
 
     // We've already got a shared_ptr for this token, so calling DestroyToken now
     // will just prevent any other API calls from grabbing the pointer.
-    gClientTokenManager.DestroyTokenForPtr(callId);
+    grpc_labview::gClientTokenManager.UnregisterPointer(callId);
     call->Cancel();
 
     int32_t result = 0;

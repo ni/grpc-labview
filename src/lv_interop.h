@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------
 #include <string>
 #include <memory>
+#include <pointer_manager.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -24,23 +25,24 @@
 
 namespace grpc_labview 
 {
+    class gRPCid;
+    extern PointerManager<gRPCid> gClientTokenManager;
+
     //---------------------------------------------------------------------
     // LabVIEW gRPC definitions
     //---------------------------------------------------------------------
     class gRPCid
     {
     public:
+
+        /// NOTE: It is important that the CastTo method never be made virtual and never access any member variables.
+        /// This code is expected to work: ((gRPCid*)nullptr)->CastTo<gRPCid>();
         template <typename T>
-        T* CastTo()
-        { 
-            if (IsValid())
-            {
-                return dynamic_cast<T*>(this); 
-            }
-            return nullptr;
+        std::shared_ptr<T> CastTo()
+        {
+            return gClientTokenManager.TryCastTo<T>(this);
         }
 
-        bool IsValid() { return true; }
         virtual ~gRPCid() { }
     protected:
         gRPCid() { }
