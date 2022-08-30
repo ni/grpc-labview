@@ -1,0 +1,17 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build_windows_x64:
+    uses: ./.github/workflows/windows_x64_build.yml
+  build_windows_x86:
+    uses: ./.github/workflows/windows_x86_build.yml
+  build_linux:
+    uses: ./.github/workflows/build_on_linux.yml
+  build_linux_rt:
+    uses: ./.github/workflows/build_on_rt.yml
