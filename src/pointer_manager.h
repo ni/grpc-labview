@@ -90,7 +90,7 @@ namespace grpc_labview
     }
 
     template <typename T>
-    typename T* PointerManager<T>::RegisterPointer(T* ptr)
+    T* PointerManager<T>::RegisterPointer(T* ptr)
     {
         std::lock_guard<std::mutex> lock(_mutex);
         if (!ptr)
