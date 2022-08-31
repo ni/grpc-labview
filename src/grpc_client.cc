@@ -282,6 +282,8 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
         return -1;
     }
 
+    grpc_labview::gPointerManager.UnregisterPointer(callId);
+
     int32_t result = 0;
     if (call->_status.ok())
     {
