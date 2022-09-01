@@ -45,13 +45,11 @@ jobs:
       run: make
 
     - name: Tar Build Artifacts
-      if: ${{ github.ref == 'refs/heads/master' }}
       run: >-
         tar -czvf liblabview-grpc-server-linux.tar.gz -C ${{runner.workspace}}/cmake/build liblabview_grpc_server.so
     
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v2
-      if: ${{ github.ref == 'refs/heads/master' }}
       with:
         name: liblabview-grpc-server-linux
         path: liblabview-grpc-server-linux.tar.gz
