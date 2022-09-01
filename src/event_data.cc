@@ -43,7 +43,8 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void CallFinishedData::Proceed(bool ok)
     {
-        _call->CallFinished();    
+        _call->CallFinished();
+        delete this;
     }
 
     //---------------------------------------------------------------------
