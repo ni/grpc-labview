@@ -24,7 +24,7 @@
 				<Item Name="labview_grpc_server.dll" Type="Document" URL="../Libraries/Win64/labview_grpc_server.dll"/>
 			</Item>
 		</Item>
-		<Item Name="gprc-lvsupport.lvlib" Type="Library" URL="../gprc-lvsupport.lvlib"/>
+		<Item Name="grpc-lvsupport.lvlib" Type="Library" URL="../grpc-lvsupport.lvlib"/>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="vi.lib" Type="Folder">
 				<Item Name="1D String Array to Delimited String.vi" Type="VI" URL="/&lt;vilib&gt;/AdvancedString/1D String Array to Delimited String.vi"/>

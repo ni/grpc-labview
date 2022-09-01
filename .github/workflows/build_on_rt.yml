@@ -1,0 +1,133 @@
+name: RT Build
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+env:
+  CMAKE_VERSION: 3.18.3
+  BUILD_TYPE: Release
+
+jobs:
+  build-nilrt:
+    name: NILRT Cross Compile with GCC 6.3.0
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v2
+
+    - name: Setup python3
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    # The URL used to download this toolchain may change in the future as
+    # improvements to hosting and exports of the NILRT toolchain are made.
+    - name: Install NI Linux RT CC Toolchain
+      run: |
+        wget -nv https://download.ni.com/support/softlib/labview/labview_rt/2018/Linux%20Toolchains/linux/oecore-x86_64-core2-64-toolchain-6.0.sh
+        sudo chmod a+x ./oecore-x86_64-core2-64-toolchain-6.0.sh
+        sudo ./oecore-x86_64-core2-64-toolchain-6.0.sh -y -d ${GITHUB_WORKSPACE}/nilrt-toolchain/
+        echo "${GITHUB_WORKSPACE}/nilrt-toolchain/sysroots/x86_64-nilrtsdk-linux/usr/bin/x86_64-nilrt-linux" >> ${GITHUB_PATH}
+    
+    - name: Update Submodules
+      id: submodules
+      run: |
+        git submodule update --init --recursive
+        echo "::set-output name=grpc-commit::$(git rev-parse --short @:./third_party/grpc)"
+    
+    - name: Cache Host OS gRPC Support
+      uses: actions/cache@v2
+      id: hostgrpccache
+      env:
+        cache-name: hostgrpccache
+      with:
+        path: third_party/grpc/build/
+        key: ${{ github.repository }}-${{ runner.os }}-${{ env.cache-name }}-${{ steps.submodules.outputs.grpc-commit }}
+
+    - name: Configure Host OS gRPC Support
+      if: steps.hostgrpccache.outputs.cache-hit != 'true'
+      shell: cmake -P {0}
+      run: |
+        set(path_separator ":")
+        set(ENV{PATH} "$ENV{GITHUB_WORKSPACE}${path_separator}$ENV{PATH}")
+        execute_process(
+          COMMAND cmake
+            -S $ENV{GITHUB_WORKSPACE}/third_party/grpc/
+            -B $ENV{GITHUB_WORKSPACE}/third_party/grpc/build
+            -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
+            -D gRPC_INSTALL=ON
+          RESULT_VARIABLE result
+        )
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Bad exit status")
+        endif()
+    
+    - name: Build Host OS gRPC Support
+      if: steps.hostgrpccache.outputs.cache-hit != 'true'
+      shell: cmake -P {0}
+      run: |
+        execute_process(
+          COMMAND cmake --build $ENV{GITHUB_WORKSPACE}/third_party/grpc/build
+          RESULT_VARIABLE result
+          OUTPUT_VARIABLE output
+          ERROR_VARIABLE output
+          ECHO_OUTPUT_VARIABLE ECHO_ERROR_VARIABLE
+        )
+        if (NOT result EQUAL 0)
+          string(REGEX MATCH "FAILED:.*$" error_message "${output}")
+          string(REPLACE "\n" "%0A" error_message "${error_message}")
+          message("::error::${error_message}")
+          message(FATAL_ERROR "Build failed")
+        endif()
+    
+    - name: Install Host OS gRPC Support
+      run: sudo cmake --install ${GITHUB_WORKSPACE}/third_party/grpc/build
+
+    - name: Configure Cross Compile
+      shell: cmake -P {0}
+      run: |
+        set(path_separator ":")
+        set(ENV{PATH} "$ENV{GITHUB_WORKSPACE}${path_separator}$ENV{PATH}")
+        execute_process(
+          COMMAND cmake
+            -S .
+            -B build
+            -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
+            -D CMAKE_TOOLCHAIN_FILE=$ENV{GITHUB_WORKSPACE}/nilrt-x86_64.cmake
+          RESULT_VARIABLE result
+        )
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Bad exit status")
+        endif()
+        
+    - name: Cross Compile
+      shell: cmake -P {0}
+      run: |
+        execute_process(
+          COMMAND cmake --build build --config $ENV{BUILD_TYPE} -j 2
+          RESULT_VARIABLE result
+          OUTPUT_VARIABLE output
+          ERROR_VARIABLE output
+          ECHO_OUTPUT_VARIABLE ECHO_ERROR_VARIABLE
+        )
+        if (NOT result EQUAL 0)
+          string(REGEX MATCH "FAILED:.*$" error_message "${output}")
+          string(REPLACE "\n" "%0A" error_message "${error_message}")
+          message("::error::${error_message}")
+          message(FATAL_ERROR "Build failed")
+        endif()
+        
+    - name: Tar Build Artifacts
+      if: ${{ github.ref == 'refs/heads/master' }}
+      run: >-
+        tar -czvf liblabview-grpc-server-rt.tar.gz -C ${GITHUB_WORKSPACE}/build liblabview_grpc_server.so
+    
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v2
+      if: ${{ github.ref == 'refs/heads/master' }}
+      with:
+        name: liblabview-grpc-server-rt
+        path: liblabview-grpc-server-rt.tar.gz
+        retention-days: 5

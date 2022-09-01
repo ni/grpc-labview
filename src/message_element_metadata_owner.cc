@@ -20,32 +20,9 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     int ClusterElementSize(LVMessageMetadataType type, bool repeated)
     {
-    #ifndef _PS_4
         if (repeated)
         {
-            return 8;
-        }
-        switch (type)
-        {
-        case LVMessageMetadataType::BoolValue:
-            return 1;
-        case LVMessageMetadataType::EnumValue:
-        case LVMessageMetadataType::Int32Value:
-        case LVMessageMetadataType::UInt32Value:
-        case LVMessageMetadataType::FloatValue:
-            return 4;
-        case LVMessageMetadataType::Int64Value:
-        case LVMessageMetadataType::UInt64Value:
-        case LVMessageMetadataType::DoubleValue:
-        case LVMessageMetadataType::StringValue:
-        case LVMessageMetadataType::BytesValue:
-        case LVMessageMetadataType::MessageValue:
-            return 8;
-        }
-    #else
-        if (repeated)
-        {
-            return 4;
+            return sizeof(void*);
         }
         switch (type)
         {
@@ -56,16 +33,15 @@ namespace grpc_labview {
         case LVMessageMetadataType::EnumValue:
         case LVMessageMetadataType::FloatValue:
             return 4;
-        case LVMessageMetadataType::StringValue:
-        case LVMessageMetadataType::BytesValue:
-        case LVMessageMetadataType::MessageValue:
-            return 4;
         case LVMessageMetadataType::Int64Value:
         case LVMessageMetadataType::UInt64Value:
         case LVMessageMetadataType::DoubleValue:
             return 8;
+        case LVMessageMetadataType::StringValue:
+        case LVMessageMetadataType::BytesValue:
+        case LVMessageMetadataType::MessageValue:
+            return sizeof(void*);
         }
-    #endif
         return 0;
     }
 
@@ -73,21 +49,12 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     int AlignClusterOffset(int clusterOffset, LVMessageMetadataType type, bool repeated)
     {
-    #ifndef _PS_4
         if (clusterOffset == 0)
         {
             return 0;
         }
-        auto multiple = ClusterElementSize(type, repeated);    
-        int remainder = abs(clusterOffset) % multiple;
-        if (remainder == 0)
-        {
-            return clusterOffset;
-        }
-        return clusterOffset + multiple - remainder;
-    #else
-        return clusterOffset;
-    #endif
+        auto multiple = ClusterElementSize(type, repeated);
+        return AlignClusterOffset(clusterOffset, multiple);
     }
 
     //---------------------------------------------------------------------
@@ -120,37 +87,46 @@ namespace grpc_labview {
             return;
         }    
         int clusterOffset = 0;
+        int maxAlignmentRequirement = 0;
         for (auto element: metadata->_elements)
         {
-            auto elementType = element->type;
-            auto nestedElement = element;
-            while (elementType == LVMessageMetadataType::MessageValue)
+            if (element->type == LVMessageMetadataType::MessageValue)
             {
                 auto nestedMetadata = FindMetadata(element->embeddedMessageName);
-                auto nestedElement = nestedMetadata->_elements.front();
-                elementType = nestedElement->type;
-            }    
-            clusterOffset = AlignClusterOffset(clusterOffset, element->type, element->isRepeated);
-            element->clusterOffset = clusterOffset;
-            if (element->type == LVMessageMetadataType::MessageValue)
-            {                
-                auto nestedMetadata = FindMetadata(element->embeddedMessageName);
                 UpdateMetadataClusterLayout(nestedMetadata);
+                int alignmentRequirement = 0;
+                int elementSize = 0;
                 if (element->isRepeated)
-                {                
-                    clusterOffset += ClusterElementSize(element->type, element->isRepeated);
+                {
+                    alignmentRequirement = elementSize = ClusterElementSize(element->type, element->isRepeated);
                 }
                 else
                 {
-                    clusterOffset += nestedMetadata->clusterSize;
+                    alignmentRequirement = nestedMetadata->alignmentRequirement;
+                    elementSize = nestedMetadata->clusterSize;
+                }
+                clusterOffset = AlignClusterOffset(clusterOffset, alignmentRequirement);
+                element->clusterOffset = clusterOffset;
+                clusterOffset += elementSize;
+                if (maxAlignmentRequirement < alignmentRequirement)
+                {
+                    maxAlignmentRequirement = alignmentRequirement;
                 }
             }
             else
             {
-                clusterOffset += ClusterElementSize(element->type, element->isRepeated);
+                clusterOffset = AlignClusterOffset(clusterOffset, element->type, element->isRepeated);
+                element->clusterOffset = clusterOffset;
+                int elementSize = ClusterElementSize(element->type, element->isRepeated);
+                clusterOffset += elementSize;
+                if (maxAlignmentRequirement < elementSize)
+                {
+                    maxAlignmentRequirement = elementSize;
+                }
             }
         }
-        metadata->clusterSize = AlignClusterOffset(clusterOffset, LVMessageMetadataType::StringValue, true);
+        metadata->alignmentRequirement = maxAlignmentRequirement;
+        metadata->clusterSize = AlignClusterOffset(clusterOffset, maxAlignmentRequirement);
     }
 
     //---------------------------------------------------------------------
