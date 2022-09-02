@@ -32,6 +32,7 @@ static RTSetCleanupProc_T RTSetCleanupProc = nullptr;
 
 namespace grpc_labview
 {
+    grpc_labview::PointerManager<grpc_labview::gRPCid> gPointerManager;
 
 #ifdef _WIN32
 
