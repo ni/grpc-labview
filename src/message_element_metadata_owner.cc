@@ -82,10 +82,10 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     void MessageElementMetadataOwner::UpdateMetadataClusterLayout(std::shared_ptr<MessageMetadata>& metadata)
     {
-        if (metadata->clusterSize != 0)
+        if (metadata->clusterSize != 0 || metadata->_elements.size() == 0)
         {
             return;
-        }    
+        }
         int clusterOffset = 0;
         int maxAlignmentRequirement = 0;
         for (auto element: metadata->_elements)
