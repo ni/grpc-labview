@@ -91,7 +91,7 @@ namespace grpc_labview
     class ClientStreamingClientCall : public ClientCall, public StreamWriter
     {        
     public:
-        ClientStreamingClientCall(int32_t timeoutMs) : ClientCall(timeoutMs) {}
+        ClientStreamingClientCall(int32_t timeoutMs) : ClientCall(timeoutMs) { _writesComplete = false; }
         ~ClientStreamingClientCall();
         void Finish() override;
         bool Write(LVMessage* message) override;
@@ -108,7 +108,7 @@ namespace grpc_labview
     class BidiStreamingClientCall : public ClientCall, public StreamReader, public StreamWriter
     {       
     public:
-        BidiStreamingClientCall(int32_t timeoutMs) : ClientCall(timeoutMs) {}
+        BidiStreamingClientCall(int32_t timeoutMs) : ClientCall(timeoutMs) { _writesComplete = false; }
         ~BidiStreamingClientCall();
         void Finish() override;
         void WritesComplete() override;
