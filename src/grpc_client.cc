@@ -168,7 +168,6 @@ LIBRARY_EXPORT int32_t CreateClient(const char* address, const char* certificate
     grpc_labview::InitCallbacks();
 
     auto client = new grpc_labview::LabVIEWgRPCClient();
-    grpc_labview::gPointerManager.RegisterPointer(client);
     client->Connect(address, certificatePath);
     *clientId = grpc_labview::gPointerManager.RegisterPointer(client);
     grpc_labview::RegisterCleanupProc(ClientCleanUpProc, client);
@@ -441,8 +440,8 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, g
     auto reader = callId->CastTo<grpc_labview::StreamReader>();
     auto call = callId->CastTo<grpc_labview::ClientCall>();
     auto occurrence = *occurrencePtr;
-	
-	if (!reader || !call)
+
+    if (!reader || !call)
     {
         grpc_labview::SignalOccurrence(occurrence);
         return -1;
