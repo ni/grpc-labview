@@ -4,6 +4,7 @@
 #include <lv_message.h>
 
 namespace grpc_labview {
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
@@ -965,3 +966,4 @@ namespace grpc_labview {
             message._values.emplace(metadata->protobufIndex, value);
         }
     }
+}
