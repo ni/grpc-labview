@@ -24,39 +24,39 @@ namespace grpc_labview {
             {
                 switch (val.second->type)
                 {
-                    case LVMessageMetadataType::StringValue:
-                        CopyStringToCluster(val.second, start, value);
-                        break;
-                    case LVMessageMetadataType::BytesValue:
-                        CopyBytesToCluster(val.second, start, value);
-                        break;
-                    case LVMessageMetadataType::BoolValue:
-                        CopyBoolToCluster(val.second, start, value);
-                        break;
-                    case LVMessageMetadataType::DoubleValue:
-                        CopyDoubleToCluster(val.second, start, value);
-                        break;
-                    case LVMessageMetadataType::FloatValue:
-                        CopyFloatToCluster(val.second, start, value);
-                        break;
-                    case LVMessageMetadataType::Int32Value:
-                        CopyInt32ToCluster(val.second, start, value);
-                        break;
-                    case LVMessageMetadataType::MessageValue:
-                        CopyMessageToCluster(val.second, start, value);
-                        break;
-                    case LVMessageMetadataType::Int64Value:
-                        CopyInt64ToCluster(val.second, start, value);
-                        break;
-                    case LVMessageMetadataType::UInt32Value:
-                        CopyUInt32ToCluster(val.second, start, value);
-                        break;
-                    case LVMessageMetadataType::UInt64Value:
-                        CopyUInt64ToCluster(val.second, start, value);
-                        break;
-                    case LVMessageMetadataType::EnumValue:
-                        CopyEnumToCluster(val.second, start, value);
-                        break;
+                case LVMessageMetadataType::StringValue:
+                    CopyStringToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::BytesValue:
+                    CopyBytesToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::BoolValue:
+                    CopyBoolToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::DoubleValue:
+                    CopyDoubleToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::FloatValue:
+                    CopyFloatToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::Int32Value:
+                    CopyInt32ToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::MessageValue:
+                    CopyMessageToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::Int64Value:
+                    CopyInt64ToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::UInt32Value:
+                    CopyUInt32ToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::UInt64Value:
+                    CopyUInt64ToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::EnumValue:
+                    CopyEnumToCluster(val.second, start, value);
+                    break;
                 }
             }
         }
@@ -73,39 +73,39 @@ namespace grpc_labview {
             auto start = cluster + val.second->clusterOffset;
             switch (val.second->type)
             {
-                case LVMessageMetadataType::StringValue:
-                    CopyStringFromCluster(val.second, start, message);
-                    break;
-                case LVMessageMetadataType::BytesValue:
-                    CopyBytesFromCluster(val.second, start, message);
-                    break;
-                case LVMessageMetadataType::BoolValue:
-                    CopyBoolFromCluster(val.second, start, message);
-                    break;
-                case LVMessageMetadataType::DoubleValue:
-                    CopyDoubleFromCluster(val.second, start, message);
-                    break;
-                case LVMessageMetadataType::FloatValue:
-                    CopyFloatFromCluster(val.second, start, message);
-                    break;
-                case LVMessageMetadataType::Int32Value:
-                    CopyInt32FromCluster(val.second, start, message);
-                    break;
-                case LVMessageMetadataType::MessageValue:
-                    CopyMessageFromCluster(val.second, start, message);
-                    break;
-                case LVMessageMetadataType::Int64Value:
-                    CopyInt64FromCluster(val.second, start, message);
-                    break;
-                case LVMessageMetadataType::UInt32Value:
-                    CopyUInt32FromCluster(val.second, start, message);
-                    break;
-                case LVMessageMetadataType::UInt64Value:
-                    CopyUInt64FromCluster(val.second, start, message);
-                    break;
-                case LVMessageMetadataType::EnumValue:
-                    CopyEnumFromCluster(val.second, start, message);
-                    break;
+            case LVMessageMetadataType::StringValue:
+                CopyStringFromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::BytesValue:
+                CopyBytesFromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::BoolValue:
+                CopyBoolFromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::DoubleValue:
+                CopyDoubleFromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::FloatValue:
+                CopyFloatFromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::Int32Value:
+                CopyInt32FromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::MessageValue:
+                CopyMessageFromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::Int64Value:
+                CopyInt64FromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::UInt32Value:
+                CopyUInt32FromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::UInt64Value:
+                CopyUInt64FromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::EnumValue:
+                CopyEnumFromCluster(val.second, start, message);
+                break;
             }
         }
     }
@@ -114,7 +114,7 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool ClusterDataCopier::AnyBuilderAddValue(LVMessage& message, LVMessageMetadataType valueType, bool isRepeated, int protobufIndex, int8_t* value)
-    {    
+    {
         auto metadata = std::make_shared<MessageElementMetadata>(nullptr);
         metadata->clusterOffset = 0;
         metadata->embeddedMessageName = std::string();
@@ -124,42 +124,42 @@ namespace grpc_labview {
 
         switch (valueType)
         {
-            case LVMessageMetadataType::StringValue:
-                CopyStringFromCluster(metadata, value, message);
-                break;
-            case LVMessageMetadataType::BytesValue:
-                CopyBytesFromCluster(metadata, value, message);
-                break;
-            case LVMessageMetadataType::BoolValue:
-                CopyBoolFromCluster(metadata, value, message);
-                break;
-            case LVMessageMetadataType::DoubleValue:
-                CopyDoubleFromCluster(metadata, value, message);
-                break;
-            case LVMessageMetadataType::FloatValue:
-                CopyFloatFromCluster(metadata, value, message);
-                break;
-            case LVMessageMetadataType::Int32Value:
-                CopyInt32FromCluster(metadata, value, message);
-                break;
-            case LVMessageMetadataType::MessageValue:
-                return false;
-                break;
-            case LVMessageMetadataType::Int64Value:
-                CopyInt64FromCluster(metadata, value, message);
-                break;
-            case LVMessageMetadataType::UInt32Value:
-                CopyUInt32FromCluster(metadata, value, message);
-                break;
-            case LVMessageMetadataType::UInt64Value:
-                CopyUInt64FromCluster(metadata, value, message);
-                break;
-            case LVMessageMetadataType::EnumValue:
-                CopyEnumFromCluster(metadata, value, message);
-                break;        
-            default:
-                return false;
-                break;
+        case LVMessageMetadataType::StringValue:
+            CopyStringFromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::BytesValue:
+            CopyBytesFromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::BoolValue:
+            CopyBoolFromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::DoubleValue:
+            CopyDoubleFromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::FloatValue:
+            CopyFloatFromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::Int32Value:
+            CopyInt32FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::MessageValue:
+            return false;
+            break;
+        case LVMessageMetadataType::Int64Value:
+            CopyInt64FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::UInt32Value:
+            CopyUInt32FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::UInt64Value:
+            CopyUInt64FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::EnumValue:
+            CopyEnumFromCluster(metadata, value, message);
+            break;
+        default:
+            return false;
+            break;
         }
         return true;
     }
@@ -169,7 +169,7 @@ namespace grpc_labview {
     void ClusterDataCopier::CopyStringToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
-        {        
+        {
             auto repeatedString = static_cast<const LVRepeatedStringMessageValue&>(*value);
             if (repeatedString._value.size() != 0)
             {
@@ -202,7 +202,7 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     struct LVCluster
-    {    
+    {
     };
 
     //---------------------------------------------------------------------
@@ -241,7 +241,7 @@ namespace grpc_labview {
     void ClusterDataCopier::CopyInt32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
-        {        
+        {
             auto repeatedInt32 = std::static_pointer_cast<LVRepeatedInt32MessageValue>(value);
             if (repeatedInt32->_value.size() != 0)
             {
@@ -263,7 +263,7 @@ namespace grpc_labview {
     void ClusterDataCopier::CopyUInt32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
-        {        
+        {
             auto repeatedUInt32 = std::static_pointer_cast<LVRepeatedUInt32MessageValue>(value);
             if (repeatedUInt32->_value.size() != 0)
             {
@@ -271,7 +271,7 @@ namespace grpc_labview {
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedUInt32->_value.size();
                 auto byteCount = repeatedUInt32->_value.size() * sizeof(uint32_t);
-                memcpy((*array)->bytes<int32_t>(), repeatedUInt32->_value.data(), byteCount);
+                memcpy((*array)->bytes<uint32_t>(), repeatedUInt32->_value.data(), byteCount);
             }
         }
         else
@@ -285,7 +285,7 @@ namespace grpc_labview {
     void ClusterDataCopier::CopyEnumToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
-        {        
+        {
             auto repeatedEnum = std::static_pointer_cast<LVRepeatedEnumMessageValue>(value);
             if (repeatedEnum->_value.size() != 0)
             {
@@ -307,7 +307,7 @@ namespace grpc_labview {
     void ClusterDataCopier::CopyInt64ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
-        {        
+        {
             auto repeatedInt64 = std::static_pointer_cast<LVRepeatedInt64MessageValue>(value);
             if (repeatedInt64->_value.size() != 0)
             {
@@ -315,7 +315,7 @@ namespace grpc_labview {
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedInt64->_value.size();
                 auto byteCount = repeatedInt64->_value.size() * sizeof(int64_t);
-                memcpy((*array)->bytes<int32_t>(), repeatedInt64->_value.data(), byteCount);
+                memcpy((*array)->bytes<int64_t>(), repeatedInt64->_value.data(), byteCount);
             }
         }
         else
@@ -329,7 +329,7 @@ namespace grpc_labview {
     void ClusterDataCopier::CopyUInt64ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
-        {        
+        {
             auto repeatedUInt64 = std::static_pointer_cast<LVRepeatedUInt64MessageValue>(value);
             if (repeatedUInt64->_value.size() != 0)
             {
@@ -337,7 +337,7 @@ namespace grpc_labview {
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedUInt64->_value.size();
                 auto byteCount = repeatedUInt64->_value.size() * sizeof(uint64_t);
-                memcpy((*array)->bytes<int32_t>(), repeatedUInt64->_value.data(), byteCount);
+                memcpy((*array)->bytes<uint64_t>(), repeatedUInt64->_value.data(), byteCount);
             }
         }
         else
@@ -351,7 +351,7 @@ namespace grpc_labview {
     void ClusterDataCopier::CopyBoolToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
-        {        
+        {
             auto repeatedBoolean = std::static_pointer_cast<LVRepeatedBooleanMessageValue>(value);
             if (repeatedBoolean->_value.size() != 0)
             {
@@ -415,8 +415,140 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    void ClusterDataCopier::CopySInt32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    {
+        if (metadata->isRepeated)
+        {
+            auto repeatedSInt32 = std::static_pointer_cast<LVRepeatedSInt32MessageValue>(value);
+            if (repeatedSInt32->_value.size() != 0)
+            {
+                NumericArrayResize(0x03, 1, start, repeatedSInt32->_value.size());
+                auto array = *(LV1DArrayHandle*)start;
+                (*array)->cnt = repeatedSInt32->_value.size();
+                auto byteCount = repeatedSInt32->_value.size() * sizeof(int32_t);
+                memcpy((*array)->bytes<int32_t>(), repeatedSInt32->_value.data(), byteCount);
+            }
+        }
+        else
+        {
+            *(int32_t*)start = ((LVSInt32MessageValue*)value.get())->_value;
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ClusterDataCopier::CopySInt64ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    {
+        if (metadata->isRepeated)
+        {
+            auto repeatedSInt64 = std::static_pointer_cast<LVRepeatedSInt64MessageValue>(value);
+            if (repeatedSInt64->_value.size() != 0)
+            {
+                NumericArrayResize(0x04, 1, start, repeatedSInt64->_value.size());
+                auto array = *(LV1DArrayHandle*)start;
+                (*array)->cnt = repeatedSInt64->_value.size();
+                auto byteCount = repeatedSInt64->_value.size() * sizeof(int64_t);
+                memcpy((*array)->bytes<int64_t>(), repeatedSInt64->_value.data(), byteCount);
+            }
+        }
+        else
+        {
+            *(int64_t*)start = ((LVSInt64MessageValue*)value.get())->_value;
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ClusterDataCopier::CopyFixed32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    {
+        if (metadata->isRepeated)
+        {
+            auto repeated = std::static_pointer_cast<LVRepeatedFixed32MessageValue>(value);
+            if (repeated->_value.size() != 0)
+            {
+                NumericArrayResize(0x03, 1, start, repeated->_value.size());
+                auto array = *(LV1DArrayHandle*)start;
+                (*array)->cnt = repeated->_value.size();
+                auto byteCount = repeated->_value.size() * sizeof(uint32_t);
+                memcpy((*array)->bytes<uint32_t>(), repeated->_value.data(), byteCount);
+            }
+        }
+        else
+        {
+            *(uint32_t*)start = ((LVFixed32MessageValue*)value.get())->_value;
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ClusterDataCopier::CopySFixed32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    {
+        if (metadata->isRepeated)
+        {
+            auto repeated = std::static_pointer_cast<LVRepeatedSFixed32MessageValue>(value);
+            if (repeated->_value.size() != 0)
+            {
+                NumericArrayResize(0x03, 1, start, repeated->_value.size());
+                auto array = *(LV1DArrayHandle*)start;
+                (*array)->cnt = repeated->_value.size();
+                auto byteCount = repeated->_value.size() * sizeof(int32_t);
+                memcpy((*array)->bytes<int32_t>(), repeated->_value.data(), byteCount);
+            }
+        }
+        else
+        {
+            *(int32_t*)start = ((LVSFixed32MessageValue*)value.get())->_value;
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ClusterDataCopier::CopyFixed64ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    {
+        if (metadata->isRepeated)
+        {
+            auto repeated = std::static_pointer_cast<LVRepeatedFixed64MessageValue>(value);
+            if (repeated->_value.size() != 0)
+            {
+                NumericArrayResize(0x04, 1, start, repeated->_value.size());
+                auto array = *(LV1DArrayHandle*)start;
+                (*array)->cnt = repeated->_value.size();
+                auto byteCount = repeated->_value.size() * sizeof(uint64_t);
+                memcpy((*array)->bytes<uint64_t>(), repeated->_value.data(), byteCount);
+            }
+        }
+        else
+        {
+            *(uint64_t*)start = ((LVFixed64MessageValue*)value.get())->_value;
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ClusterDataCopier::CopySFixed64ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    {
+        if (metadata->isRepeated)
+        {
+            auto repeated = std::static_pointer_cast<LVRepeatedSFixed64MessageValue>(value);
+            if (repeated->_value.size() != 0)
+            {
+                NumericArrayResize(0x04, 1, start, repeated->_value.size());
+                auto array = *(LV1DArrayHandle*)start;
+                (*array)->cnt = repeated->_value.size();
+                auto byteCount = repeated->_value.size() * sizeof(int64_t);
+                memcpy((*array)->bytes<int64_t>(), repeated->_value.data(), byteCount);
+            }
+        }
+        else
+        {
+            *(int64_t*)start = ((LVSFixed64MessageValue*)value.get())->_value;
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void ClusterDataCopier::CopyStringFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-    {    
+    {
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;
@@ -425,7 +557,7 @@ namespace grpc_labview {
                 auto repeatedStringValue = std::make_shared<LVRepeatedStringMessageValue>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedStringValue);
                 auto lvStr = (*array)->bytes<LStrHandle>();
-                for (int x=0; x < (*array)->cnt; ++x)
+                for (int x = 0; x < (*array)->cnt; ++x)
                 {
                     auto str = GetLVString(*lvStr);
                     repeatedStringValue->_value.Add(str);
@@ -444,14 +576,14 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyBytesFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-    {   
+    {
         CopyStringFromCluster(metadata, start, message);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyBoolFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-    {    
+    {
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;
@@ -476,7 +608,7 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyInt32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-    {    
+    {
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;
@@ -501,7 +633,7 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyUInt32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-    {    
+    {
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;
@@ -526,7 +658,7 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyEnumFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-    {    
+    {
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;
@@ -551,7 +683,7 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyInt64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-    {    
+    {
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;
@@ -576,7 +708,7 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyUInt64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-    {    
+    {
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;
@@ -601,7 +733,7 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyDoubleFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-    {    
+    {
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;
@@ -626,7 +758,7 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyFloatFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-    {    
+    {
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;
@@ -651,7 +783,7 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyMessageFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
-    {    
+    {
         auto nestedMetadata = metadata->_owner->FindMetadata(metadata->embeddedMessageName);
 
         if (metadata->isRepeated)
@@ -683,4 +815,153 @@ namespace grpc_labview {
             message._values.emplace(metadata->protobufIndex, value);
         }
     }
-}
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ClusterDataCopier::CopySInt32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    {
+        if (metadata->isRepeated)
+        {
+            auto array = *(LV1DArrayHandle*)start;
+            if (array && *array && ((*array)->cnt != 0))
+            {
+                auto count = (*array)->cnt;
+                auto repeatedValue = std::make_shared<LVRepeatedSInt32MessageValue>(metadata->protobufIndex);
+                message._values.emplace(metadata->protobufIndex, repeatedValue);
+                auto data = (*array)->bytes<int32_t>();
+                repeatedValue->_value.Reserve(count);
+                auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
+                memcpy(dest, data, count * sizeof(int32_t));
+            }
+        }
+        else
+        {
+            auto value = std::make_shared<LVSInt32MessageValue>(metadata->protobufIndex, *(int*)start);
+            message._values.emplace(metadata->protobufIndex, value);
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ClusterDataCopier::CopySInt64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    {
+        if (metadata->isRepeated)
+        {
+            auto array = *(LV1DArrayHandle*)start;
+            if (array && *array && ((*array)->cnt != 0))
+            {
+                auto count = (*array)->cnt;
+                auto repeatedValue = std::make_shared<LVRepeatedSInt64MessageValue>(metadata->protobufIndex);
+                message._values.emplace(metadata->protobufIndex, repeatedValue);
+                auto data = (*array)->bytes<int64_t>();
+                repeatedValue->_value.Reserve(count);
+                auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
+                memcpy(dest, data, count * sizeof(int64_t));
+            }
+        }
+        else
+        {
+            auto value = std::make_shared<LVSInt64MessageValue>(metadata->protobufIndex, *(int64_t*)start);
+            message._values.emplace(metadata->protobufIndex, value);
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ClusterDataCopier::CopyFixed32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    {
+        if (metadata->isRepeated)
+        {
+            auto array = *(LV1DArrayHandle*)start;
+            if (array && *array && ((*array)->cnt != 0))
+            {
+                auto count = (*array)->cnt;
+                auto repeatedValue = std::make_shared<LVRepeatedFixed32MessageValue>(metadata->protobufIndex);
+                message._values.emplace(metadata->protobufIndex, repeatedValue);
+                auto data = (*array)->bytes<uint32_t>();
+                repeatedValue->_value.Reserve(count);
+                auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
+                memcpy(dest, data, count * sizeof(uint32_t));
+            }
+        }
+        else
+        {
+            auto value = std::make_shared<LVFixed32MessageValue>(metadata->protobufIndex, *(uint32_t*)start);
+            message._values.emplace(metadata->protobufIndex, value);
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ClusterDataCopier::CopyFixed64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    {
+        if (metadata->isRepeated)
+        {
+            auto array = *(LV1DArrayHandle*)start;
+            if (array && *array && ((*array)->cnt != 0))
+            {
+                auto count = (*array)->cnt;
+                auto repeatedValue = std::make_shared<LVRepeatedFixed64MessageValue>(metadata->protobufIndex);
+                message._values.emplace(metadata->protobufIndex, repeatedValue);
+                auto data = (*array)->bytes<uint64_t>();
+                repeatedValue->_value.Reserve(count);
+                auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
+                memcpy(dest, data, count * sizeof(uint64_t));
+            }
+        }
+        else
+        {
+            auto value = std::make_shared<LVFixed64MessageValue>(metadata->protobufIndex, *(uint64_t*)start);
+            message._values.emplace(metadata->protobufIndex, value);
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ClusterDataCopier::CopySFixed32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    {
+        if (metadata->isRepeated)
+        {
+            auto array = *(LV1DArrayHandle*)start;
+            if (array && *array && ((*array)->cnt != 0))
+            {
+                auto count = (*array)->cnt;
+                auto repeatedValue = std::make_shared<LVRepeatedSFixed32MessageValue>(metadata->protobufIndex);
+                message._values.emplace(metadata->protobufIndex, repeatedValue);
+                auto data = (*array)->bytes<int32_t>();
+                repeatedValue->_value.Reserve(count);
+                auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
+                memcpy(dest, data, count * sizeof(int32_t));
+            }
+        }
+        else
+        {
+            auto value = std::make_shared<LVSFixed32MessageValue>(metadata->protobufIndex, *(int32_t*)start);
+            message._values.emplace(metadata->protobufIndex, value);
+        }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ClusterDataCopier::CopySFixed64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    {
+        if (metadata->isRepeated)
+        {
+            auto array = *(LV1DArrayHandle*)start;
+            if (array && *array && ((*array)->cnt != 0))
+            {
+                auto count = (*array)->cnt;
+                auto repeatedValue = std::make_shared<LVRepeatedSFixed64MessageValue>(metadata->protobufIndex);
+                message._values.emplace(metadata->protobufIndex, repeatedValue);
+                auto data = (*array)->bytes<int64_t>();
+                repeatedValue->_value.Reserve(count);
+                auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
+                memcpy(dest, data, count * sizeof(int64_t));
+            }
+        }
+        else
+        {
+            auto value = std::make_shared<LVSFixed64MessageValue>(metadata->protobufIndex, *(int64_t*)start);
+            message._values.emplace(metadata->protobufIndex, value);
+        }
+    }
