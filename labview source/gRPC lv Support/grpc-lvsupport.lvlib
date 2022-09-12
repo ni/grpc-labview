@@ -20,6 +20,7 @@
 		<Item Name="Client Writes Complete.vi" Type="VI" URL="../Client API/Client Writes Complete.vi"/>
 		<Item Name="Close Client.vi" Type="VI" URL="../Client API/Close Client.vi"/>
 		<Item Name="Create Client.vi" Type="VI" URL="../Client API/Create Client.vi"/>
+		<Item Name="Client Cancel Call.vi" Type="VI" URL="../Client API/Client Cancel Call.vi"/>
 	</Item>
 	<Item Name="Protobuf" Type="Folder">
 		<Item Name="Any Support" Type="Folder">
