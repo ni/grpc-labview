@@ -1,6 +1,8 @@
 name: Windows x86 build
 
-on: [push]
+on:
+  workflow_call:
+  workflow_dispatch:
 
 env:
   BUILD_TYPE: Release
@@ -29,3 +31,16 @@ jobs:
     - name: Build
       working-directory: ${{runner.workspace}}\grpc-labview\build
       run: cmake --build . --config ${{env.BUILD_TYPE}}
+
+    - name: Tar Build Artifacts
+      run: >-
+        tar -czvf labview-grpc-server-windows-x86.tar.gz -C ${{runner.workspace}}\grpc-labview\build\Release
+        labview_grpc_server.dll
+        labview_grpc_generator.dll
+    
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: labview-grpc-server-windows-x86
+        path: labview-grpc-server-windows-x86.tar.gz
+        retention-days: 5

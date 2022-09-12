@@ -15,7 +15,7 @@ You only need to build the binaries if you wish to contribute to the C++ source 
 #### Prerequisites
 To prepare for cmake + Microsoft Visual C++ compiler build
 - Install LabVIEW 2019
-- Install Visual Studio 2015, 2017, or 2019 (Visual C++ compiler will be used).
+- Install Visual Studio 2019 (Visual C++ compiler will be used).
 - Install [Git](https://git-scm.com/).
 - Install [CMake](https://cmake.org/download/).
 

@@ -93,6 +93,7 @@ namespace grpc_labview
         std::string messageName;
         std::string typeUrl;
         int clusterSize;
+        int alignmentRequirement;
         LVMessageMetadataList _elements;
         LVMessageMetadataMap _mappedElements;
     };

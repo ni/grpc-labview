@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstring>
 #include <memory>
+#include <grpcpp/grpcpp.h>
 
 #ifndef _WIN32
 #include <dlfcn.h>
@@ -31,6 +32,7 @@ static RTSetCleanupProc_T RTSetCleanupProc = nullptr;
 
 namespace grpc_labview
 {
+    grpc_labview::PointerManager<grpc_labview::gRPCid> gPointerManager;
 
 #ifdef _WIN32
 
@@ -69,21 +71,17 @@ namespace grpc_labview
             return;
         }
 
-        auto lvModule = dlopen(nullptr, RTLD_LAZY);
-        if (lvModule != nullptr)
+        NumericArrayResizeImp = (NumericArrayResize_T)dlsym(RTLD_DEFAULT, "NumericArrayResize");
+        PostLVUserEvent = (PostLVUserEvent_T)dlsym(RTLD_DEFAULT, "PostLVUserEvent");
+        Occur = (Occur_T)dlsym(RTLD_DEFAULT, "Occur");
+        RTSetCleanupProc = (RTSetCleanupProc_T)dlsym(RTLD_DEFAULT, "RTSetCleanupProc");
+
+        if (NumericArrayResizeImp == nullptr ||
+            PostLVUserEvent == nullptr ||
+            Occur == nullptr ||
+            RTSetCleanupProc == nullptr)
         {
-            NumericArrayResizeImp = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
-            PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
-            Occur = (Occur_T)dlsym(lvModule, "Occur");
-        }
-        if (NumericArrayResize == nullptr)
-        {
-            std::cout << "Loading LabVIEW Runtime engine!" << std::endl;
-            lvModule = dlopen("liblvrt.so", RTLD_NOW);
-            NumericArrayResizeImp = (NumericArrayResize_T)dlsym(lvModule, "NumericArrayResize");
-            PostLVUserEvent = (PostLVUserEvent_T)dlsym(lvModule, "PostLVUserEvent");
-            Occur = (Occur_T)dlsym(lvModule, "Occur");
-            RTSetCleanupProc = (RTSetCleanupProc_T)dlsym(lvModule, "RTSetCleanupProc");
+            exit(grpc::StatusCode::INTERNAL);
         }
     }
 
@@ -148,5 +146,19 @@ namespace grpc_labview
     int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, gRPCid* id)
     {
         return RTSetCleanupProc(cleanUpProc, id, kCleanOnRemove);
+    }
+
+    int AlignClusterOffset(int clusterOffset, int alignmentRequirement)
+    {
+#ifndef _PS_4
+        int remainder = abs(clusterOffset) % alignmentRequirement;
+        if (remainder == 0)
+        {
+            return clusterOffset;
+        }
+        return clusterOffset + alignmentRequirement - remainder;
+#else
+        return clusterOffset;
+#endif
     }
 }

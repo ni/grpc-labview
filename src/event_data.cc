@@ -43,7 +43,8 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void CallFinishedData::Proceed(bool ok)
     {
-        _call->CallFinished();    
+        _call->CallFinished();
+        delete this;
     }
 
     //---------------------------------------------------------------------
@@ -191,6 +192,7 @@ namespace grpc_labview
                 _requestDataReady = true;
 
                 _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
+                gPointerManager.RegisterPointer(_methodData.get());
                 _server->SendEvent(name, static_cast<gRPCid*>(_methodData.get()));
             }
             else

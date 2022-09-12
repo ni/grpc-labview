@@ -47,7 +47,8 @@ namespace grpc_labview
         int clusterOffset = 0;
         if (lvMetadata->elements != nullptr)
         {
-            auto lvElement = (*lvMetadata->elements)->bytes<LVMesageElementMetadata>();
+            // byteAlignment for LVMesageElementMetadata would be the size of its largest element which is a LStrHandle
+            auto lvElement = (LVMesageElementMetadata*)(*lvMetadata->elements)->bytes(0, sizeof(LStrHandle));
             for (int x = 0; x < (*lvMetadata->elements)->cnt; ++x, ++lvElement)
             {
                 auto element = std::make_shared<MessageElementMetadata>(metadataOwner);
@@ -75,7 +76,8 @@ namespace grpc_labview
         int clusterOffset = 0;
         if (lvMetadata->elements != nullptr)
         {
-            auto lvElement = (*lvMetadata->elements)->bytes<LVMesageElementMetadata>();
+            // byteAlignment for LVMesageElementMetadata would be the size of its largest element which is a LStrHandle
+            auto lvElement = (LVMesageElementMetadata*)(*lvMetadata->elements)->bytes(0, sizeof(LStrHandle));
             for (int x = 0; x < (*lvMetadata->elements)->cnt; ++x, ++lvElement)
             {
                 auto element = std::make_shared<MessageElementMetadata>(metadataOwner);
@@ -100,6 +102,7 @@ LIBRARY_EXPORT int32_t LVCreateServer(grpc_labview::gRPCid** id)
 {
     grpc_labview::InitCallbacks();
     auto server = new grpc_labview::LabVIEWgRPCServer();
+    grpc_labview::gPointerManager.RegisterPointer(server);
     *id = server;
     grpc_labview::RegisterCleanupProc(ServerCleanupProc, server);
     return 0;
@@ -142,7 +145,7 @@ LIBRARY_EXPORT int32_t LVStopServer(grpc_labview::gRPCid** id)
     server->StopServer();
 
     grpc_labview::DeregisterCleanupProc(ServerCleanupProc, *id);
-    delete server;
+    grpc_labview::gPointerManager.UnregisterPointer(server.get());
     return 0;
 }
 
@@ -160,7 +163,7 @@ LIBRARY_EXPORT int32_t RegisterMessageMetadata(grpc_labview::gRPCid** id, grpc_l
     {
         return -1;
     }
-    auto metadata = CreateMessageMetadata(server, lvMetadata);
+    auto metadata = CreateMessageMetadata(server.get(), lvMetadata);
     server->RegisterMetadata(metadata);
     return 0;
 }
@@ -174,7 +177,7 @@ LIBRARY_EXPORT int32_t RegisterMessageMetadata2(grpc_labview::gRPCid** id, grpc_
     {
         return -1;
     }
-    auto metadata = CreateMessageMetadata2(server, lvMetadata);
+    auto metadata = CreateMessageMetadata2(server.get(), lvMetadata);
     server->RegisterMetadata(metadata);
     return 0;
 }
