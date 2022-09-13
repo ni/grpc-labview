@@ -58,6 +58,24 @@ namespace grpc_labview {
                 case LVMessageMetadataType::EnumValue:
                     CopyEnumToCluster(val.second, start, value);
                     break;
+                case LVMessageMetadataType::SInt32Value:
+                    CopySInt32ToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType:: SInt64Value:
+                    CopySInt64ToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::Fixed32Value:
+                    CopyFixed32ToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::Fixed64Value:
+                     CopyFixed64ToCluster(val.second, start, value);
+                     break;
+                case LVMessageMetadataType::SFixed32Value:
+                    CopySFixed32ToCluster(val.second, start, value);
+                    break;
+                case LVMessageMetadataType::SFixed64Value:
+                    CopySFixed64ToCluster(val.second, start, value);
+                    break;
                 }
             }
         }
@@ -106,6 +124,23 @@ namespace grpc_labview {
                 break;
             case LVMessageMetadataType::EnumValue:
                 CopyEnumFromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::SInt32Value:
+                CopySInt32FromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::SInt64Value:
+                CopySInt64FromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::Fixed32Value:
+                CopyFixed32FromCluster(val.second, start, message);
+            case LVMessageMetadataType::Fixed64Value:
+                CopyFixed64FromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::SFixed32Value:
+                CopySFixed32FromCluster(val.second, start, message);
+                break;
+            case LVMessageMetadataType::SFixed64Value:
+                CopySFixed64FromCluster(val.second, start, message);
                 break;
             }
         }
