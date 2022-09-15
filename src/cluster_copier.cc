@@ -193,6 +193,24 @@ namespace grpc_labview {
         case LVMessageMetadataType::EnumValue:
             CopyEnumFromCluster(metadata, value, message);
             break;
+        case LVMessageMetadataType::SInt32Value:
+            CopySInt32FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::SInt64Value:
+            CopySInt64FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::Fixed32Value:
+            CopyFixed32FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::Fixed64Value:
+            CopyFixed64FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::SFixed32Value:
+            CopySFixed32FromCluster(metadata, value, message);
+            break;
+        case LVMessageMetadataType::SFixed64Value:
+            CopySFixed64FromCluster(metadata, value, message);
+            break;
         default:
             return false;
             break;
