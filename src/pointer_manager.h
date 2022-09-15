@@ -32,6 +32,11 @@ namespace grpc_labview
         /// Call UnregisterPointer to allow the pointer to be destroyed.
         T* RegisterPointer(T* ptr);
 
+        /// Register a shared pointer. This adds the std::shared_ptr passed in into a std::set.
+        /// The pointer will be alive until that shared_ptr and all its copies (created via GetPointer) are out of scope.
+        /// Call UnregisterPointer to allow the pointer to be destroyed.
+        T* RegisterPointer(std::shared_ptr<T> ptr);
+
         /// Get the pointer for a given pointer.
         /// If the pointer has been registered, returns a shared_ptr containing the requested pointer.
         /// If the pointer is null or unregistered, returns a default std::shared_ptr and optionally sets a status code.
@@ -104,6 +109,23 @@ namespace grpc_labview
             _registeredPointers.insert({ ptr, std::shared_ptr<T>(ptr) });
         }
         return ptr;
+    }
+
+    template <typename T>
+    T* PointerManager<T>::RegisterPointer(std::shared_ptr<T> ptr)
+    {
+        std::lock_guard<std::mutex> lock(_mutex);
+        if (!ptr)
+        {
+            std::cerr << "ERROR: CANNOT REGISTER A NULL POINTER" << std::endl;
+            return nullptr;
+        }
+
+        if (_registeredPointers.find(ptr.get()) == _registeredPointers.end())
+        {
+            _registeredPointers.insert({ ptr.get(), ptr });
+        }
+        return ptr.get();
     }
 
     template <typename T>
