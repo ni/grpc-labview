@@ -446,28 +446,22 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
             info->type = 5;
             break;
         case FieldDescriptor::TYPE_FIXED64:
-            grpc_labview::AddFieldError(field, "Unsupported Type: TYPE_FIXED64");
-            info->type = 99;
+            info->type = 11;
             break;
         case FieldDescriptor::TYPE_FIXED32:
-            grpc_labview::AddFieldError(field, "Unsupported Type: TYPE_FIXED32");
-            info->type = 99;
+            info->type = 12;
             break;
         case FieldDescriptor::TYPE_SFIXED32:
-            grpc_labview::AddFieldError(field, "Unsupported Type: TYPE_SFIXED32");
-            info->type = 99;
+            info->type = 14;
             break;
         case FieldDescriptor::TYPE_SFIXED64:
-            grpc_labview::AddFieldError(field, "Unsupported Type: TYPE_SFIXED64");
-            info->type = 99;
+            info->type = 13;
             break;
         case FieldDescriptor::TYPE_SINT32:
-            grpc_labview::AddFieldError(field, "Unsupported Type: TYPE_SINT32");
-            info->type = 99;
+            info->type = 16;
             break;
         case FieldDescriptor::TYPE_SINT64:
-            grpc_labview::AddFieldError(field, "Unsupported Type: TYPE_SINT64");
-            info->type = 99;
+            info->type = 15;
             break;
     }
     if (field->type() == FieldDescriptor::TYPE_MESSAGE)

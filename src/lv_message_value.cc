@@ -582,4 +582,345 @@ namespace grpc_labview
         }
         return target;
     }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVSInt32MessageValue::LVSInt32MessageValue(int protobufId, int32_t value) :
+        LVMessageValue(protobufId),
+        _value(value)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    size_t LVSInt32MessageValue::ByteSizeLong()
+    {
+        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_SINT32) + WireFormatLite::SInt32Size(_value);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::uint8* LVSInt32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    {
+        target = stream->EnsureSpace(target);
+        return WireFormatLite::WriteSInt32ToArray(_protobufId, _value, target);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVRepeatedSInt32MessageValue::LVRepeatedSInt32MessageValue(int protobufId) :
+        LVMessageValue(protobufId)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    size_t LVRepeatedSInt32MessageValue::ByteSizeLong()
+    {
+        size_t totalSize = 0;
+        size_t dataSize = WireFormatLite::SInt32Size(_value);
+        if (dataSize > 0)
+        {
+            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::SInt32Size(static_cast<google::protobuf::int32>(dataSize));
+        }
+        _cachedSize = ToCachedSize(dataSize);
+        totalSize += dataSize;
+        return totalSize;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::uint8* LVRepeatedSInt32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    {
+        if (_cachedSize > 0)
+        {
+            target = stream->WriteSInt32Packed(_protobufId, _value, _cachedSize, target);
+        }
+        return target;
+    }
+    //---------------------------------------------------------------------
+     //---------------------------------------------------------------------
+    LVSInt64MessageValue::LVSInt64MessageValue(int protobufId, int64_t value) :
+        LVMessageValue(protobufId),
+        _value(value)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    size_t LVSInt64MessageValue::ByteSizeLong()
+    {
+        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_SINT64) + WireFormatLite::SInt64Size(_value);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::uint8* LVSInt64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    {
+        target = stream->EnsureSpace(target);
+        return WireFormatLite::WriteSInt64ToArray(_protobufId, _value, target);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVRepeatedSInt64MessageValue::LVRepeatedSInt64MessageValue(int protobufId) :
+        LVMessageValue(protobufId)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    size_t LVRepeatedSInt64MessageValue::ByteSizeLong()
+    {
+        size_t totalSize = 0;
+        size_t dataSize = WireFormatLite::SInt64Size(_value);
+        if (dataSize > 0)
+        {
+            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::SInt64Size(static_cast<google::protobuf::int32>(dataSize));
+        }
+        _cachedSize = ToCachedSize(dataSize);
+        totalSize += dataSize;
+        return totalSize;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::uint8* LVRepeatedSInt64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    {
+        if (_cachedSize > 0)
+        {
+            target = stream->WriteSInt64Packed(_protobufId, _value, _cachedSize, target);
+        }
+        return target;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVFixed32MessageValue::LVFixed32MessageValue(int protobufId, uint32_t value) :
+        LVMessageValue(protobufId),
+        _value(value)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    size_t LVFixed32MessageValue::ByteSizeLong()
+    {
+        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_FIXED32) + WireFormatLite::kFixed32Size;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::uint8* LVFixed32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    {
+        target = stream->EnsureSpace(target);
+        return WireFormatLite::WriteFixed32ToArray(_protobufId, _value, target);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVRepeatedFixed32MessageValue::LVRepeatedFixed32MessageValue(int protobufId) :
+        LVMessageValue(protobufId)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    size_t LVRepeatedFixed32MessageValue::ByteSizeLong()
+    {
+        size_t totalSize = 0;
+        unsigned int count = static_cast<unsigned int>(_value.size());
+        size_t dataSize = WireFormatLite::kFixed32Size * count;
+        if (dataSize > 0)
+        {
+            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::UInt32Size(static_cast<google::protobuf::int32>(dataSize));
+        }
+        totalSize += dataSize;
+        return totalSize;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::uint8* LVRepeatedFixed32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    {
+        if (_value.size() > 0)
+        {
+            target = stream->WriteFixedPacked(_protobufId, _value, target);
+        }
+        return target;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVFixed64MessageValue::LVFixed64MessageValue(int protobufId, uint64_t value) :
+        LVMessageValue(protobufId),
+        _value(value)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    size_t LVFixed64MessageValue::ByteSizeLong()
+    {
+        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_FIXED64) + WireFormatLite::kFixed64Size;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::uint8* LVFixed64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    {
+        target = stream->EnsureSpace(target);
+        return WireFormatLite::WriteFixed64ToArray(_protobufId, _value, target);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVRepeatedFixed64MessageValue::LVRepeatedFixed64MessageValue(int protobufId) :
+        LVMessageValue(protobufId)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    size_t LVRepeatedFixed64MessageValue::ByteSizeLong()
+    {
+        size_t totalSize = 0;
+        unsigned int count = static_cast<unsigned int>(_value.size());
+        size_t dataSize = WireFormatLite::kFixed64Size * count;
+        if (dataSize > 0)
+        {
+            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::UInt64Size(static_cast<google::protobuf::int32>(dataSize));
+        }
+        totalSize += dataSize;
+        return totalSize;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::uint8* LVRepeatedFixed64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    {
+        if (_value.size() > 0)
+        {
+            target = stream->WriteFixedPacked(_protobufId, _value, target);
+        }
+        return target;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVSFixed32MessageValue::LVSFixed32MessageValue(int protobufId, int32_t value) :
+        LVMessageValue(protobufId),
+        _value(value)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    size_t LVSFixed32MessageValue::ByteSizeLong()
+    {
+        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_SFIXED32) + WireFormatLite::kSFixed32Size;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::uint8* LVSFixed32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    {
+        target = stream->EnsureSpace(target);
+        return WireFormatLite::WriteSFixed32ToArray(_protobufId, _value, target);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVRepeatedSFixed32MessageValue::LVRepeatedSFixed32MessageValue(int protobufId) :
+        LVMessageValue(protobufId)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    size_t LVRepeatedSFixed32MessageValue::ByteSizeLong()
+    {
+        size_t totalSize = 0;
+        unsigned int count = static_cast<unsigned int>(_value.size());
+        size_t dataSize = WireFormatLite::kSFixed32Size * count;
+        if (dataSize > 0)
+        {
+            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
+        }
+        totalSize += dataSize;
+        return totalSize;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::uint8* LVRepeatedSFixed32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    {
+        if (_value.size() > 0)
+        {
+            target = stream->WriteFixedPacked(_protobufId, _value, target);
+        }
+        return target;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVSFixed64MessageValue::LVSFixed64MessageValue(int protobufId, int64_t value) :
+        LVMessageValue(protobufId),
+        _value(value)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    size_t LVSFixed64MessageValue::ByteSizeLong()
+    {
+        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_SFIXED64) + WireFormatLite::kSFixed64Size;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::uint8* LVSFixed64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    {
+        target = stream->EnsureSpace(target);
+        return WireFormatLite::WriteSFixed64ToArray(_protobufId, _value, target);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    LVRepeatedSFixed64MessageValue::LVRepeatedSFixed64MessageValue(int protobufId) :
+        LVMessageValue(protobufId)
+    {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    size_t LVRepeatedSFixed64MessageValue::ByteSizeLong()
+    {
+        size_t totalSize = 0;
+        unsigned int count = static_cast<unsigned int>(_value.size());
+        size_t dataSize = WireFormatLite::kSFixed64Size * count;
+        if (dataSize > 0)
+        {
+            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
+            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int64Size(static_cast<google::protobuf::int32>(dataSize));
+        }
+        totalSize += dataSize;
+        return totalSize;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::uint8* LVRepeatedSFixed64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    {
+        if (_value.size() > 0)
+        {
+            target = stream->WriteFixedPacked(_protobufId, _value, target);
+        }
+        return target;
+    }
 }

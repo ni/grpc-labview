@@ -32,10 +32,16 @@ namespace grpc_labview {
         case LVMessageMetadataType::UInt32Value:
         case LVMessageMetadataType::EnumValue:
         case LVMessageMetadataType::FloatValue:
+        case LVMessageMetadataType::SFixed32Value:
+        case LVMessageMetadataType::SInt32Value:
+        case LVMessageMetadataType::Fixed32Value:
             return 4;
         case LVMessageMetadataType::Int64Value:
         case LVMessageMetadataType::UInt64Value:
         case LVMessageMetadataType::DoubleValue:
+        case LVMessageMetadataType::SFixed64Value:
+        case LVMessageMetadataType::SInt64Value:
+        case LVMessageMetadataType::Fixed64Value:
             return 8;
         case LVMessageMetadataType::StringValue:
         case LVMessageMetadataType::BytesValue:

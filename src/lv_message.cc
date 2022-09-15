@@ -142,6 +142,24 @@ namespace grpc_labview
                         case LVMessageMetadataType::EnumValue:
                             ptr = ParseEnum(*fieldInfo, index, ptr, ctx);
                             break;
+                        case LVMessageMetadataType::SInt32Value:
+                            ptr = ParseSInt32(*fieldInfo, index, ptr, ctx);
+                            break;
+                        case LVMessageMetadataType::SInt64Value:
+                            ptr = ParseSInt64(*fieldInfo, index, ptr, ctx);
+                            break;
+                        case LVMessageMetadataType::Fixed32Value:
+                            ptr = ParseFixed32(*fieldInfo, index, ptr, ctx);
+                            break;
+                        case LVMessageMetadataType::Fixed64Value:
+                            ptr = ParseFixed64(*fieldInfo, index, ptr, ctx);
+                            break;
+                        case LVMessageMetadataType::SFixed32Value:
+                            ptr = ParseSFixed32(*fieldInfo, index, ptr, ctx);
+                            break;
+                        case LVMessageMetadataType::SFixed64Value:
+                            ptr = ParseSFixed64(*fieldInfo, index, ptr, ctx);
+                            break;
                     }
                     assert(ptr != nullptr);
                 }
@@ -373,6 +391,127 @@ namespace grpc_labview
             char buf[2] = {static_cast<char>(tag | 0x80), static_cast<char>(tag >> 7)};
             return std::memcmp(ptr, buf, 2) == 0;
         }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char* LVMessage::ParseSInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedSInt32MessageValue>(index);
+            ptr = PackedSInt32Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            int32_t result;
+            ptr = ReadSINT32(ptr, &result);
+            auto v = std::make_shared<LVSInt32MessageValue>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char* LVMessage::ParseSInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedSInt64MessageValue>(index);
+            ptr = PackedSInt64Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            int64_t result;
+            ptr = ReadSINT64(ptr, &result);
+            auto v = std::make_shared<LVSInt64MessageValue>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char* LVMessage::ParseFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedFixed32MessageValue>(index);
+            ptr = PackedFixed32Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            uint32_t result;
+            ptr = ReadFIXED32(ptr, &result);
+            auto v = std::make_shared<LVFixed32MessageValue>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
+    }
+
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char* LVMessage::ParseFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedFixed64MessageValue>(index);
+            ptr = PackedFixed64Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            uint64_t result;
+            ptr = ReadFIXED64(ptr, &result);
+            auto v = std::make_shared<LVFixed64MessageValue>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char* LVMessage::ParseSFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedFixed32MessageValue>(index);
+            ptr = PackedSFixed32Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            int32_t result;
+            ptr = ReadSFIXED32(ptr, &result);
+            auto v = std::make_shared<LVSFixed32MessageValue>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char* LVMessage::ParseSFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(index);
+            ptr = PackedSFixed64Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            int64_t result;
+            ptr = ReadSFIXED64(ptr, &result);
+            auto v = std::make_shared<LVSFixed64MessageValue>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
     }
 
     //---------------------------------------------------------------------
