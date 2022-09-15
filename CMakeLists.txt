@@ -63,6 +63,7 @@ add_library(labview_grpc_server SHARED
   src/message_element_metadata_owner.cc
   src/any_support.cc
   src/unpacked_fields.cc
+  src/grpc_load.cc
   )
 target_link_libraries(labview_grpc_server
    ${_REFLECTION}
