@@ -269,6 +269,7 @@ LIBRARY_EXPORT int32_t CloseServerEvent(grpc_labview::gRPCid** id)
     }
     data->NotifyComplete();
     data->_call->Finish();
+    grpc_labview::gPointerManager.UnregisterPointer(*id);
     return 0;
 }
 
