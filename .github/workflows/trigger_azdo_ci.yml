@@ -1,0 +1,21 @@
+name: Trigger AzDO CIs
+
+on:
+  workflow_call:
+    secrets:
+      AZDO_DEVOPS_TOKEN:
+        required: true
+  workflow_dispatch:
+
+jobs:
+  trigger_azdo_ci:
+    name: Trigger Main CI
+    runs-on: windows-latest
+    steps:
+    - name: Trigger Main CI
+      uses: Azure/pipelines@v1
+      if: ${{ github.repository == 'ni/grpc-labview' }}
+      with:
+        azure-devops-project-url: 'https://dev.azure.com/ni/DevCentral'
+        azure-pipeline-name: 'ni-central-grpc-labview-build-vipkg-in-windows'
+        azure-devops-token: ${{ secrets.AZURE_DEVOPS_TOKEN }}
