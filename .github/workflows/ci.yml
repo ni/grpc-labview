@@ -15,3 +15,13 @@ jobs:
     uses: ./.github/workflows/build_on_linux.yml
   build_linux_rt:
     uses: ./.github/workflows/build_on_rt.yml
+  
+  trigger_azdo_ci:
+    needs:
+      - build_windows_x64
+      - build_windows_x86
+      - build_linux
+      - build_linux_rt
+    uses: ./.github/workflows/trigger_azdo_ci.yml
+    secrets:
+      AZURE_DEVOPS_TOKEN: ${{ secrets.AZURE_DEVOPS_TOKEN }}
