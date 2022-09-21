@@ -1,10 +1,10 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-29 00:29:27" Modified_Date="2022-09-16 14:43:28" Creator="navin" Comments="" ID="776ab1dd6c0bf0a28804dafa132145ce">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-29 00:29:27" Modified_Date="2022-09-21 13:24:43" Creator="navin" Comments="" ID="b17d7d9e20cddce4818ec48b3ea74200">
   <Library_General_Settings>
     <Package_File_Name>NI_lib_gRPC_Server_and_Client_Template[2]</Package_File_Name>
     <Library_Version>0.5.0.2</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
-    <Library_Output_Folder>..\build</Library_Output_Folder>
+    <Library_Output_Folder>..\..\vipkgs-build-output</Library_Output_Folder>
     <Company_Name>NI</Company_Name>
     <Library_Summary/>
     <Library_License/>
