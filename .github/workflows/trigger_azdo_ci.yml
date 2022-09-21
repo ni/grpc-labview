@@ -19,4 +19,4 @@ jobs:
         azure-devops-project-url: 'https://dev.azure.com/ni/DevCentral'
         azure-pipeline-name: 'ni-central-grpc-labview-build-vipkg-in-windows'
         azure-devops-token: ${{ secrets.AZURE_DEVOPS_TOKEN }}
-        azure-pipeline-variables: '{"workflow_run_id": "value1", "is_release": "false"}'
+        azure-pipeline-variables: '{"workflow_run_id": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", "is_release": "false"}'
