@@ -46,7 +46,9 @@ jobs:
 
     - name: Tar Build Artifacts
       run: >-
-        tar -czvf liblabview-grpc-server-linux.tar.gz -C ${{runner.workspace}}/cmake/build liblabview_grpc_server.so
+        tar -czvf liblabview-grpc-server-linux.tar.gz -C ${{runner.workspace}}/cmake/build
+        liblabview_grpc_server.so
+        liblabview_grpc_generator.so
     
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v2
