@@ -12,7 +12,7 @@ jobs:
     
     - name: Zip Release Artifacts
       run: |
-        cd ${{runner.workspace}}/grpc-labview/labview source/Builds
+        cd "${{runner.workspace}}/grpc-labview/labview source/Builds"
         tar -cavf grpc-labview.zip *.vip
 
     - if: startsWith(github.ref, 'refs/tags/v')
