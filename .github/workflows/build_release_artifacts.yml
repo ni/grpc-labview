@@ -6,8 +6,6 @@ on:
 
 jobs:
   build_release_artifacts:
-    env:
-      STAGING_PATH: ${{ runner.temp }}\grpc-labview-staged-artifacts
     name: Download and Build artifacts
     runs-on: self-hosted
     steps:
@@ -20,11 +18,11 @@ jobs:
 
     - name: Stage Artifacts
       run:
-       python ${{runner.workspace}}\grpc-labview\build-it\stage_artifacts.py --downloaded_path ${{ steps.download_artifacts.outputs.download-path }} --staging_path ${{ env.STAGING_PATH}}
+       python ${{runner.workspace}}\grpc-labview\build-it\stage_artifacts.py --downloaded_path ${{ steps.download_artifacts.outputs.download-path }} --staging_path ${{ runner.temp }}\grpc-labview-staged-artifacts
     
     - name: Build VI Packages
       run:
-       python ${{runner.workspace}}\grpc-labview\build-it\build.py --target All --pathToBinaries ${{ env.STAGING_PATH }}\TopLevelDlls
+       python ${{runner.workspace}}\grpc-labview\build-it\build.py --target All --pathToBinaries ${{ runner.temp }}\grpc-labview-staged-artifacts\TopLevelDlls
 
     - if: startsWith(github.ref, 'refs/tags/v')
       id: create_release
