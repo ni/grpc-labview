@@ -9,6 +9,12 @@ jobs:
     name: draft release 
     runs-on: self-hosted
     steps:
+    
+    - name: Zip Release Artifacts
+      run: |
+        cd ${{runner.workspace}}/grpc-labview/labview source/Builds
+        tar -cavf grpc-labview.zip *.vip
+
     - if: startsWith(github.ref, 'refs/tags/v')
       name: Create Draft Release
       id: create_release
@@ -27,6 +33,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{runner.workspace}}\grpc-labview\labview source\Builds\Builds.zip
-          asset_name: Builds.zip
+          asset_path: ${{runner.workspace}}\grpc-labview\labview source\Builds\grpc-labview.zip
+          asset_name: grpc-labview.zip
           asset_content_type: application/zip
