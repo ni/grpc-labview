@@ -4,11 +4,10 @@ on:
   workflow_call:
   workflow_dispatch:
 
-env:
-  STAGING_PATH: ${{ runner.temp }}\grpc-labview-staged-artifacts
-
 jobs:
   build_release_artifacts:
+    env:
+      STAGING_PATH: ${{ runner.temp }}\grpc-labview-staged-artifacts
     name: Download and Build artifacts
     runs-on: self-hosted
     steps:
