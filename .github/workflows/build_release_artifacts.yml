@@ -1,0 +1,46 @@
+name: Build Release artifacts
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  trigger_azdo_ci:
+    name: Download and Build artifacts
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/download-artifact@v3
+      with:
+        path: ${{ runner.temp }}\grpc-labview-artifacts
+
+    - name: Stage Artifacts
+      run:
+       python ${{runner.workspace}}\grpc-labview\build-it\stage_artifacts.py --downloaded_path ${{ runner.temp }}\grpc-labview-artifacts --staging_path ${{ runner.temp }}\grpc-labview-staged-artifacts
+    
+    - name: Build VI Packages
+      run:
+       python ${{runner.workspace}}\grpc-labview\build-it\build.py --target All --pathToBinaries ${{ runner.temp }}\grpc-labview-staged-artifacts\TopLevelDlls
+
+    - if: startsWith(github.ref, 'refs/tag/v')
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        name: Verison ${{ github.ref }}
+        draft: true
+
+    - if: startsWith(github.ref, 'refs/tag/v')
+      name: upload release artifacts
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VIPM_OUTPUTS: '"grpc-labview/labview source/Builds"'
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{runner.workspace}}/${VIPM_OUTPUTS}
+          asset_name: grpc-laview.zip
+          asset_content_type: application/zip
