@@ -27,6 +27,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{runner.workspace}}\grpc-labview\labview source\Builds
+          asset_path: ${{runner.workspace}}\grpc-labview\labview source\Builds\Builds.zip
           asset_name: Builds.zip
           asset_content_type: application/zip
