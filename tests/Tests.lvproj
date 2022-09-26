@@ -31,30 +31,13 @@
 		</Item>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="vi.lib" Type="Folder">
-				<Item Name="Any.ctl" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/typeDefs/Any.ctl"/>
-				<Item Name="AnyBuilderAddValue.vim" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/Message Requests/AnyBuilderAddValue.vim"/>
-				<Item Name="AnyBuilderBegin.vi" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/Message Requests/AnyBuilderBegin.vi"/>
-				<Item Name="AnyBuilderBuild.vi" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/Message Requests/AnyBuilderBuild.vi"/>
-				<Item Name="AnyBuilderBuildToBuffer.vi" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/Message Requests/AnyBuilderBuildToBuffer.vi"/>
+				<Item Name="1D String Array to Delimited String.vi" Type="VI" URL="/&lt;vilib&gt;/AdvancedString/1D String Array to Delimited String.vi"/>
 				<Item Name="Application Directory.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/file.llb/Application Directory.vi"/>
-				<Item Name="CompleteMetadataRegistration.vi" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/CompleteMetadataRegistration.vi"/>
-				<Item Name="CreateSerializationSession.vi" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/CreateSerializationSession.vi"/>
 				<Item Name="Error Cluster From Error Code.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/Error Cluster From Error Code.vi"/>
-				<Item Name="FreeSerializationSession.vi" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/FreeSerializationSession.vi"/>
-				<Item Name="Get Server DLL Path.vi" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/Server/Get Server DLL Path.vi"/>
-				<Item Name="grpcId.ctl" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/typeDefs/grpcId.ctl"/>
-				<Item Name="Message Element Metadata.ctl" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/typeDefs/Message Element Metadata.ctl"/>
-				<Item Name="Message Element Type.ctl" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/typeDefs/Message Element Type.ctl"/>
-				<Item Name="Message Metadata.ctl" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/typeDefs/Message Metadata.ctl"/>
 				<Item Name="NI_Data Type.lvlib" Type="Library" URL="/&lt;vilib&gt;/Utility/Data Type/NI_Data Type.lvlib"/>
 				<Item Name="NI_FileType.lvlib" Type="Library" URL="/&lt;vilib&gt;/Utility/lvfile.llb/NI_FileType.lvlib"/>
-				<Item Name="PackToAny.vim" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/Message Requests/PackToAny.vim"/>
-				<Item Name="PackToBuffer.vim" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/PackToBuffer.vim"/>
-				<Item Name="Register Message Metadata.vi" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/Server/Register Message Metadata.vi"/>
-				<Item Name="UnpackFromAny.vim" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/Message Requests/UnpackFromAny.vim"/>
-				<Item Name="UnpackFromBuffer.vim" Type="VI" URL="/&lt;vilib&gt;/gRPC/LabVIEW gRPC Library/Server API/UnpackFromBuffer.vim"/>
 			</Item>
-			<Item Name="gprc-lvsupport.lvlib" Type="Library" URL="../../labview source/gRPC lv Support/gprc-lvsupport.lvlib"/>
+			<Item Name="grpc-lvsupport.lvlib" Type="Library" URL="../../labview source/gRPC lv Support/grpc-lvsupport.lvlib"/>
 		</Item>
 		<Item Name="Build Specifications" Type="Build"/>
 	</Item>
