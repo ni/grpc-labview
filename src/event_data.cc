@@ -18,7 +18,6 @@ namespace grpc_labview
         _stream(&_ctx),
         _status(CallStatus::Create),
         _writeSemaphore(0),
-        _cancelled(false),
         _requestDataReady(false),
         _callStatus(grpc::Status::OK)
     {
@@ -43,7 +42,6 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void CallFinishedData::Proceed(bool ok)
     {
-        _call->CallFinished();
         delete this;
     }
 
@@ -83,13 +81,6 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void CallData::CallFinished()
-    {
-        _cancelled = _ctx.IsCancelled();      
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
     void CallData::Finish()
     {
         if (_status == CallStatus::PendingFinish)
@@ -108,7 +99,14 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     bool CallData::IsCancelled()
     {
-        return _cancelled;
+        return _ctx.IsCancelled();
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    bool CallData::IsActive()
+    {
+        return !IsCancelled() && _status != CallStatus::Finish && _status != CallStatus::PendingFinish;
     }
 
     //---------------------------------------------------------------------
