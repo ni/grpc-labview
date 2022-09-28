@@ -8,6 +8,10 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build_windows_x64:
     uses: ./.github/workflows/windows_x64_build.yml
@@ -19,6 +23,7 @@ jobs:
     uses: ./.github/workflows/build_on_rt.yml
   
   build_release_arifacts:
+    if: ${{ github.repository == 'ni/grpc-labview' }}
     needs:
       - build_windows_x64
       - build_windows_x86
