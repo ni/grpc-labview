@@ -1,9 +1,12 @@
-import sys
+import argparse
+import glob
 import os
 import distutils
 import distutils.dir_util
 import distutils.file_util
+from pathlib import Path
 import subprocess
+from lxml import etree as ET
 
 class LVgRPCBuilder:
     def __init__(self):
@@ -11,49 +14,33 @@ class LVgRPCBuilder:
         self.root_directory = os.path.dirname(self.build_script_directory)
         self.server_binary_destination = os.path.join(self.root_directory, "labview source", "gRPC lv Support")
         self.generator_binary_destination = os.path.join(self.root_directory, "labview source", "Client Server Support New", "gRPC Scripting Tools", "Proto Parser API")
-        self.parse_configuration()
+        self.vipb_file_paths = self.get_vipb_files()
+    
+    def get_vipb_files(self):
+        labview_source_directory = os.path.join(self.root_directory, "labview source")
+        vipb_paths = glob.glob(labview_source_directory + '**/**/*.vipb', recursive=True)
+        return vipb_paths
 
-    def parse_configuration(self):
-        self.build_target = None
-        self.path_to_binaries = None
-        self.vipb_build_only = True
-
-        for i in range(1, len(sys.argv)):
-            current_arg = sys.argv[i]
-
-            if current_arg == "--target" or current_arg == "-t":
-                self.build_target = sys.argv[i+1]
-            elif current_arg == "--pathToBinaries" or current_arg == "-p":
-                self.path_to_binaries = sys.argv[i+1]
-            elif current_arg == "--buildcpp":
-                self.vipb_build_only = False
-
-        if self.build_target != "Win32" and self.build_target != "Win64" and self.build_target != "All":
-            raise Exception("Build target should be one off Win32, Win64 or All. Passed build target is " + self.build_target)
-
-        if self.build_target == "All" and self.path_to_binaries == None:
-            raise Exception("For build target All a path to binaries should be specified using the --pathToBinaries/-p option")
-
-    def get_cmake_args(self):
-        if self.build_target == "Win32":
+    def get_cmake_args(args):
+        if args.target == "Win32":
             return ["-A", "Win32", ".."]
-        elif self.build_target == "Win64":
+        elif args.target == "Win64":
             return [".."]
 
-    def cpp_build(self):
+    def cpp_build(self, args):
         cpp_build_directory = os.path.join(self.root_directory, "build");
         if os.path.exists(cpp_build_directory):
             distutils.dir_util.remove_tree(cpp_build_directory)
         os.makedirs(cpp_build_directory)
         os.chdir(cpp_build_directory)
 
-        subprocess.run(["cmake"] + self.get_cmake_args())
+        subprocess.run(["cmake"] + self.get_cmake_args(args))
         subprocess.run(["cmake", "--build",  ".",  "--config", "Release"])
 
-    def copy_binaries_all_targets(self):
-        server_dll_source = os.path.join(self.path_to_binaries, "LabVIEW gRPC Server")
+    def copy_binaries_all_targets(self, args):
+        server_dll_source = os.path.join(args.pathToBinaries, "LabVIEW gRPC Server")
         distutils.dir_util.copy_tree(server_dll_source, self.server_binary_destination)
-        generator_dll_source = os.path.join(self.path_to_binaries, "LabVIEW gRPC Generator")
+        generator_dll_source = os.path.join(args.pathToBinaries, "LabVIEW gRPC Generator")
         distutils.dir_util.copy_tree(generator_dll_source, self.generator_binary_destination)
 
     def copy_binaries_for_target(self):
@@ -69,22 +56,68 @@ class LVgRPCBuilder:
             os.makedirs(generator_dll_destination)
         distutils.file_util.copy_file(generator_dll_source, generator_dll_destination)
 
-    def copy_built_binaries(self):
-        if self.build_target == "All":
-            self.copy_binaries_all_targets()
+    def copy_built_binaries(self, args):
+        if args.target == "All":
+            self.copy_binaries_all_targets(args)
         else:
             self.copy_binaries_for_target()
 
 
-    def build(self):
-        if not self.build_target == "All" and not self.vipb_build_only:
-            self.cpp_build()
-        self.copy_built_binaries()
+    def build(self, args):
+        if not args.target == "All" and not args.buildcpp:
+            self.cpp_build(args)
+        self.copy_built_binaries(args)
         build_vi_path = os.path.join(self.build_script_directory, "LV Build", "BuildGRPCPackages.vi")
         subprocess.run(["LabVIEWCLI", "-OperationName", "RunVI", "-VIPath", build_vi_path, os.path.join(self.root_directory, "labview source")])
 
+    def parse_args(self):
+        parser = argparse.ArgumentParser(
+            description="Parsing the script parameters"
+        )
+        parser.add_argument(
+            "--library_version",
+            help="release tag",
+            default="0.6.0.0"
+        )
+        parser.add_argument(
+            "--target",
+            help="Build targets",
+            default="All",
+        )
+        parser.add_argument(
+            "--pathToBinaries",
+            help="Path to the pre-built binaries",
+            default="C:",
+        )
+        parser.add_argument(
+            "--buildcpp",
+            help="Build cpp",
+            default=False,
+        )
+        return parser.parse_args()
+
+    def upgrade_vipb_library_version(self, updated_library_version):
+        for vipb_file in self.vipb_file_paths:
+            vipb = open(vipb_file, 'r')
+            tree = ET.parse(vipb)
+            root = tree.getroot()
+            for current_library_version in root.iter('Library_Version'):
+                current_library_version.text = updated_library_version
+            tree.write(vipb.name)
+
 def main():
     gRPCPackageBuilder = LVgRPCBuilder()
-    gRPCPackageBuilder.build()
+    args = gRPCPackageBuilder.parse_args()
+
+    if args.library_version != "":
+        gRPCPackageBuilder.upgrade_vipb_library_version(args.library_version)
+
+    if args.target != "Win32" and args.target != "Win64" and args.target != "All":
+            raise Exception("Build target should be one off Win32, Win64 or All. Passed build target is " + args.target)
+
+    if args.target == "All" and args.pathToBinaries == "":
+            raise Exception("For build target All a path to binaries should be specified using the --pathToBinaries option")
+
+    gRPCPackageBuilder.build(args)
 
 main()
