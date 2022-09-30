@@ -48,6 +48,7 @@ namespace grpc_labview
     public:
         std::map<int, std::shared_ptr<LVMessageValue>> _values;
         std::shared_ptr<MessageMetadata> _metadata;
+        bool supportNullTerminatedMessage;
 
     private:
         mutable google::protobuf::internal::CachedSize _cached_size_;

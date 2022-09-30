@@ -13,7 +13,9 @@ namespace grpc_labview
     class IMessageElementMetadataOwner
     {
     public:
+        IMessageElementMetadataOwner() : supportNullTerminatedMessages(false) { }
         virtual std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) = 0;
+        bool supportNullTerminatedMessages;
     };
 
     //---------------------------------------------------------------------
