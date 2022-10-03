@@ -77,7 +77,7 @@ class LVgRPCBuilder:
         parser.add_argument(
             "--library_version",
             help="release tag",
-            default="0.6.0.0"
+            default=""
         )
         parser.add_argument(
             "--target",
