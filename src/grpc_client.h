@@ -30,6 +30,7 @@ namespace grpc_labview
     public:
         std::shared_ptr<grpc::Channel> Channel;
         std::list<ClientCall*> ActiveClientCalls;
+        std::mutex clientLock;
     };
 
     //---------------------------------------------------------------------
