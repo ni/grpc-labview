@@ -42,7 +42,7 @@ jobs:
     - name: Build
       working-directory: ${{runner.workspace}}/cmake/build
       shell: bash
-      run: make
+      run: make -j 16
 
     - name: Tar Build Artifacts
       run: >-
