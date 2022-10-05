@@ -90,7 +90,7 @@ Build Debug
 ```
 > mkdir -p cmake/build
 > cd cmake/build
-> cmake ../..
+> cmake -DCMAKE_BUILD_TYPE=Debug ../..
 > make
 ```
 
@@ -129,7 +129,7 @@ Build Debug
 ```
 > mkdir -p cmake/build
 > cd cmake/build
-> cmake ../..
+> cmake -DCMAKE_BUILD_TYPE=Debug ../..
 > make
 ```
 
