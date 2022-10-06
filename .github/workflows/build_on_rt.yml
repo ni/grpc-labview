@@ -106,7 +106,7 @@ jobs:
       shell: cmake -P {0}
       run: |
         execute_process(
-          COMMAND cmake --build build --config $ENV{BUILD_TYPE} -j 2
+          COMMAND cmake --build build --config $ENV{BUILD_TYPE} -j 16
           RESULT_VARIABLE result
           OUTPUT_VARIABLE output
           ERROR_VARIABLE output
