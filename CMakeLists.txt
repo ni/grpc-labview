@@ -51,7 +51,7 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src" "./third_party/grpc")
 #----------------------------------------------------------------------
 # LabVIEW support for grpc and protobuf
 #----------------------------------------------------------------------
-add_library(labview_grpc_server SHARED
+add_library(labview_grpc_server_nanopb SHARED
   src/grpc_client.cc
   src/grpc_server.cc
   src/grpc_interop.cc
@@ -65,7 +65,7 @@ add_library(labview_grpc_server SHARED
   src/unpacked_fields.cc
   src/grpc_load.cc
   )
-target_link_libraries(labview_grpc_server
+target_link_libraries(labview_grpc_server_nanopb
    ${_REFLECTION}
    ${_GRPC_GRPCPP}
    ${_PROTOBUF_LIBPROTOBUF})
