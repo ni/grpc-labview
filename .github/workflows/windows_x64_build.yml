@@ -19,6 +19,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: ilammy/msvc-dev-cmd@v1.4.1
+      with:
+        # MSVC 15.0 toolchain used by newer leaf NI components
+        toolset: 14.16.27012
 
     - name: Update Submodules
       working-directory: ${{runner.workspace}}/grpc-labview      
