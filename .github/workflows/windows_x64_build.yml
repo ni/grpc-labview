@@ -22,6 +22,8 @@ jobs:
       with:
         # MSVC 15.0 toolchain used by newer leaf NI components
         toolset: 14.16.27012
+        vsversion: 2017
+        spectre: true
 
     - name: Update Submodules
       working-directory: ${{runner.workspace}}/grpc-labview      
