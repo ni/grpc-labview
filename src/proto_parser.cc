@@ -45,7 +45,8 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void ErrorCollector::AddError(const std::string & filename, int line, int column, const std::string & message)
     {
-        _errors.emplace_back(message);
+        std::string errorMessage = filename + ": " + std::to_string(line) + " - " + message; 
+        _errors.emplace_back(errorMessage);
     }
 
     //---------------------------------------------------------------------
@@ -66,15 +67,15 @@ namespace grpc_labview
     {
     public:
         LVProtoParser();
+        void AddSearchPath(const std::string& searchPath);
         void Import(const std::string& filePath, const std::string& searchPath);
 
     public:
         DiskSourceTree m_SourceTree;
         ErrorCollector m_ErrorCollector;
         Importer m_Importer;
-
+        std::list<std::string> m_searchPaths;
         const FileDescriptor* m_FileDescriptor;
-
         static LVProtoParser* s_Parser;
     };
 
@@ -92,11 +93,24 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    void LVProtoParser::AddSearchPath(const std::string& searchPath)
+    {
+        std::string path = searchPath;
+        std::replace(path.begin(), path.end(), '\\', '/');
+        m_searchPaths.push_back(path);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void LVProtoParser::Import(const std::string& filePath, const std::string& search)
     {
         std::string searchPath = search;
         std::replace(searchPath.begin(), searchPath.end(), '\\', '/');
         m_SourceTree.MapPath("", searchPath);
+        for (auto path: m_searchPaths)
+        {
+            m_SourceTree.MapPath("", path);
+        }
         
         std::string path = filePath;
         std::replace(path.begin(), path.end(), '\\', '/');
@@ -161,6 +175,33 @@ LIBRARY_EXPORT int LVGetgRPCAPIVersion(int* version)
     grpc_labview::InitCallbacks();
 
     *version = 2;
+    return 0;    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int LVCreateParser(grpc_labview::LVProtoParser** parser)
+{
+    grpc_labview::InitCallbacks();
+
+    *parser = new grpc_labview::LVProtoParser();
+    return 0;
+}
+
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int LVAddParserSearchPath(grpc_labview::LVProtoParser* parser, const char* searchPath)
+{
+    parser->AddSearchPath(searchPath);
+    return 0;    
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int LVImportProto2(grpc_labview::LVProtoParser* parser, const char* filePath, const char* searchPath)
+{
+    parser->Import(filePath, searchPath);
     return 0;    
 }
 
