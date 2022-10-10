@@ -36,7 +36,7 @@ jobs:
     - name: Build
       working-directory: ${{runner.workspace}}\grpc-labview\build
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build . --config ${{env.BUILD_TYPE}}
+      run: cmake --build . --config ${{env.BUILD_TYPE}} -j 16
 
     - name: Tar Build Artifacts
       run: >-
