@@ -193,6 +193,10 @@ LIBRARY_EXPORT int LVCreateParser(grpc_labview::LVProtoParser** parser)
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int LVAddParserSearchPath(grpc_labview::LVProtoParser* parser, const char* searchPath)
 {
+    if (parser == nullptr)
+    {
+        return -1;
+    }
     parser->AddSearchPath(searchPath);
     return 0;    
 }
@@ -201,6 +205,10 @@ LIBRARY_EXPORT int LVAddParserSearchPath(grpc_labview::LVProtoParser* parser, co
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int LVImportProto2(grpc_labview::LVProtoParser* parser, const char* filePath, const char* searchPath)
 {
+    if (parser == nullptr)
+    {
+        return -1;
+    }
     parser->Import(filePath, searchPath);
     return 0;    
 }
