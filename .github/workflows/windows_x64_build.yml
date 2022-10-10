@@ -31,7 +31,7 @@ jobs:
 
     - name: Configure CMake
       working-directory: ${{runner.workspace}}\grpc-labview\build
-      run: cmake ..
+      run: cmake -G "Visual Studio 16 2019" ..
 
     - name: Build
       working-directory: ${{runner.workspace}}\grpc-labview\build
