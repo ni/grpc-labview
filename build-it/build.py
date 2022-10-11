@@ -8,12 +8,39 @@ from pathlib import Path
 import subprocess
 
 class LVgRPCBuilder:
+
     def __init__(self):
         self.build_script_directory = os.path.abspath(os.path.dirname(__file__))
         self.root_directory = os.path.dirname(self.build_script_directory)
         self.server_binary_destination = os.path.join(self.root_directory, "labview source", "gRPC lv Support")
         self.generator_binary_destination = os.path.join(self.root_directory, "labview source", "Client Server Support New", "gRPC Scripting Tools", "Proto Parser API")
         self.vipb_file_paths = self.get_vipb_files()
+    
+    def parse_args(self):
+        parser = argparse.ArgumentParser(
+            description="Parsing the script parameters"
+        )
+        parser.add_argument(
+            "--library_version",
+            help="release tag",
+            default=""
+        )
+        parser.add_argument(
+            "--target",
+            help="Build targets",
+            default="All",
+        )
+        parser.add_argument(
+            "--pathToBinaries",
+            help="Path to the pre-built binaries",
+            default="C:",
+        )
+        parser.add_argument(
+            "--buildcpp",
+            help="Build cpp",
+            default=False,
+        )
+        return parser.parse_args()
     
     def get_vipb_files(self):
         labview_source_directory = os.path.join(self.root_directory, "labview source")
@@ -70,32 +97,6 @@ class LVgRPCBuilder:
         build_vipkgs = subprocess.run(["LabVIEWCLI", "-OperationName", "RunVI", "-VIPath", build_vi_path, os.path.join(self.root_directory, "labview source")], capture_output = True)
         if (build_vipkgs.returncode != 0):
             raise Exception(f'Failed to Build vipkgs { build_vipkgs.stderr.decode() }')
-
-    def parse_args(self):
-        parser = argparse.ArgumentParser(
-            description="Parsing the script parameters"
-        )
-        parser.add_argument(
-            "--library_version",
-            help="release tag",
-            default=""
-        )
-        parser.add_argument(
-            "--target",
-            help="Build targets",
-            default="All",
-        )
-        parser.add_argument(
-            "--pathToBinaries",
-            help="Path to the pre-built binaries",
-            default="C:",
-        )
-        parser.add_argument(
-            "--buildcpp",
-            help="Build cpp",
-            default=False,
-        )
-        return parser.parse_args()
 
 def main():
     gRPCPackageBuilder = LVgRPCBuilder()
