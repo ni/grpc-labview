@@ -6,7 +6,6 @@ import distutils.dir_util
 import distutils.file_util
 from pathlib import Path
 import subprocess
-from lxml import etree as ET
 
 class LVgRPCBuilder:
     def __init__(self):
@@ -70,7 +69,7 @@ class LVgRPCBuilder:
         build_vi_path = os.path.join(self.build_script_directory, "LV Build", "BuildGRPCPackages.vi")
         build_vipkgs = subprocess.run(["LabVIEWCLI", "-OperationName", "RunVI", "-VIPath", build_vi_path, os.path.join(self.root_directory, "labview source")], capture_output = True)
         if (build_vipkgs.returncode != 0):
-            raise Exception(f'Failed to Build vipkgs { p.returncode } because {  p.stderror.decode() }')
+            raise Exception(f'Failed to Build vipkgs { build_vipkgs.stderr.decode() }')
 
     def parse_args(self):
         parser = argparse.ArgumentParser(
@@ -98,21 +97,9 @@ class LVgRPCBuilder:
         )
         return parser.parse_args()
 
-    def upgrade_vipb_library_version(self, updated_library_version):
-        for vipb_file in self.vipb_file_paths:
-            vipb = open(vipb_file, 'r')
-            tree = ET.parse(vipb)
-            root = tree.getroot()
-            for current_library_version in root.iter('Library_Version'):
-                current_library_version.text = updated_library_version
-            tree.write(vipb.name)
-
 def main():
     gRPCPackageBuilder = LVgRPCBuilder()
     args = gRPCPackageBuilder.parse_args()
-
-    if args.library_version != "":
-        gRPCPackageBuilder.upgrade_vipb_library_version(args.library_version)
 
     if args.target != "Win32" and args.target != "Win64" and args.target != "All":
             raise Exception("Build target should be one off Win32, Win64 or All. Passed build target is " + args.target)
