@@ -94,14 +94,14 @@ class LVgRPCBuilder:
             self.cpp_build(args)
         self.copy_built_binaries(args)
         build_vi_path = os.path.join(self.build_script_directory, "LV Build", "BuildGRPCPackages.vi")
-        build_vipkgs = subprocess.run(["LabVIEWCLI", "-OperationName", "RunVI", "-VIPath", build_vi_path, os.path.join(self.root_directory, "labview source")], capture_output = True)
+        build_vipkgs = subprocess.run(["LabVIEWCLI", "-OperationName", "RunVI", "-VIPath", build_vi_path, os.path.join(self.root_directory, "labview source"), args.library_version], capture_output = True)
         if (build_vipkgs.returncode != 0):
             raise Exception(f'Failed to Build vipkgs { build_vipkgs.stderr.decode() }')
 
 def main():
     gRPCPackageBuilder = LVgRPCBuilder()
     args = gRPCPackageBuilder.parse_args()
-
+    
     if args.target != "Win32" and args.target != "Win64" and args.target != "All":
             raise Exception("Build target should be one off Win32, Win64 or All. Passed build target is " + args.target)
 
