@@ -16,6 +16,7 @@ jobs:
     - uses: ilammy/msvc-dev-cmd@v1.4.1
       with:
         arch: x86
+    - uses: ilammy/setup-nasm@v1
 
     - name: Update Submodules
       working-directory: ${{runner.workspace}}/grpc-labview      
