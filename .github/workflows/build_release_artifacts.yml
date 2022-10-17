@@ -32,7 +32,7 @@ jobs:
     - if: startsWith(github.ref, 'refs/tags/v')
       name: Build VI Packages for release
       run: 
-        python ${{runner.workspace}}\grpc-labview\build-it\build.py --target All --pathToBinaries ${{ runner.temp }}\grpc-labview-staged-artifacts\TopLevelDlls 
+        python ${{runner.workspace}}\grpc-labview\build-it\build.py --library_version ${{github.ref_name}} --target All --pathToBinaries ${{ runner.temp }}\grpc-labview-staged-artifacts\TopLevelDlls 
 
     - if: startsWith(github.ref, 'refs/tags/v')
       name: Zip Release Artifacts
