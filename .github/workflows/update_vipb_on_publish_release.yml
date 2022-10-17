@@ -9,9 +9,9 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Update VIPB Verison
-      - run: 
+        run: 
          python ${{runner.workspace}}\grpc-labview\build-it\update_vipb_version.py --library_version ${{github.ref_name}}
-      - continue-on-error: false
+        continue-on-error: false
     
       - name : Commit VIPB library version bump
         uses: stefanzweifel/git-auto-commit-action@v4
