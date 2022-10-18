@@ -6,6 +6,7 @@ import distutils.dir_util
 import distutils.file_util
 from pathlib import Path
 import subprocess
+import vipb_helper_class
 
 class LVgRPCBuilder:
 
@@ -28,7 +29,7 @@ class LVgRPCBuilder:
         parser.add_argument(
             "--target",
             help="Build targets",
-            default="All",
+            default="",
         )
         parser.add_argument(
             "--pathToBinaries",
@@ -40,6 +41,12 @@ class LVgRPCBuilder:
             help="Build cpp",
             default=False,
         )
+        parser.add_argument(
+            "build_vipb",
+            help="Does the VIPB files need to be built",
+            default="1",
+        )
+        
         return parser.parse_args()
     
     def get_vipb_files(self):
@@ -94,7 +101,7 @@ class LVgRPCBuilder:
             self.cpp_build(args)
         self.copy_built_binaries(args)
         build_vi_path = os.path.join(self.build_script_directory, "LV Build", "BuildGRPCPackages.vi")
-        build_vipkgs = subprocess.run(["LabVIEWCLI", "-OperationName", "RunVI", "-VIPath", build_vi_path, os.path.join(self.root_directory, "labview source"), args.library_version], capture_output = True)
+        build_vipkgs = subprocess.run(["LabVIEWCLI", "-OperationName", "RunVI", "-VIPath", build_vi_path, os.path.join(self.root_directory, "labview source")], capture_output = True)
         if (build_vipkgs.returncode != 0):
             raise Exception(f'Failed to Build vipkgs { build_vipkgs.stderr.decode() }')
 
@@ -102,6 +109,14 @@ def main():
     gRPCPackageBuilder = LVgRPCBuilder()
     args = gRPCPackageBuilder.parse_args()
     
+    if args.library_version != "" :
+        vipb_files = vipb_helper_class.get_vipb_files(gRPCPackageBuilder.root_directory)
+        for vipb_file in vipb_files:
+            vipb_helper_class.update_vipb_verion(vipb_file = vipb_file, library_version = args.library_version)
+        # build_vipb will be -1 when we donot want to build the vipb files    
+        if args.build_vipb == -1:
+            return
+
     if args.target != "Win32" and args.target != "Win64" and args.target != "All":
             raise Exception("Build target should be one off Win32, Win64 or All. Passed build target is " + args.target)
 
