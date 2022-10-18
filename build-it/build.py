@@ -15,7 +15,6 @@ class LVgRPCBuilder:
         self.root_directory = os.path.dirname(self.build_script_directory)
         self.server_binary_destination = os.path.join(self.root_directory, "labview source", "gRPC lv Support")
         self.generator_binary_destination = os.path.join(self.root_directory, "labview source", "Client Server Support New", "gRPC Scripting Tools", "Proto Parser API")
-        self.vipb_file_paths = self.get_vipb_files()
     
     def parse_args(self):
         parser = argparse.ArgumentParser(
@@ -42,17 +41,12 @@ class LVgRPCBuilder:
             default=False,
         )
         parser.add_argument(
-            "build_vipb",
+            "--build_vipb",
             help="Does the VIPB files need to be built",
             default="1",
         )
-        
+
         return parser.parse_args()
-    
-    def get_vipb_files(self):
-        labview_source_directory = os.path.join(self.root_directory, "labview source")
-        vipb_paths = glob.glob(labview_source_directory + '**/**/*.vipb', recursive=True)
-        return vipb_paths
 
     def get_cmake_args(args):
         if args.target == "Win32":
