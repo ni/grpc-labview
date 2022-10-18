@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Update VIPB Verison
         run: 
-         python ${{runner.workspace}}\grpc-labview\build-it\build.py --library_version ${{github.ref_name}} --build_vipb -1
+         python ${{runner.workspace}}\grpc-labview\build-it\update_vipb_version.py --library_version ${{github.ref_name}}
         continue-on-error: false
     
       - name : Commit VIPB library version bump
@@ -20,3 +20,4 @@ jobs:
           branch: master
           file_pattern: '*vipb'
           push_options: '--force'
+          

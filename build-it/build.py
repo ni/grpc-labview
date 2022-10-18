@@ -1,12 +1,10 @@
 import argparse
-import glob
 import os
 import distutils
 import distutils.dir_util
 import distutils.file_util
-from pathlib import Path
 import subprocess
-import vipb_helper_class
+import vipb_helper
 
 class LVgRPCBuilder:
 
@@ -21,7 +19,7 @@ class LVgRPCBuilder:
             description="Parsing the script parameters"
         )
         parser.add_argument(
-            "--library_version",
+            "--libraryVersion",
             help="release tag",
             default=""
         )
@@ -39,11 +37,6 @@ class LVgRPCBuilder:
             "--buildcpp",
             help="Build cpp",
             default=False,
-        )
-        parser.add_argument(
-            "--build_vipb",
-            help="Does the VIPB files need to be built",
-            default="1",
         )
 
         return parser.parse_args()
@@ -89,7 +82,6 @@ class LVgRPCBuilder:
         else:
             self.copy_binaries_for_target()
 
-
     def build(self, args):
         if not args.target == "All" and not args.buildcpp:
             self.cpp_build(args)
@@ -103,13 +95,11 @@ def main():
     gRPCPackageBuilder = LVgRPCBuilder()
     args = gRPCPackageBuilder.parse_args()
     
-    if args.library_version != "" :
-        vipb_files = vipb_helper_class.get_vipb_files(gRPCPackageBuilder.root_directory)
+    # libraryVersion will be null when we are build vipbs for Pull Requests/Testing
+    if args.libraryVersion != "" :
+        vipb_files = vipb_helper.get_vipb_files(gRPCPackageBuilder.root_directory)
         for vipb_file in vipb_files:
-            vipb_helper_class.update_vipb_verion(vipb_file = vipb_file, library_version = args.library_version)
-        # build_vipb will be -1 when we donot want to build the vipb files    
-        if args.build_vipb == -1:
-            return
+            vipb_helper.update_vipb_verion(vipb_file = vipb_file, library_version = args.libraryVersion)
 
     if args.target != "Win32" and args.target != "Win64" and args.target != "All":
             raise Exception("Build target should be one off Win32, Win64 or All. Passed build target is " + args.target)
