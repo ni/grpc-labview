@@ -40,7 +40,7 @@ class LVgRPCBuilder:
         )
         return parser.parse_args()
 
-    def get_cmake_args(args):
+    def get_cmake_args(self, args):
         if args.target == "Win32":
             return ["-A", "Win32", ".."]
         elif args.target == "Win64":
