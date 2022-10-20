@@ -70,7 +70,7 @@ class LVgRPCBuilder:
         distutils.file_util.copy_file(server_dll_source, server_dll_destination)
 
         generator_dll_source = os.path.join(self.root_directory, "build", "Release", "labview_grpc_generator.dll")
-        generator_dll_destination = os.path.join(self.generator_binary_destination, "Libraries", self.build_target)
+        generator_dll_destination = os.path.join(self.generator_binary_destination, "Libraries", args.target)
         if not os.path.exists(generator_dll_destination):
             os.makedirs(generator_dll_destination)
         distutils.file_util.copy_file(generator_dll_source, generator_dll_destination)
