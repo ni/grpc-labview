@@ -10,6 +10,6 @@ def update_vipb_verion(vipb_file, library_version):
         raise Exception(update_vipb_version.stderr.decode())
 
 def get_vipb_files(root_directory):
-        labview_source_directory = os.path.join(root_directory, "labview source")
-        vipb_paths = glob.glob(labview_source_directory + '**/**/*.vipb', recursive=True)
-        return vipb_paths
+    labview_source_directory = os.path.join(root_directory, "labview source")
+    vipb_paths = glob.glob(labview_source_directory + '**/**/*.vipb', recursive=True)
+    return vipb_paths

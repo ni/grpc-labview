@@ -36,9 +36,8 @@ class LVgRPCBuilder:
         parser.add_argument(
             "--buildcpp",
             help="Build cpp",
-            default=False,
+            action="store_true"
         )
-
         return parser.parse_args()
 
     def get_cmake_args(args):
@@ -63,9 +62,9 @@ class LVgRPCBuilder:
         generator_dll_source = os.path.join(args.pathToBinaries, "LabVIEW gRPC Generator")
         distutils.dir_util.copy_tree(generator_dll_source, self.generator_binary_destination)
 
-    def copy_binaries_for_target(self):
+    def copy_binaries_for_target(self, args):
         server_dll_source = os.path.join(self.root_directory, "build", "Release", "labview_grpc_server.dll")
-        server_dll_destination = os.path.join(self.server_binary_destination, "Libraries", self.build_target)
+        server_dll_destination = os.path.join(self.server_binary_destination, "Libraries", args.target)
         if not os.path.exists(server_dll_destination):
             os.makedirs(server_dll_destination)
         distutils.file_util.copy_file(server_dll_source, server_dll_destination)
@@ -80,10 +79,10 @@ class LVgRPCBuilder:
         if args.target == "All":
             self.copy_binaries_all_targets(args)
         else:
-            self.copy_binaries_for_target()
+            self.copy_binaries_for_target(args)
 
     def build(self, args):
-        if not args.target == "All" and not args.buildcpp:
+        if not args.target == "All" and args.buildcpp:
             self.cpp_build(args)
         self.copy_built_binaries(args)
         build_vi_path = os.path.join(self.build_script_directory, "LV Build", "BuildGRPCPackages.vi")
@@ -95,7 +94,7 @@ def main():
     gRPCPackageBuilder = LVgRPCBuilder()
     args = gRPCPackageBuilder.parse_args()
     
-    # libraryVersion will be null when we are build vipbs for Pull Requests/Testing
+    # libraryVersion will be null when we are building vipbs for Pull Requests/Testing
     if args.libraryVersion != "" :
         vipb_files = vipb_helper.get_vipb_files(gRPCPackageBuilder.root_directory)
         for vipb_file in vipb_files:
