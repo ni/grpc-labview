@@ -31,7 +31,7 @@ class LVgRPCBuilder:
         parser.add_argument(
             "--pathToBinaries",
             help="Path to the pre-built binaries",
-            default="C:",
+            default="",
         )
         parser.add_argument(
             "--buildcpp",
