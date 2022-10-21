@@ -79,8 +79,8 @@ def extract_tarfile(tar_file_name, tar_staging_directory, top_level_dll_director
         _logger.debug(f"extracted {tar_file.getnames()} to {tar_staging_directory}")
 
 def extract_and_stage_artifact(artifact, tar_file, bitness_type, top_level_dll_directory):
-    server_folder = prepare_directory(top_level_dll_directory, sub_directory="LabVIEW gRPC Server")
-    generator_folder = prepare_directory(top_level_dll_directory, sub_directory="LabVIEW gRPC Generator")
+    server_folder = prepare_directory(top_level_dll_directory, sub_directory="LabVIEW gRPC Server/Libraries")
+    generator_folder = prepare_directory(top_level_dll_directory, sub_directory="LabVIEW gRPC Generator/Libraries")
     if(artifact.name.find('server') != -1 ):
         extract_directory = (Path(server_folder) / bitness_type)
     elif(artifact.name.find('generator') != -1):
