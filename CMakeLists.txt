@@ -2,12 +2,15 @@
 #----------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.5.1)
 
+cmake_policy(SET CMP0091 NEW)
+
 project(labview-grpc C CXX)
 
 if(NOT MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 else()
   add_definitions(-D_WIN32_WINNT=0x600)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4267 /wd4244")
 endif()
 
