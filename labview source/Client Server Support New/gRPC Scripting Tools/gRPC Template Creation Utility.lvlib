@@ -141,6 +141,7 @@
 			<Item Name="Get RPC Methods Binds.vi" Type="VI" URL="../Top Level API/Get RPC Methods Binds.vi"/>
 			<Item Name="Get RPC Service Name from Method Namespace.vi" Type="VI" URL="../Top Level API/Get RPC Service Name from Method Namespace.vi"/>
 			<Item Name="Get RPC Type.vi" Type="VI" URL="../Top Level API/Get RPC Type.vi"/>
+			<Item Name="Get RPC Method Name.vi" Type="VI" URL="../Top Level API/Get RPC Method Name.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Create Server Library from Template.vi" Type="VI" URL="../Top Level API/Create Server Library from Template.vi"/>
@@ -269,6 +270,9 @@
 		<Item Name="Translate gRPC Method FullName.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Translate gRPC Method FullName.vi"/>
 		<Item Name="Get Message TypeUrl.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message TypeUrl.vi"/>
 		<Item Name="Group Services.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Group Services.vi"/>
+		<Item Name="Create Proto Parser.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Proto Parser.vi"/>
+		<Item Name="Add Proto Search Path.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Add Proto Search Path.vi"/>
+		<Item Name="GetProtoParseError.vi" Type="VI" URL="../Proto Parser API/GetProtoParseError.vi"/>
 	</Item>
 	<Item Name="Animation API" Type="Folder">
 		<Item Name="Animation.vi" Type="VI" URL="../Animation API/Animation.vi"/>
