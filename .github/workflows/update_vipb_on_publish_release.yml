@@ -1,0 +1,23 @@
+name: Bump VIPB Verison
+on:
+  release:
+    types: [published]
+
+jobs:
+  update_vipb_version:
+    name: Update VIPB Verison on Release
+    runs-on: self-hosted
+    steps:
+      - name: Update VIPB Verison
+        run: 
+         python ${{runner.workspace}}\grpc-labview\build-it\update_vipb_version.py --library_version ${{github.ref_name}}
+        continue-on-error: false
+    
+      - name : Commit VIPB library version bump
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: VIPB version bump
+          branch: master
+          file_pattern: '*vipb'
+          push_options: '--force'
+          

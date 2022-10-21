@@ -19,6 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: ilammy/msvc-dev-cmd@v1.4.1
+    - uses: ilammy/setup-nasm@v1
 
     - name: Update Submodules
       working-directory: ${{runner.workspace}}/grpc-labview      
