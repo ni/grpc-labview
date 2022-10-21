@@ -14,7 +14,7 @@ jobs:
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: windows-latest
+    runs-on: windows-2019
 
     steps:
     - uses: actions/checkout@v2
@@ -32,7 +32,7 @@ jobs:
 
     - name: Configure CMake
       working-directory: ${{runner.workspace}}\grpc-labview\build
-      run: cmake ..
+      run: cmake -G "Visual Studio 16 2019" ..
 
     - name: Build
       working-directory: ${{runner.workspace}}\grpc-labview\build
