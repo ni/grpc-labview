@@ -74,6 +74,11 @@ namespace grpc_labview
         return false;
     }
 
+    bool LabVIEWgRPCServer::HasRegisteredServerMethod(std::string methodName)
+    {
+        return _registeredServerMethods.find(methodName) != _registeredServerMethods.end();
+    }
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LabVIEWgRPCServer::HasGenericMethodEvent()

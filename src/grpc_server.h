@@ -94,12 +94,13 @@ namespace grpc_labview
         void SendEvent(std::string name, gRPCid* data);
 
         bool FindEventData(std::string name, LVEventData& data);
-        bool HasGenericMethodEvent();    
+        bool HasGenericMethodEvent();
+        bool HasRegisteredServerMethod(std::string methodName);
 
     private:
         std::mutex _mutex;
         std::unique_ptr<Server> _server;
-        std::map<std::string, LVEventData> _registeredServerMethods;    
+        std::map<std::string, LVEventData> _registeredServerMethods;
         LVUserEventRef _genericMethodEvent;
         std::unique_ptr<grpc::AsyncGenericService> _rpcService;
         std::unique_ptr<std::thread> _runThread;
