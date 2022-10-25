@@ -4,8 +4,10 @@
 #include <lv_interop.h>
 #include <lv_message.h>
 #include <cluster_copier.h>
+#include <grpcpp/create_channel.h>
 #include <grpcpp/impl/codegen/client_context.h>
 #include <grpcpp/impl/codegen/client_unary_call.h>
+#include <grpcpp/support/channel_arguments.h>
 #include <ctime>
 #include <chrono>
 
@@ -33,7 +35,10 @@ namespace grpc_labview
         {
             creds = grpc::InsecureChannelCredentials();
         }
-        Channel = grpc::CreateChannel(address, creds);
+        grpc::ChannelArguments args;
+        args.SetMaxReceiveMessageSize(-1);
+        args.SetMaxSendMessageSize(-1);
+        Channel = grpc::CreateCustomChannel(address, creds, args);
     }
 
     //---------------------------------------------------------------------
