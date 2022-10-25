@@ -204,8 +204,9 @@ namespace grpc_labview
             }
             else
             {
+                _status = CallStatus::Finish;
                 _stream.Finish(grpc::Status(grpc::StatusCode::UNIMPLEMENTED, ""), this);
-            }       
+            }
         }
         else if (_status == CallStatus::Writing)
         {
