@@ -172,8 +172,17 @@ namespace grpc_labview
             // part of its FINISH state.
             new CallData(_server, _service, _cq);
 
-            _stream.Read(&_rb, this);
-            _status = CallStatus::Process;
+            auto name = _ctx.method();
+            if (_server->HasRegisteredServerMethod(name) || _server->HasGenericMethodEvent())
+            {
+                _stream.Read(&_rb, this);
+                _status = CallStatus::Process;
+            }
+            else
+            {
+                _status = CallStatus::Finish;
+                _stream.Finish(grpc::Status(grpc::StatusCode::UNIMPLEMENTED, ""), this);
+            }
         }
         else if (_status == CallStatus::Process)
         {
@@ -195,8 +204,9 @@ namespace grpc_labview
             }
             else
             {
-                _stream.Finish(grpc::Status::CANCELLED, this);
-            }       
+                _status = CallStatus::Finish;
+                _stream.Finish(grpc::Status(grpc::StatusCode::UNIMPLEMENTED, ""), this);
+            }
         }
         else if (_status == CallStatus::Writing)
         {
