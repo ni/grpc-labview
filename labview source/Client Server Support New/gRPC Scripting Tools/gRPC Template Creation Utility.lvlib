@@ -162,6 +162,7 @@
 			<Item Name="Set VI Icon Text Layer.vi" Type="VI" URL="../Top Level API/Set VI Icon Text Layer.vi"/>
 			<Item Name="UpdateVIIcon.vi" Type="VI" URL="../Top Level API/UpdateVIIcon.vi"/>
 			<Item Name="Basic Generate LV Icon Text Layer.vi" Type="VI" URL="../Top Level API/Basic Generate LV Icon Text Layer.vi"/>
+			<Item Name="UpdateLibraryFromTemplate.vi" Type="VI" URL="../Top Level API/UpdateLibraryFromTemplate.vi"/>
 		</Item>
 	</Item>
 	<Item Name="VI API" Type="Folder">
