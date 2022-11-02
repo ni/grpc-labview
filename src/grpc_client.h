@@ -44,7 +44,7 @@ namespace grpc_labview
         void Cancel();
         
     public:
-        grpc_labview::LabVIEWgRPCClient* _client;
+        std::shared_ptr<grpc_labview::LabVIEWgRPCClient> _client;
         std::string _methodName;
         MagicCookie _occurrence;
         grpc::ClientContext _context;
