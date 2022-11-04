@@ -149,6 +149,10 @@ namespace grpc_labview
     {
         if (!ok)
         {
+            if (_status == CallStatus::Writing)
+            {
+                _writeSemaphore.notify();
+            }
             if (_status != CallStatus::Finish)
             {
                 _status = CallStatus::PendingFinish;

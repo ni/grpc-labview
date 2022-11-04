@@ -252,7 +252,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
 
     auto clientCall = new grpc_labview::ClientCall(timeoutMs);
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
-    clientCall->_client = client.get();
+    clientCall->_client = client;
     clientCall->_methodName = methodName;
     clientCall->_occurrence = *occurrence;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
@@ -347,7 +347,7 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(
 
     auto clientCall = new grpc_labview::ClientStreamingClientCall(timeoutMs);
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
-    clientCall->_client = client.get();
+    clientCall->_client = client;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 
@@ -389,7 +389,7 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
 
     auto clientCall = new grpc_labview::ServerStreamingClientCall(timeoutMs);
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
-    clientCall->_client = client.get();
+    clientCall->_client = client;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 
@@ -432,7 +432,7 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(
 
     auto clientCall = new grpc_labview::BidiStreamingClientCall(timeoutMs);
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
-    clientCall->_client = client.get();
+    clientCall->_client = client;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
 

@@ -158,6 +158,11 @@
 			<Item Name="Generate RPC Client Methods.vi" Type="VI" URL="../Top Level API/Generate RPC Client Methods.vi"/>
 			<Item Name="Update RPC Client Method Constants.vi" Type="VI" URL="../Top Level API/Update RPC Client Method Constants.vi"/>
 			<Item Name="Update RPC Client Method Controls.vi" Type="VI" URL="../Top Level API/Update RPC Client Method Controls.vi"/>
+			<Item Name="StringSplitIntoThree.vi" Type="VI" URL="../Top Level API/StringSplitIntoThree.vi"/>
+			<Item Name="Set VI Icon Text Layer.vi" Type="VI" URL="../Top Level API/Set VI Icon Text Layer.vi"/>
+			<Item Name="UpdateVIIcon.vi" Type="VI" URL="../Top Level API/UpdateVIIcon.vi"/>
+			<Item Name="Basic Generate LV Icon Text Layer.vi" Type="VI" URL="../Top Level API/Basic Generate LV Icon Text Layer.vi"/>
+			<Item Name="UpdateLibraryFromTemplate.vi" Type="VI" URL="../Top Level API/UpdateLibraryFromTemplate.vi"/>
 		</Item>
 	</Item>
 	<Item Name="VI API" Type="Folder">
