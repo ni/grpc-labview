@@ -1,0 +1,14 @@
+name : Run CI Tests
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  run_ci_tests:
+    name: Run CI Tests
+    runs-on: self-hosted
+    steps:
+    - name: Run Arcadia Tests
+      run: 
+        Arcadia --optionsFile ${{runner.workspace}}\grpc-labview\ci-tests\options.json
