@@ -1,0 +1,19 @@
+[
+	{
+		"Test Name": "TEST_HelloWorld",
+		"Test Description": "Will be testing TEST_Add.vi from location C:\\repos\\labview\\src\\LabVIEW\\tests\\auto\\SourceOnly\\Typedefs\\TEST_HelloWorld.vi",
+		"Test Hierarchy": "Core/Build_ATS/SourceOnly",
+		"VI Specs": [
+			{
+				"VI Path": "C:/Arcadia_exp/LV_ATS/LV_ATS.vi",
+				"Test Json": {
+					"VI path": "C:\\Dev\\grpc-labview\\examples\\helloworld\\Test\\HelloWorldTest.vi"
+				}
+			}
+		],
+		"Timeout": 
+		{
+			"Seconds":	180
+		}
+	}
+]
