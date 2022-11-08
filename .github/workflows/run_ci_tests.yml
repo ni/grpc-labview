@@ -11,4 +11,4 @@ jobs:
     steps:
     - name: Run Arcadia Tests
       run: 
-        Arcadia --optionsFile ${{runner.workspace}}\grpc-labview\ci-tests\options.json
+        python ${{runner.workspace}}\grpc-labview\tests\run_tests.py

@@ -144,3 +144,115 @@ HelloWorldTest.vi
 Start Time: 15:42:14.2869	Finish Time: 15:42:17.8887
 HelloWorldTest.vi
 Start Time: 15:42:59.2074	Finish Time: 15:43:03.4345
+
+Start Time: 11:27:55.7726	Finish Time: 11:27:56.0042
+
+Start Time: 11:28:59.1846	Finish Time: 11:28:59.4160
+
+Start Time: 11:30:05.7049	Finish Time: 11:30:05.9112
+
+Start Time: 11:30:07.5036	Finish Time: 11:30:07.7016
+
+Start Time: 11:30:08.7201	Finish Time: 11:30:08.9201
+
+Start Time: 11:31:12.6536	Finish Time: 11:31:12.8454
+
+Start Time: 11:31:14.9282	Finish Time: 11:31:15.1232
+HelloWorldTest.vi"
+Start Time: 11:35:03.0177	Finish Time: 11:35:03.2153
+HelloWorldTest.vi"
+Start Time: 11:36:53.9658	Finish Time: 11:37:28.9404
+HelloWorldTest.vi"
+Start Time: 11:37:34.0298	Finish Time: 11:37:37.3255
+HelloWorldTest.vi"
+Start Time: 11:39:02.1033	Finish Time: 11:39:02.4201
+HelloWorldTest.vi
+Start Time: 11:39:15.9115	Finish Time: 11:39:19.3460
+HelloWorldTest.vi
+Start Time: 11:39:52.3697	Finish Time: 11:39:55.8289
+HelloWorldTest.vi
+Start Time: 11:42:17.1707	Finish Time: 11:42:20.6247
+HelloWorldTest.vi
+Start Time: 11:43:05.2868	Finish Time: 11:43:08.7361
+HelloWorldTest.vi
+Start Time: 11:55:08.7888	Finish Time: 11:55:12.5056
+HelloWorldTest.vi
+Start Time: 12:14:19.1552	Finish Time: 12:14:23.2386
+HelloWorldTest.vi
+Start Time: 12:14:52.2095	Finish Time: 12:14:56.2998
+HelloWorldTest.vi
+Start Time: 12:15:39.5236	Finish Time: 12:15:43.1286
+HelloWorldTest.vi
+Start Time: 12:17:05.2300	Finish Time: 12:17:09.3929
+HelloWorldTest.vi
+Start Time: 12:18:05.5169	Finish Time: 12:18:09.0465
+HelloWorldTest.vi
+Start Time: 12:18:32.9545	Finish Time: 12:18:36.5359
+HelloWorldTest.vi
+Start Time: 12:22:57.5509	Finish Time: 12:23:01.1442
+HelloWorldTest.vi
+Start Time: 12:24:08.1237	Finish Time: 12:24:11.7139
+HelloWorldTest.vi
+Start Time: 12:26:23.7918	Finish Time: 12:26:27.3990
+HelloWorldTest.vi
+Start Time: 12:26:48.0388	Finish Time: 12:26:51.6110
+HelloWorldTest.vi
+Start Time: 12:32:43.9014	Finish Time: 12:32:47.5064
+HelloWorldTest.vi
+Start Time: 12:34:55.8962	Finish Time: 12:34:59.5053
+HelloWorldTest.vi
+Start Time: 12:35:28.2446	Finish Time: 12:35:31.8447
+HelloWorldTest.vi
+Start Time: 12:37:02.0998	Finish Time: 12:37:05.7146
+
+Start Time: 13:59:19.5384	Finish Time: 13:59:20.0618
+
+Start Time: 13:59:49.0463	Finish Time: 13:59:49.2514
+
+Start Time: 13:59:52.2711	Finish Time: 13:59:52.4842
+
+Start Time: 14:01:04.1106	Finish Time: 14:01:04.3476
+
+Start Time: 14:01:18.7716	Finish Time: 14:01:18.9773
+
+Start Time: 14:02:32.5899	Finish Time: 14:02:32.8303
+HelloWorldTest.vi
+Start Time: 14:03:59.8189	Finish Time: 14:04:03.2505
+
+Start Time: 14:04:51.3726	Finish Time: 14:04:51.5706
+
+Start Time: 14:05:52.1834	Finish Time: 14:05:52.3876
+HelloWorldTest.vi
+Start Time: 14:07:25.4391	Finish Time: 14:07:30.1483
+
+Start Time: 14:23:10.3385	Finish Time: 14:23:11.2432
+HelloWorldTest.vi
+Start Time: 14:23:46.3456	Finish Time: 14:23:50.3164
+HelloWorldTest.vi
+Start Time: 14:33:47.8862	Finish Time: 14:33:51.7075
+
+Start Time: 14:47:01.8550	Finish Time: 14:47:02.0817
+
+Start Time: 14:47:49.5929	Finish Time: 14:47:49.7972
+
+Start Time: 14:47:58.0486	Finish Time: 14:47:58.2386
+
+Start Time: 14:48:57.1608	Finish Time: 14:48:57.3626
+HelloWorldTest.vi
+Start Time: 15:09:01.2694	Finish Time: 15:09:05.2594
+HelloWorldTest.vi
+Start Time: 15:11:35.6224	Finish Time: 15:11:39.0633
+HelloWorldTest.vi
+Start Time: 15:37:30.2431	Finish Time: 15:37:34.0014
+HelloWorldTest.vi
+Start Time: 15:58:23.4428	Finish Time: 15:58:27.2246
+HelloWorldTest.vi
+Start Time: 15:59:00.1376	Finish Time: 15:59:03.5855
+HelloWorldTest.vi
+Start Time: 16:00:01.3665	Finish Time: 16:00:04.7843
+HelloWorldTest.vi
+Start Time: 16:02:42.9523	Finish Time: 16:02:46.4024
+HelloWorldTest.vi
+Start Time: 16:04:18.0234	Finish Time: 16:04:21.4406
+HelloWorldTest.vi
+Start Time: 16:04:42.7874	Finish Time: 16:04:46.1977

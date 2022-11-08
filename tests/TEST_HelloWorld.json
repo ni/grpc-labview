@@ -5,7 +5,7 @@
 		"Test Hierarchy": "Core/Build_ATS/SourceOnly",
 		"VI Specs": [
 			{
-				"VI Path": "C:/Arcadia_exp/LV_ATS/LV_ATS.vi",
+				"VI Path": "C:/Dev/grpc-labview/tests/LV_ATS/gRPC_ATS.vi",
 				"Test Json": {
 					"VI path": "C:\\Dev\\grpc-labview\\examples\\helloworld\\Test\\HelloWorldTest.vi"
 				}
