@@ -9,6 +9,6 @@ jobs:
     name: Run CI Tests
     runs-on: self-hosted
     steps:
-    - name: Run Arcadia Tests
+    - name: Run CI Tests
       run: 
         python ${{runner.workspace}}\grpc-labview\tests\run_tests.py

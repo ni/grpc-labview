@@ -32,3 +32,4 @@ labview source/Servers/Generated Server/
 *.pdb
 
 *.so
+tests/LV_ATS/TimeStamp.txt
