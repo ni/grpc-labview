@@ -1,7 +1,7 @@
 <VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-11-19 18:41:05" Modified_Date="2022-10-06 11:46:59" Creator="navin" Comments="" ID="6a5f01391cfebcc49c70fa93789293c7">
   <Library_General_Settings>
     <Package_File_Name>NI_lib_LabVIEW_gRPC_Servicer</Package_File_Name>
-    <Library_Version>0.5.0.3</Library_Version>
+    <Library_Version>0.5.1.3</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>..\..\Builds</Library_Output_Folder>
