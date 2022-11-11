@@ -36,4 +36,5 @@ def runTest(WrapperVI, testVI):
     else:
         _logger.exception(f"[FAILED] {testVI} has failed with {testResult.stdout.decode()} {testResult.stderr.decode()}")
         return (testResult.stdout.decode() + "\n" + testResult.stderr.decode() + "\n")
+        
 main()
