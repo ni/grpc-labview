@@ -16,5 +16,5 @@ Run the [python script](../tests/run_tests.py).
 ## For Adding New Tests
 
 1. Create a Test VI.
-2. Add the VI to the [Test Repository](../tests/Tests/).
+2. Add the VI to the [Test Repository](../tests/AutoTests/)
 3. Add the Test VI's relative path to [Tests.lst](../tests/Tests.lst)
