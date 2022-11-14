@@ -18,13 +18,14 @@ def main():
 def run_all_tests():
     test_directory = os.path.abspath(os.path.dirname(__file__))
     _logger.debug(f"Finding tests in {test_directory}...")
-    test_runner_vi = os.path.join(test_directory, "LV_ATS\\gRPC_ATS.vi")
+    test_runner_vi = os.path.join(test_directory, "gRPC_ATS\\gRPC_ATS.vi")
     test_file = os.path.join(test_directory , "Tests.lst")
     failed_test_results = ""
     with open(test_file, 'r') as file:
         all_tests = file.readlines()
         for test in all_tests:
             run_result = run_test(test_runner_vi, os.path.join(test_directory, test))
+            # run_result will be None for PASSED tests
             if(run_result != None):
                 failed_test_results += run_result
         if (failed_test_results != ""):
