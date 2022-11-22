@@ -22,7 +22,7 @@ def run_all_tests():
     test_file = os.path.join(test_directory , "Tests.lst")
     failed_test_results = ""
     with open(test_file, 'r') as file:
-        all_tests = file.readlines()
+        all_tests = file.read().splitlines()
         for test in all_tests:
             run_result = run_test(test_runner_vi, os.path.join(test_directory, test))
             # run_result will be None for PASSED tests

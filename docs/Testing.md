@@ -13,6 +13,14 @@ Run the [python script](../tests/run_tests.py).
 2. Run it.
 3. You will find the test result in the Front Panel fo the VI.
 
+## For writing new Tests
+1. Open the [Test Template](../tests/gRPC_ATS/TestUtility/Test_TemplateVI.vit)
+2. Configure the Server VI path(The path must be relative to the TestVI location)
+3. Configure the Client VI path(The path must be relative to the TestVI location)
+4. Configure Call by Reference for the Client VI ![Configure Call by Reference for the Client VI](images/TestTemplate_CallByReference_HelperImage.png)
+5. Rewire Test Input
+6. Test Assert the expected value
+
 ## For Adding New Tests
 
 1. Create a Test VI.
