@@ -30,7 +30,3 @@ jobs:
       - build_linux
       - build_linux_rt
     uses: ./.github/workflows/build_release_artifacts.yml
-
-  run_ci_tests:
-    needs: build_release_arifacts
-    uses: ./.github/workflows/run_ci_tests.yml

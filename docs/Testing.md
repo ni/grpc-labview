@@ -1,7 +1,7 @@
 # Test
 
 ## Prerequisites
-Latest grpc-libraries should be installed in LabVIEW through VI Package Manager. This can be done by following the instructions in [Building.md](/docs/Building.md)
+The grpc-libraries that you want to test should be installed in LabVIEW through VI Package Manager. This can be done by following the instructions in [Building.md](/docs/Building.md)
 
 ## For Running:
 
