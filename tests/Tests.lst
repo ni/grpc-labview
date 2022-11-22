@@ -3,3 +3,4 @@ AutoTests\Test_RouteGuide_BidirectionalStreaming.vi
 AutoTests\Test_RouteGuide_RequestStreaming.vi
 AutoTests\Test_RouteGuide_ResponseStreaming.vi
 AutoTests\Test_RouteGuide_Unary.vi
+AutoTests\Test_ServiceDoesnot_Exist.vi
