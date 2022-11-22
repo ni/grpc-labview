@@ -7,7 +7,13 @@ jobs:
   update_vipb_version:
     name: Update VIPB Verison on Release
     runs-on: self-hosted
-    steps:
+    steps:  
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
       - name: Update VIPB Verison
         run: 
          python ${{runner.workspace}}\grpc-labview\build-it\update_vipb_version.py --library_version ${{github.ref_name}}
