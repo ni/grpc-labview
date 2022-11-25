@@ -39,6 +39,7 @@ namespace grpc_labview
     {
     public:
         void Cancel();
+        void set_deadline(int32_t timeoutMs);
         grpc::ClientContext gRPCClientContext;
     };
 
@@ -47,7 +48,6 @@ namespace grpc_labview
     class ClientCall : public gRPCid
     {
     public:
-        ClientCall(int32_t timeoutMs);
         virtual ~ClientCall();
         virtual void Finish();
         void Cancel();
@@ -88,7 +88,6 @@ namespace grpc_labview
     class ServerStreamingClientCall : public ClientCall, public StreamReader
     {        
     public:
-        ServerStreamingClientCall(int32_t timeoutMs) : ClientCall(timeoutMs) {}
         ~ServerStreamingClientCall() override;
         bool Read(LVMessage* message) override;
         void Finish() override;
@@ -101,7 +100,7 @@ namespace grpc_labview
     class ClientStreamingClientCall : public ClientCall, public StreamWriter
     {        
     public:
-        ClientStreamingClientCall(int32_t timeoutMs) : ClientCall(timeoutMs) { _writesComplete = false; }
+        ClientStreamingClientCall() { _writesComplete = false; }
         ~ClientStreamingClientCall();
         void Finish() override;
         bool Write(LVMessage* message) override;
@@ -118,7 +117,7 @@ namespace grpc_labview
     class BidiStreamingClientCall : public ClientCall, public StreamReader, public StreamWriter
     {       
     public:
-        BidiStreamingClientCall(int32_t timeoutMs) : ClientCall(timeoutMs) { _writesComplete = false; }
+        BidiStreamingClientCall() { _writesComplete = false; }
         ~BidiStreamingClientCall();
         void Finish() override;
         void WritesComplete() override;

@@ -43,17 +43,6 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    ClientCall::ClientCall(int32_t timeoutMs)
-    {
-        if (timeoutMs >= 0)
-        {
-            auto deadline = std::chrono::system_clock::now() + std::chrono::milliseconds(timeoutMs);
-            this->_context.get()->gRPCClientContext.set_deadline(deadline);
-        }
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
     ClientCall::~ClientCall()
     {        
     }
@@ -161,6 +150,12 @@ namespace grpc_labview
     bool BidiStreamingClientCall::Write(LVMessage* message)
     {
         return _readerWriter->Write(*message);
+    }
+
+    void ClientContext::set_deadline(int32_t timeoutMs)
+    {
+        auto deadline = std::chrono::system_clock::now() + std::chrono::milliseconds(timeoutMs);
+        gRPCClientContext.set_deadline(deadline);
     }
 
     void ClientContext::Cancel()
@@ -283,7 +278,12 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     {
         clientContext = std::make_shared<grpc_labview::ClientContext>();
     }
-    auto clientCall = new grpc_labview::ClientCall(timeoutMs);
+    if (timeoutMs > 0)
+    {
+        clientContext->set_deadline(timeoutMs);
+    }
+
+    auto clientCall = new grpc_labview::ClientCall();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
     clientCall->_methodName = methodName;
@@ -385,8 +385,12 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(
     {
         clientContext = std::make_shared<grpc_labview::ClientContext>();
     }
+    if (timeoutMs > 0)
+    {
+        clientContext->set_deadline(timeoutMs);
+    }
 
-    auto clientCall = new grpc_labview::ClientStreamingClientCall(timeoutMs);
+    auto clientCall = new grpc_labview::ClientStreamingClientCall();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
@@ -435,8 +439,12 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
     {
         clientContext = std::make_shared<grpc_labview::ClientContext>();
     }
+    if (timeoutMs > 0)
+    {
+        clientContext->set_deadline(timeoutMs);
+    }
 
-    auto clientCall = new grpc_labview::ServerStreamingClientCall(timeoutMs);
+    auto clientCall = new grpc_labview::ServerStreamingClientCall();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
@@ -486,8 +494,12 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(
     {
         clientContext = std::make_shared<grpc_labview::ClientContext>();
     }
+    if (timeoutMs > 0)
+    {
+        clientContext->set_deadline(timeoutMs);
+    }
 
-    auto clientCall = new grpc_labview::BidiStreamingClientCall(timeoutMs);
+    auto clientCall = new grpc_labview::BidiStreamingClientCall();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
