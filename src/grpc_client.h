@@ -35,6 +35,15 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    class ClientContext : public gRPCid
+    {
+    public:
+        void Cancel();
+        grpc::ClientContext gRPCClientContext;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     class ClientCall : public gRPCid
     {
     public:
@@ -47,7 +56,7 @@ namespace grpc_labview
         std::shared_ptr<grpc_labview::LabVIEWgRPCClient> _client;
         std::string _methodName;
         MagicCookie _occurrence;
-        grpc::ClientContext _context;
+        std::shared_ptr<ClientContext> _context;
         std::shared_ptr<LVMessage> _request;
         std::shared_ptr<LVMessage> _response;
         grpc::Status _status;

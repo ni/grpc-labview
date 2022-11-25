@@ -1,1 +1,5 @@
 AutoTests\HelloWorldTest.vi
+AutoTests\ClientCancellationTests\UnaryClientCancellationTest.vi
+AutoTests\ClientCancellationTests\ClientStreamingCancellationTest.vi
+AutoTests\ClientCancellationTests\ServerStreamingCancellationTest.vi
+AutoTests\ClientCancellationTests\BiDiStreamingCancellationTest.vi
