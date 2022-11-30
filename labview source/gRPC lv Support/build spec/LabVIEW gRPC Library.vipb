@@ -1,4 +1,4 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-28 23:37:57" Modified_Date="2022-11-11 11:38:45" Creator="navin" Comments="" ID="b47823c88b3b9c48158af021e27cf686">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-28 23:37:57" Modified_Date="2022-11-25 12:23:02" Creator="navin" Comments="" ID="4e861d40f40c808bf3080cedded94dc2">
   <Library_General_Settings>
     <Package_File_Name>NI_lib_LabVIEW_gRPC_Library</Package_File_Name>
     <Library_Version>0.5.1.4</Library_Version>
@@ -252,14 +252,14 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Server API</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>A04899786D511DD9A2FC15E8756D4253</GUID>
+      <GUID>CD903834ABD12EDDCB633F7DC9986E27</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
       <Name>Client API</Name>
       <View_Format>Icons</View_Format>
       <Size>
-        <Height_Row>1</Height_Row>
+        <Height_Row>2</Height_Row>
         <Width_Col.>4</Width_Col.>
       </Size>
       <_256_Color_Icon>0000037E002900000012000000020000000D00FFFFFF000100000000000A0000000800000000002000200028000001AE0000017A000000070007001900180000000000FFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000FFFFFF000000FFFFFFFFFFFF000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000FFFFFF000000FFFFFFFFFFFF000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000FFFFFFFFFFFF000000000000FFFFFFFFFFFF000000000000000000FFFFFFFFFFFF000000FFFFFFFFFFFF000000FFFFFF000000000000000000FFFFFF000000FFFFFF000000FFFFFF000000FFFFFF000000FFFFFFFFFFFF000000FFFFFFFFFFFF000000FFFFFF000000FFFFFFFFFFFFFFFFFF000000FFFFFF000000FFFFFF000000FFFFFFFFFFFF000000FFFFFFFFFFFF000000FFFFFF000000FFFFFFFFFFFF000000000000FFFFFF000000FFFFFF000000FFFFFFFFFFFF000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00003FFF5200BFFF904CFFFF92EABFFF928ABFFF4A6A7FFF00003FFF0028000000E3000000BD0008000C000F001500180000000000FFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000FFFFFFFFFFFF000000000000FFFFFFFFFFFF000000000000FFFFFF000000FFFFFF000000FFFFFF000000FFFFFF000000000000000000000000FFFFFF000000000000FFFFFFFFFFFF000000000000FFFFFF000000FFFFFF000000FFFFFFFFFFFFFFFFFF000000000000FFFFFF000000FFFFFF000000FFFFFFFFFFFFFFFFFF000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF007F4CFFAAFFECFFA8FFA8FF007F002900000012000000020000000D00CCCCFF000100000000000A00000008001900000020002000280000008F000000690019000E0020001300180000000000FFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6C00006C0000FFFFFFFFFFFF6C00006C0000FFFFFF6C0000FFFFFF6C00006C0000FFFFFF6C0000FFFFFF6C00006C0000FFFFFF6C0000FFFFFF6C00006C0000FFFFFF6C0000FFFFFF6C0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF07FFCFFFAFFFAFFFAFFFAFFF07FF</_256_Color_Icon>
@@ -315,7 +315,63 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Client API\Create Client.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>DBBFFA04A757A9BF9D655E838B2B7EA4</GUID>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Create Client Context.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>4</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Client API\Create Client Context.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Client Cancel Call Context.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>2</Row>
+          <Column>1</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Client API\Client Cancel Call Context.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Close Client Context.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>2</Row>
+          <Column>2</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Client API\Close Client Context.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Client Cancel Call.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>2</Row>
+          <Column>3</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Client API\Client Cancel Call.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <GUID>076B43738B11332B28D2B4829A4B0EB8</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -434,7 +490,7 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Server API\UnpackFromBuffer.vim</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>BF585F26464588BFEBA4BBE5B9DF6F0E</GUID>
+      <GUID>46B947FB8FDD272A133680FC26122841</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>2</Parent_Palette_Index>
@@ -665,7 +721,7 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Server API\Message Requests\Write Call Response.vim</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>21735F0986CCBF6C865430E570BD34B1</GUID>
+      <GUID>6CB69A9321C5B339EFC4A5BEE49A676F</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>2</Parent_Palette_Index>
@@ -784,7 +840,7 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Server API\Server\Stop Server.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>B8B3E081A99E679813737ED79528DD18</GUID>
+      <GUID>3D97B4933094A8303DBE4BD8408ABD7E</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>

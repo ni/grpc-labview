@@ -21,6 +21,9 @@
 		<Item Name="Close Client.vi" Type="VI" URL="../Client API/Close Client.vi"/>
 		<Item Name="Create Client.vi" Type="VI" URL="../Client API/Create Client.vi"/>
 		<Item Name="Client Cancel Call.vi" Type="VI" URL="../Client API/Client Cancel Call.vi"/>
+		<Item Name="Create Client Context.vi" Type="VI" URL="../Client API/Create Client Context.vi"/>
+		<Item Name="Close Client Context.vi" Type="VI" URL="../Client API/Close Client Context.vi"/>
+		<Item Name="Client Cancel Call Context.vi" Type="VI" URL="../Client API/Client Cancel Call Context.vi"/>
 	</Item>
 	<Item Name="Protobuf" Type="Folder">
 		<Item Name="Any Support" Type="Folder">
