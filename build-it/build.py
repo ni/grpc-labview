@@ -98,7 +98,7 @@ def main():
     if args.libraryVersion != "" :
         vipb_files = vipb_helper.get_vipb_files(gRPCPackageBuilder.root_directory)
         for vipb_file in vipb_files:
-            vipb_helper.update_vipb_verion(vipb_file = vipb_file, library_version = args.libraryVersion)
+            vipb_helper.update_vipb_version(vipb_file = vipb_file, library_version = args.libraryVersion)
 
     if args.target != "Win32" and args.target != "Win64" and args.target != "All":
             raise Exception("Build target should be one off Win32, Win64 or All. Passed build target is " + args.target)
