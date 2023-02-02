@@ -459,6 +459,10 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
         return -1;
     }
     int error = 0;
+    const EnumDescriptor* enumType = nullptr;
+    int enumValueCount; // = enumDesc->value_count();
+    std::vector<std::string> enumValues;
+    std::string enumNames = "";
     switch (field->type())
     {
         case FieldDescriptor::TYPE_DOUBLE:
@@ -481,6 +485,15 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
             break;
         case FieldDescriptor::TYPE_ENUM:
             info->type = 9;
+            enumType = const_cast<EnumDescriptor*>(field->enum_type());
+            enumValueCount = enumType->value_count();
+            enumNames = "";
+            for (int i = 0; i < enumValueCount; i++)
+            {
+                //enumValues.push_back(enumType->value(i)->name());
+                enumNames += enumType->value(i)->name() + ((i < enumValueCount - 1)? ";": "");
+            }
+            SetLVString(&info->embeddedMessage, enumNames);
             break;
         case FieldDescriptor::TYPE_BOOL:
             info->type = 3;
