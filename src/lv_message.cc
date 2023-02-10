@@ -12,7 +12,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     LVMessage::LVMessage(std::shared_ptr<MessageMetadata> metadata) : 
-        _metadata(metadata)
+        _metadata(metadata), supportNullTerminatedMessage(false)
     {
     }
 
@@ -95,6 +95,11 @@ namespace grpc_labview
             google::protobuf::uint32 tag;
             ptr = ReadTag(ptr, &tag);
             auto index = (tag >> 3);
+
+            if (supportNullTerminatedMessage && index == 0)
+            {
+                break;
+            }
             if (_metadata == nullptr)
             {
                 ptr = UnknownFieldParse(tag, &_unknownFields, ptr, ctx);

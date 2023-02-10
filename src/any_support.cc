@@ -8,10 +8,11 @@
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t CreateSerializationSession(grpc_labview::gRPCid** sessionId)
+LIBRARY_EXPORT int32_t CreateSerializationSession(grpc_labview::gRPCid** sessionId, bool supportNullTerminatedMessages)
 {
     grpc_labview::InitCallbacks();
     auto session = new grpc_labview::LabVIEWSerializationSession();
+    session->supportNullTerminatedMessages = supportNullTerminatedMessages;
     grpc_labview::gPointerManager.RegisterPointer(session);
     *sessionId = session;
     return 0;
@@ -78,6 +79,7 @@ LIBRARY_EXPORT int32_t UnpackFromBuffer(grpc_labview::gRPCid* id, grpc_labview::
         return -2;
     }  
     grpc_labview::LVMessage message(metadata);
+    message.supportNullTerminatedMessage = metadataOwner->supportNullTerminatedMessages;
     char* elements = (*lvBuffer)->bytes<char>();
     std::string buffer(elements, (*lvBuffer)->cnt);
     if (message.ParseFromString(buffer))
