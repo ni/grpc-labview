@@ -491,7 +491,8 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
             for (int i = 0; i < enumValueCount; i++)
             {
                 //enumValues.push_back(enumType->value(i)->name());
-                enumNames += enumType->value(i)->name() + ((i < enumValueCount - 1)? ";": "");
+                std::string enumVal = enumType->value(i)->name() + "=" + std::to_string(enumType->value(i)->number());
+                enumNames += enumVal + ((i < enumValueCount - 1)? ";": "");
             }
             SetLVString(&info->embeddedMessage, enumNames);
             break;
