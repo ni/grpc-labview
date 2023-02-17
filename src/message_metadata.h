@@ -49,7 +49,7 @@ namespace grpc_labview
         {            
         }
 
-        MessageElementMetadata() {}
+        //MessageElementMetadata() {}
 
     public:
         IMessageElementMetadataOwner* _owner;
@@ -63,10 +63,12 @@ namespace grpc_labview
     class MessageElementEnumMetadata : public MessageElementMetadata
     {
     public:
+        //MessageElementEnumMetadata() {}
+
         MessageElementEnumMetadata(MessageElementMetadata messageMetadata) :
             MessageElementMetadata(messageMetadata._owner)
         {
-
+            embeddedMessageName = messageMetadata.embeddedMessageName;
         }
 
         int IsValid(int value)

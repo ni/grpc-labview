@@ -379,7 +379,8 @@ namespace grpc_labview {
     {
         // Check if the value actually exists in the enum. Error out here, or send back the fault values of the enum? (That would be the first element of the enum.)
         int userValue = ((LVEnumMessageValue*)value.get())->_value;
-        //MessageElementEnumMetadata enumMetadata(const_cast<MessageElementMetadata>(metadata));
+        MessageElementMetadata messageMetadata(metadata->_owner);
+        MessageElementEnumMetadata enumMetadata(messageMetadata);
         if (IsEnumDataValid(metadata, value))// (enumMetadata.IsValid(userValue)) // (IsEnumDataValid(metadata, value))
         {
             if (metadata->isRepeated)
