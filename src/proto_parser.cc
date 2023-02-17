@@ -450,6 +450,8 @@ LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, grpc_labview::LV1DArrayHa
     return 0;
 }
 
+void GetEnumNames(google::protobuf::FieldDescriptor* field, grpc_labview::MessageFieldCluster* info);
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFieldCluster* info)
@@ -459,10 +461,6 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
         return -1;
     }
     int error = 0;
-    const EnumDescriptor* enumType = nullptr;
-    int enumValueCount; // = enumDesc->value_count();
-    std::vector<std::string> enumValues;
-    std::string enumNames = "";
     switch (field->type())
     {
         case FieldDescriptor::TYPE_DOUBLE:
@@ -485,16 +483,7 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
             break;
         case FieldDescriptor::TYPE_ENUM:
             info->type = 9;
-            enumType = const_cast<EnumDescriptor*>(field->enum_type());
-            enumValueCount = enumType->value_count();
-            enumNames = "";
-            for (int i = 0; i < enumValueCount; i++)
-            {
-                //enumValues.push_back(enumType->value(i)->name());
-                std::string enumVal = enumType->value(i)->name() + "=" + std::to_string(enumType->value(i)->number());
-                enumNames += enumVal + ((i < enumValueCount - 1)? ";": "");
-            }
-            SetLVString(&info->embeddedMessage, enumNames);
+            GetEnumNames(field, info);
             break;
         case FieldDescriptor::TYPE_BOOL:
             info->type = 3;
@@ -539,4 +528,23 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
         error = -2;
     }
     return error;
+}
+
+void GetEnumNames(google::protobuf::FieldDescriptor* field, grpc_labview::MessageFieldCluster* info)
+{
+    const EnumDescriptor* enumType = nullptr;
+    int enumValueCount; // = enumDesc->value_count();
+    std::vector<std::string> enumValues;
+    std::string enumNames = "";
+
+    enumType = const_cast<EnumDescriptor*>(field->enum_type());
+    enumValueCount = enumType->value_count();
+    enumNames = "";
+    for (int i = 0; i < enumValueCount; i++)
+    {
+        //enumValues.push_back(enumType->value(i)->name());
+        std::string enumVal = enumType->value(i)->name() + "=" + std::to_string(enumType->value(i)->number());
+        enumNames += enumVal + ((i < enumValueCount - 1) ? ";" : "");
+    }
+    SetLVString(&info->embeddedMessage, enumNames);
 }

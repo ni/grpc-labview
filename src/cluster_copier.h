@@ -63,5 +63,9 @@ namespace grpc_labview
         static void CopyFixed64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
         static void CopySFixed32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
         static void CopySFixed64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
+
+        static std::vector<std::string> split(std::string s, std::string delimiter);
+        static std::map<int, std::string> CreateEnumFromMetadata(std::vector<std::string> enumValues);
+        static bool IsEnumDataValid(const std::shared_ptr<MessageElementMetadata> metadata, const std::shared_ptr<LVMessageValue>& value);
     };
 }
