@@ -299,19 +299,8 @@ LIBRARY_EXPORT int LVGetMessages(grpc_labview::LVProtoParser* parser, grpc_labvi
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int LVGetEnums(grpc_labview::LVProtoParser* parser, grpc_labview::LV1DArrayHandle* messages, grpc_labview::LV1DArrayHandle* enums) // get another input from the LV side, which sends a list of all messages in proto file. Parse each of these messages to find enums inside them. Also parse the proto file to find the top level enums.
+void AddTopLevelEnums(grpc_labview::LVProtoParser* parser, std::set<const google::protobuf::EnumDescriptor*>& allEnums)
 {
-    if (parser == nullptr)
-    {
-        return -1;
-    }
-    if (parser->m_FileDescriptor == nullptr)
-    {
-        return -2;
-    }
-
-    std::set<const google::protobuf::EnumDescriptor*> allEnums;
-
     // Get global enums defined in the proto file.
     // FileDescriptor is being used to fetch these enum descriptors.
     const FileDescriptor* descriptor = parser->m_FileDescriptor;
@@ -321,7 +310,10 @@ LIBRARY_EXPORT int LVGetEnums(grpc_labview::LVProtoParser* parser, grpc_labview:
         auto current = descriptor->enum_type(x);
         allEnums.emplace(current);
     }
+}
 
+void AddNestedEnums(grpc_labview::LV1DArrayHandle* messages, std::set<const google::protobuf::EnumDescriptor*>& allEnums)
+{
     // Get enums nested within messages.
     // Descriptor is being used to fetch these enum descriptors.
 
@@ -344,6 +336,22 @@ LIBRARY_EXPORT int LVGetEnums(grpc_labview::LVProtoParser* parser, grpc_labview:
             allEnums.emplace(current);
         }
     }
+}
+
+LIBRARY_EXPORT int LVGetEnums(grpc_labview::LVProtoParser* parser, grpc_labview::LV1DArrayHandle* messages, grpc_labview::LV1DArrayHandle* enums)
+{
+    if (parser == nullptr)
+    {
+        return -1;
+    }
+    if (parser->m_FileDescriptor == nullptr)
+    {
+        return -2;
+    }
+
+    std::set<const google::protobuf::EnumDescriptor*> allEnums;
+    AddTopLevelEnums(parser, allEnums);
+    AddNestedEnums(messages, allEnums);    
 
     auto count = allEnums.size();
     if (grpc_labview::NumericArrayResize(0x08, 1, enums, count * sizeof(EnumDescriptor*)) != 0)
@@ -538,7 +546,7 @@ LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, grpc_labview::LV1DArrayHa
     return 0;
 }
 
-void GetEnumNames(google::protobuf::EnumDescriptor* field, grpc_labview::MessageFieldCluster* info);
+std::string GetEnumNames(google::protobuf::EnumDescriptor* field);
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -571,7 +579,6 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
             break;
         case FieldDescriptor::TYPE_ENUM:
             info->type = 9;
-            GetEnumNames(const_cast<EnumDescriptor*>(field->enum_type()), info);
             break;
         case FieldDescriptor::TYPE_BOOL:
             info->type = 3;
@@ -608,6 +615,11 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
     {
         SetLVString(&info->embeddedMessage, grpc_labview::TransformMessageName(field->message_type()->full_name()));
     }
+    if (field->type() == FieldDescriptor::TYPE_ENUM)
+    {
+        std::string enumKeyValues = GetEnumNames(const_cast<EnumDescriptor*>(field->enum_type()));
+        SetLVString(&info->embeddedMessage, enumKeyValues);
+    }
     SetLVString(&info->fieldName, field->name());
     info->protobufIndex = field->number();
     info->isRepeated = field->is_repeated();
@@ -624,20 +636,18 @@ LIBRARY_EXPORT int GetEnumInfo(EnumDescriptor* enumDescriptor, grpc_labview::Mes
     {
         return -1;
     }
-    int error = 0;
 
     SetLVString(&info->fieldName, enumDescriptor->name());
     info->type = 9;
-
-    GetEnumNames(enumDescriptor, info);
-    return error;
+    SetLVString(&info->embeddedMessage, GetEnumNames(enumDescriptor));
+    
+    return 0;
 }
 
-void GetEnumNames(google::protobuf::EnumDescriptor* enumDescriptor, grpc_labview::MessageFieldCluster* info)
+std::string GetEnumNames(google::protobuf::EnumDescriptor* enumDescriptor)
 {
     const EnumDescriptor* enumType = nullptr;
     int enumValueCount = enumDescriptor->value_count();
-    //std::vector<std::string> enumValues;
     std::string enumNames = grpc_labview::TransformMessageName(enumDescriptor->full_name()) + ";";
 
     for (int i = 0; i < enumValueCount; i++)
@@ -645,5 +655,6 @@ void GetEnumNames(google::protobuf::EnumDescriptor* enumDescriptor, grpc_labview
         std::string enumVal = enumDescriptor->value(i)->name() + "=" + std::to_string(enumDescriptor->value(i)->number());
         enumNames += enumVal + ((i < enumValueCount - 1) ? ";" : "");
     }
-    SetLVString(&info->embeddedMessage, enumNames);
+    
+    return enumNames;
 }

@@ -337,44 +337,6 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
 
-    std::vector<std::string> ClusterDataCopier::split(std::string s, std::string delimiter)
-    {
-        size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-        std::string token;
-        std::vector<std::string> res;
-
-        while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos)
-        {
-            token = s.substr(pos_start, pos_end - pos_start);
-            pos_start = pos_end + delim_len;
-            res.push_back(token);
-        }
-
-        res.push_back(s.substr(pos_start));
-        return res;
-    }
-
-    std::map<int, std::string> ClusterDataCopier::CreateEnumFromMetadata(std::vector<std::string> enumValues)
-    {
-        std::map<int, std::string> keyValuePairs;
-        for (std::string enumValue: enumValues)
-        {
-            std::vector<std::string> keyValue = split(enumValue, "=");
-            int key = std::stoi(keyValue[1]);
-            keyValuePairs.insert(std::pair<int, std::string>(key, keyValue[0]));
-        }
-        return keyValuePairs;
-    }
-
-
-    bool ClusterDataCopier::IsEnumDataValid(const std::shared_ptr<MessageElementMetadata> metadata, const std::shared_ptr<LVMessageValue>& value)
-    {
-        std::vector<std::string> enumValues = split(metadata->embeddedMessageName, ";");
-        std::map<int, std::string> enumKeyValues = CreateEnumFromMetadata(enumValues);
-
-        return !(enumKeyValues.find(((LVEnumMessageValue*)value.get())->_value) == enumKeyValues.end());        
-    }
-
     void ClusterDataCopier::CopyEnumToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         // Check if the value actually exists in the enum. Error out here, or send back the fault values of the enum? (That would be the first element of the enum.)
