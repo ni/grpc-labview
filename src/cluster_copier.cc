@@ -336,31 +336,23 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-
     void ClusterDataCopier::CopyEnumToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
-        // Check if the value actually exists in the enum. Error out here, or send back the fault values of the enum? (That would be the first element of the enum.)
-        int userValue = ((LVEnumMessageValue*)value.get())->_value;
-        MessageElementMetadata messageMetadata(metadata->_owner);
-        MessageElementEnumMetadata enumMetadata(metadata->embeddedMessageName);
-        if (metadata->embeddedMessageName != "" && enumMetadata.IsValid(userValue))
+        if (metadata->isRepeated)
         {
-            if (metadata->isRepeated)
+            auto repeatedEnum = std::static_pointer_cast<LVRepeatedEnumMessageValue>(value);
+            if (repeatedEnum->_value.size() != 0)
             {
-                auto repeatedEnum = std::static_pointer_cast<LVRepeatedEnumMessageValue>(value);
-                if (repeatedEnum->_value.size() != 0)
-                {
-                    NumericArrayResize(0x03, 1, start, repeatedEnum->_value.size());
-                    auto array = *(LV1DArrayHandle*)start;
-                    (*array)->cnt = repeatedEnum->_value.size();
-                    auto byteCount = repeatedEnum->_value.size() * sizeof(int32_t);
-                    memcpy((*array)->bytes<int32_t>(), repeatedEnum->_value.data(), byteCount);
-                }
+                NumericArrayResize(0x03, 1, start, repeatedEnum->_value.size());
+                auto array = *(LV1DArrayHandle*)start;
+                (*array)->cnt = repeatedEnum->_value.size();
+                auto byteCount = repeatedEnum->_value.size() * sizeof(int32_t);
+                memcpy((*array)->bytes<int32_t>(), repeatedEnum->_value.data(), byteCount);
             }
-            else
-            {
-                *(int*)start = ((LVEnumMessageValue*)value.get())->_value;
-            }
+        }
+        else
+        {
+            *(int*)start = ((LVEnumMessageValue*)value.get())->_value;
         }
     }
 

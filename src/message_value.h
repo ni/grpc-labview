@@ -161,7 +161,6 @@ namespace grpc_labview
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
         google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
-        bool IsValid(int value);
     };
 
     //---------------------------------------------------------------------
