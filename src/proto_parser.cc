@@ -646,7 +646,6 @@ LIBRARY_EXPORT int GetEnumInfo(EnumDescriptor* enumDescriptor, grpc_labview::Mes
 
 std::string GetEnumNames(google::protobuf::EnumDescriptor* enumDescriptor)
 {
-    const EnumDescriptor* enumType = nullptr;
     int enumValueCount = enumDescriptor->value_count();
     std::string enumNames = grpc_labview::TransformMessageName(enumDescriptor->full_name()) + ";";
 
