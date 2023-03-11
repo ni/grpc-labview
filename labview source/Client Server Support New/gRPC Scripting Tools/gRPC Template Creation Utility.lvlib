@@ -110,6 +110,7 @@
 			<Item Name="Create Message Setter (from Accessor).vi" Type="VI" URL="../Top Level API/Create Message Setter (from Accessor).vi"/>
 			<Item Name="Delete Message Template Files.vi" Type="VI" URL="../Top Level API/Delete Message Template Files.vi"/>
 			<Item Name="Set Message Field Representation.vi" Type="VI" URL="../Top Level API/Set Message Field Representation.vi"/>
+			<Item Name="Set Message Data.vi" Type="VI" URL="../Top Level API/Set Message Data.vi"/>
 		</Item>
 		<Item Name="RPC Events" Type="Folder">
 			<Item Name="Populate gRPC Events.vi" Type="VI" URL="../Top Level API/Populate gRPC Events.vi"/>
@@ -278,6 +279,10 @@
 		<Item Name="Create Proto Parser.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Proto Parser.vi"/>
 		<Item Name="Add Proto Search Path.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Add Proto Search Path.vi"/>
 		<Item Name="GetProtoParseError.vi" Type="VI" URL="../Proto Parser API/GetProtoParseError.vi"/>
+		<Item Name="Get ProtoFile Enums.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get ProtoFile Enums.vi"/>
+		<Item Name="Get Enum Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Enum Name.vi"/>
+		<Item Name="Get Enum TypeUrl.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Enum TypeUrl.vi"/>
+		<Item Name="Get Enum Field Info.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Enum Field Info.vi"/>
 	</Item>
 	<Item Name="Animation API" Type="Folder">
 		<Item Name="Animation.vi" Type="VI" URL="../Animation API/Animation.vi"/>
