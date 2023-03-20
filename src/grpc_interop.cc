@@ -92,6 +92,20 @@ namespace grpc_labview
         }
         return metadata;
     }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    std::shared_ptr<EnumMetadata> CreateEnumMetadata2(IMessageElementMetadataOwner* metadataOwner, LVEnumMetadata2* lvMetadata)
+    {
+        std::shared_ptr<EnumMetadata> metadata(new EnumMetadata());
+
+        auto name = GetLVString(lvMetadata->messageName);
+        metadata->messageName = name;
+        metadata->typeUrl = GetLVString(lvMetadata->typeUrl);
+        metadata->elements = GetLVString(lvMetadata->elements);
+        int clusterOffset = 0;
+        return metadata;
+    }
 }
 
 int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId);
@@ -178,6 +192,20 @@ LIBRARY_EXPORT int32_t RegisterMessageMetadata2(grpc_labview::gRPCid** id, grpc_
         return -1;
     }
     auto metadata = CreateMessageMetadata2(server.get(), lvMetadata);
+    server->RegisterMetadata(metadata);
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t RegisterEnumMetadata2(grpc_labview::gRPCid** id, grpc_labview::LVEnumMetadata2* lvMetadata)
+{
+    auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
+    if (server == nullptr)
+    {
+        return -1;
+    }
+    auto metadata = CreateEnumMetadata2(server.get(), lvMetadata);
     server->RegisterMetadata(metadata);
     return 0;
 }
