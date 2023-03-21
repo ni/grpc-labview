@@ -180,5 +180,9 @@ namespace grpc_labview {
         {
             UpdateMetadataClusterLayout(metadata.second);
         }
+        for (auto metadata : _registeredEnumMetadata)
+        {
+            UpdateMetadataClusterLayout(metadata.second);
+        }
     }
 }
