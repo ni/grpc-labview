@@ -95,15 +95,100 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+
+    std::vector<std::string> SplitString(std::string s, std::string delimiter)
+    {
+        size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+        std::string token;
+        std::vector<std::string> res;
+
+        while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos)
+        {
+            token = s.substr(pos_start, pos_end - pos_start);
+            pos_start = pos_end + delim_len;
+            res.push_back(token);
+        }
+
+        res.push_back(s.substr(pos_start));
+        return res;
+    }
+
+    std::map<int, int32_t> CreateMapBetweenLVEnumAndProtoEnumvalues(std::string enumValues)
+    {
+        std::map<int, int32_t> lvEnumToProtoEnum;
+        int seqLVEnumIndex = 0;
+        for each (std::string keyValuePair in SplitString(enumValues, ";"))
+        {
+            auto keyValue = SplitString(keyValuePair, "=");
+            // TODO: Assert that there are two elements in the keyValue array.
+            int protoEnumNumeric = std::stoi(keyValue[1]);
+            lvEnumToProtoEnum.insert(std::pair<int, int32_t>(seqLVEnumIndex, protoEnumNumeric));
+            seqLVEnumIndex += 1;
+        }
+        return lvEnumToProtoEnum;
+    }
+
+    std::map<int32_t, std::list<int>> CreateMapBetweenProtoEnumAndLVEnumvalues(std::string enumValues)
+    {
+        std::map<int32_t, std::list<int>> lvEnumToProtoEnum;
+        int seqLVEnumIndex = 0;
+        for each (std::string keyValuePair in SplitString(enumValues, ";"))
+        {
+            auto keyValue = SplitString(keyValuePair, "=");
+            int protoEnumNumeric = std::stoi(keyValue[1]);
+            // TODO: Assert that there are two elements in the keyValue array.
+
+            std::list<int> lvEnumNumericValues;
+            auto existingElement = lvEnumToProtoEnum.find(protoEnumNumeric);
+            if (existingElement != lvEnumToProtoEnum.end())
+                lvEnumNumericValues = existingElement->second;
+
+            lvEnumNumericValues.push_back(seqLVEnumIndex); // Add the new element
+
+            lvEnumToProtoEnum.insert(std::pair<int32_t, std::list<int>>(protoEnumNumeric, lvEnumNumericValues));
+
+            seqLVEnumIndex += 1;
+        }
+        return lvEnumToProtoEnum;
+    }
+
+    //std::map<std::string, int> CreateMapFromEnumString(std::string enumValues)
+    //{
+    //    std::map<std::string, int> enumMap; // pass by reference here
+    //    for each (std::string keyValuePair in SplitString(enumValues))
+    //    {
+    //        auto keyValue = SplitString(keyValuePair);
+    //        // TODO: Assert that there are two elements in the keyValue array.
+    //        enumMap.insert(std::pair<std::string, int>(keyValue[0], std::stoi(keyValue[1])));
+    //    }
+    //    return enumMap;
+    //}
+
+    /*std::map<int, std::string> CreateEnumFromMetadata(std::vector<std::string> enumValues)
+    {
+        std::map<int, std::string> keyValuePairs;
+        for (std::string enumValue : enumValues)
+        {
+            std::vector<std::string> keyValue = split(enumValue, "=");
+            int key = std::stoi(keyValue[1]);
+            keyValuePairs.insert(std::pair<int, std::string>(key, keyValue[0]));
+        }
+        return keyValuePairs;
+    }*/
+
     std::shared_ptr<EnumMetadata> CreateEnumMetadata2(IMessageElementMetadataOwner* metadataOwner, LVEnumMetadata2* lvMetadata)
     {
         std::shared_ptr<EnumMetadata> metadata(new EnumMetadata());
 
-        auto name = GetLVString(lvMetadata->messageName);
-        metadata->messageName = name;
+        metadata->messageName = GetLVString(lvMetadata->messageName);
         metadata->typeUrl = GetLVString(lvMetadata->typeUrl);
         metadata->elements = GetLVString(lvMetadata->elements);
-        int clusterOffset = 0;
+        metadata->allowAlias = lvMetadata->allowAlias;
+
+        // Create the map between LV enum and proto enum values
+        metadata->LVEnumToProtoEnum = CreateMapBetweenLVEnumAndProtoEnumvalues(metadata->elements);
+        metadata->ProtoEnumToLVEnum = CreateMapBetweenProtoEnumAndLVEnumvalues(metadata->elements);
+
         return metadata;
     }
 }

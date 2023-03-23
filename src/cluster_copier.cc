@@ -713,6 +713,9 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyEnumFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
+        //auto enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
+        // Add mapping code here.
+
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;

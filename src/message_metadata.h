@@ -60,6 +60,28 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    class EnumElementMetadata
+    {
+    public:
+        EnumElementMetadata(IMessageElementMetadataOwner* owner) :
+            _owner(owner)
+        {
+            //type = LVMessageMetadataType.EnumValue;
+        }
+
+    public:
+        IMessageElementMetadataOwner* _owner;
+        std::string embeddedMessageName;
+        int protobufIndex;
+        int clusterOffset;
+        LVMessageMetadataType type;
+        bool isRepeated;
+        std::string enumValues;
+        bool allowAlias;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     #ifdef _PS_4
     #pragma pack (push, 1)
     #endif
@@ -77,6 +99,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     using LVMessageMetadataMap = std::map<google::protobuf::uint32, std::shared_ptr<MessageElementMetadata>>;
+    //using LVEnumMetadataMap = std::map<google::protobuf::uint32, std::shared_ptr<EnumElementMetadata>>;
     using LVMessageMetadataList = std::vector<std::shared_ptr<MessageElementMetadata>>;
 
     //---------------------------------------------------------------------
@@ -96,6 +119,7 @@ namespace grpc_labview
         int alignmentRequirement;
         LVMessageMetadataList _elements;
         LVMessageMetadataMap _mappedElements;
+        //LVEnumMetadataMap _mappedEnumElements;
     };
 
     //---------------------------------------------------------------------
@@ -116,6 +140,10 @@ namespace grpc_labview
         int clusterSize;
         int alignmentRequirement;
         //LVMessageMetadataMap _mappedElements;
+
+        // Create the map between LV enum and proto enum values. Use that map in CopyFromCluster and CopyToCluster. Map should be created when RegisterMetadata is called.
+        std::map<int, int32_t> LVEnumToProtoEnum; // Should the map contain enum string name as well?
+        std::map<int32_t, std::list<int>> ProtoEnumToLVEnum;
     };
 
     //---------------------------------------------------------------------

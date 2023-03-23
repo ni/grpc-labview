@@ -24,6 +24,7 @@ namespace grpc_labview
         void RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata); // Repeat for enum?
         void RegisterMetadata(std::shared_ptr<EnumMetadata> requestMetadata); // Repeat for enum?
         std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
+        std::shared_ptr<EnumMetadata> FindEnumMetadata(const std::string& name);
         void FinalizeMetadata();
 
     private:
