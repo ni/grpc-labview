@@ -100,26 +100,6 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    struct EnumMetadata
-    {
-    public:
-        EnumMetadata() :
-            clusterSize(0)
-        {
-        }
-
-    public:
-        std::string messageName;
-        std::string typeUrl;
-        std::string elements;
-        bool allowAlias;
-        int clusterSize;
-        int alignmentRequirement;
-        //LVMessageMetadataMap _mappedElements;
-    };
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
     struct LVMessageMetadata
     {
         LStrHandle messageName;
@@ -135,15 +115,4 @@ namespace grpc_labview
         LStrHandle typeUrl;
         LV1DArrayHandle elements;
     };
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    struct LVEnumMetadata2
-    {
-        int version;
-        LStrHandle messageName;
-        LStrHandle typeUrl;
-        LStrHandle elements;
-        bool allowAlias;
-    }; // TODO: Define this in another file
 }

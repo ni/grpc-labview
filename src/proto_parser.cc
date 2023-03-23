@@ -650,6 +650,7 @@ LIBRARY_EXPORT int GetEnumInfo(EnumDescriptor* enumDescriptor, grpc_labview::Enu
     SetLVString(&info->name, grpc_labview::TransformMessageName(enumDescriptor->full_name()));
     SetLVString(&info->typeUrl, enumDescriptor->full_name());
     SetLVString(&info->enumValues, GetEnumNames(enumDescriptor));
+    // TODO: Set allow_alias
     
     return 0;
 }

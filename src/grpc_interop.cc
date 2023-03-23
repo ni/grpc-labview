@@ -99,10 +99,10 @@ namespace grpc_labview
     {
         std::shared_ptr<EnumMetadata> metadata(new EnumMetadata());
 
-        auto name = GetLVString(lvMetadata->messageName);
-        metadata->messageName = name;
+        metadata->messageName = GetLVString(lvMetadata->messageName);
         metadata->typeUrl = GetLVString(lvMetadata->typeUrl);
         metadata->elements = GetLVString(lvMetadata->elements);
+        metadata->allowAlias = lvMetadata->allowAlias;
         int clusterOffset = 0;
         return metadata;
     }

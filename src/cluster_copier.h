@@ -11,6 +11,7 @@
 #include <map>
 #include <mutex>
 #include <message_metadata.h>
+#include <enum_metadata.h>
 #include <message_value.h>
 
 namespace grpc_labview

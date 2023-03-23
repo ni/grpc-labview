@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <message_metadata.h>
+#include <enum_metadata.h>
 
 namespace grpc_labview 
 {
@@ -31,7 +32,5 @@ namespace grpc_labview
         std::map<std::string, std::shared_ptr<MessageMetadata>> _registeredMessageMetadata;
         std::map<std::string, std::shared_ptr<EnumMetadata>> _registeredEnumMetadata;
         void UpdateMetadataClusterLayout(std::shared_ptr<MessageMetadata>& metadata);
-        void UpdateMetadataClusterLayout(std::shared_ptr<EnumMetadata>& metadata);
-        int GetMaxAlignmentRequirement(LVMessageMetadataType elementType, bool elementIsRepeated);
     };
 }
