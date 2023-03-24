@@ -145,7 +145,7 @@ namespace grpc_labview
 
             lvEnumNumericValues.push_back(seqLVEnumIndex); // Add the new element
 
-            lvEnumToProtoEnum.insert(std::pair<int32_t, std::list<int>>(protoEnumNumeric, lvEnumNumericValues));
+            lvEnumToProtoEnum.insert_or_assign(protoEnumNumeric, lvEnumNumericValues);
 
             seqLVEnumIndex += 1;
         }

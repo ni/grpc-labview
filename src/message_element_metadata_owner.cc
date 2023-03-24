@@ -142,8 +142,6 @@ namespace grpc_labview {
             }
             else
             {
-                //maxAlignmentRequirement = GetMaxAlignmentRequirement(element->type, element->isRepeated);
-
                 clusterOffset = AlignClusterOffset(clusterOffset, element->type, element->isRepeated);
                 element->clusterOffset = clusterOffset;
                 int elementSize = ClusterElementSize(element->type, element->isRepeated);
@@ -158,32 +156,6 @@ namespace grpc_labview {
         metadata->clusterSize = AlignClusterOffset(clusterOffset, maxAlignmentRequirement);
     }
 
-    int MessageElementMetadataOwner::GetMaxAlignmentRequirement(LVMessageMetadataType elementType, bool elementIsRepeated)
-    {
-        int clusterOffset = AlignClusterOffset(clusterOffset, elementType, elementIsRepeated);
-        //int maxAlignmentRequirement = 0;
-        //element->clusterOffset = clusterOffset;
-        int elementSize = ClusterElementSize(elementType, elementIsRepeated);
-        clusterOffset += elementSize;       
-
-        return elementSize;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void MessageElementMetadataOwner::UpdateMetadataClusterLayout(std::shared_ptr<EnumMetadata>& metadata)
-    {
-        if (metadata->clusterSize != 0)
-        {
-            return;
-        }
-        int clusterOffset = 0;
-        int maxAlignmentRequirement = 0;
-        //maxAlignmentRequirement = GetMaxAlignmentRequirement((LVMessageMetadataType)9 /*TODO: Clean up*/, false /*element->isRepeated*/); // This should only be the enum definition, so the "repeated" part should get handled in the field of the message. Is this code required at all?
-        metadata->alignmentRequirement = maxAlignmentRequirement;
-        metadata->clusterSize = AlignClusterOffset(clusterOffset, maxAlignmentRequirement);
-    }
-
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void MessageElementMetadataOwner::FinalizeMetadata()
@@ -192,9 +164,5 @@ namespace grpc_labview {
         {
             UpdateMetadataClusterLayout(metadata.second);
         }
-        /*for (auto metadata : _registeredEnumMetadata)
-        {
-            UpdateMetadataClusterLayout(metadata.second);
-        }*/
     }
 }

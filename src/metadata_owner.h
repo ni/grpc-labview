@@ -15,6 +15,7 @@ namespace grpc_labview
     {
     public:
         virtual std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) = 0;
+        virtual std::shared_ptr<EnumMetadata> FindEnumMetadata(const std::string& name) = 0;
     };
 
     //---------------------------------------------------------------------
@@ -22,8 +23,8 @@ namespace grpc_labview
     class MessageElementMetadataOwner : public IMessageElementMetadataOwner
     {    
     public:
-        void RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata); // Repeat for enum?
-        void RegisterMetadata(std::shared_ptr<EnumMetadata> requestMetadata); // Repeat for enum?
+        void RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata);
+        void RegisterMetadata(std::shared_ptr<EnumMetadata> requestMetadata);
         std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
         std::shared_ptr<EnumMetadata> FindEnumMetadata(const std::string& name);
         void FinalizeMetadata();
@@ -33,7 +34,5 @@ namespace grpc_labview
         std::map<std::string, std::shared_ptr<MessageMetadata>> _registeredMessageMetadata;
         std::map<std::string, std::shared_ptr<EnumMetadata>> _registeredEnumMetadata;
         void UpdateMetadataClusterLayout(std::shared_ptr<MessageMetadata>& metadata);
-        void UpdateMetadataClusterLayout(std::shared_ptr<EnumMetadata>& metadata);
-        int GetMaxAlignmentRequirement(LVMessageMetadataType elementType, bool elementIsRepeated);
     };
 }

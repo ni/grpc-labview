@@ -352,7 +352,7 @@ namespace grpc_labview {
 
     void ClusterDataCopier::CopyEnumToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
-        auto enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
+        std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
 
         if (metadata->isRepeated)
         {
@@ -738,7 +738,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    int32_t GetProtoValueForLVValue(int enumValueFromLV, std::shared_ptr<EnumMetadata> enumMetadata)
+    int32_t GetProtoValueForLVValue(int32_t enumValueFromLV, std::shared_ptr<EnumMetadata> enumMetadata)
     {
         int value = 0;
         // Find the equivalent proto value for enumValueFromLV
@@ -753,7 +753,7 @@ namespace grpc_labview {
     }
     void ClusterDataCopier::CopyEnumFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
-        auto enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
+        std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
 
         // Add mapping code here.
 
@@ -774,7 +774,7 @@ namespace grpc_labview {
 
                 for (size_t i = 0; i < count; i++)
                 {
-                    int32_t* enumValueFromLV = data[i];
+                    auto enumValueFromLV = data[i];
                     // Find the equivalent proto value for enumValueFromLV
                     mappedArray[i] = GetProtoValueForLVValue(enumValueFromLV, enumMetadata);
                 }
