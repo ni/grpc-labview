@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <message_metadata.h>
+#include <enum_metadata.h>
 
 namespace grpc_labview 
 {
@@ -21,8 +22,8 @@ namespace grpc_labview
     class MessageElementMetadataOwner : public IMessageElementMetadataOwner
     {    
     public:
-        void RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata);
-        void RegisterMetadata(std::shared_ptr<EnumMetadata> requestMetadata);
+        void RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata); // Repeat for enum?
+        void RegisterMetadata(std::shared_ptr<EnumMetadata> requestMetadata); // Repeat for enum?
         std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
         std::shared_ptr<EnumMetadata> FindEnumMetadata(const std::string& name);
         void FinalizeMetadata();

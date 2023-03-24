@@ -626,8 +626,6 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
     }
     if (field->type() == FieldDescriptor::TYPE_ENUM)
     {
-        //std::string enumKeyValues = GetEnumNames(const_cast<EnumDescriptor*>(field->enum_type()));
-        //SetLVString(&info->embeddedMessage, enumKeyValues);
         SetLVString(&info->embeddedMessage, grpc_labview::TransformMessageName(field->enum_type()->full_name()));
     }
     SetLVString(&info->fieldName, field->name());
@@ -650,6 +648,7 @@ LIBRARY_EXPORT int GetEnumInfo(EnumDescriptor* enumDescriptor, grpc_labview::Enu
     SetLVString(&info->name, grpc_labview::TransformMessageName(enumDescriptor->full_name()));
     SetLVString(&info->typeUrl, enumDescriptor->full_name());
     SetLVString(&info->enumValues, GetEnumNames(enumDescriptor));
+    // TODO: Set allow_alias
     
     return 0;
 }
@@ -657,7 +656,7 @@ LIBRARY_EXPORT int GetEnumInfo(EnumDescriptor* enumDescriptor, grpc_labview::Enu
 std::string GetEnumNames(google::protobuf::EnumDescriptor* enumDescriptor)
 {
     int enumValueCount = enumDescriptor->value_count();
-    std::string enumNames = ""; // grpc_labview::TransformMessageName(enumDescriptor->full_name()) + ";";
+    std::string enumNames = "";
 
     for (int i = 0; i < enumValueCount; i++)
     {

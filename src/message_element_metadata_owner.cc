@@ -74,11 +74,11 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void MessageElementMetadataOwner::RegisterMetadata(std::shared_ptr<EnumMetadata> requestMetadata)
+    void MessageElementMetadataOwner::RegisterMetadata(std::shared_ptr<EnumMetadata> metadata)
     {
         std::lock_guard<std::mutex> lock(_mutex);
 
-        _registeredEnumMetadata.insert({ requestMetadata->messageName, requestMetadata });
+        _registeredEnumMetadata.insert({ metadata->messageName, metadata });
     }
 
     //---------------------------------------------------------------------

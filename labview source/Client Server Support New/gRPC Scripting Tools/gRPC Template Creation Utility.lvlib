@@ -100,6 +100,8 @@
 			<Item Name="Create Message Setter.vi" Type="VI" URL="../Top Level API/Create Message Setter.vi"/>
 			<Item Name="Create Message Accessors.vi" Type="VI" URL="../Top Level API/Create Message Accessors.vi"/>
 			<Item Name="Update Messages MetaData.vi" Type="VI" URL="../Top Level API/Update Messages MetaData.vi"/>
+			<Item Name="Create Messages For Registration.vi" Type="VI" URL="../Top Level API/Create Messages For Registration.vi"/>
+			<Item Name="Create Enums For Registration.vi" Type="VI" URL="../Top Level API/Create Enums For Registration.vi"/>
 			<Item Name="Update Message Setter.vi" Type="VI" URL="../Top Level API/Update Message Setter.vi"/>
 			<Item Name="Generate RPC Messages.vi" Type="VI" URL="../Top Level API/Generate RPC Messages.vi"/>
 			<Item Name="Check Message Data Clusters.vi" Type="VI" URL="../Top Level API/Check Message Data Clusters.vi"/>
@@ -110,9 +112,10 @@
 			<Item Name="Create Message Setter (from Accessor).vi" Type="VI" URL="../Top Level API/Create Message Setter (from Accessor).vi"/>
 			<Item Name="Delete Message Template Files.vi" Type="VI" URL="../Top Level API/Delete Message Template Files.vi"/>
 			<Item Name="Set Message Field Representation.vi" Type="VI" URL="../Top Level API/Set Message Field Representation.vi"/>
-			<Item Name="Set Message Data.vi" Type="VI" URL="../Top Level API/Set Message Data.vi"/>
+			<Item Name="Set Enum Control Strings.vi" Type="VI" URL="../Top Level API/Set Enum Control Strings.vi"/>
 			<Item Name="Create Data Clusters for Types.vi" Type="VI" URL="../Top Level API/Create Data Clusters for Types.vi"/>
 			<Item Name="Create Type Data Clusters.vi" Type="VI" URL="../Top Level API/Create Type Data Clusters.vi"/>
+			<Item Name="Get Or Create Typedef.vi" Type="VI" URL="../Top Level API/Get Or Create Typedef.vi"/>
 			<Item Name="Create Enum Data Clusters.vi" Type="VI" URL="../Top Level API/Create Enum Data Clusters.vi"/>
 			<Item Name="Create Enum Data Clusters (simple).vi" Type="VI" URL="../Top Level API/Create Enum Data Clusters (simple).vi"/>
 		</Item>
@@ -290,7 +293,7 @@
 		<Item Name="Get Enum Field Info.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Enum Field Info.vi"/>
 		<Item Name="Create Enum Metadata.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Enum Metadata.vi"/>
 		<Item Name="Create Message Metadata.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Message Metadata.vi"/>
-		<Item Name="Create Messages.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Messages.vi"/>
+		<Item Name="Create Types.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Types.vi"/>
 		<Item Name="Create Methods.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Methods.vi"/>
 		<Item Name="Create Method Metadata.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Method Metadata.vi"/>
 	</Item>
@@ -336,5 +339,4 @@
 		<Item Name="Error 5032.vi" Type="VI" URL="../Error Handling/Error 5032.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
-	<Item Name="Get Or Create Typedef.vi" Type="VI" URL="../Top Level API/Get Or Create Typedef.vi"/>
 </Library>
