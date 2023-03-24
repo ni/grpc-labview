@@ -130,8 +130,6 @@ namespace grpc_labview {
             }
             else
             {
-                //maxAlignmentRequirement = GetMaxAlignmentRequirement(element->type, element->isRepeated);
-
                 clusterOffset = AlignClusterOffset(clusterOffset, element->type, element->isRepeated);
                 element->clusterOffset = clusterOffset;
                 int elementSize = ClusterElementSize(element->type, element->isRepeated);
