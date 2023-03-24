@@ -25,6 +25,15 @@ namespace grpc_labview
         int32_t type;
         char isRepeated;
     };
+
+    struct EnumFieldCluster
+    {
+        int32_t version;
+        LStrHandle name;
+        LStrHandle typeUrl;
+        LStrHandle enumValues;
+        char isAliasAllowed;
+    };
     #ifdef _PS_4
     #pragma pack (pop)
     #endif
@@ -617,8 +626,7 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
     }
     if (field->type() == FieldDescriptor::TYPE_ENUM)
     {
-        std::string enumKeyValues = GetEnumNames(const_cast<EnumDescriptor*>(field->enum_type()));
-        SetLVString(&info->embeddedMessage, enumKeyValues);
+        SetLVString(&info->embeddedMessage, grpc_labview::TransformMessageName(field->enum_type()->full_name()));
     }
     SetLVString(&info->fieldName, field->name());
     info->protobufIndex = field->number();
@@ -630,16 +638,17 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
     return error;
 }
 
-LIBRARY_EXPORT int GetEnumInfo(EnumDescriptor* enumDescriptor, grpc_labview::MessageFieldCluster* info)
+LIBRARY_EXPORT int GetEnumInfo(EnumDescriptor* enumDescriptor, grpc_labview::EnumFieldCluster* info)
 {
     if (enumDescriptor == nullptr)
     {
         return -1;
     }
 
-    SetLVString(&info->fieldName, enumDescriptor->name());
-    info->type = 9;
-    SetLVString(&info->embeddedMessage, GetEnumNames(enumDescriptor));
+    SetLVString(&info->name, grpc_labview::TransformMessageName(enumDescriptor->full_name()));
+    SetLVString(&info->typeUrl, enumDescriptor->full_name());
+    SetLVString(&info->enumValues, GetEnumNames(enumDescriptor));
+    // TODO: Set allow_alias
     
     return 0;
 }
@@ -647,7 +656,7 @@ LIBRARY_EXPORT int GetEnumInfo(EnumDescriptor* enumDescriptor, grpc_labview::Mes
 std::string GetEnumNames(google::protobuf::EnumDescriptor* enumDescriptor)
 {
     int enumValueCount = enumDescriptor->value_count();
-    std::string enumNames = grpc_labview::TransformMessageName(enumDescriptor->full_name()) + ";";
+    std::string enumNames = "";
 
     for (int i = 0; i < enumValueCount; i++)
     {

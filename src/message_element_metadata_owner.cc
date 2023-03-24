@@ -74,6 +74,15 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    void MessageElementMetadataOwner::RegisterMetadata(std::shared_ptr<EnumMetadata> metadata)
+    {
+        std::lock_guard<std::mutex> lock(_mutex);
+
+        _registeredEnumMetadata.insert({ metadata->messageName, metadata });
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     std::shared_ptr<MessageMetadata> MessageElementMetadataOwner::FindMetadata(const std::string& name)
     {
         auto it = _registeredMessageMetadata.find(name);
