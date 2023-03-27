@@ -60,27 +60,6 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class EnumElementMetadata
-    {
-    public:
-        EnumElementMetadata(IMessageElementMetadataOwner* owner) :
-            _owner(owner)
-        {
-        }
-
-    public:
-        IMessageElementMetadataOwner* _owner;
-        std::string embeddedMessageName;
-        int protobufIndex;
-        int clusterOffset;
-        LVMessageMetadataType type;
-        bool isRepeated;
-        std::string enumValues;
-        bool allowAlias;
-    };
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
     #ifdef _PS_4
     #pragma pack (push, 1)
     #endif
