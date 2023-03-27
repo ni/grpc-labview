@@ -121,7 +121,7 @@ namespace grpc_labview
         for each (std::string keyValuePair in SplitString(enumValues, ";"))
         {
             auto keyValue = SplitString(keyValuePair, "=");
-            assert(keyValue.size == 2);
+            assert(keyValue.size() == 2);
 
             int protoEnumNumeric = std::stoi(keyValue[1]);
             lvEnumToProtoEnum.insert(std::pair<int, int32_t>(seqLVEnumIndex, protoEnumNumeric));
@@ -138,7 +138,7 @@ namespace grpc_labview
         {
             auto keyValue = SplitString(keyValuePair, "=");
             int protoEnumNumeric = std::stoi(keyValue[1]);
-            assert(keyValue.size == 2);
+            assert(keyValue.size() == 2);
 
             std::list<int> lvEnumNumericValues;
             auto existingElement = protoEnumToLVEnum.find(protoEnumNumeric);
@@ -333,9 +333,10 @@ LIBRARY_EXPORT int32_t GetRequestData(grpc_labview::gRPCid** id, int8_t* lvReque
         {
             grpc_labview::ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
         }
-        catch (std::exception e)
+        catch (std::exception& e)
         {
-            return -3;
+            data->_call->ReadComplete();
+            return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
         }
         data->_call->ReadComplete();
         return 0;
@@ -358,7 +359,7 @@ LIBRARY_EXPORT int32_t SetResponseData(grpc_labview::gRPCid** id, int8_t* lvRequ
     }
     catch (std::exception e)
     {
-        return -3;
+        return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
     }
     if (data->_call->IsCancelled())
     {

@@ -298,7 +298,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     }
     catch (std::exception e)
     {
-        return -3;
+        return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
     }
 
     clientCall->_runFuture = std::async(
@@ -341,7 +341,11 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
         }
         catch (std::exception e)
         {
-            return -3;
+            return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
+            if (errorMessage != nullptr)
+            {
+                grpc_labview::SetLVString(errorMessage, e.what());
+            }
         }
     }
     else
@@ -471,7 +475,7 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
     }
     catch (std::exception e)
     {
-        return -3;
+        return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
     }
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::SERVER_STREAMING);
@@ -583,7 +587,7 @@ LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId
         }
         catch (std::exception e)
         {
-            return -3;
+            return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
         }
     }
     return 0;
@@ -609,7 +613,7 @@ LIBRARY_EXPORT int32_t ClientWriteToStream(grpc_labview::gRPCid* callId, int8_t*
     }
     catch (std::exception e)
     {
-        return -3;
+        return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
     }
     *success = writer->Write(clientCall->_request.get());
     return 0;
@@ -650,7 +654,11 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
         }
         catch (std::exception e)
         {
-            return -3;
+            result = -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
+            if (errorMessage != nullptr)
+            {
+                grpc_labview::SetLVString(errorMessage, e.what());
+            }
         }
     }
     else

@@ -345,7 +345,7 @@ namespace grpc_labview {
             value = (lvValue->second).front(); // Since one proto value can be mapped to multiple LV enum values, so always return the first element.
         else
         {
-            throw new std::exception("Key not found in map!");
+            throw std::exception("Invalid enum value!");
         }
         return value;
     }
@@ -749,7 +749,7 @@ namespace grpc_labview {
             value = protoValue->second;
         else
         {
-            throw new std::exception("Key not found in map!");
+            throw std::exception("Invalid enum value!");
         }
         return value;
     }

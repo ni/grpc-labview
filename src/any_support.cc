@@ -44,7 +44,7 @@ LIBRARY_EXPORT int32_t PackToBuffer(grpc_labview::gRPCid* id, const char* messag
     }
     catch (std::exception e)
     {
-        return -3;
+        return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
     }
     std::string buffer;
     if (message.SerializeToString(&buffer))
@@ -165,7 +165,7 @@ LIBRARY_EXPORT int32_t AnyBuilderAddValue(grpc_labview::gRPCid* anyId, grpc_labv
     }
     catch (std::exception e)
     {
-        return -3;
+        return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
     }
     return 0;
 }
