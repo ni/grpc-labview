@@ -2,7 +2,6 @@
 //---------------------------------------------------------------------
 #include <cluster_copier.h>
 #include <lv_message.h>
-#include <stdexcept>
 
 namespace grpc_labview {
 
@@ -345,7 +344,7 @@ namespace grpc_labview {
             value = (lvValue->second).front(); // Since one proto value can be mapped to multiple LV enum values, so always return the first element.
         else
         {
-            throw std::exception("Invalid enum value!");
+            throw InvalidEnumValueException("Invalid enum value!");
         }
         return value;
     }
@@ -749,7 +748,7 @@ namespace grpc_labview {
             value = protoValue->second;
         else
         {
-            throw std::exception("Invalid enum value!");
+            throw InvalidEnumValueException("Invalid enum value!");
         }
         return value;
     }

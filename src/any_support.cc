@@ -42,9 +42,9 @@ LIBRARY_EXPORT int32_t PackToBuffer(grpc_labview::gRPCid* id, const char* messag
     {
         grpc_labview::ClusterDataCopier::CopyFromCluster(message, cluster);
     }
-    catch (std::exception e)
+    catch (InvalidEnumValueException e)
     {
-        return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
+        return e.code;
     }
     std::string buffer;
     if (message.SerializeToString(&buffer))
@@ -93,9 +93,9 @@ LIBRARY_EXPORT int32_t UnpackFromBuffer(grpc_labview::gRPCid* id, grpc_labview::
         {
             grpc_labview::ClusterDataCopier::CopyToCluster(message, cluster);
         }
-        catch (std::exception e)
+        catch (InvalidEnumValueException e)
         {
-            return -3;
+            return e.code;
         }
         return 0;
     }
@@ -163,9 +163,9 @@ LIBRARY_EXPORT int32_t AnyBuilderAddValue(grpc_labview::gRPCid* anyId, grpc_labv
     {
         grpc_labview::ClusterDataCopier::AnyBuilderAddValue(*message, valueType, isRepeated, protobufIndex, value);
     }
-    catch (std::exception e)
+    catch (InvalidEnumValueException e)
     {
-        return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
+        return e.code;
     }
     return 0;
 }

@@ -296,9 +296,9 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     {
         grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->_request.get(), requestCluster);
     }
-    catch (std::exception e)
+    catch (InvalidEnumValueException e)
     {
-        return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
+        return e.code;
     }
 
     clientCall->_runFuture = std::async(
@@ -339,13 +339,13 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
         {
             grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
         }
-        catch (std::exception e)
+        catch (InvalidEnumValueException e)
         {
-            return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
             if (errorMessage != nullptr)
             {
                 grpc_labview::SetLVString(errorMessage, e.what());
             }
+            return e.code;
         }
     }
     else
@@ -473,9 +473,9 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
     {
         grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->_request.get(), requestCluster);
     }
-    catch (std::exception e)
+    catch (InvalidEnumValueException e)
     {
-        return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
+        return e.code;
     }
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::SERVER_STREAMING);
@@ -585,9 +585,9 @@ LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId
         {
             grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
         }
-        catch (std::exception e)
+        catch (InvalidEnumValueException e)
         {
-            return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
+            return e.code;
         }
     }
     return 0;
@@ -611,9 +611,9 @@ LIBRARY_EXPORT int32_t ClientWriteToStream(grpc_labview::gRPCid* callId, int8_t*
     {
         grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->_request.get(), requestCluster);
     }
-    catch (std::exception e)
+    catch (InvalidEnumValueException e)
     {
-        return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
+        return e.code;
     }
     *success = writer->Write(clientCall->_request.get());
     return 0;
@@ -652,9 +652,9 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
         {
             grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
         }
-        catch (std::exception e)
+        catch (InvalidEnumValueException e)
         {
-            result = -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
+            result = e.code;
             if (errorMessage != nullptr)
             {
                 grpc_labview::SetLVString(errorMessage, e.what());
