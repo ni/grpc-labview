@@ -351,7 +351,14 @@ LIBRARY_EXPORT int32_t GetRequestData(grpc_labview::gRPCid** id, int8_t* lvReque
     }
     if (data->_call->IsActive() && data->_call->ReadNext())
     {
-        grpc_labview::ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
+        try
+        {
+            grpc_labview::ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
+        }
+        catch (std::exception e)
+        {
+            return -3;
+        }
         data->_call->ReadComplete();
         return 0;
     }
@@ -367,7 +374,14 @@ LIBRARY_EXPORT int32_t SetResponseData(grpc_labview::gRPCid** id, int8_t* lvRequ
     {
         return -1;
     }
-    grpc_labview::ClusterDataCopier::CopyFromCluster(*data->_response, lvRequest);
+    try
+    {
+        grpc_labview::ClusterDataCopier::CopyFromCluster(*data->_response, lvRequest);
+    }
+    catch (std::exception e)
+    {
+        return -3;
+    }
     if (data->_call->IsCancelled())
     {
         return -(1000 + grpc::StatusCode::CANCELLED);

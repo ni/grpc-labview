@@ -64,7 +64,9 @@ namespace grpc_labview
     public:
         GenericMethodData(CallData* call, ServerContext* context, std::shared_ptr<LVMessage> request, std::shared_ptr<LVMessage> response);
         virtual std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
-        virtual std::shared_ptr<EnumMetadata> FindEnumMetadata(const std::string& name) override;
+        std::shared_ptr<EnumMetadata> FindEnumMetadata(const std::string& name) {
+            return nullptr;
+        };
 
     public:
         CallData* _call;
@@ -143,7 +145,9 @@ namespace grpc_labview
     public:
         CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService* service, grpc::ServerCompletionQueue* cq);
         std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
-        std::shared_ptr<EnumMetadata> FindEnumMetadata(const std::string& name) override;
+        std::shared_ptr<EnumMetadata> FindEnumMetadata(const std::string& name) {
+            return nullptr;
+        }
         void Proceed(bool ok) override;
         bool Write();
         void Finish();

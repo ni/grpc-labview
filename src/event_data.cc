@@ -33,10 +33,10 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    std::shared_ptr<EnumMetadata> CallData::FindEnumMetadata(const std::string& name)
+    /*std::shared_ptr<EnumMetadata> CallData::FindEnumMetadata(const std::string& name)
     {
         return _server->FindEnumMetadata(name);
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -305,14 +305,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    std::shared_ptr<EnumMetadata> GenericMethodData::FindEnumMetadata(const std::string& name)
+    /*std::shared_ptr<EnumMetadata> GenericMethodData::FindEnumMetadata(const std::string& name)
     {
         if (_call != nullptr)
         {
             return _call->FindEnumMetadata(name);
         }
         return nullptr;
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------

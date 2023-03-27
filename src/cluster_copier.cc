@@ -2,7 +2,7 @@
 //---------------------------------------------------------------------
 #include <cluster_copier.h>
 #include <lv_message.h>
-//#include <metadata_owner.h>
+#include <stdexcept>
 
 namespace grpc_labview {
 
@@ -345,7 +345,7 @@ namespace grpc_labview {
             value = (lvValue->second).front(); // Since one proto value can be mapped to multiple LV enum values, so always return the first element.
         else
         {
-            // Throw error
+            throw new std::exception("Key not found in map!");
         }
         return value;
     }
@@ -375,6 +375,8 @@ namespace grpc_labview {
                 auto byteCount = count * sizeof(int32_t);
                 memcpy((*array)->bytes<int32_t>(), mappedArray, byteCount);
             }
+            
+            free(mappedArray);
         }
         else
         {
@@ -747,16 +749,13 @@ namespace grpc_labview {
             value = protoValue->second;
         else
         {
-            // Throw error
+            throw new std::exception("Key not found in map!");
         }
         return value;
     }
     void ClusterDataCopier::CopyEnumFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
-
-        // Add mapping code here.
-
 
         if (metadata->isRepeated)
         {
@@ -768,7 +767,7 @@ namespace grpc_labview {
                 message._values.emplace(metadata->protobufIndex, repeatedValue);
                 auto data = (*array)->bytes<int32_t>();
 
-                // data has the array of enums send from LV side. Iterate this array, map each element to the equivalent proto
+                // "data" has the array of enums sent from the LV side. Iterate this array, map each element to the equivalent proto
                 // value and copy the new array into the destination.
                 int32_t* mappedArray = (int32_t*)malloc(count * sizeof(int32_t));
 

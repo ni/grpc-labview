@@ -66,7 +66,6 @@ namespace grpc_labview
         EnumElementMetadata(IMessageElementMetadataOwner* owner) :
             _owner(owner)
         {
-            //type = LVMessageMetadataType.EnumValue;
         }
 
     public:
@@ -99,7 +98,6 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     using LVMessageMetadataMap = std::map<google::protobuf::uint32, std::shared_ptr<MessageElementMetadata>>;
-    //using LVEnumMetadataMap = std::map<google::protobuf::uint32, std::shared_ptr<EnumElementMetadata>>;
     using LVMessageMetadataList = std::vector<std::shared_ptr<MessageElementMetadata>>;
 
     //---------------------------------------------------------------------
@@ -119,7 +117,6 @@ namespace grpc_labview
         int alignmentRequirement;
         LVMessageMetadataList _elements;
         LVMessageMetadataMap _mappedElements;
-        //LVEnumMetadataMap _mappedEnumElements;
     };
 
     //---------------------------------------------------------------------

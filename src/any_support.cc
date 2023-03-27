@@ -38,7 +38,14 @@ LIBRARY_EXPORT int32_t PackToBuffer(grpc_labview::gRPCid* id, const char* messag
     }
 
     grpc_labview::LVMessage message(metadata);
-    grpc_labview::ClusterDataCopier::CopyFromCluster(message, cluster);
+    try
+    {
+        grpc_labview::ClusterDataCopier::CopyFromCluster(message, cluster);
+    }
+    catch (std::exception e)
+    {
+        return -3;
+    }
     std::string buffer;
     if (message.SerializeToString(&buffer))
     {
@@ -82,7 +89,14 @@ LIBRARY_EXPORT int32_t UnpackFromBuffer(grpc_labview::gRPCid* id, grpc_labview::
     std::string buffer(elements, (*lvBuffer)->cnt);
     if (message.ParseFromString(buffer))
     {
-        grpc_labview::ClusterDataCopier::CopyToCluster(message, cluster);
+        try
+        {
+            grpc_labview::ClusterDataCopier::CopyToCluster(message, cluster);
+        }
+        catch (std::exception e)
+        {
+            return -3;
+        }
         return 0;
     }
     return -2;
@@ -145,7 +159,14 @@ LIBRARY_EXPORT int32_t AnyBuilderBegin(grpc_labview::gRPCid** builderId)
 LIBRARY_EXPORT int32_t AnyBuilderAddValue(grpc_labview::gRPCid* anyId, grpc_labview::LVMessageMetadataType valueType, int isRepeated, int protobufIndex, int8_t* value)
 {
     auto message = anyId->CastTo<grpc_labview::LVMessage>();
-    grpc_labview::ClusterDataCopier::AnyBuilderAddValue(*message, valueType, isRepeated, protobufIndex, value);
+    try
+    {
+        grpc_labview::ClusterDataCopier::AnyBuilderAddValue(*message, valueType, isRepeated, protobufIndex, value);
+    }
+    catch (std::exception e)
+    {
+        return -3;
+    }
     return 0;
 }
 
