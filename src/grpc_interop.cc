@@ -118,7 +118,7 @@ namespace grpc_labview
     {
         std::map<int, int32_t> lvEnumToProtoEnum;
         int seqLVEnumIndex = 0;
-        for each (std::string keyValuePair in SplitString(enumValues, ";"))
+        for (std::string keyValuePair : SplitString(enumValues, ";"))
         {
             auto keyValue = SplitString(keyValuePair, "=");
             assert(keyValue.size() == 2);
@@ -134,7 +134,7 @@ namespace grpc_labview
     {
         std::map<int32_t, std::list<int>> protoEnumToLVEnum;
         int seqLVEnumIndex = 0;
-        for each (std::string keyValuePair in SplitString(enumValues, ";"))
+        for (std::string keyValuePair : SplitString(enumValues, ";"))
         {
             auto keyValue = SplitString(keyValuePair, "=");
             int protoEnumNumeric = std::stoi(keyValue[1]);
