@@ -333,7 +333,7 @@ LIBRARY_EXPORT int32_t GetRequestData(grpc_labview::gRPCid** id, int8_t* lvReque
         {
             grpc_labview::ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
         }
-        catch (InvalidEnumValueException e)
+        catch (grpc_labview::InvalidEnumValueException& e)
         {
             data->_call->ReadComplete();
             return e.code;
@@ -357,7 +357,7 @@ LIBRARY_EXPORT int32_t SetResponseData(grpc_labview::gRPCid** id, int8_t* lvRequ
     {
         grpc_labview::ClusterDataCopier::CopyFromCluster(*data->_response, lvRequest);
     }
-    catch (InvalidEnumValueException e)
+    catch (grpc_labview::InvalidEnumValueException& e)
     {
         return e.code;
     }

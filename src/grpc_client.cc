@@ -296,7 +296,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     {
         grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->_request.get(), requestCluster);
     }
-    catch (InvalidEnumValueException e)
+    catch (grpc_labview::InvalidEnumValueException& e)
     {
         return e.code;
     }
@@ -339,7 +339,7 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
         {
             grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
         }
-        catch (InvalidEnumValueException e)
+        catch (grpc_labview::InvalidEnumValueException& e)
         {
             if (errorMessage != nullptr)
             {
@@ -473,7 +473,7 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
     {
         grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->_request.get(), requestCluster);
     }
-    catch (InvalidEnumValueException e)
+    catch (grpc_labview::InvalidEnumValueException& e)
     {
         return e.code;
     }
@@ -585,7 +585,7 @@ LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId
         {
             grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
         }
-        catch (InvalidEnumValueException e)
+        catch (grpc_labview::InvalidEnumValueException& e)
         {
             return e.code;
         }
@@ -611,7 +611,7 @@ LIBRARY_EXPORT int32_t ClientWriteToStream(grpc_labview::gRPCid* callId, int8_t*
     {
         grpc_labview::ClusterDataCopier::CopyFromCluster(*clientCall->_request.get(), requestCluster);
     }
-    catch (InvalidEnumValueException e)
+    catch (grpc_labview::InvalidEnumValueException& e)
     {
         return e.code;
     }
@@ -652,7 +652,7 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
         {
             grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
         }
-        catch (InvalidEnumValueException e)
+        catch (grpc_labview::InvalidEnumValueException& e)
         {
             result = e.code;
             if (errorMessage != nullptr)
