@@ -130,6 +130,18 @@ namespace grpc_labview
         return lvEnumToProtoEnum;
     }
 
+    void MapInsertOrAssign(std::map<int32_t, std::list<int>> *protoEnumToLVEnum, int protoEnumNumeric, std::list<int> lvEnumNumericValues)
+    {
+        auto existingElement = protoEnumToLVEnum->find(protoEnumNumeric);
+        if (existingElement != protoEnumToLVEnum->end())
+        {
+            protoEnumToLVEnum->erase(protoEnumNumeric);
+            protoEnumToLVEnum->insert(std::pair<int, std::list<int>>(protoEnumNumeric, lvEnumNumericValues));
+        }
+        else
+            protoEnumToLVEnum->insert(std::pair<int, std::list<int>>(protoEnumNumeric, lvEnumNumericValues));
+    }
+
     std::map<int32_t, std::list<int>> CreateMapBetweenProtoEnumAndLVEnumvalues(std::string enumValues)
     {
         std::map<int32_t, std::list<int>> protoEnumToLVEnum;
@@ -147,7 +159,7 @@ namespace grpc_labview
 
             lvEnumNumericValues.push_back(seqLVEnumIndex); // Add the new element
 
-            protoEnumToLVEnum.insert_or_assign(protoEnumNumeric, lvEnumNumericValues);
+            MapInsertOrAssign(&protoEnumToLVEnum, protoEnumNumeric, lvEnumNumericValues);
 
             seqLVEnumIndex += 1;
         }
