@@ -335,6 +335,7 @@ LIBRARY_EXPORT int32_t GetRequestData(grpc_labview::gRPCid** id, int8_t* lvReque
         }
         catch (grpc_labview::InvalidEnumValueException& e)
         {
+            // Before returning, set the call to complete, otherwise the server hangs waiting for the call.
             data->_call->ReadComplete();
             return e.code;
         }

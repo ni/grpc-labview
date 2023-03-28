@@ -341,7 +341,7 @@ namespace grpc_labview {
         int value = 0;
         auto lvValue = enumMetadata->ProtoEnumToLVEnum.find(protoValue);
         if (lvValue != enumMetadata->ProtoEnumToLVEnum.end())
-            value = (lvValue->second).front(); // Since one proto value can be mapped to multiple LV enum values, so always return the first element.
+            value = (lvValue->second).front(); // Since one proto value can be mapped to multiple LV enum values, always return the first element.
         else
         {
             throw InvalidEnumValueException("Invalid enum value!");

@@ -14,6 +14,6 @@ namespace grpc_labview
         {
             return message;
         }
-        int code = -2003; // Essentially, -(1000 + grpc::StatusCode::INVALID_ARGUMENT);, but 2000 instead of 1000 because it's not a gRPC eror, more of an LV error.
+        const int code = -2003; // Essentially, -(1000 + grpc::StatusCode::INVALID_ARGUMENT);, but 2000 instead of 1000 because it's not a gRPC eror, more of an LV error.
     };
 }
