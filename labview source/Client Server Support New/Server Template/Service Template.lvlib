@@ -13,6 +13,8 @@
 			<Item Name="package_templatemessage.ctl" Type="VI" URL="../RPC Messages/package_templatemessage.ctl"/>
 			<Item Name="Get package_templatemessage.vi" Type="VI" URL="../RPC Messages/Get package_templatemessage.vi"/>
 			<Item Name="Set package_templatemessage.vi" Type="VI" URL="../RPC Messages/Set package_templatemessage.vi"/>
+			<Item Name="Get package_template_enum for Value.vi" Type="VI" URL="../RPC Messages/Get package_template_enum for Value.vi"/>
+			<Item Name="Get Value for package_template_enum.vi" Type="VI" URL="../RPC Messages/Get Value for package_template_enum.vi"/>
 		</Item>
 		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../RPC Messages/Register gRPC Messages.vi"/>
 	</Item>
