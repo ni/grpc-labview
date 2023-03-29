@@ -9,6 +9,7 @@
 #include <map>
 #include <mutex>
 #include <thread>
+#include <assert.h>
 
 namespace grpc_labview
 {
@@ -95,16 +96,90 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+
+    std::vector<std::string> SplitString(std::string s, std::string delimiter)
+    {
+        size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+        std::string token;
+        std::vector<std::string> res;
+
+        while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos)
+        {
+            token = s.substr(pos_start, pos_end - pos_start);
+            pos_start = pos_end + delim_len;
+            res.push_back(token);
+        }
+
+        res.push_back(s.substr(pos_start));
+        return res;
+    }
+
+    std::map<int, int32_t> CreateMapBetweenLVEnumAndProtoEnumvalues(std::string enumValues)
+    {
+        std::map<int, int32_t> lvEnumToProtoEnum;
+        int seqLVEnumIndex = 0;
+        for (std::string keyValuePair : SplitString(enumValues, ";"))
+        {
+            auto keyValue = SplitString(keyValuePair, "=");
+            assert(keyValue.size() == 2);
+
+            int protoEnumNumeric = std::stoi(keyValue[1]);
+            lvEnumToProtoEnum.insert(std::pair<int, int32_t>(seqLVEnumIndex, protoEnumNumeric));
+            seqLVEnumIndex += 1;
+        }
+        return lvEnumToProtoEnum;
+    }
+
+    void MapInsertOrAssign(std::map<int32_t, std::list<int>> *protoEnumToLVEnum, int protoEnumNumeric, std::list<int> lvEnumNumericValues)
+    {
+        auto existingElement = protoEnumToLVEnum->find(protoEnumNumeric);
+        if (existingElement != protoEnumToLVEnum->end())
+        {
+            protoEnumToLVEnum->erase(protoEnumNumeric);
+            protoEnumToLVEnum->insert(std::pair<int, std::list<int>>(protoEnumNumeric, lvEnumNumericValues));
+        }
+        else
+            protoEnumToLVEnum->insert(std::pair<int, std::list<int>>(protoEnumNumeric, lvEnumNumericValues));
+    }
+
+    std::map<int32_t, std::list<int>> CreateMapBetweenProtoEnumAndLVEnumvalues(std::string enumValues)
+    {
+        std::map<int32_t, std::list<int>> protoEnumToLVEnum;
+        int seqLVEnumIndex = 0;
+        for (std::string keyValuePair : SplitString(enumValues, ";"))
+        {
+            auto keyValue = SplitString(keyValuePair, "=");
+            int protoEnumNumeric = std::stoi(keyValue[1]);
+            assert(keyValue.size() == 2);
+
+            std::list<int> lvEnumNumericValues;
+            auto existingElement = protoEnumToLVEnum.find(protoEnumNumeric);
+            if (existingElement != protoEnumToLVEnum.end())
+                lvEnumNumericValues = existingElement->second;
+
+            lvEnumNumericValues.push_back(seqLVEnumIndex); // Add the new element
+
+            MapInsertOrAssign(&protoEnumToLVEnum, protoEnumNumeric, lvEnumNumericValues);
+
+            seqLVEnumIndex += 1;
+        }
+        return protoEnumToLVEnum;
+    }
+
     std::shared_ptr<EnumMetadata> CreateEnumMetadata2(IMessageElementMetadataOwner* metadataOwner, LVEnumMetadata2* lvMetadata)
     {
-        std::shared_ptr<EnumMetadata> metadata(new EnumMetadata());
+        std::shared_ptr<EnumMetadata> enumMetadata(new EnumMetadata());
 
-        metadata->messageName = GetLVString(lvMetadata->messageName);
-        metadata->typeUrl = GetLVString(lvMetadata->typeUrl);
-        metadata->elements = GetLVString(lvMetadata->elements);
-        metadata->allowAlias = lvMetadata->allowAlias;
-        int clusterOffset = 0;
-        return metadata;
+        enumMetadata->messageName = GetLVString(lvMetadata->messageName);
+        enumMetadata->typeUrl = GetLVString(lvMetadata->typeUrl);
+        enumMetadata->elements = GetLVString(lvMetadata->elements);
+        enumMetadata->allowAlias = lvMetadata->allowAlias;
+
+        // Create the map between LV enum and proto enum values
+        enumMetadata->LVEnumToProtoEnum = CreateMapBetweenLVEnumAndProtoEnumvalues(enumMetadata->elements);
+        enumMetadata->ProtoEnumToLVEnum = CreateMapBetweenProtoEnumAndLVEnumvalues(enumMetadata->elements);
+
+        return enumMetadata;
     }
 }
 
@@ -266,7 +341,16 @@ LIBRARY_EXPORT int32_t GetRequestData(grpc_labview::gRPCid** id, int8_t* lvReque
     }
     if (data->_call->IsActive() && data->_call->ReadNext())
     {
-        grpc_labview::ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
+        try
+        {
+            grpc_labview::ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
+        }
+        catch (grpc_labview::InvalidEnumValueException& e)
+        {
+            // Before returning, set the call to complete, otherwise the server hangs waiting for the call.
+            data->_call->ReadComplete();
+            return e.code;
+        }
         data->_call->ReadComplete();
         return 0;
     }
@@ -282,7 +366,14 @@ LIBRARY_EXPORT int32_t SetResponseData(grpc_labview::gRPCid** id, int8_t* lvRequ
     {
         return -1;
     }
-    grpc_labview::ClusterDataCopier::CopyFromCluster(*data->_response, lvRequest);
+    try
+    {
+        grpc_labview::ClusterDataCopier::CopyFromCluster(*data->_response, lvRequest);
+    }
+    catch (grpc_labview::InvalidEnumValueException& e)
+    {
+        return e.code;
+    }
     if (data->_call->IsCancelled())
     {
         return -(1000 + grpc::StatusCode::CANCELLED);

@@ -95,6 +95,18 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    std::shared_ptr<EnumMetadata> MessageElementMetadataOwner::FindEnumMetadata(const std::string& name)
+    {
+        auto it = _registeredEnumMetadata.find(name);
+        if (it != _registeredEnumMetadata.end())
+        {
+            return (*it).second;
+        }
+        return nullptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void MessageElementMetadataOwner::UpdateMetadataClusterLayout(std::shared_ptr<MessageMetadata>& metadata)
     {
         if (metadata->clusterSize != 0 || metadata->_elements.size() == 0)
