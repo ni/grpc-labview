@@ -2,6 +2,8 @@
 //---------------------------------------------------------------------
 #pragma once
 
+#include <list>
+
 namespace grpc_labview
 {
     //---------------------------------------------------------------------
@@ -21,6 +23,8 @@ namespace grpc_labview
         bool allowAlias;
         int clusterSize;
         int alignmentRequirement;
+        std::map<int, int32_t> LVEnumToProtoEnum;
+        std::map<int32_t, std::list<int>> ProtoEnumToLVEnum;
     };
 
     //---------------------------------------------------------------------
