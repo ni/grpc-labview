@@ -3,6 +3,7 @@
 #pragma once
 
 #include <list>
+#include <exceptions.h>
 
 namespace grpc_labview
 {
@@ -14,6 +15,33 @@ namespace grpc_labview
         EnumMetadata() :
             clusterSize(0)
         {
+        }
+
+        int GetLVEnumValueFromProtoValue(int protoValue)
+        {
+            int value = 0;
+            auto lvValue = ProtoEnumToLVEnum.find(protoValue);
+            if (lvValue != ProtoEnumToLVEnum.end())
+                value = (lvValue->second).front(); // Since one proto value can be mapped to multiple LV enum values, always return the first element.
+            else
+            {
+                throw InvalidEnumValueException("Invalid enum value!");
+            }
+            return value;
+        }
+
+        int GetProtoValueFromLVValue(int enumValueFromLV)
+        {
+            int value = 0;
+            // Find the equivalent proto value for enumValueFromLV
+            auto protoValue = LVEnumToProtoEnum.find(enumValueFromLV);
+            if (protoValue != LVEnumToProtoEnum.end())
+                value = protoValue->second;
+            else
+            {
+                throw InvalidEnumValueException("Invalid enum value!");
+            }
+            return value;
         }
 
     public:

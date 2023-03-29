@@ -287,6 +287,36 @@ LIBRARY_EXPORT int32_t RegisterEnumMetadata2(grpc_labview::gRPCid** id, grpc_lab
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t GetLVEnumValueFromProtoValue(grpc_labview::gRPCid** id, std::string enumName, int protoValue)
+{
+    auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
+    if (server == nullptr)
+    {
+        return -1;
+    }
+    auto metadata = (server.get())->FindEnumMetadata(enumName);
+    return metadata.get()->GetLVEnumValueFromProtoValue(protoValue);
+    
+    //return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t GetProtoValueFromLVValue(grpc_labview::gRPCid** id, std::string enumName, int lvEnumValue)
+{
+    auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
+    if (server == nullptr)
+    {
+        return -1;
+    }
+    auto metadata = (server.get())->FindEnumMetadata(enumName);
+    return metadata.get()->GetProtoValueFromLVValue(lvEnumValue);
+
+    //return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t CompleteMetadataRegistration(grpc_labview::gRPCid** id)
 {        
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
