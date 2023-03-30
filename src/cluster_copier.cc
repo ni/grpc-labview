@@ -739,7 +739,7 @@ namespace grpc_labview {
 
     ////---------------------------------------------------------------------
     ////---------------------------------------------------------------------
-    //int32_t GetProtoValueFromLVValue(int32_t enumValueFromLV, std::shared_ptr<EnumMetadata> enumMetadata)
+    //int32_t GetProtoValueFromLVEnumValue(int32_t enumValueFromLV, std::shared_ptr<EnumMetadata> enumMetadata)
     //{
     //    int value = 0;
     //    // Find the equivalent proto value for enumValueFromLV
@@ -774,7 +774,7 @@ namespace grpc_labview {
                 {
                     auto enumValueFromLV = data[i];
                     // Find the equivalent proto value for enumValueFromLV
-                    mappedArray[i] = enumMetadata->GetProtoValueFromLVValue(enumValueFromLV);
+                    mappedArray[i] = enumMetadata->GetProtoValueFromLVEnumValue(enumValueFromLV);
                 }
 
                 repeatedValue->_value.Reserve(count);
@@ -787,7 +787,7 @@ namespace grpc_labview {
         else
         {
             auto enumValueFromLV = *(int32_t*)start;
-            int protoValue = enumMetadata->GetProtoValueFromLVValue(enumValueFromLV);
+            int protoValue = enumMetadata->GetProtoValueFromLVEnumValue(enumValueFromLV);
             auto value = std::make_shared<LVEnumMessageValue>(metadata->protobufIndex, protoValue);
             message._values.emplace(metadata->protobufIndex, value);
         }

@@ -30,7 +30,7 @@ namespace grpc_labview
             return value;
         }
 
-        int GetProtoValueFromLVValue(int enumValueFromLV)
+        int GetProtoValueFromLVEnumValue(int enumValueFromLV)
         {
             int value = 0;
             // Find the equivalent proto value for enumValueFromLV

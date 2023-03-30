@@ -302,7 +302,7 @@ LIBRARY_EXPORT int32_t GetLVEnumValueFromProtoValue(grpc_labview::gRPCid** id, s
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t GetProtoValueFromLVValue(grpc_labview::gRPCid** id, std::string enumName, int lvEnumValue)
+LIBRARY_EXPORT int32_t GetProtoValueFromLVEnumValue(grpc_labview::gRPCid** id, std::string enumName, int lvEnumValue)
 {
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
     if (server == nullptr)
@@ -310,7 +310,7 @@ LIBRARY_EXPORT int32_t GetProtoValueFromLVValue(grpc_labview::gRPCid** id, std::
         return -1;
     }
     auto metadata = (server.get())->FindEnumMetadata(enumName);
-    return metadata.get()->GetProtoValueFromLVValue(lvEnumValue);
+    return metadata.get()->GetProtoValueFromLVEnumValue(lvEnumValue);
 
     //return 0;
 }
