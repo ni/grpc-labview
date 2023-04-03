@@ -334,21 +334,6 @@ namespace grpc_labview {
         }
     }
 
-    ////---------------------------------------------------------------------
-    ////---------------------------------------------------------------------
-    //int GetLVEnumValueFromProtoValue(int protoValue, std::shared_ptr<EnumMetadata> enumMetadata)
-    //{
-    //    int value = 0;
-    //    auto lvValue = enumMetadata->ProtoEnumToLVEnum.find(protoValue);
-    //    if (lvValue != enumMetadata->ProtoEnumToLVEnum.end())
-    //        value = (lvValue->second).front(); // Since one proto value can be mapped to multiple LV enum values, always return the first element.
-    //    else
-    //    {
-    //        throw InvalidEnumValueException("Invalid enum value!");
-    //    }
-    //    return value;
-    //}
-
     void ClusterDataCopier::CopyEnumToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
@@ -737,21 +722,6 @@ namespace grpc_labview {
         }
     }
 
-    ////---------------------------------------------------------------------
-    ////---------------------------------------------------------------------
-    //int32_t GetProtoValueFromLVEnumValue(int32_t enumValueFromLV, std::shared_ptr<EnumMetadata> enumMetadata)
-    //{
-    //    int value = 0;
-    //    // Find the equivalent proto value for enumValueFromLV
-    //    auto protoValue = enumMetadata->LVEnumToProtoEnum.find(enumValueFromLV);
-    //    if (protoValue != enumMetadata->LVEnumToProtoEnum.end())
-    //        value = protoValue->second;
-    //    else
-    //    {
-    //        throw InvalidEnumValueException("Invalid enum value!");
-    //    }
-    //    return value;
-    //}
     void ClusterDataCopier::CopyEnumFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
