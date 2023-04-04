@@ -313,7 +313,7 @@ LIBRARY_EXPORT int32_t GetProtoValueFromLVEnumValue(grpc_labview::gRPCid** id, c
     }
     auto metadata = (server.get())->FindEnumMetadata(std::string(enumName));
     *(int*)protoValue = metadata.get()->GetProtoValueFromLVEnumValue(lvEnumValue);
-    // Unregister pointer here?
+
     return 0;
 }
 
