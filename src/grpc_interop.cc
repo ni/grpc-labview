@@ -287,32 +287,34 @@ LIBRARY_EXPORT int32_t RegisterEnumMetadata2(grpc_labview::gRPCid** id, grpc_lab
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t GetLVEnumValueFromProtoValue(grpc_labview::gRPCid** id, const char* enumName, int protoValue)
+LIBRARY_EXPORT int32_t GetLVEnumValueFromProtoValue(grpc_labview::gRPCid** id, const char* enumName, int protoValue, int* lvEnumValue)
 {
+    grpc_labview::gPointerManager.RegisterPointer(*id);
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
     if (server == nullptr)
     {
         return -1;
     }
     auto metadata = (server.get())->FindEnumMetadata(std::string(enumName));
-    return metadata.get()->GetLVEnumValueFromProtoValue(protoValue);
+    *(int*)lvEnumValue = metadata.get()->GetLVEnumValueFromProtoValue(protoValue);
     
-    //return 0;
+    return 0;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t GetProtoValueFromLVEnumValue(grpc_labview::gRPCid** id, const char* enumName, int lvEnumValue)
+LIBRARY_EXPORT int32_t GetProtoValueFromLVEnumValue(grpc_labview::gRPCid** id, const char* enumName, int lvEnumValue, int* protoValue)
 {
+    grpc_labview::gPointerManager.RegisterPointer(*id);
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
     if (server == nullptr)
     {
         return -1;
     }
     auto metadata = (server.get())->FindEnumMetadata(std::string(enumName));
-    return metadata.get()->GetProtoValueFromLVEnumValue(lvEnumValue);
-
-    //return 0;
+    *(int*)protoValue = metadata.get()->GetProtoValueFromLVEnumValue(lvEnumValue);
+    // Unregister pointer here?
+    return 0;
 }
 
 //---------------------------------------------------------------------
