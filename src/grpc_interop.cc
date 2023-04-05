@@ -289,7 +289,6 @@ LIBRARY_EXPORT int32_t RegisterEnumMetadata2(grpc_labview::gRPCid** id, grpc_lab
 //---------------------------------------------------------------------
 LIBRARY_EXPORT uint32_t GetLVEnumValueFromProtoValue(grpc_labview::gRPCid** id, const char* enumName, int protoValue, uint32_t* lvEnumValue)
 {
-    grpc_labview::gPointerManager.RegisterPointer(*id);
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
     if (server == nullptr)
     {
@@ -305,7 +304,6 @@ LIBRARY_EXPORT uint32_t GetLVEnumValueFromProtoValue(grpc_labview::gRPCid** id, 
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t GetProtoValueFromLVEnumValue(grpc_labview::gRPCid** id, const char* enumName, int lvEnumValue, int32_t* protoValue)
 {
-    grpc_labview::gPointerManager.RegisterPointer(*id);
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
     if (server == nullptr)
     {
