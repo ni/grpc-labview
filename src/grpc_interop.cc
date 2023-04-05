@@ -114,7 +114,7 @@ namespace grpc_labview
         return res;
     }
 
-    std::map<int, int32_t> CreateMapBetweenLVEnumAndProtoEnumvalues(std::string enumValues)
+    std::map<uint32_t, int32_t> CreateMapBetweenLVEnumAndProtoEnumvalues(std::string enumValues)
     {
         std::map<uint32_t, int32_t> lvEnumToProtoEnum;
         int seqLVEnumIndex = 0;
@@ -136,7 +136,7 @@ namespace grpc_labview
         if (existingElement != protoEnumToLVEnum->end())
         {
             protoEnumToLVEnum->erase(protoEnumNumeric);
-            protoEnumToLVEnum->insert(std::<int32_t, std::list<uint32_t>>(protoEnumNumeric, lvEnumNumericValues));
+            protoEnumToLVEnum->insert(std::pair<int32_t, std::list<uint32_t>>(protoEnumNumeric, lvEnumNumericValues));
         }
         else
             protoEnumToLVEnum->insert(std::pair<int32_t, std::list<uint32_t>>(protoEnumNumeric, lvEnumNumericValues));
