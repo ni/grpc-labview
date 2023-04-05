@@ -142,7 +142,7 @@ namespace grpc_labview
             protoEnumToLVEnum->insert(std::pair<int32_t, std::list<uint32_t>>(protoEnumNumeric, lvEnumNumericValues));
     }
 
-    std::map<int32_t, std::list<int>> CreateMapBetweenProtoEnumAndLVEnumvalues(std::string enumValues)
+    std::map<int32_t, std::list<uint32_t>> CreateMapBetweenProtoEnumAndLVEnumvalues(std::string enumValues)
     {
         std::map<int32_t, std::list<uint32_t>> protoEnumToLVEnum;
         int seqLVEnumIndex = 0;
