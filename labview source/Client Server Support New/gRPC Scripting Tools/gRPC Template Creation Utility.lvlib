@@ -118,6 +118,9 @@
 			<Item Name="Get Or Create Typedef.vi" Type="VI" URL="../Top Level API/Get Or Create Typedef.vi"/>
 			<Item Name="Create Enum Data Clusters.vi" Type="VI" URL="../Top Level API/Create Enum Data Clusters.vi"/>
 			<Item Name="Create Enum Data Clusters (simple).vi" Type="VI" URL="../Top Level API/Create Enum Data Clusters (simple).vi"/>
+			<Item Name="Create Enum Mapper.vi" Type="VI" URL="../Top Level API/Create Enum Mapper.vi"/>
+			<Item Name="Update Enum Mapper.vi" Type="VI" URL="../Top Level API/Update Enum Mapper.vi"/>
+			<Item Name="Create Mapper VIs for Enum.vi" Type="VI" URL="../Top Level API/Create Mapper VIs for Enum.vi"/>
 		</Item>
 		<Item Name="RPC Events" Type="Folder">
 			<Item Name="Populate gRPC Events.vi" Type="VI" URL="../Top Level API/Populate gRPC Events.vi"/>

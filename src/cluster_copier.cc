@@ -334,21 +334,6 @@ namespace grpc_labview {
         }
     }
 
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    int GetLVEnumValueFromProtoValue(int protoValue, std::shared_ptr<EnumMetadata> enumMetadata)
-    {
-        int value = 0;
-        auto lvValue = enumMetadata->ProtoEnumToLVEnum.find(protoValue);
-        if (lvValue != enumMetadata->ProtoEnumToLVEnum.end())
-            value = (lvValue->second).front(); // Since one proto value can be mapped to multiple LV enum values, always return the first element.
-        else
-        {
-            throw InvalidEnumValueException("Invalid enum value!");
-        }
-        return value;
-    }
-
     void ClusterDataCopier::CopyEnumToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
@@ -363,7 +348,7 @@ namespace grpc_labview {
             for (size_t i = 0; i < count; i++)
             {
                 auto protoValue = (repeatedEnum->_value.data())[i];
-                mappedArray[i] = GetLVEnumValueFromProtoValue(protoValue, enumMetadata);
+                mappedArray[i] = enumMetadata->GetLVEnumValueFromProtoValue(protoValue);
             }
 
             if (count != 0)
@@ -380,7 +365,7 @@ namespace grpc_labview {
         else
         {
             auto enumValueFromPrtobuf = ((LVEnumMessageValue*)value.get())->_value;
-            *(int*)start = GetLVEnumValueFromProtoValue(enumValueFromPrtobuf, enumMetadata);
+            *(int*)start = enumMetadata->GetLVEnumValueFromProtoValue(enumValueFromPrtobuf);
         }
     }
 
@@ -737,21 +722,6 @@ namespace grpc_labview {
         }
     }
 
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    int32_t GetProtoValueForLVValue(int32_t enumValueFromLV, std::shared_ptr<EnumMetadata> enumMetadata)
-    {
-        int value = 0;
-        // Find the equivalent proto value for enumValueFromLV
-        auto protoValue = enumMetadata->LVEnumToProtoEnum.find(enumValueFromLV);
-        if (protoValue != enumMetadata->LVEnumToProtoEnum.end())
-            value = protoValue->second;
-        else
-        {
-            throw InvalidEnumValueException("Invalid enum value!");
-        }
-        return value;
-    }
     void ClusterDataCopier::CopyEnumFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
@@ -774,7 +744,7 @@ namespace grpc_labview {
                 {
                     auto enumValueFromLV = data[i];
                     // Find the equivalent proto value for enumValueFromLV
-                    mappedArray[i] = GetProtoValueForLVValue(enumValueFromLV, enumMetadata);
+                    mappedArray[i] = enumMetadata->GetProtoValueFromLVEnumValue(enumValueFromLV);
                 }
 
                 repeatedValue->_value.Reserve(count);
@@ -787,7 +757,7 @@ namespace grpc_labview {
         else
         {
             auto enumValueFromLV = *(int32_t*)start;
-            int protoValue = GetProtoValueForLVValue(enumValueFromLV, enumMetadata);
+            int protoValue = enumMetadata->GetProtoValueFromLVEnumValue(enumValueFromLV);
             auto value = std::make_shared<LVEnumMessageValue>(metadata->protobufIndex, protoValue);
             message._values.emplace(metadata->protobufIndex, value);
         }

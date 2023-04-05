@@ -9,6 +9,10 @@
 
 </Property>
 	<Item Name="RPC Messages" Type="Folder">
+		<Item Name="package_templatemessage" Type="Folder">
+			<Item Name="Get package_template_enum for Value.vi" Type="VI" URL="../RPC Messages/Get package_template_enum for Value.vi"/>
+			<Item Name="Get Value for package_template_enum.vi" Type="VI" URL="../RPC Messages/Get Value for package_template_enum.vi"/>
+		</Item>
 		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../RPC Messages/Register gRPC Messages.vi"/>
 	</Item>
 	<Item Name="RPC Service" Type="Folder">
