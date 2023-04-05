@@ -17,9 +17,9 @@ namespace grpc_labview
         {
         }
 
-        int GetLVEnumValueFromProtoValue(int protoValue)
+        uint32_t GetLVEnumValueFromProtoValue(int32_t protoValue)
         {
-            int value = 0;
+            uint32_t value = 0;
             auto lvValue = ProtoEnumToLVEnum.find(protoValue);
             if (lvValue != ProtoEnumToLVEnum.end())
                 value = (lvValue->second).front(); // Since one proto value can be mapped to multiple LV enum values, always return the first element.
@@ -30,9 +30,9 @@ namespace grpc_labview
             return value;
         }
 
-        int GetProtoValueFromLVEnumValue(int enumValueFromLV)
+        int32_t GetProtoValueFromLVEnumValue(uint32_t enumValueFromLV)
         {
-            int value = 0;
+            int32_t value = 0;
             // Find the equivalent proto value for enumValueFromLV
             auto protoValue = LVEnumToProtoEnum.find(enumValueFromLV);
             if (protoValue != LVEnumToProtoEnum.end())
@@ -51,8 +51,8 @@ namespace grpc_labview
         bool allowAlias;
         int clusterSize;
         int alignmentRequirement;
-        std::map<int, int32_t> LVEnumToProtoEnum;
-        std::map<int32_t, std::list<int>> ProtoEnumToLVEnum;
+        std::map<uint32_t, int32_t> LVEnumToProtoEnum;
+        std::map<int32_t, std::list<uint32_t>> ProtoEnumToLVEnum;
     };
 
     //---------------------------------------------------------------------
