@@ -116,7 +116,7 @@ namespace grpc_labview
 
     std::map<int, int32_t> CreateMapBetweenLVEnumAndProtoEnumvalues(std::string enumValues)
     {
-        std::map<int, int32_t> lvEnumToProtoEnum;
+        std::map<uint32_t, int32_t> lvEnumToProtoEnum;
         int seqLVEnumIndex = 0;
         for (std::string keyValuePair : SplitString(enumValues, ";"))
         {
@@ -124,27 +124,27 @@ namespace grpc_labview
             assert(keyValue.size() == 2);
 
             int protoEnumNumeric = std::stoi(keyValue[1]);
-            lvEnumToProtoEnum.insert(std::pair<int, int32_t>(seqLVEnumIndex, protoEnumNumeric));
+            lvEnumToProtoEnum.insert(std::pair<uint32_t, int32_t>(seqLVEnumIndex, protoEnumNumeric));
             seqLVEnumIndex += 1;
         }
         return lvEnumToProtoEnum;
     }
 
-    void MapInsertOrAssign(std::map<int32_t, std::list<int>> *protoEnumToLVEnum, int protoEnumNumeric, std::list<int> lvEnumNumericValues)
+    void MapInsertOrAssign(std::map<int32_t, std::list<uint32_t>>*protoEnumToLVEnum, int protoEnumNumeric, std::list<uint32_t> lvEnumNumericValues)
     {
         auto existingElement = protoEnumToLVEnum->find(protoEnumNumeric);
         if (existingElement != protoEnumToLVEnum->end())
         {
             protoEnumToLVEnum->erase(protoEnumNumeric);
-            protoEnumToLVEnum->insert(std::pair<int, std::list<int>>(protoEnumNumeric, lvEnumNumericValues));
+            protoEnumToLVEnum->insert(std::<int32_t, std::list<uint32_t>>(protoEnumNumeric, lvEnumNumericValues));
         }
         else
-            protoEnumToLVEnum->insert(std::pair<int, std::list<int>>(protoEnumNumeric, lvEnumNumericValues));
+            protoEnumToLVEnum->insert(std::pair<int32_t, std::list<uint32_t>>(protoEnumNumeric, lvEnumNumericValues));
     }
 
     std::map<int32_t, std::list<int>> CreateMapBetweenProtoEnumAndLVEnumvalues(std::string enumValues)
     {
-        std::map<int32_t, std::list<int>> protoEnumToLVEnum;
+        std::map<int32_t, std::list<uint32_t>> protoEnumToLVEnum;
         int seqLVEnumIndex = 0;
         for (std::string keyValuePair : SplitString(enumValues, ";"))
         {
@@ -152,7 +152,7 @@ namespace grpc_labview
             int protoEnumNumeric = std::stoi(keyValue[1]);
             assert(keyValue.size() == 2);
 
-            std::list<int> lvEnumNumericValues;
+            std::list<uint32_t> lvEnumNumericValues;
             auto existingElement = protoEnumToLVEnum.find(protoEnumNumeric);
             if (existingElement != protoEnumToLVEnum.end())
                 lvEnumNumericValues = existingElement->second;
