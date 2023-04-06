@@ -241,7 +241,7 @@
 			<Item Name="Add TypeDef to Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Add TypeDef to Cluster.vi"/>
 			<Item Name="Delete Cluster Controls.vi" Type="VI" URL="../VI API/Front Panel API/Delete Cluster Controls.vi"/>
 			<Item Name="Get Control (by Name).vi" Type="VI" URL="../VI API/Front Panel API/Get Control (by Name).vi"/>
-			<Item Name="Add TypeDef to TypeDef.vi" Type="VI" URL="../VI API/Front Panel API/Add TypeDef to TypeDef.vi"/>
+			<Item Name="Add TypeDef to TypeDef_.vi" Type="VI" URL="../VI API/Front Panel API/Add TypeDef to TypeDef_.vi"/>
 		</Item>
 		<Item Name="General VI API" Type="Folder">
 			<Item Name="Coordinates" Type="Folder">
