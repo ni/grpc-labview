@@ -533,6 +533,24 @@ LIBRARY_EXPORT int LVEnumTypeUrl(EnumDescriptor* descriptor, grpc_labview::LStrH
     return 0;
 }
 
+LIBRARY_EXPORT void SerializeReflectionInfo(grpc_labview::LVProtoParser * parser, grpc_labview::LStrHandle * outbuffer)
+{
+    FileDescriptorProto fProto;
+    parser->m_FileDescriptor->CopyTo(&fProto);
+    std::string output;
+    fProto.SerializeToString(&output);
+    grpc_labview::SetLVString(outbuffer, output);
+
+    FileDescriptorProto fProto2;
+    fProto2.ParseFromString(output);
+
+    std::string output2;
+    fProto2.SerializeToString(&output2);
+
+    int x;
+    x = 20;
+}
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, grpc_labview::LV1DArrayHandle* fields)
