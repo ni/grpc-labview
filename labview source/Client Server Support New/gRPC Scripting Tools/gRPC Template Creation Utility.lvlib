@@ -303,7 +303,7 @@
 		<Item Name="Create Types.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Types.vi"/>
 		<Item Name="Create Methods.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Methods.vi"/>
 		<Item Name="Create Method Metadata.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Method Metadata.vi"/>
-		<Item Name="Serialize Proto.vi" Type="VI" URL="/&lt;vilib&gt;/gRPC/gRPC Server and Client Template [2]/gRPC Scripting Tools/Proto Parser API/LabVIEW API/Serialize Proto.vi"/>
+		<Item Name="Serialize Proto.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Serialize Proto.vi"/>
 	</Item>
 	<Item Name="Animation API" Type="Folder">
 		<Item Name="Animation.vi" Type="VI" URL="../Animation API/Animation.vi"/>
