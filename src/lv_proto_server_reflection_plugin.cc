@@ -59,7 +59,7 @@ namespace grpc_labview
         m_instance = nullptr;
     }
 
-    static std::unique_ptr< ::grpc::ServerBuilderPlugin> CreateLVProtoReflection() {
+    std::unique_ptr< ::grpc::ServerBuilderPlugin> CreateLVProtoReflection() {
         return std::unique_ptr< ::grpc::ServerBuilderPlugin>(
             LVProtoServerReflectionPlugin::GetInstance());
     }
