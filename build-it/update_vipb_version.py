@@ -8,7 +8,7 @@ def main():
     root_directory = os.path.dirname(build_script_directory)
     vipb_files =  vipb_helper.get_vipb_files(root_directory=root_directory)
     for vipb_file in vipb_files:
-        vipb_helper.update_vipb_verion(vipb_file=vipb_file, library_version=args.library_version)
+        vipb_helper.update_vipb_version(vipb_file=vipb_file, library_version=args.library_version)
 
 def parse_args():
     parser = argparse.ArgumentParser(

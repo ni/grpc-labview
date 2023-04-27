@@ -334,25 +334,38 @@ namespace grpc_labview {
         }
     }
 
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
     void ClusterDataCopier::CopyEnumToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
+        std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
+
         if (metadata->isRepeated)
         {
             auto repeatedEnum = std::static_pointer_cast<LVRepeatedEnumMessageValue>(value);
-            if (repeatedEnum->_value.size() != 0)
+            int count = repeatedEnum->_value.size();
+            // Map the repeatedEnum from protobuf to LV enum values.
+            int32_t* mappedArray = (int32_t*)malloc(count * sizeof(int32_t));
+
+            for (size_t i = 0; i < count; i++)
             {
-                NumericArrayResize(0x03, 1, start, repeatedEnum->_value.size());
-                auto array = *(LV1DArrayHandle*)start;
-                (*array)->cnt = repeatedEnum->_value.size();
-                auto byteCount = repeatedEnum->_value.size() * sizeof(int32_t);
-                memcpy((*array)->bytes<int32_t>(), repeatedEnum->_value.data(), byteCount);
+                auto protoValue = (repeatedEnum->_value.data())[i];
+                mappedArray[i] = enumMetadata->GetLVEnumValueFromProtoValue(protoValue);
             }
+
+            if (count != 0)
+            {
+                NumericArrayResize(0x03, 1, start, count);
+                auto array = *(LV1DArrayHandle*)start;
+                (*array)->cnt = count;
+                auto byteCount = count * sizeof(int32_t);
+                memcpy((*array)->bytes<int32_t>(), mappedArray, byteCount);
+            }
+            
+            free(mappedArray);
         }
         else
         {
-            *(int*)start = ((LVEnumMessageValue*)value.get())->_value;
+            auto enumValueFromPrtobuf = ((LVEnumMessageValue*)value.get())->_value;
+            *(int*)start = enumMetadata->GetLVEnumValueFromProtoValue(enumValueFromPrtobuf);
         }
     }
 
@@ -709,10 +722,10 @@ namespace grpc_labview {
         }
     }
 
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
     void ClusterDataCopier::CopyEnumFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
+        std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
+
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;
@@ -722,14 +735,30 @@ namespace grpc_labview {
                 auto repeatedValue = std::make_shared<LVRepeatedEnumMessageValue>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedValue);
                 auto data = (*array)->bytes<int32_t>();
+
+                // "data" has the array of enums sent from the LV side. Iterate this array, map each element to the equivalent proto
+                // value and copy the new array into the destination.
+                int32_t* mappedArray = (int32_t*)malloc(count * sizeof(int32_t));
+
+                for (size_t i = 0; i < count; i++)
+                {
+                    auto enumValueFromLV = data[i];
+                    // Find the equivalent proto value for enumValueFromLV
+                    mappedArray[i] = enumMetadata->GetProtoValueFromLVEnumValue(enumValueFromLV);
+                }
+
                 repeatedValue->_value.Reserve(count);
                 auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
-                memcpy(dest, data, count * sizeof(int32_t));
+                memcpy(dest, mappedArray, count * sizeof(int32_t));
+                
+                free(mappedArray);
             }
         }
         else
         {
-            auto value = std::make_shared<LVEnumMessageValue>(metadata->protobufIndex, *(int32_t*)start);
+            auto enumValueFromLV = *(int32_t*)start;
+            int protoValue = enumMetadata->GetProtoValueFromLVEnumValue(enumValueFromLV);
+            auto value = std::make_shared<LVEnumMessageValue>(metadata->protobufIndex, protoValue);
             message._values.emplace(metadata->protobufIndex, value);
         }
     }

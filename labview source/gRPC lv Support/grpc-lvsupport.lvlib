@@ -80,6 +80,7 @@
 			<Item Name="Set Call Status.vi" Type="VI" URL="../Server API/Set Call Status.vi"/>
 			<Item Name="Start Server.vi" Type="VI" URL="../Server API/Server/Start Server.vi"/>
 			<Item Name="Stop Server.vi" Type="VI" URL="../Server API/Server/Stop Server.vi"/>
+			<Item Name="Register Enum Metadata.vi" Type="VI" URL="../Server API/Server/Register Enum Metadata.vi"/>
 		</Item>
 		<Item Name="typeDefs" Type="Folder">
 			<Item Name="Generic Method Event Data.ctl" Type="VI" URL="../Server API/typeDefs/Generic Method Event Data.ctl"/>
@@ -89,6 +90,7 @@
 			<Item Name="Message Element Metadata.ctl" Type="VI" URL="../Server API/typeDefs/Message Element Metadata.ctl"/>
 			<Item Name="Message Element Type.ctl" Type="VI" URL="../Server API/typeDefs/Message Element Type.ctl"/>
 			<Item Name="Message Metadata.ctl" Type="VI" URL="../Server API/typeDefs/Message Metadata.ctl"/>
+			<Item Name="Enum Metadata.ctl" Type="VI" URL="../Server API/typeDefs/Enum Metadata.ctl"/>
 		</Item>
 	</Item>
 	<Item Name="Shared" Type="Folder">
