@@ -22,4 +22,5 @@
 		<Item Name="Generated Descriptors.vi" Type="VI" URL="../Generated Descriptors/Generated Descriptors.vi"/>
 	</Item>
 	<Item Name="Run Service.vi" Type="VI" URL="../Run Service.vi"/>
+	<Item Name="Register Descriptors.vi" Type="VI" URL="../RPC Messages/Register Descriptors.vi"/>
 </Library>
