@@ -165,7 +165,7 @@ namespace grpc_labview
 }
 
 int32_t ClientCleanUpProc(grpc_labview::gRPCid* clientId);
-void SignalOccurenceForClientCall(grpc_labview::ClientCall* clientCall);
+void CheckActiveAndSignalOccurenceForClientCall(grpc_labview::ClientCall* clientCall);
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -193,8 +193,8 @@ int32_t CloseClient(grpc_labview::LabVIEWgRPCClient* client)
     return 0;
 }
 
-// Signal a lv occurence for a client call from async c++ thread
-void SignalOccurenceForClientCall(grpc_labview::ClientCall* clientCall)
+// Signal a lv occurence for an active client call from async c++ thread
+void CheckActiveAndSignalOccurenceForClientCall(grpc_labview::ClientCall* clientCall)
 {
     if (clientCall == nullptr)
     {
@@ -326,7 +326,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
         {
             grpc::internal::RpcMethod method(clientCall->_methodName.c_str(), grpc::internal::RpcMethod::NORMAL_RPC);
             clientCall->_status = grpc::internal::BlockingUnaryCall(clientCall->_client->Channel.get(), method, &(clientCall->_context.get()->gRPCClientContext) , *clientCall->_request.get(), clientCall->_response.get());
-            SignalOccurenceForClientCall(clientCall);
+            CheckActiveAndSignalOccurenceForClientCall(clientCall);
             return 0;
         });
 
@@ -565,6 +565,7 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, g
 {
     auto reader = callId->CastTo<grpc_labview::StreamReader>();
     auto call = callId->CastTo<grpc_labview::ClientCall>();
+
     auto occurrence = *occurrencePtr;
 
     if (!reader || !call)
@@ -573,13 +574,14 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, g
         return -1;
     }
 
+    call->_occurrence = occurrence;
     reader->_readFuture = std::async(
         std::launch::async, 
-        [call, reader, occurrence]() 
+        [call, reader]() 
         {
             call->_response->Clear();
             auto result = reader->Read(call->_response.get());
-            SignalOccurenceForClientCall(call.get());
+            CheckActiveAndSignalOccurenceForClientCall(call.get());
             return result;
         });
 
@@ -708,13 +710,13 @@ LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpc_labview::gRPCid* c
     {
         return -1;
     }
-    auto occurrence = *occurrencePtr;
+    call->_occurrence = *occurrencePtr;
     call->_runFuture = std::async(
         std::launch::async,
-        [call, occurrence]()
+        [call]()
         {
             call->Finish();
-            SignalOccurenceForClientCall(call.get());
+            CheckActiveAndSignalOccurenceForClientCall(call.get());
             return 0;
         });
     return 0;
