@@ -98,13 +98,6 @@ namespace grpc_labview
             service_response->set_name(value);
         }
 
-        //auto serviceCount = protoParser.m_FileDescriptor->service_count();
-        //for (int i = 0; i < serviceCount; ++i) {
-        //    auto serviceDescriptor = protoParser.m_FileDescriptor->service(i);
-        //    auto service_response = response->add_service();
-        //    service_response->set_name(serviceDescriptor->full_name());
-        //}
-
         return Status::OK;
     }
 
@@ -119,12 +112,6 @@ namespace grpc_labview
             descriptor_pool_->FindFileByName(file_name);
         if (file_desc == nullptr) {
             // check in other pools
-            /*for (auto it = custom_descriptor_poolMap.begin(); it != custom_descriptor_poolMap.end(); ++it) {
-                const grpc::protobuf::FileDescriptor* descriptor = it->second;
-                file_desc = descriptor->pool()->FindFileByName(file_name);
-                if (file_desc != nullptr)
-                    break;
-            }*/
             file_desc = other_pool.FindFileByName(file_name);
         }
 
@@ -170,17 +157,17 @@ namespace grpc_labview
 
         const grpc::protobuf::Descriptor* desc =
             descriptor_pool_->FindMessageTypeByName(request->containing_type());
-        /*if (desc == nullptr) {
-            desc = protoParser.m_FileDescriptor->pool()->FindMessageTypeByName(request->containing_type());
-        }*/
+        if (desc == nullptr) {
+            desc = other_pool.FindMessageTypeByName(request->containing_type());
+        }
         if (desc == nullptr) {
             return Status(grpc::StatusCode::NOT_FOUND, "Type not found.");
         }
 
         const grpc::protobuf::FieldDescriptor* field_desc = descriptor_pool_->FindExtensionByNumber(desc, request->extension_number());
-        /*if (field_desc == nullptr) {
-            field_desc = protoParser.m_FileDescriptor->pool()->FindExtensionByNumber(desc, request->extension_number());
-        }*/
+        if (field_desc == nullptr) {
+            field_desc = other_pool.FindExtensionByNumber(desc, request->extension_number());
+        }
         if (field_desc == nullptr) {
             return Status(grpc::StatusCode::NOT_FOUND, "Extension not found.");
         }
@@ -198,19 +185,16 @@ namespace grpc_labview
 
         const grpc::protobuf::Descriptor* desc =
             descriptor_pool_->FindMessageTypeByName(type);
-        /* if (desc == nullptr) {
-            desc = protoParser.m_FileDescriptor->pool()->FindMessageTypeByName(type);
-        }*/
-        if (desc == nullptr) {
-            return Status(grpc::StatusCode::NOT_FOUND, "Type not found.");
-        }
+        if (desc == nullptr) 
+            desc = other_pool.FindMessageTypeByName(type);
+
+        if (desc == nullptr)
+            return Status(grpc::StatusCode::NOT_FOUND, "Type not found.");        
 
         std::vector<const grpc::protobuf::FieldDescriptor*> extensions;
         descriptor_pool_->FindAllExtensions(desc, &extensions);
-        /*if (extensions.empty())
-        {
-            protoParser.m_FileDescriptor->pool()->FindAllExtensions(desc, &extensions);
-        }*/
+        if (extensions.empty())
+            other_pool.FindAllExtensions(desc, &extensions);
         for (const auto& value : extensions) {
             response->add_extension_number(value->number());
         }
@@ -239,7 +223,8 @@ namespace grpc_labview
     }
 
     void LVProtoServerReflectionService::FillErrorResponse(const Status& status,
-        grpc::reflection::v1alpha::ErrorResponse* error_response) { // TODO: Fill this!}
-
+        grpc::reflection::v1alpha::ErrorResponse* error_response) {
+        error_response->set_error_code(status.error_code());
+        error_response->set_error_message(status.error_message());
     }
 }
