@@ -33,13 +33,26 @@ def run_all_tests():
 
 def run_test(WrapperVI, testVI):
     if os.path.exists(testVI):
-        testResult = subprocess.run(["LabVIEWCLI", "-OperationName", "RunVI", "-VIPath", os.path.normpath(WrapperVI), testVI], capture_output= True)
+        testResult = subprocess.Popen(["LabVIEWCLI", "-OperationName", "RunVI", "-VIPath", os.path.normpath(WrapperVI), testVI],
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            shell=False)
+
+        
+        try:
+            out, err = testResult.communicate(timeout=60) # TODO: find if this timeout can be eliminated
+        except subprocess.TimeoutExpired:
+                with testResult:
+                    testResult.kill()
+                out, err = testResult.communicate()
+
         if(testResult.returncode == 0):
             _logger.debug(f"[PASSED] {testVI}")
             return
         else:
-            _logger.error(f"[FAILED] {testVI} has failed \n {testResult.stderr.decode()}")
-            return (testResult.stderr.decode() + "\n")
+            _logger.error(f"[FAILED] {testVI} has failed \n {err.decode()}")
+            return (err.decode() + "\n")
     else:
         _logger.error(f"[FAILED] {testVI} \n {testVI} doesnot exist.")
         return testVI + " doesnot exist. \n"
