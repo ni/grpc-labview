@@ -4,3 +4,4 @@ AutoTests\Test_RouteGuide_ResponseStreaming.vi
 AutoTests\Test_RouteGuide_BidirectionalStreaming.vi
 AutoTests\Test_RouteGuide_RequestStreaming.vi
 AutoTests\Test_ServiceNotFoundInServer.vi
+AutoTests\ClientCallAbortTests\UnaryClientAbortTest.vi
