@@ -7,6 +7,8 @@
 #include <fstream>
 #include <iostream>
 #include <future>
+#include <grpcpp/impl/server_initializer.h>
+#include "lv_proto_server_reflection_plugin.h"
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -14,6 +16,7 @@ using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
+using grpc::ServerInitializer;
 
 namespace grpc_labview
 {
@@ -182,7 +185,8 @@ namespace grpc_labview
         }
 
         grpc::EnableDefaultHealthCheckService(true);
-        grpc::reflection::InitProtoReflectionServerBuilderPlugin();
+        InitLVProtoReflectionServerBuilderPlugin();
+        // grpc::reflection::InitProtoReflectionServerBuilderPlugin();
         ServerBuilder builder;
 
         std::shared_ptr<grpc::ServerCredentials> creds;
@@ -211,6 +215,10 @@ namespace grpc_labview
 
         _rpcService = std::unique_ptr<grpc::AsyncGenericService>(new grpc::AsyncGenericService());
         builder.RegisterAsyncGenericService(_rpcService.get());
+
+        // auto _reflectionService = std::unique_ptr<grpc_labview::LVProtoServerReflectionService>(new grpc_labview::LVProtoServerReflectionService());
+        // builder.RegisterService(_reflectionService.get());
+
         auto cq = builder.AddCompletionQueue();
 
         _server = builder.BuildAndStart();
@@ -242,5 +250,6 @@ namespace grpc_labview
             _runThread->join();
             _server = nullptr;
         }
-    }
+        LVProtoServerReflectionPlugin::GetInstance()->DeleteInstance();
+    }    
 }
