@@ -400,7 +400,7 @@ namespace grpc_labview {
             auto repeatedUInt64 = std::static_pointer_cast<LVRepeatedUInt64MessageValue>(value);
             if (repeatedUInt64->_value.size() != 0)
             {
-                NumericArrayResize(0x03, 1, start, repeatedUInt64->_value.size());
+                NumericArrayResize(0x08, 1, start, repeatedUInt64->_value.size());
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedUInt64->_value.size();
                 auto byteCount = repeatedUInt64->_value.size() * sizeof(uint64_t);
