@@ -165,6 +165,10 @@ namespace grpc_labview
                 }
                 else
                 {
+                    if (tag == 0 || WireFormatLite::GetTagWireType(tag) == WireFormatLite::WIRETYPE_END_GROUP) {
+                        ctx->SetLastTag(tag);
+                        return ptr;
+                    }
                     ptr = UnknownFieldParse(tag, &_unknownFields, ptr, ctx);
                     assert(ptr != nullptr);
                 }

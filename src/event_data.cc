@@ -199,12 +199,19 @@ namespace grpc_labview
                 auto responseMetadata = _server->FindMetadata(eventData.responseMetadataName);
                 _request = std::make_shared<LVMessage>(requestMetadata);
                 _response = std::make_shared<LVMessage>(responseMetadata);
-                _request->ParseFromByteBuffer(_rb);
-                _requestDataReady = true;
 
-                _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
-                gPointerManager.RegisterPointer(_methodData);
-                _server->SendEvent(name, static_cast<gRPCid*>(_methodData.get()));
+                if (_request->ParseFromByteBuffer(_rb))
+                {
+                    _requestDataReady = true;
+                    _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
+                    gPointerManager.RegisterPointer(_methodData);
+                    _server->SendEvent(name, static_cast<gRPCid*>(_methodData.get()));
+                }
+                else
+                {
+                    _status = CallStatus::Finish;
+                    _stream.Finish(grpc::Status(grpc::StatusCode::UNAVAILABLE, ""), this);
+                }
             }
             else
             {
