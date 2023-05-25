@@ -241,7 +241,8 @@ namespace grpc_labview
         if (_server != nullptr)
         {
             // We need shutdown passing a deadline so that any RPC calls in progress are terminated as well.
-            _server->Shutdown();
+            _server->Shutdown(std::chrono::system_clock::now());
+            _server->Wait();
 
             // Always shutdown the completion queue after the server.
             if (_cq != nullptr)
