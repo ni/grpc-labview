@@ -300,6 +300,7 @@
 		<Item Name="Create Types.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Types.vi"/>
 		<Item Name="Create Methods.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Methods.vi"/>
 		<Item Name="Create Method Metadata.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Method Metadata.vi"/>
+		<Item Name="Get Message HasOneof.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message HasOneof.vi"/>
 	</Item>
 	<Item Name="Animation API" Type="Folder">
 		<Item Name="Animation.vi" Type="VI" URL="../Animation API/Animation.vi"/>
