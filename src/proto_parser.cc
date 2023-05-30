@@ -650,7 +650,7 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
     if (info->isInOneof)
     {
         SetLVString(&info->oneofContainerName, field->real_containing_oneof()->name());
-        info->type = 17; // The numeric value comes from Message Element Type.ctl. TODO: Change this to an enum on the C++ side instead of 
+        //info->type = 17; // The numeric value comes from Message Element Type.ctl. TODO: Change this to an enum on the C++ side instead of 
     }
 
     if (info->type == 99)
