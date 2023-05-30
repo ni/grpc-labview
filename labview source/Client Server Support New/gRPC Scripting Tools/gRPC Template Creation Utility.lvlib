@@ -87,6 +87,7 @@
 		<Item Name="Get ProjectItem Descendants (with Type).vi" Type="VI" URL="../Project API/Get ProjectItem Descendants (with Type).vi"/>
 		<Item Name="Close Project.vi" Type="VI" URL="../Project API/Close Project.vi"/>
 		<Item Name="Get Target ref.vi" Type="VI" URL="../Project API/Get Target ref.vi"/>
+		<Item Name="Delete In Folder.vi" Type="VI" URL="../Project API/Delete In Folder.vi"/>
 	</Item>
 	<Item Name="Top Level API" Type="Folder">
 		<Item Name="RPC Messages" Type="Folder">
