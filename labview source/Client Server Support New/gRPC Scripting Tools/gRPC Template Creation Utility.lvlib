@@ -105,7 +105,6 @@
 			<Item Name="Update Message Setter.vi" Type="VI" URL="../Top Level API/Update Message Setter.vi"/>
 			<Item Name="Generate RPC Messages.vi" Type="VI" URL="../Top Level API/Generate RPC Messages.vi"/>
 			<Item Name="Check Message Data Clusters.vi" Type="VI" URL="../Top Level API/Check Message Data Clusters.vi"/>
-			<Item Name="Create Message Data Cluster.vi" Type="VI" URL="../Top Level API/Create Message Data Cluster.vi"/>
 			<Item Name="Create Message Getter (from Template).vi" Type="VI" URL="../Top Level API/Create Message Getter (from Template).vi"/>
 			<Item Name="Create Message Setter (from Template).vi" Type="VI" URL="../Top Level API/Create Message Setter (from Template).vi"/>
 			<Item Name="Create Message Getter (from Accessor).vi" Type="VI" URL="../Top Level API/Create Message Getter (from Accessor).vi"/>
@@ -121,6 +120,7 @@
 			<Item Name="Create Enum Mapper.vi" Type="VI" URL="../Top Level API/Create Enum Mapper.vi"/>
 			<Item Name="Update Enum Mapper.vi" Type="VI" URL="../Top Level API/Update Enum Mapper.vi"/>
 			<Item Name="Create Mapper VIs for Enum.vi" Type="VI" URL="../Top Level API/Create Mapper VIs for Enum.vi"/>
+			<Item Name="Create Message Data Cluster.vi" Type="VI" URL="../Top Level API/Create Message Data Cluster.vi"/>
 		</Item>
 		<Item Name="RPC Events" Type="Folder">
 			<Item Name="Populate gRPC Events.vi" Type="VI" URL="../Top Level API/Populate gRPC Events.vi"/>
