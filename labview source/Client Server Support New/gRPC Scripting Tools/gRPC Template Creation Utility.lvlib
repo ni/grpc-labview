@@ -345,6 +345,11 @@
 		<Item Name="Error 5032.vi" Type="VI" URL="../Error Handling/Error 5032.vi"/>
 	</Item>
 	<Item Name="Oneof API" Type="Folder">
+		<Item Name="Accessor Helpers" Type="Folder">
+			<Item Name="GenOneOf_Set_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Set_Accessor.vi"/>
+			<Item Name="GenOneOf_Has_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Has_Accessor.vi"/>
+			<Item Name="GenOneOf_Get_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Get_Accessor.vi"/>
+		</Item>
 		<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Oneof API/Create LVClass for Oneof.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
