@@ -351,6 +351,8 @@
 			<Item Name="GenOneOf_Get_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Get_Accessor.vi"/>
 		</Item>
 		<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Oneof API/Create LVClass for Oneof.vi"/>
+		<Item Name="Get Message Placement Cluster.vi" Type="VI" URL="../Top Level API/Get Message Placement Cluster.vi"/>
+		<Item Name="Create OneOf Accessors.vi" Type="VI" URL="../Oneof API/Create OneOf Accessors.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
