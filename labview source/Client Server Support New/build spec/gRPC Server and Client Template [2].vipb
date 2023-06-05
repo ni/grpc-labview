@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-29 00:29:27" Modified_Date="2023-05-08 09:22:33" Creator="navin" Comments="" ID="4411492ee449447276048982e468d3c1">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-29 00:29:27" Modified_Date="2023-06-05 17:18:43" Creator="navin" Comments="" ID="ef6503e8d41fcbe29b752ad3030b06dc">
   <Library_General_Settings>
     <Package_File_Name>NI_lib_gRPC_Server_and_Client_Template[2]</Package_File_Name>
-    <Library_Version>1.0.0.4</Library_Version>
+    <Library_Version>1.0.0.5</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>..\..\Builds</Library_Output_Folder>
@@ -17,8 +17,8 @@
   </Library_General_Settings>
   <Advanced_Settings>
     <Package_Dependencies>
-      <Additional_External_Dependencies>ni_lib_labview_grpc_library &gt;=1.0.0.4</Additional_External_Dependencies>
-      <Additional_External_Dependencies>ni_lib_labview_grpc_servicer &gt;=1.0.0.4</Additional_External_Dependencies>
+      <Additional_External_Dependencies>ni_lib_labview_grpc_library &gt;=1.0.0.5</Additional_External_Dependencies>
+      <Additional_External_Dependencies>ni_lib_labview_grpc_servicer &gt;=1.0.0.5</Additional_External_Dependencies>
     </Package_Dependencies>
     <Custom_Action_VIs>
       <Pre-Build_VI/>
