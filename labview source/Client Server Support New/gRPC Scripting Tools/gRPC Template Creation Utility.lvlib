@@ -35,19 +35,19 @@
 	<Property Name="Serialized ACL" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!A1%!!!@````]!!".V&lt;H.J:WZF:#"C?82F)'&amp;S=G&amp;Z!!%!!1!!!!A)!!!!#!!!!!!!!!!</Property>
 	<Property Name="Use Data Logging Database" Type="Bool">true</Property>
 	<Item Name="Class API" Type="Folder">
-		<Item Name="Clear Private Data Cluster.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Class API/Clear Private Data Cluster.vi"/>
-		<Item Name="Copy Class Item.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Class API/Copy Class Item.vi"/>
-		<Item Name="Create LVClass Copy.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Class API/Create LVClass Copy.vi"/>
-		<Item Name="Delete LVClass Item.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Class API/Delete LVClass Item.vi"/>
-		<Item Name="Find Class in ProjectItem.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Class API/Find Class in ProjectItem.vi"/>
+		<Item Name="Clear Private Data Cluster.vi" Type="VI" URL="../Class API/Clear Private Data Cluster.vi"/>
+		<Item Name="Copy Class Item.vi" Type="VI" URL="../Class API/Copy Class Item.vi"/>
+		<Item Name="Create LVClass Copy.vi" Type="VI" URL="../Class API/Create LVClass Copy.vi"/>
+		<Item Name="Delete LVClass Item.vi" Type="VI" URL="../Class API/Delete LVClass Item.vi"/>
+		<Item Name="Find Class in ProjectItem.vi" Type="VI" URL="../Class API/Find Class in ProjectItem.vi"/>
 		<Item Name="Find Item in LVClass.vi" Type="VI" URL="../Class API/Find Item in LVClass.vi"/>
 		<Item Name="Get LVClass Item Path.vi" Type="VI" URL="../Class API/Get LVClass Item Path.vi"/>
-		<Item Name="Open LVClass.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Class API/Open LVClass.vi"/>
+		<Item Name="Open LVClass.vi" Type="VI" URL="../Class API/Open LVClass.vi"/>
 		<Item Name="Ref to LVClass.vi" Type="VI" URL="../Class API/Ref to LVClass.vi"/>
 		<Item Name="Save LVClass.vi" Type="VI" URL="../Class API/Save LVClass.vi"/>
 		<Item Name="Get VIRef from ClassItem.vi" Type="VI" URL="../Class API/Get VIRef from ClassItem.vi"/>
 		<Item Name="Get ControlRef from ClassItem.vi" Type="VI" URL="../Class API/Get ControlRef from ClassItem.vi"/>
-		<Item Name="Delete Item from LVClass.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Class API/Delete Item from LVClass.vi"/>
+		<Item Name="Delete Item from LVClass.vi" Type="VI" URL="../Class API/Delete Item from LVClass.vi"/>
 	</Item>
 	<Item Name="Library API" Type="Folder">
 		<Item Name="Add File to Lib.vi" Type="VI" URL="../Library API/Add File to Lib.vi"/>
@@ -58,28 +58,28 @@
 		<Item Name="Get ControlRef from LibraryItem.vi" Type="VI" URL="../Library API/Get ControlRef from LibraryItem.vi"/>
 		<Item Name="Open Library.vi" Type="VI" URL="../Library API/Open Library.vi"/>
 		<Item Name="Get Library Item Path.vi" Type="VI" URL="../Library API/Get Library Item Path.vi"/>
-		<Item Name="Ref To Library.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Library API/Ref To Library.vi"/>
+		<Item Name="Ref To Library.vi" Type="VI" URL="../Library API/Ref To Library.vi"/>
 		<Item Name="Save Library.vi" Type="VI" URL="../Library API/Save Library.vi"/>
 		<Item Name="Get grpc-library ref.vi" Type="VI" URL="../Library API/Get grpc-library ref.vi"/>
-		<Item Name="Delete Library Item.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Library API/Delete Library Item.vi"/>
+		<Item Name="Delete Library Item.vi" Type="VI" URL="../Library API/Delete Library Item.vi"/>
 		<Item Name="Delete Item from Library.vi" Type="VI" URL="../Library API/Delete Item from Library.vi"/>
 		<Item Name="Get VIRef from Library.vi" Type="VI" URL="../Library API/Get VIRef from Library.vi"/>
 	</Item>
 	<Item Name="Project API" Type="Folder">
 		<Property Name="NI.SortType" Type="Int">3</Property>
-		<Item Name="Create Lib in Project.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Project API/Create Lib in Project.vi"/>
-		<Item Name="Get Application Refs.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Project API/Get Application Refs.vi"/>
+		<Item Name="Create Lib in Project.vi" Type="VI" URL="../Project API/Create Lib in Project.vi"/>
+		<Item Name="Get Application Refs.vi" Type="VI" URL="../Project API/Get Application Refs.vi"/>
 		<Item Name="Set Relative Path.vi" Type="VI" URL="../Project API/Set Relative Path.vi"/>
 		<Item Name="Save Project.vi" Type="VI" URL="../Project API/Save Project.vi"/>
 		<Item Name="Create Folder at Location.vi" Type="VI" URL="../Project API/Create Folder at Location.vi"/>
-		<Item Name="Add File to Project TargetItem.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Project API/Add File to Project TargetItem.vi"/>
-		<Item Name="Get Project Root.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Project API/Get Project Root.vi"/>
+		<Item Name="Add File to Project TargetItem.vi" Type="VI" URL="../Project API/Add File to Project TargetItem.vi"/>
+		<Item Name="Get Project Root.vi" Type="VI" URL="../Project API/Get Project Root.vi"/>
 		<Item Name="Get ProjectItem Descendants.vi" Type="VI" URL="../Project API/Get ProjectItem Descendants.vi"/>
 		<Item Name="Open Project.vi" Type="VI" URL="../Project API/Open Project.vi"/>
-		<Item Name="Get ClassItems from ProjectItem.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Project API/Get ClassItems from ProjectItem.vi"/>
+		<Item Name="Get ClassItems from ProjectItem.vi" Type="VI" URL="../Project API/Get ClassItems from ProjectItem.vi"/>
 		<Item Name="Get LibItems from ProjectItem.vi" Type="VI" URL="../Project API/Get LibItems from ProjectItem.vi"/>
-		<Item Name="Get MyComputer.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Project API/Get MyComputer.vi"/>
-		<Item Name="Delete LVClass from ProjectItem.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Project API/Delete LVClass from ProjectItem.vi"/>
+		<Item Name="Get MyComputer.vi" Type="VI" URL="../Project API/Get MyComputer.vi"/>
+		<Item Name="Delete LVClass from ProjectItem.vi" Type="VI" URL="../Project API/Delete LVClass from ProjectItem.vi"/>
 		<Item Name="Add File to ProjectItem.vi" Type="VI" URL="../Project API/Add File to ProjectItem.vi"/>
 		<Item Name="Create Virtual FolderItem.vi" Type="VI" URL="../Project API/Create Virtual FolderItem.vi"/>
 		<Item Name="Find Item in ProjectItem.vi" Type="VI" URL="../Project API/Find Item in ProjectItem.vi"/>
@@ -121,7 +121,6 @@
 			<Item Name="Create Enum Mapper.vi" Type="VI" URL="../Top Level API/Create Enum Mapper.vi"/>
 			<Item Name="Update Enum Mapper.vi" Type="VI" URL="../Top Level API/Update Enum Mapper.vi"/>
 			<Item Name="Create Mapper VIs for Enum.vi" Type="VI" URL="../Top Level API/Create Mapper VIs for Enum.vi"/>
-			<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Top Level API/Create LVClass for Oneof.vi"/>
 		</Item>
 		<Item Name="RPC Events" Type="Folder">
 			<Item Name="Populate gRPC Events.vi" Type="VI" URL="../Top Level API/Populate gRPC Events.vi"/>
@@ -144,8 +143,8 @@
 			<Item Name="Update Methods Event Unbundlers.vi" Type="VI" URL="../Top Level API/Update Methods Event Unbundlers.vi"/>
 			<Item Name="Update RPC Method Template.vi" Type="VI" URL="../Top Level API/Update RPC Method Template.vi"/>
 			<Item Name="Update Bind RPC Template.vi" Type="VI" URL="../Top Level API/Update Bind RPC Template.vi"/>
-			<Item Name="Update RPC Template Accessors.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Top Level API/Update RPC Template Accessors.vi"/>
-			<Item Name="Update RPC Template Accessor.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Top Level API/Update RPC Template Accessor.vi"/>
+			<Item Name="Update RPC Template Accessors.vi" Type="VI" URL="../Top Level API/Update RPC Template Accessors.vi"/>
+			<Item Name="Update RPC Template Accessor.vi" Type="VI" URL="../Top Level API/Update RPC Template Accessor.vi"/>
 			<Item Name="Delete Method Template Files.vi" Type="VI" URL="../Top Level API/Delete Method Template Files.vi"/>
 			<Item Name="Create LV RPC Method Name.vi" Type="VI" URL="../Top Level API/Create LV RPC Method Name.vi"/>
 			<Item Name="Update Server Start Async.vi" Type="VI" URL="../Top Level API/Update Server Start Async.vi"/>
@@ -161,7 +160,7 @@
 			<Item Name="Add Server Library to Project.vi" Type="VI" URL="../Top Level API/Add Server Library to Project.vi"/>
 			<Item Name="Copy Template Files.vi" Type="VI" URL="../Top Level API/Copy Template Files.vi"/>
 			<Item Name="Update Template Files.vi" Type="VI" URL="../Top Level API/Update Template Files.vi"/>
-			<Item Name="Delete Template Files.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Top Level API/Delete Template Files.vi"/>
+			<Item Name="Delete Template Files.vi" Type="VI" URL="../Top Level API/Delete Template Files.vi"/>
 		</Item>
 		<Item Name="RPC Client" Type="Folder">
 			<Item Name="Create Client from Template.vi" Type="VI" URL="../Top Level API/Create Client from Template.vi"/>
@@ -180,11 +179,11 @@
 	<Item Name="VI API" Type="Folder">
 		<Item Name="Block Diagram" Type="Folder">
 			<Item Name="Case Structure" Type="Folder">
-				<Item Name="Connect Case Selector Terminal.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Block Diagram API/Case Structure/Connect Case Selector Terminal.vi"/>
-				<Item Name="Create Case Structure Frames.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Block Diagram API/Case Structure/Create Case Structure Frames.vi"/>
-				<Item Name="Create Case Structure.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Block Diagram API/Case Structure/Create Case Structure.vi"/>
+				<Item Name="Connect Case Selector Terminal.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Connect Case Selector Terminal.vi"/>
+				<Item Name="Create Case Structure Frames.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Create Case Structure Frames.vi"/>
+				<Item Name="Create Case Structure.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Create Case Structure.vi"/>
 				<Item Name="Get Case Struct Tunnels.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Struct Tunnels.vi"/>
-				<Item Name="Set Default Case.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Block Diagram API/Case Structure/Set Default Case.vi"/>
+				<Item Name="Set Default Case.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Set Default Case.vi"/>
 				<Item Name="Get Case Structure (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Structure (by Name).vi"/>
 				<Item Name="Get Case Structure Frame (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Structure Frame (by Name).vi"/>
 				<Item Name="Get Case Structure Frame Index (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Structure Frame Index (by Name).vi"/>
@@ -192,9 +191,9 @@
 			</Item>
 			<Item Name="Constants" Type="Folder">
 				<Item Name="Enum" Type="Folder">
-					<Item Name="Insert BD Enum.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Block Diagram API/Constants/Enum/Insert BD Enum.vi"/>
+					<Item Name="Insert BD Enum.vi" Type="VI" URL="../VI API/Block Diagram API/Constants/Enum/Insert BD Enum.vi"/>
 				</Item>
-				<Item Name="Connect Const to Source.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Block Diagram API/Constants/Connect Const to Source.vi"/>
+				<Item Name="Connect Const to Source.vi" Type="VI" URL="../VI API/Block Diagram API/Constants/Connect Const to Source.vi"/>
 				<Item Name="Get Constant (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Constants/Get Constant (by Name).vi"/>
 			</Item>
 			<Item Name="SubVI" Type="Folder">
@@ -221,19 +220,19 @@
 				<Item Name="Set Frame User Events.vi" Type="VI" URL="../VI API/Block Diagram API/Event Structure/Set Frame User Events.vi"/>
 			</Item>
 			<Item Name="Diagram Disable Structure" Type="Folder">
-				<Item Name="Create Diagram Disable Structure.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Block Diagram API/Diagram Disable Structure/Create Diagram Disable Structure.vi"/>
+				<Item Name="Create Diagram Disable Structure.vi" Type="VI" URL="../VI API/Block Diagram API/Diagram Disable Structure/Create Diagram Disable Structure.vi"/>
 			</Item>
-			<Item Name="BD CleanUp.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Block Diagram API/BD CleanUp.vi"/>
-			<Item Name="Get BD Reference.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Block Diagram API/Get BD Reference.vi"/>
+			<Item Name="BD CleanUp.vi" Type="VI" URL="../VI API/Block Diagram API/BD CleanUp.vi"/>
+			<Item Name="Get BD Reference.vi" Type="VI" URL="../VI API/Block Diagram API/Get BD Reference.vi"/>
 			<Item Name="Delete Diagram SubVIs.vi" Type="VI" URL="../VI API/Block Diagram API/Delete Diagram SubVIs.vi"/>
 		</Item>
 		<Item Name="Front Panel" Type="Folder">
 			<Item Name="Add Control to Cluster (from src ref).vi" Type="VI" URL="../VI API/Front Panel API/Add Control to Cluster (from src ref).vi"/>
-			<Item Name="Create Enum Ctrl.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Front Panel API/Create Enum Ctrl.vi"/>
-			<Item Name="Create String Control.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Front Panel API/Create String Control.vi"/>
+			<Item Name="Create Enum Ctrl.vi" Type="VI" URL="../VI API/Front Panel API/Create Enum Ctrl.vi"/>
+			<Item Name="Create String Control.vi" Type="VI" URL="../VI API/Front Panel API/Create String Control.vi"/>
 			<Item Name="Create Type Definition.vi" Type="VI" URL="../VI API/Front Panel API/Create Type Definition.vi"/>
-			<Item Name="Get String Control Terminal.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Front Panel API/Get String Control Terminal.vi"/>
-			<Item Name="Get VI FP Reference.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/Front Panel API/Get VI FP Reference.vi"/>
+			<Item Name="Get String Control Terminal.vi" Type="VI" URL="../VI API/Front Panel API/Get String Control Terminal.vi"/>
+			<Item Name="Get VI FP Reference.vi" Type="VI" URL="../VI API/Front Panel API/Get VI FP Reference.vi"/>
 			<Item Name="Get ControlRef from ctrlVI.vi" Type="VI" URL="../VI API/Front Panel API/Get ControlRef from ctrlVI.vi"/>
 			<Item Name="Create Cluster Control.vi" Type="VI" URL="../VI API/Front Panel API/Create Cluster Control.vi"/>
 			<Item Name="Delete Control from Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Delete Control from Cluster.vi"/>
@@ -247,13 +246,13 @@
 		</Item>
 		<Item Name="General VI API" Type="Folder">
 			<Item Name="Coordinates" Type="Folder">
-				<Item Name="Generate Bounds Coordinates.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/General VI API/Coordinates/Generate Bounds Coordinates.vi"/>
+				<Item Name="Generate Bounds Coordinates.vi" Type="VI" URL="../VI API/General VI API/Coordinates/Generate Bounds Coordinates.vi"/>
 				<Item Name="Generate Location Coordinates.vi" Type="VI" URL="../VI API/General VI API/Coordinates/Generate Location Coordinates.vi"/>
 			</Item>
-			<Item Name="Close GO References (Multiple).vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/General VI API/Close GO References (Multiple).vi"/>
-			<Item Name="Create VI.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/General VI API/Create VI.vi"/>
+			<Item Name="Close GO References (Multiple).vi" Type="VI" URL="../VI API/General VI API/Close GO References (Multiple).vi"/>
+			<Item Name="Create VI.vi" Type="VI" URL="../VI API/General VI API/Create VI.vi"/>
 			<Item Name="Save VI at Path.vi" Type="VI" URL="../VI API/General VI API/Save VI at Path.vi"/>
-			<Item Name="SubVI Template.vit" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/VI API/General VI API/SubVI Template.vit"/>
+			<Item Name="SubVI Template.vit" Type="VI" URL="../VI API/General VI API/SubVI Template.vit"/>
 			<Item Name="Cleanup VI BD.vi" Type="VI" URL="../VI API/General VI API/Cleanup VI BD.vi"/>
 			<Item Name="Validate Path Length.vi" Type="VI" URL="../VI API/General VI API/Validate Path Length.vi"/>
 		</Item>
@@ -272,9 +271,9 @@
 		<Item Name="Load ProtoFile.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Load ProtoFile.vi"/>
 		<Item Name="Get ProtoParser DLL Directory.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get ProtoParser DLL Directory.vi"/>
 		<Item Name="Get gRPC Services.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Services.vi"/>
-		<Item Name="Get gRPC Service Name.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Proto Parser API/LabVIEW API/Get gRPC Service Name.vi"/>
+		<Item Name="Get gRPC Service Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Service Name.vi"/>
 		<Item Name="Get gRPC Service Methods.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Service Methods.vi"/>
-		<Item Name="Get gRPC Method Name.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Proto Parser API/LabVIEW API/Get gRPC Method Name.vi"/>
+		<Item Name="Get gRPC Method Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Method Name.vi"/>
 		<Item Name="Check Method Client Streaming.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Check Method Client Streaming.vi"/>
 		<Item Name="Check Method Server Streaming.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Check Method Server Streaming.vi"/>
 		<Item Name="Get Method Input Message.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Method Input Message.vi"/>
@@ -282,8 +281,8 @@
 		<Item Name="Get Message Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message Name.vi"/>
 		<Item Name="Get Message Fields.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message Fields.vi"/>
 		<Item Name="Get Message Field Info.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message Field Info.vi"/>
-		<Item Name="Get gRPC Package.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Proto Parser API/LabVIEW API/Get gRPC Package.vi"/>
-		<Item Name="Get gRPC Package Name.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Proto Parser API/LabVIEW API/Get gRPC Package Name.vi"/>
+		<Item Name="Get gRPC Package.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Package.vi"/>
+		<Item Name="Get gRPC Package Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Package Name.vi"/>
 		<Item Name="Get Message Parameters.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message Parameters.vi"/>
 		<Item Name="Get gRPC Method FullName.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get gRPC Method FullName.vi"/>
 		<Item Name="Get ProtoFile Messages.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get ProtoFile Messages.vi"/>
@@ -294,8 +293,8 @@
 		<Item Name="Add Proto Search Path.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Add Proto Search Path.vi"/>
 		<Item Name="GetProtoParseError.vi" Type="VI" URL="../Proto Parser API/GetProtoParseError.vi"/>
 		<Item Name="Get ProtoFile Enums.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get ProtoFile Enums.vi"/>
-		<Item Name="Get Enum Name.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Proto Parser API/LabVIEW API/Get Enum Name.vi"/>
-		<Item Name="Get Enum TypeUrl.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Proto Parser API/LabVIEW API/Get Enum TypeUrl.vi"/>
+		<Item Name="Get Enum Name.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Enum Name.vi"/>
+		<Item Name="Get Enum TypeUrl.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Enum TypeUrl.vi"/>
 		<Item Name="Get Enum Field Info.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Enum Field Info.vi"/>
 		<Item Name="Create Enum Metadata.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Enum Metadata.vi"/>
 		<Item Name="Create Message Metadata.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Create Message Metadata.vi"/>
@@ -305,14 +304,14 @@
 		<Item Name="Get Message HasOneof.vi" Type="VI" URL="../Proto Parser API/LabVIEW API/Get Message HasOneof.vi"/>
 	</Item>
 	<Item Name="Animation API" Type="Folder">
-		<Item Name="Animation.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Animation API/Animation.vi"/>
+		<Item Name="Animation.vi" Type="VI" URL="../Animation API/Animation.vi"/>
 		<Item Name="Get Subpanel Ref.vi" Type="VI" URL="../Animation API/Get Subpanel Ref.vi"/>
 		<Item Name="Display Loader.vi" Type="VI" URL="../Animation API/Display Loader.vi"/>
 		<Item Name="Hide Loader.vi" Type="VI" URL="../Animation API/Hide Loader.vi"/>
 	</Item>
 	<Item Name="Error Handling" Type="Folder">
 		<Property Name="NI.SortType" Type="Int">0</Property>
-		<Item Name="Error 5001.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Error Handling/Error 5001.vi"/>
+		<Item Name="Error 5001.vi" Type="VI" URL="../Error Handling/Error 5001.vi"/>
 		<Item Name="Error 5002.vi" Type="VI" URL="../Error Handling/Error 5002.vi"/>
 		<Item Name="Error 5003.vi" Type="VI" URL="../Error Handling/Error 5003.vi"/>
 		<Item Name="Error 5004.vi" Type="VI" URL="../Error Handling/Error 5004.vi"/>
@@ -320,9 +319,9 @@
 		<Item Name="Error 5006.vi" Type="VI" URL="../Error Handling/Error 5006.vi"/>
 		<Item Name="Error 5007.vi" Type="VI" URL="../Error Handling/Error 5007.vi"/>
 		<Item Name="Error 5008.vi" Type="VI" URL="../Error Handling/Error 5008.vi"/>
-		<Item Name="Error 5009.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Error Handling/Error 5009.vi"/>
+		<Item Name="Error 5009.vi" Type="VI" URL="../Error Handling/Error 5009.vi"/>
 		<Item Name="Error 5010.vi" Type="VI" URL="../Error Handling/Error 5010.vi"/>
-		<Item Name="Error 5011.vi" Type="VI" URL="../../../.Client Server Support New/gRPC Scripting Tools/Error Handling/Error 5011.vi"/>
+		<Item Name="Error 5011.vi" Type="VI" URL="../Error Handling/Error 5011.vi"/>
 		<Item Name="Error 5012.vi" Type="VI" URL="../Error Handling/Error 5012.vi"/>
 		<Item Name="Error 5013.vi" Type="VI" URL="../Error Handling/Error 5013.vi"/>
 		<Item Name="Error 5014.vi" Type="VI" URL="../Error Handling/Error 5014.vi"/>
@@ -344,6 +343,9 @@
 		<Item Name="Error 5030.vi" Type="VI" URL="../Error Handling/Error 5030.vi"/>
 		<Item Name="Error 5031.vi" Type="VI" URL="../Error Handling/Error 5031.vi"/>
 		<Item Name="Error 5032.vi" Type="VI" URL="../Error Handling/Error 5032.vi"/>
+	</Item>
+	<Item Name="Oneof API" Type="Folder">
+		<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Oneof API/Create LVClass for Oneof.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
