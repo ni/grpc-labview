@@ -55,7 +55,9 @@ namespace grpc_labview
         int protobufIndex;
         int clusterOffset;
         LVMessageMetadataType type;    
-        bool isRepeated;    
+        bool isRepeated;
+        bool isInOneof;
+        std::string oneofContainerName;
     };
 
     //---------------------------------------------------------------------
@@ -69,6 +71,9 @@ namespace grpc_labview
         int protobufIndex;
         int valueType;
         bool isRepeated;
+        LStrHandle fieldName;
+        bool isInOneof;
+        LStrHandle oneofContainerName;
     };
     #ifdef _PS_4
     #pragma pack (pop)

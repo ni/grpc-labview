@@ -88,7 +88,8 @@ namespace grpc_labview
                 element->isRepeated = lvElement->isRepeated;
                 metadata->_elements.push_back(element);
                 metadata->_mappedElements.emplace(element->protobufIndex, element);
-
+                element->isInOneof = lvElement->isInOneof;
+                element->oneofContainerName = GetLVString(lvElement->oneofContainerName);
             }
         }
         return metadata;

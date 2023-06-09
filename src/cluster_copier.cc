@@ -12,6 +12,11 @@ namespace grpc_labview {
         for (auto val : message._metadata->_mappedElements)
         {
             auto start = cluster + val.second->clusterOffset;
+            // The cluster offset set above is for regular fields in a cluster. If the field is a oneof, then get the start address of the acutual LVClass inside the cluster, and then get address of the private data control inside the LVClass.
+            if (val.second->isInOneof)
+            {
+                // Set "start" to the actual address of the field inside the private data control of the LVClass.
+            }
             std::shared_ptr<LVMessageValue> value;
             for (auto v : message._values)
             {
