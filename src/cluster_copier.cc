@@ -7,6 +7,9 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    // Reads a message from any client and writes that message data to a cluster on the LabVIEW side.
+    // This method takes the address of the cluster as a parameter and writes to it using the offsets present
+    // in the metadata. Each field of the cluster gets written that way, by fetching the offset from the metadata.
     void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
     {
         for (auto val : message._metadata->_mappedElements)

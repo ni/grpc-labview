@@ -82,6 +82,7 @@ namespace grpc_labview
             for (int x = 0; x < (*lvMetadata->elements)->cnt; ++x, ++lvElement)
             {
                 auto element = std::make_shared<MessageElementMetadata>(metadataOwner);
+                element->fieldName = GetLVString(lvElement->fieldName); // I added this field at the beginning of the cluster, should it go to the end instead?
                 element->embeddedMessageName = GetLVString(lvElement->embeddedMessageName);
                 element->protobufIndex = lvElement->protobufIndex;
                 element->type = (LVMessageMetadataType)lvElement->valueType;
