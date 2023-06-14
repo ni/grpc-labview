@@ -12,9 +12,8 @@ namespace grpc_labview {
     // in the metadata. Each field of the cluster gets written that way, by fetching the offset from the metadata.
     // [Inputs]
     // LVMessage: Rrepresentation of the proto 'message' in LabVIEW
-    //  ->  message._values: contain the deserialized values for this message
+    //  ->  message._values: contains the deserialized values for this message
     // cluster: Pointer to the cluster created by LabVIEW
-    // 
     void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
     {
         std::map<std::string, int> oneof_containerToSelectedIndexMap;
@@ -35,8 +34,8 @@ namespace grpc_labview {
             {
                 if (msgMetadata->isInOneof)
                 {
-                    // populate the map of the selected index
-                    // TODO: assert that the map doesn't have this oneof
+                    // set the map of the selected index for the "oneofContainer" to this protobuf Index
+                    assert(oneof_containerToSelectedIndexMap.find(msgMetadata->oneofContainerName) == oneof_containerToSelectedIndexMap.end());
                     oneof_containerToSelectedIndexMap.insert(std::pair<std::string, int>(msgMetadata->oneofContainerName, msgMetadata->protobufIndex));
                 }
                 switch (msgMetadata->type)
@@ -96,19 +95,16 @@ namespace grpc_labview {
             }
         }
 
-        // second pass to fill the oneof selected_index. We can do this in one pass when we push the selected_field to the end of the oneof cluster!
+        // second pass to fill the oneof selected_index. We can do this in one pass when we push the selected_field to the end of the oneof cluster!        
         // TODO: Skip the entire loop if the message has no oneof. It's a bool in the metadata.
         for (auto val : message._metadata->_mappedElements)
         {
-            auto msgMetadata = val.second;
-            // The cluster offset set above is for regular fields in a cluster. If the field is a oneof, 
-            // then get the start address of the actual LVClass inside the cluster, and then get address
-            // of the private data control inside the LVClass.
-            if (msgMetadata->isInOneof && msgMetadata->protobufIndex == -1) // This is the selected_index field to retrieve the metadata
-            {
+            auto msgMetadata = val.second;            
+            if (msgMetadata->isInOneof && msgMetadata->protobufIndex == -1)
+            {   
+                // This field is the selected_index field of a oneof
                 if (oneof_containerToSelectedIndexMap.find(msgMetadata->oneofContainerName) != oneof_containerToSelectedIndexMap.end())
                 {
-                    // Set "start" to the actual address of the field inside the private data control of the LVClass.
                     auto start = cluster + msgMetadata->clusterOffset;
                     *(int*)start = oneof_containerToSelectedIndexMap[msgMetadata->oneofContainerName];
                 }
