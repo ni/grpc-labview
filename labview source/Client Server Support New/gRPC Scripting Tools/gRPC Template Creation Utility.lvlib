@@ -113,7 +113,6 @@
 			<Item Name="Set Message Field Representation.vi" Type="VI" URL="../Top Level API/Set Message Field Representation.vi"/>
 			<Item Name="Set Enum Control Strings.vi" Type="VI" URL="../Top Level API/Set Enum Control Strings.vi"/>
 			<Item Name="Create Data Clusters for Types.vi" Type="VI" URL="../Top Level API/Create Data Clusters for Types.vi"/>
-			<Item Name="Create Type Data Clusters.vi" Type="VI" URL="../Top Level API/Create Type Data Clusters.vi"/>
 			<Item Name="Get Or Create Typedef.vi" Type="VI" URL="../Top Level API/Get Or Create Typedef.vi"/>
 			<Item Name="Create Enum Data Clusters.vi" Type="VI" URL="../Top Level API/Create Enum Data Clusters.vi"/>
 			<Item Name="Create Enum Data Clusters (simple).vi" Type="VI" URL="../Top Level API/Create Enum Data Clusters (simple).vi"/>
@@ -121,6 +120,8 @@
 			<Item Name="Update Enum Mapper.vi" Type="VI" URL="../Top Level API/Update Enum Mapper.vi"/>
 			<Item Name="Create Mapper VIs for Enum.vi" Type="VI" URL="../Top Level API/Create Mapper VIs for Enum.vi"/>
 			<Item Name="Create Message Data Cluster.vi" Type="VI" URL="../Top Level API/Create Message Data Cluster.vi"/>
+			<Item Name="Create Type Data Clusters.vi" Type="VI" URL="../Top Level API/Create Type Data Clusters.vi"/>
+			<Item Name="Get Message Placement Cluster.vi" Type="VI" URL="../Top Level API/Get Message Placement Cluster.vi"/>
 		</Item>
 		<Item Name="RPC Events" Type="Folder">
 			<Item Name="Populate gRPC Events.vi" Type="VI" URL="../Top Level API/Populate gRPC Events.vi"/>
@@ -353,7 +354,6 @@
 			<Item Name="GenOneOf_Get_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Get_Accessor.vi"/>
 		</Item>
 		<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Oneof API/Create LVClass for Oneof.vi"/>
-		<Item Name="Get Message Placement Cluster.vi" Type="VI" URL="../Top Level API/Get Message Placement Cluster.vi"/>
 		<Item Name="Create OneOf Accessors.vi" Type="VI" URL="../Oneof API/Create OneOf Accessors.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
