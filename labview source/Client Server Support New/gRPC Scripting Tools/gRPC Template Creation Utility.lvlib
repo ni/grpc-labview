@@ -227,7 +227,9 @@
 			<Item Name="Delete Diagram SubVIs.vi" Type="VI" URL="../VI API/Block Diagram API/Delete Diagram SubVIs.vi"/>
 		</Item>
 		<Item Name="Front Panel" Type="Folder">
+			<Item Name="Add Control to Cluster (from src ref) Ret Created Control.vi" Type="VI" URL="../VI API/Front Panel API/Add Control to Cluster (from src ref) Ret Created Control.vi"/>
 			<Item Name="Add Control to Cluster (from src ref).vi" Type="VI" URL="../VI API/Front Panel API/Add Control to Cluster (from src ref).vi"/>
+			<Item Name="Add Empty Cluster to Cluster.vi" Type="VI" URL="../VI API/Front Panel API/Add Empty Cluster to Cluster.vi"/>
 			<Item Name="Create Enum Ctrl.vi" Type="VI" URL="../VI API/Front Panel API/Create Enum Ctrl.vi"/>
 			<Item Name="Create String Control.vi" Type="VI" URL="../VI API/Front Panel API/Create String Control.vi"/>
 			<Item Name="Create Type Definition.vi" Type="VI" URL="../VI API/Front Panel API/Create Type Definition.vi"/>
