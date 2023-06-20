@@ -355,6 +355,7 @@
 		</Item>
 		<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Oneof API/Create LVClass for Oneof.vi"/>
 		<Item Name="Create OneOf Accessors.vi" Type="VI" URL="../Oneof API/Create OneOf Accessors.vi"/>
+		<Item Name="Get Typedef Name.vi" Type="VI" URL="../Oneof API/Get Typedef Name.vi"/>
 	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
