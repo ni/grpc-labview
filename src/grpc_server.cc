@@ -7,6 +7,8 @@
 #include <fstream>
 #include <iostream>
 #include <future>
+#include <grpcpp/impl/server_initializer.h>
+#include "lv_proto_server_reflection_plugin.h"
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -14,6 +16,7 @@ using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
+using grpc::ServerInitializer;
 
 namespace grpc_labview
 {
@@ -186,7 +189,8 @@ namespace grpc_labview
         }
 
         grpc::EnableDefaultHealthCheckService(true);
-        grpc::reflection::InitProtoReflectionServerBuilderPlugin();
+        InitLVProtoReflectionServerBuilderPlugin();
+        // grpc::reflection::InitProtoReflectionServerBuilderPlugin();
         ServerBuilder builder;
 
         std::shared_ptr<grpc::ServerCredentials> creds;
@@ -266,5 +270,6 @@ namespace grpc_labview
 
             _server = nullptr;
         }
-    }
+        LVProtoServerReflectionPlugin::GetInstance()->DeleteInstance();
+    }    
 }
