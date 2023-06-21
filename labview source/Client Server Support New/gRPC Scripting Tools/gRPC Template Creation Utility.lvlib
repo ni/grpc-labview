@@ -113,7 +113,14 @@
 		</Item>
 		<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Oneof API/Create LVClass for Oneof.vi"/>
 		<Item Name="Create OneOf Accessors.vi" Type="VI" URL="../Oneof API/Create OneOf Accessors.vi"/>
+		<Item Name="Create Oneof Class Converter.vi" Type="VI" URL="../Oneof API/Create Oneof Class Converter.vi"/>
+		<Item Name="Create Oneof Message Converters.vi" Type="VI" URL="../Oneof API/Create Oneof Message Converters.vi"/>
+		<Item Name="Create Oneof Protobuf To Field Name.vi" Type="VI" URL="../Oneof API/Create Oneof Protobuf To Field Name.vi"/>
+		<Item Name="Create VI From Template For Oneof Class.vi" Type="VI" URL="../Oneof API/Create VI From Template For Oneof Class.vi"/>
 		<Item Name="Get Typedef Name.vi" Type="VI" URL="../Oneof API/Get Typedef Name.vi"/>
+		<Item Name="Set LVClass Const Label.vi" Type="VI" URL="../Oneof API/Set LVClass Const Label.vi"/>
+		<Item Name="Set LVClass Control Label.vi" Type="VI" URL="../Oneof API/Set LVClass Control Label.vi"/>
+		<Item Name="Wire Selected_Index To Case Selector.vi" Type="VI" URL="../Oneof API/Wire Selected_Index To Case Selector.vi"/>
 	</Item>
 	<Item Name="Project API" Type="Folder">
 		<Property Name="NI.SortType" Type="Int">3</Property>
@@ -280,8 +287,14 @@
 				<Item Name="Get NamedBundler Input.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get NamedBundler Input.vi"/>
 				<Item Name="Get NamedBundler.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get NamedBundler.vi"/>
 				<Item Name="Get NamedUnbundler.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get NamedUnbundler.vi"/>
+				<Item Name="Get Unbundler Input Terminal.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get Unbundler Input Terminal.vi"/>
+				<Item Name="Get Unbundler Output Terminal By Name.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get Unbundler Output Terminal By Name.vi"/>
+				<Item Name="Get Unbundler Output Terminal Names.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get Unbundler Output Terminal Names.vi"/>
+				<Item Name="Get Unbundler.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get Unbundler.vi"/>
 				<Item Name="Set Bundler Input Count.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Set Bundler Input Count.vi"/>
 				<Item Name="Set NamedBundler Input Count.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Set NamedBundler Input Count.vi"/>
+				<Item Name="Wire Between Unbundle And Bundle.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Wire Between Unbundle And Bundle.vi"/>
+				<Item Name="Wire To Unbundler Input Terminal.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Wire To Unbundler Input Terminal.vi"/>
 			</Item>
 			<Item Name="Case Structure" Type="Folder">
 				<Item Name="Connect Case Selector Terminal.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Connect Case Selector Terminal.vi"/>
@@ -310,6 +323,7 @@
 				<Item Name="Set Frame User Events.vi" Type="VI" URL="../VI API/Block Diagram API/Event Structure/Set Frame User Events.vi"/>
 			</Item>
 			<Item Name="SubVI" Type="Folder">
+				<Item Name="Create SubVI.vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Create SubVI.vi"/>
 				<Item Name="Get SubVI Reference (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI Reference (by Name).vi"/>
 				<Item Name="Get SubVI References (by Pattern).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI References (by Pattern).vi"/>
 				<Item Name="Get SubVI References.vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI References.vi"/>
