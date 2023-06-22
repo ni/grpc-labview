@@ -124,6 +124,7 @@
 		<Item Name="ScriptOneofClassConverter.vi" Type="VI" URL="../Oneof API/ScriptOneofClassConverter.vi"/>
 		<Item Name="Set LVClass Const Label.vi" Type="VI" URL="../Oneof API/Set LVClass Const Label.vi"/>
 		<Item Name="Set LVClass Control Label.vi" Type="VI" URL="../Oneof API/Set LVClass Control Label.vi"/>
+		<Item Name="Wire Between Unbundle And Bundle For Message Converter With Oneof.vi" Type="VI" URL="../Oneof API/Wire Between Unbundle And Bundle For Message Converter With Oneof.vi"/>
 		<Item Name="Wire Selected_Index To Case Selector.vi" Type="VI" URL="../Oneof API/Wire Selected_Index To Case Selector.vi"/>
 	</Item>
 	<Item Name="Project API" Type="Folder">
@@ -297,7 +298,6 @@
 				<Item Name="Get Unbundler.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get Unbundler.vi"/>
 				<Item Name="Set Bundler Input Count.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Set Bundler Input Count.vi"/>
 				<Item Name="Set NamedBundler Input Count.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Set NamedBundler Input Count.vi"/>
-				<Item Name="Wire Between Unbundle And Bundle.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Wire Between Unbundle And Bundle.vi"/>
 				<Item Name="Wire To Unbundler Input Terminal.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Wire To Unbundler Input Terminal.vi"/>
 			</Item>
 			<Item Name="Case Structure" Type="Folder">
