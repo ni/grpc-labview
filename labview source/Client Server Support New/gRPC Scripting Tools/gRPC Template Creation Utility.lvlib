@@ -111,13 +111,17 @@
 			<Item Name="GenOneOf_Has_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Has_Accessor.vi"/>
 			<Item Name="GenOneOf_Set_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Set_Accessor.vi"/>
 		</Item>
+		<Item Name="Copy PDC To VI.vi" Type="VI" URL="../Oneof API/Copy PDC To VI.vi"/>
 		<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Oneof API/Create LVClass for Oneof.vi"/>
 		<Item Name="Create OneOf Accessors.vi" Type="VI" URL="../Oneof API/Create OneOf Accessors.vi"/>
 		<Item Name="Create Oneof Class Converter.vi" Type="VI" URL="../Oneof API/Create Oneof Class Converter.vi"/>
 		<Item Name="Create Oneof Message Converters.vi" Type="VI" URL="../Oneof API/Create Oneof Message Converters.vi"/>
 		<Item Name="Create Oneof Protobuf To Field Name.vi" Type="VI" URL="../Oneof API/Create Oneof Protobuf To Field Name.vi"/>
+		<Item Name="Create Selected Index Numeric In Cluster.vi" Type="VI" URL="../Oneof API/Create Selected Index Numeric In Cluster.vi"/>
 		<Item Name="Create VI From Template For Oneof Class.vi" Type="VI" URL="../Oneof API/Create VI From Template For Oneof Class.vi"/>
+		<Item Name="Drop Protobuf To Field Converter SubVI.vi" Type="VI" URL="../Oneof API/Drop Protobuf To Field Converter SubVI.vi"/>
 		<Item Name="Get Typedef Name.vi" Type="VI" URL="../Oneof API/Get Typedef Name.vi"/>
+		<Item Name="ScriptOneofClassConverter.vi" Type="VI" URL="../Oneof API/ScriptOneofClassConverter.vi"/>
 		<Item Name="Set LVClass Const Label.vi" Type="VI" URL="../Oneof API/Set LVClass Const Label.vi"/>
 		<Item Name="Set LVClass Control Label.vi" Type="VI" URL="../Oneof API/Set LVClass Control Label.vi"/>
 		<Item Name="Wire Selected_Index To Case Selector.vi" Type="VI" URL="../Oneof API/Wire Selected_Index To Case Selector.vi"/>
@@ -300,11 +304,14 @@
 				<Item Name="Connect Case Selector Terminal.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Connect Case Selector Terminal.vi"/>
 				<Item Name="Create Case Structure Frames.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Create Case Structure Frames.vi"/>
 				<Item Name="Create Case Structure.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Create Case Structure.vi"/>
+				<Item Name="Duplicate Case Structure Frames.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Duplicate Case Structure Frames.vi"/>
+				<Item Name="Find Frame Sink Terminal (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Find Frame Sink Terminal (by Name).vi"/>
 				<Item Name="Find Frame Source Terminal (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Find Frame Source Terminal (by Name).vi"/>
 				<Item Name="Get Case Struct Tunnels.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Struct Tunnels.vi"/>
 				<Item Name="Get Case Structure (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Structure (by Name).vi"/>
 				<Item Name="Get Case Structure Frame (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Structure Frame (by Name).vi"/>
 				<Item Name="Get Case Structure Frame Index (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Structure Frame Index (by Name).vi"/>
+				<Item Name="Set Default Case By Frame Name.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Set Default Case By Frame Name.vi"/>
 				<Item Name="Set Default Case.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Set Default Case.vi"/>
 			</Item>
 			<Item Name="Constants" Type="Folder">
@@ -356,6 +363,7 @@
 			<Item Name="Get ControlRef from ctrlVI.vi" Type="VI" URL="../VI API/Front Panel API/Get ControlRef from ctrlVI.vi"/>
 			<Item Name="Get String Control Terminal.vi" Type="VI" URL="../VI API/Front Panel API/Get String Control Terminal.vi"/>
 			<Item Name="Get VI FP Reference.vi" Type="VI" URL="../VI API/Front Panel API/Get VI FP Reference.vi"/>
+			<Item Name="Set Cluster AutoResize to Vertical.vi" Type="VI" URL="../VI API/Front Panel API/Set Cluster AutoResize to Vertical.vi"/>
 		</Item>
 		<Item Name="General VI API" Type="Folder">
 			<Item Name="Coordinates" Type="Folder">
