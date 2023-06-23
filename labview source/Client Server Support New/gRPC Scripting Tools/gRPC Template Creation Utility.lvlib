@@ -114,12 +114,15 @@
 		<Item Name="Copy PDC To VI.vi" Type="VI" URL="../Oneof API/Copy PDC To VI.vi"/>
 		<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Oneof API/Create LVClass for Oneof.vi"/>
 		<Item Name="Create OneOf Accessors.vi" Type="VI" URL="../Oneof API/Create OneOf Accessors.vi"/>
+		<Item Name="Create Oneof Case Structure.vi" Type="VI" URL="../Oneof API/Create Oneof Case Structure.vi"/>
 		<Item Name="Create Oneof Class Converter.vi" Type="VI" URL="../Oneof API/Create Oneof Class Converter.vi"/>
+		<Item Name="Create Oneof Message Converter Skeletons.vi" Type="VI" URL="../Oneof API/Create Oneof Message Converter Skeletons.vi"/>
 		<Item Name="Create Oneof Message Converters.vi" Type="VI" URL="../Oneof API/Create Oneof Message Converters.vi"/>
 		<Item Name="Create Oneof Protobuf To Field Name.vi" Type="VI" URL="../Oneof API/Create Oneof Protobuf To Field Name.vi"/>
 		<Item Name="Create Selected Index Numeric In Cluster.vi" Type="VI" URL="../Oneof API/Create Selected Index Numeric In Cluster.vi"/>
 		<Item Name="Create VI From Template For Oneof Class.vi" Type="VI" URL="../Oneof API/Create VI From Template For Oneof Class.vi"/>
 		<Item Name="Drop Protobuf To Field Converter SubVI.vi" Type="VI" URL="../Oneof API/Drop Protobuf To Field Converter SubVI.vi"/>
+		<Item Name="Get Selected Index Terminal from Unbundler (by oneof name).vi" Type="VI" URL="../Oneof API/Get Selected Index Terminal from Unbundler (by oneof name).vi"/>
 		<Item Name="Get Typedef Name.vi" Type="VI" URL="../Oneof API/Get Typedef Name.vi"/>
 		<Item Name="ScriptOneofClassConverter.vi" Type="VI" URL="../Oneof API/ScriptOneofClassConverter.vi"/>
 		<Item Name="Set LVClass Const Label.vi" Type="VI" URL="../Oneof API/Set LVClass Const Label.vi"/>
@@ -288,6 +291,8 @@
 	<Item Name="VI API" Type="Folder">
 		<Item Name="Block Diagram" Type="Folder">
 			<Item Name="Bundler" Type="Folder">
+				<Item Name="Create Bundler With Name.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Create Bundler With Name.vi"/>
+				<Item Name="Get Bundler Input Terminal By Name.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get Bundler Input Terminal By Name.vi"/>
 				<Item Name="Get Bundler.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get Bundler.vi"/>
 				<Item Name="Get NamedBundler Input.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get NamedBundler Input.vi"/>
 				<Item Name="Get NamedBundler.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Get NamedBundler.vi"/>
@@ -301,9 +306,12 @@
 				<Item Name="Wire To Unbundler Input Terminal.vi" Type="VI" URL="../VI API/Block Diagram API/Bundler/Wire To Unbundler Input Terminal.vi"/>
 			</Item>
 			<Item Name="Case Structure" Type="Folder">
+				<Item Name="Add Case Structure Frame (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Add Case Structure Frame (by Name).vi"/>
 				<Item Name="Connect Case Selector Terminal.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Connect Case Selector Terminal.vi"/>
 				<Item Name="Create Case Structure Frames.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Create Case Structure Frames.vi"/>
 				<Item Name="Create Case Structure.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Create Case Structure.vi"/>
+				<Item Name="Delete All Case Structure Frames But Default.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Delete All Case Structure Frames But Default.vi"/>
+				<Item Name="Delete Empty Case Structure Frames.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Delete Empty Case Structure Frames.vi"/>
 				<Item Name="Duplicate Case Structure Frames.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Duplicate Case Structure Frames.vi"/>
 				<Item Name="Find Frame Sink Terminal (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Find Frame Sink Terminal (by Name).vi"/>
 				<Item Name="Find Frame Source Terminal (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Find Frame Source Terminal (by Name).vi"/>
@@ -343,6 +351,7 @@
 			<Item Name="BD CleanUp.vi" Type="VI" URL="../VI API/Block Diagram API/BD CleanUp.vi"/>
 			<Item Name="Delete Diagram SubVIs.vi" Type="VI" URL="../VI API/Block Diagram API/Delete Diagram SubVIs.vi"/>
 			<Item Name="Get BD Reference.vi" Type="VI" URL="../VI API/Block Diagram API/Get BD Reference.vi"/>
+			<Item Name="Wire Two Terminals.vi" Type="VI" URL="../VI API/Block Diagram API/Wire Two Terminals.vi"/>
 		</Item>
 		<Item Name="Front Panel" Type="Folder">
 			<Item Name="Add Control to Cluster (from src ref) Ret Created Control.vi" Type="VI" URL="../VI API/Front Panel API/Add Control to Cluster (from src ref) Ret Created Control.vi"/>
