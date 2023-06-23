@@ -378,5 +378,6 @@
 			<Item Name="Validate Path Length.vi" Type="VI" URL="../VI API/General VI API/Validate Path Length.vi"/>
 		</Item>
 	</Item>
+	<Item Name="Add Oneof Indices To Metadata.vi" Type="VI" URL="../Oneof API/Add Oneof Indices To Metadata.vi"/>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
