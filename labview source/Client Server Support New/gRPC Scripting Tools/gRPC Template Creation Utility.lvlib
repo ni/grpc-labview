@@ -118,6 +118,7 @@
 		<Item Name="Create Oneof Case Structure.vi" Type="VI" URL="../Oneof API/Create Oneof Case Structure.vi"/>
 		<Item Name="Create Oneof Class Converter.vi" Type="VI" URL="../Oneof API/Create Oneof Class Converter.vi"/>
 		<Item Name="Create Oneof Message Converter Skeletons.vi" Type="VI" URL="../Oneof API/Create Oneof Message Converter Skeletons.vi"/>
+		<Item Name="Create Oneof Message Converters (Rich to Flat).vi" Type="VI" URL="../Oneof API/Create Oneof Message Converters (Rich to Flat).vi"/>
 		<Item Name="Create Oneof Message Converters.vi" Type="VI" URL="../Oneof API/Create Oneof Message Converters.vi"/>
 		<Item Name="Create Oneof Protobuf To Field Name.vi" Type="VI" URL="../Oneof API/Create Oneof Protobuf To Field Name.vi"/>
 		<Item Name="Create Selected Index Numeric In Cluster.vi" Type="VI" URL="../Oneof API/Create Selected Index Numeric In Cluster.vi"/>
@@ -126,6 +127,7 @@
 		<Item Name="Drop Protobuf To Field Converter SubVI.vi" Type="VI" URL="../Oneof API/Drop Protobuf To Field Converter SubVI.vi"/>
 		<Item Name="Get Selected Index Terminal from Unbundler (by oneof name).vi" Type="VI" URL="../Oneof API/Get Selected Index Terminal from Unbundler (by oneof name).vi"/>
 		<Item Name="Get Typedef Name.vi" Type="VI" URL="../Oneof API/Get Typedef Name.vi"/>
+		<Item Name="Script Rich to Flat Conversion.vi" Type="VI" URL="../Oneof API/Script Rich to Flat Conversion.vi"/>
 		<Item Name="ScriptOneofClassConverter.vi" Type="VI" URL="../Oneof API/ScriptOneofClassConverter.vi"/>
 		<Item Name="Set LVClass Const Label.vi" Type="VI" URL="../Oneof API/Set LVClass Const Label.vi"/>
 		<Item Name="Set LVClass Control Label.vi" Type="VI" URL="../Oneof API/Set LVClass Control Label.vi"/>
