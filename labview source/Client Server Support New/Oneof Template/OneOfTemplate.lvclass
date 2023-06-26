@@ -56,14 +56,14 @@
 		<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
 		<Property Name="NI.ClassItem.State" Type="Int">1342710272</Property>
 	</Item>
-	<Item Name="Message_ConvertClusterToClass.vi" Type="VI" URL="../Message_ConvertClusterToClass.vi">
+	<Item Name="Message_ConvertClusterToClass.vim" Type="VI" URL="../Message_ConvertClusterToClass.vim">
 		<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!#T!!!!"A!%!!!!$5!+!!&gt;/&gt;7VF=GFD!":!5!!"!!%.4X6U=(6U1WRV=X2F=A!;1&amp;!!!1!"%5^V&gt;("V&gt;%.M&gt;8.U:8*5?8"F!":!5!!"!!%-37ZQ&gt;82$&lt;(6T&gt;'6S!!"5!0!!$!!!!!!!!!!#!!!!!Q!!!!!!!!!!!!!!"!)!!(A!!!!!!!!!!!!!!!!!!!U&amp;!!!!!!!!#A!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#!!!!!!"!!5!!!!!</Property>
 		<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
-		<Property Name="NI.ClassItem.Flags" Type="Int">0</Property>
+		<Property Name="NI.ClassItem.Flags" Type="Int">16777218</Property>
 		<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
 		<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
 		<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
-		<Property Name="NI.ClassItem.State" Type="Int">1107821056</Property>
+		<Property Name="NI.ClassItem.State" Type="Int">1342713856</Property>
 	</Item>
 	<Item Name="Oneof_ConvertClusterToClassTemplate.vi" Type="VI" URL="../Oneof_ConvertClusterToClassTemplate.vi">
 		<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!";!!!!!Q!W1(!!(A!!&amp;R60&lt;G60:F2F&lt;8"M982F,GRW9WRB=X-!&amp;5^O:5^G6'6N='RB&gt;'5O&lt;(:D&lt;'&amp;T=Q!%!!!!'!$Q!!)!!!!"!A!!#!!!#1!!!!!!!!!!!1!#!!!!!!</Property>
