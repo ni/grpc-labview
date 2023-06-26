@@ -111,6 +111,7 @@
 			<Item Name="GenOneOf_Has_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Has_Accessor.vi"/>
 			<Item Name="GenOneOf_Set_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Set_Accessor.vi"/>
 		</Item>
+		<Item Name="Add Oneof Indices To Metadata.vi" Type="VI" URL="../Oneof API/Add Oneof Indices To Metadata.vi"/>
 		<Item Name="Copy PDC To VI.vi" Type="VI" URL="../Oneof API/Copy PDC To VI.vi"/>
 		<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Oneof API/Create LVClass for Oneof.vi"/>
 		<Item Name="Create OneOf Accessors.vi" Type="VI" URL="../Oneof API/Create OneOf Accessors.vi"/>
@@ -121,6 +122,7 @@
 		<Item Name="Create Oneof Protobuf To Field Name.vi" Type="VI" URL="../Oneof API/Create Oneof Protobuf To Field Name.vi"/>
 		<Item Name="Create Selected Index Numeric In Cluster.vi" Type="VI" URL="../Oneof API/Create Selected Index Numeric In Cluster.vi"/>
 		<Item Name="Create VI From Template For Oneof Class.vi" Type="VI" URL="../Oneof API/Create VI From Template For Oneof Class.vi"/>
+		<Item Name="Drop Oneof Constant into Case Structure Default.vi" Type="VI" URL="../Oneof API/Drop Oneof Constant into Case Structure Default.vi"/>
 		<Item Name="Drop Protobuf To Field Converter SubVI.vi" Type="VI" URL="../Oneof API/Drop Protobuf To Field Converter SubVI.vi"/>
 		<Item Name="Get Selected Index Terminal from Unbundler (by oneof name).vi" Type="VI" URL="../Oneof API/Get Selected Index Terminal from Unbundler (by oneof name).vi"/>
 		<Item Name="Get Typedef Name.vi" Type="VI" URL="../Oneof API/Get Typedef Name.vi"/>
@@ -313,6 +315,7 @@
 				<Item Name="Delete All Case Structure Frames But Default.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Delete All Case Structure Frames But Default.vi"/>
 				<Item Name="Delete Empty Case Structure Frames.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Delete Empty Case Structure Frames.vi"/>
 				<Item Name="Duplicate Case Structure Frames.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Duplicate Case Structure Frames.vi"/>
+				<Item Name="Find Frame Sink Terminal (Assuming only one sink).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Find Frame Sink Terminal (Assuming only one sink).vi"/>
 				<Item Name="Find Frame Sink Terminal (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Find Frame Sink Terminal (by Name).vi"/>
 				<Item Name="Find Frame Source Terminal (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Find Frame Source Terminal (by Name).vi"/>
 				<Item Name="Get Case Struct Tunnels.vi" Type="VI" URL="../VI API/Block Diagram API/Case Structure/Get Case Struct Tunnels.vi"/>
@@ -387,6 +390,5 @@
 			<Item Name="Validate Path Length.vi" Type="VI" URL="../VI API/General VI API/Validate Path Length.vi"/>
 		</Item>
 	</Item>
-	<Item Name="Add Oneof Indices To Metadata.vi" Type="VI" URL="../Oneof API/Add Oneof Indices To Metadata.vi"/>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
