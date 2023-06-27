@@ -19,12 +19,12 @@ namespace grpc_labview {
         std::map<std::string, int> oneof_containerToSelectedIndexMap;
         for (auto val : message._metadata->_mappedElements)
         {
-            auto msgMetadata = val.second;
-            auto start = cluster + msgMetadata->clusterOffset;
+            auto fieldMetadata = val.second;
+            auto start = cluster + fieldMetadata->clusterOffset;
             std::shared_ptr<LVMessageValue> value;
             for (auto v : message._values)
             {
-                if (v.second->_protobufId == msgMetadata->protobufIndex)
+                if (v.second->_protobufId == fieldMetadata->protobufIndex)
                 {
                     value = v.second;
                     break;
@@ -32,64 +32,64 @@ namespace grpc_labview {
             }            
             if (value != nullptr)
             {
-                if (msgMetadata->isInOneof)
+                if (fieldMetadata->isInOneof)
                 {
                     // set the map of the selected index for the "oneofContainer" to this protobuf Index
-                    assert(oneof_containerToSelectedIndexMap.find(msgMetadata->oneofContainerName) == oneof_containerToSelectedIndexMap.end());
-                    oneof_containerToSelectedIndexMap.insert(std::pair<std::string, int>(msgMetadata->oneofContainerName, msgMetadata->protobufIndex));
+                    assert(oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName) == oneof_containerToSelectedIndexMap.end());
+                    oneof_containerToSelectedIndexMap.insert(std::pair<std::string, int>(fieldMetadata->oneofContainerName, fieldMetadata->protobufIndex));
                 }
-                switch (msgMetadata->type)
+                switch (fieldMetadata->type)
                 {
                 case LVMessageMetadataType::StringValue:
-                    CopyStringToCluster(msgMetadata, start, value);
+                    CopyStringToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::BytesValue:
-                    CopyBytesToCluster(msgMetadata, start, value);
+                    CopyBytesToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::BoolValue:
-                    CopyBoolToCluster(msgMetadata, start, value);
+                    CopyBoolToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::DoubleValue:
-                    CopyDoubleToCluster(msgMetadata, start, value);
+                    CopyDoubleToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::FloatValue:
-                    CopyFloatToCluster(msgMetadata, start, value);
+                    CopyFloatToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::Int32Value:
-                    CopyInt32ToCluster(msgMetadata, start, value);
+                    CopyInt32ToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::MessageValue:
-                    CopyMessageToCluster(msgMetadata, start, value);
+                    CopyMessageToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::Int64Value:
-                    CopyInt64ToCluster(msgMetadata, start, value);
+                    CopyInt64ToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::UInt32Value:
-                    CopyUInt32ToCluster(msgMetadata, start, value);
+                    CopyUInt32ToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::UInt64Value:
-                    CopyUInt64ToCluster(msgMetadata, start, value);
+                    CopyUInt64ToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::EnumValue:
-                    CopyEnumToCluster(msgMetadata, start, value);
+                    CopyEnumToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::SInt32Value:
-                    CopySInt32ToCluster(msgMetadata, start, value);
+                    CopySInt32ToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType:: SInt64Value:
-                    CopySInt64ToCluster(msgMetadata, start, value);
+                    CopySInt64ToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::Fixed32Value:
-                    CopyFixed32ToCluster(msgMetadata, start, value);
+                    CopyFixed32ToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::Fixed64Value:
-                     CopyFixed64ToCluster(msgMetadata, start, value);
+                     CopyFixed64ToCluster(fieldMetadata, start, value);
                      break;
                 case LVMessageMetadataType::SFixed32Value:
-                    CopySFixed32ToCluster(msgMetadata, start, value);
+                    CopySFixed32ToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::SFixed64Value:
-                    CopySFixed64ToCluster(msgMetadata, start, value);
+                    CopySFixed64ToCluster(fieldMetadata, start, value);
                     break;
                 }
             }
@@ -99,14 +99,14 @@ namespace grpc_labview {
         // TODO: Skip the entire loop if the message has no oneof. It's a bool in the metadata.
         for (auto val : message._metadata->_mappedElements)
         {
-            auto msgMetadata = val.second;            
-            if (msgMetadata->isInOneof && msgMetadata->protobufIndex == -1)
+            auto fieldMetadata = val.second;            
+            if (fieldMetadata->isInOneof && fieldMetadata->protobufIndex == -1)
             {   
                 // This field is the selected_index field of a oneof
-                if (oneof_containerToSelectedIndexMap.find(msgMetadata->oneofContainerName) != oneof_containerToSelectedIndexMap.end())
+                if (oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName) != oneof_containerToSelectedIndexMap.end())
                 {
-                    auto start = cluster + msgMetadata->clusterOffset;
-                    *(int*)start = oneof_containerToSelectedIndexMap[msgMetadata->oneofContainerName];
+                    auto start = cluster + fieldMetadata->clusterOffset;
+                    *(int*)start = oneof_containerToSelectedIndexMap[fieldMetadata->oneofContainerName];
                 }
             }
         }
@@ -117,61 +117,90 @@ namespace grpc_labview {
     void ClusterDataCopier::CopyFromCluster(LVMessage& message, int8_t* cluster)
     {
         message._values.clear();
-
+        std::map<std::string, int> oneof_containerToSelectedIndexMap; // Needed to serialize only the field related to the selected_index
+        for (auto val : message._metadata->_mappedElements)
+        {            
+            auto fieldMetadata = val.second;
+            if (fieldMetadata->isInOneof)
+            {
+                if (fieldMetadata->protobufIndex == -1)
+                {
+                    // set the map of the selected index for the "oneofContainer" to this protobuf Index
+                    assert(oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName) == oneof_containerToSelectedIndexMap.end());
+                    auto selected_index = *(int*)(cluster + fieldMetadata->clusterOffset);
+                    oneof_containerToSelectedIndexMap.insert(std::pair<std::string, int>(fieldMetadata->oneofContainerName, selected_index));
+                }
+            }
+        }
         for (auto val : message._metadata->_mappedElements)
         {
-            auto start = cluster + val.second->clusterOffset;
-            switch (val.second->type)
+            auto fieldMetadata = val.second;
+            if (fieldMetadata->isInOneof)
+            {
+                if (fieldMetadata->protobufIndex != -1)
+                {
+                    auto it = oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName);
+                    assert (it != oneof_containerToSelectedIndexMap.end());
+                    auto selected_index = it->second;
+                    if (selected_index != fieldMetadata->protobufIndex)
+                    {
+                        // This field is not the selected_index field of a oneof. Do not serialize it.
+                        continue;
+                    }
+                }
+            }
+            auto start = cluster + fieldMetadata->clusterOffset;
+            switch (fieldMetadata->type)
             {
             case LVMessageMetadataType::StringValue:
-                CopyStringFromCluster(val.second, start, message);
+                CopyStringFromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::BytesValue:
-                CopyBytesFromCluster(val.second, start, message);
+                CopyBytesFromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::BoolValue:
-                CopyBoolFromCluster(val.second, start, message);
+                CopyBoolFromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::DoubleValue:
-                CopyDoubleFromCluster(val.second, start, message);
+                CopyDoubleFromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::FloatValue:
-                CopyFloatFromCluster(val.second, start, message);
+                CopyFloatFromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::Int32Value:
-                CopyInt32FromCluster(val.second, start, message);
+                CopyInt32FromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::MessageValue:
-                CopyMessageFromCluster(val.second, start, message);
+                CopyMessageFromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::Int64Value:
-                CopyInt64FromCluster(val.second, start, message);
+                CopyInt64FromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::UInt32Value:
-                CopyUInt32FromCluster(val.second, start, message);
+                CopyUInt32FromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::UInt64Value:
-                CopyUInt64FromCluster(val.second, start, message);
+                CopyUInt64FromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::EnumValue:
-                CopyEnumFromCluster(val.second, start, message);
+                CopyEnumFromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::SInt32Value:
-                CopySInt32FromCluster(val.second, start, message);
+                CopySInt32FromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::SInt64Value:
-                CopySInt64FromCluster(val.second, start, message);
+                CopySInt64FromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::Fixed32Value:
-                CopyFixed32FromCluster(val.second, start, message);
+                CopyFixed32FromCluster(fieldMetadata, start, message);
             case LVMessageMetadataType::Fixed64Value:
-                CopyFixed64FromCluster(val.second, start, message);
+                CopyFixed64FromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::SFixed32Value:
-                CopySFixed32FromCluster(val.second, start, message);
+                CopySFixed32FromCluster(fieldMetadata, start, message);
                 break;
             case LVMessageMetadataType::SFixed64Value:
-                CopySFixed64FromCluster(val.second, start, message);
+                CopySFixed64FromCluster(fieldMetadata, start, message);
                 break;
             }
         }
