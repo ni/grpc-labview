@@ -49,6 +49,7 @@
 		<Item Name="Find Item in LVClass.vi" Type="VI" URL="../Class API/Find Item in LVClass.vi"/>
 		<Item Name="Get ControlRef from ClassItem.vi" Type="VI" URL="../Class API/Get ControlRef from ClassItem.vi"/>
 		<Item Name="Get LVClass Item Path.vi" Type="VI" URL="../Class API/Get LVClass Item Path.vi"/>
+		<Item Name="Get Static Methods in LVClass.vi" Type="VI" URL="../Class API/Get Static Methods in LVClass.vi"/>
 		<Item Name="Get VIRef from ClassItem.vi" Type="VI" URL="../Class API/Get VIRef from ClassItem.vi"/>
 		<Item Name="Open LVClass.vi" Type="VI" URL="../Class API/Open LVClass.vi"/>
 		<Item Name="Ref to LVClass.vi" Type="VI" URL="../Class API/Ref to LVClass.vi"/>
@@ -110,6 +111,7 @@
 			<Item Name="GenOneOf_Get_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Get_Accessor.vi"/>
 			<Item Name="GenOneOf_Has_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Has_Accessor.vi"/>
 			<Item Name="GenOneOf_Set_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Set_Accessor.vi"/>
+			<Item Name="GetOneOfAccessorList.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GetOneOfAccessorList.vi"/>
 		</Item>
 		<Item Name="Add Oneof Indices To Metadata.vi" Type="VI" URL="../Oneof API/Add Oneof Indices To Metadata.vi"/>
 		<Item Name="Copy PDC To VI.vi" Type="VI" URL="../Oneof API/Copy PDC To VI.vi"/>
@@ -237,6 +239,7 @@
 			<Item Name="Create Type Data Clusters.vi" Type="VI" URL="../Top Level API/Create Type Data Clusters.vi"/>
 			<Item Name="Delete Message Template Files.vi" Type="VI" URL="../Top Level API/Delete Message Template Files.vi"/>
 			<Item Name="Generate RPC Messages.vi" Type="VI" URL="../Top Level API/Generate RPC Messages.vi"/>
+			<Item Name="Get LV Object Type for Proto Field Type.vi" Type="VI" URL="../Top Level API/Get LV Object Type for Proto Field Type.vi"/>
 			<Item Name="Get Message Placement Cluster.vi" Type="VI" URL="../Top Level API/Get Message Placement Cluster.vi"/>
 			<Item Name="Get Or Create Typedef.vi" Type="VI" URL="../Top Level API/Get Or Create Typedef.vi"/>
 			<Item Name="Set Enum Control Strings.vi" Type="VI" URL="../Top Level API/Set Enum Control Strings.vi"/>
