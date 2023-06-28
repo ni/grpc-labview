@@ -100,7 +100,7 @@ namespace grpc_labview {
         for (auto val : message._metadata->_mappedElements)
         {
             auto fieldMetadata = val.second;            
-            if (fieldMetadata->isInOneof && fieldMetadata->protobufIndex == -1)
+            if (fieldMetadata->isInOneof&& fieldMetadata->protobufIndex < 0)
             {   
                 // This field is the selected_index field of a oneof
                 if (oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName) != oneof_containerToSelectedIndexMap.end())
@@ -123,7 +123,7 @@ namespace grpc_labview {
             auto fieldMetadata = val.second;
             if (fieldMetadata->isInOneof)
             {
-                if (fieldMetadata->protobufIndex == -1)
+                if (fieldMetadata->protobufIndex < 0)
                 {
                     // set the map of the selected index for the "oneofContainer" to this protobuf Index
                     assert(oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName) == oneof_containerToSelectedIndexMap.end());
@@ -137,7 +137,7 @@ namespace grpc_labview {
             auto fieldMetadata = val.second;
             if (fieldMetadata->isInOneof)
             {
-                if (fieldMetadata->protobufIndex != -1)
+                if (fieldMetadata->protobufIndex >= 0)
                 {
                     auto it = oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName);
                     assert (it != oneof_containerToSelectedIndexMap.end());
