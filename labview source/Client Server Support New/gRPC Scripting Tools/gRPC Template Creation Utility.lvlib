@@ -114,7 +114,6 @@
 			<Item Name="GetOneOfAccessorList.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GetOneOfAccessorList.vi"/>
 		</Item>
 		<Item Name="Add Oneof Indices To Metadata.vi" Type="VI" URL="../Oneof API/Add Oneof Indices To Metadata.vi"/>
-		<Item Name="Check For Nested Messages With Oneofs.vi" Type="VI" URL="../Oneof API/Check For Nested Messages With Oneofs.vi"/>
 		<Item Name="Copy PDC To VI.vi" Type="VI" URL="../Oneof API/Copy PDC To VI.vi"/>
 		<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Oneof API/Create LVClass for Oneof.vi"/>
 		<Item Name="Create OneOf Accessors.vi" Type="VI" URL="../Oneof API/Create OneOf Accessors.vi"/>
