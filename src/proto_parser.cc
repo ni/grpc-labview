@@ -26,6 +26,7 @@ namespace grpc_labview
         char isRepeated;
         char isInOneof;
         LStrHandle oneofContainerName;
+        char isMessageWithOneof;
         // TODO: Add isOptional Boolean
     };
 

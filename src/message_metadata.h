@@ -85,6 +85,7 @@ namespace grpc_labview
         bool isRepeated;
         bool isInOneof;
         LStrHandle oneofContainerName;
+        bool isMessageWithOneof;
     };
     #ifdef _PS_4
     #pragma pack (pop)
