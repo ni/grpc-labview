@@ -264,6 +264,7 @@
 			<Item Name="Update Bind Method Controls.vi" Type="VI" URL="../Top Level API/Update Bind Method Controls.vi"/>
 			<Item Name="Update Bind Methods.vi" Type="VI" URL="../Top Level API/Update Bind Methods.vi"/>
 			<Item Name="Update Bind RPC Template.vi" Type="VI" URL="../Top Level API/Update Bind RPC Template.vi"/>
+			<Item Name="Update Message Converter VIs in Unary Method Call.vi" Type="VI" URL="../Oneof API/Update Message Converter VIs in Unary Method Call.vi"/>
 			<Item Name="Update Method Accessors.vi" Type="VI" URL="../Top Level API/Update Method Accessors.vi"/>
 			<Item Name="Update Method Event Unbundlers.vi" Type="VI" URL="../Top Level API/Update Method Event Unbundlers.vi"/>
 			<Item Name="Update Method Getter.vi" Type="VI" URL="../Top Level API/Update Method Getter.vi"/>
@@ -351,6 +352,7 @@
 				<Item Name="Get SubVI References (by Pattern).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI References (by Pattern).vi"/>
 				<Item Name="Get SubVI References.vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI References.vi"/>
 				<Item Name="Get SubVI Terminal (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Get SubVI Terminal (by Name).vi"/>
+				<Item Name="Replace SubVI (by Name).vi" Type="VI" URL="../VI API/Block Diagram API/SubVI/Replace SubVI (by Name).vi"/>
 			</Item>
 			<Item Name="Tunnels" Type="Folder">
 				<Item Name="Connect Terminals.vi" Type="VI" URL="../VI API/Block Diagram API/Tunnels/Connect Terminals.vi"/>
