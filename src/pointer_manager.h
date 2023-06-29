@@ -72,7 +72,9 @@ namespace grpc_labview
         auto storedPtr = _registeredPointers.find(ptr);
         if (storedPtr == _registeredPointers.end())
         {
+#ifndef  NDEBUG
             std::cerr << "ERROR: THIS POINTER IS NOT REGISTERED" << std::endl;
+#endif // ! NDEBUG
             if (status != nullptr)
             {
                 *status = -1;
@@ -83,7 +85,9 @@ namespace grpc_labview
         std::shared_ptr<TDerivedType> derivedPtr = std::dynamic_pointer_cast<TDerivedType>(storedPtr->second);
         if (!derivedPtr)
         {
+#ifndef  NDEBUG
             std::cerr << "ERROR: CASTING POINTER TO MORE SPECIFIC TYPE FAILED" << std::endl;
+#endif // ! NDEBUG
             if (status != nullptr)
             {
                 *status = -1;
@@ -100,7 +104,9 @@ namespace grpc_labview
         std::lock_guard<std::mutex> lock(_mutex);
         if (!ptr)
         {
+#ifndef  NDEBUG
             std::cerr << "ERROR: CANNOT REGISTER A NULL POINTER" << std::endl;
+#endif // ! NDEBUG
             return nullptr;
         }
 
@@ -117,7 +123,9 @@ namespace grpc_labview
         std::lock_guard<std::mutex> lock(_mutex);
         if (!ptr)
         {
+#ifndef  NDEBUG
             std::cerr << "ERROR: CANNOT REGISTER A NULL POINTER" << std::endl;
+#endif // ! NDEBUG
             return nullptr;
         }
 
