@@ -24,6 +24,9 @@ namespace grpc_labview
         int32_t protobufIndex;
         int32_t type;
         char isRepeated;
+        char isInOneof;
+        LStrHandle oneofContainerName;
+        // TODO: Add isOptional Boolean
     };
 
     struct EnumFieldCluster
@@ -516,6 +519,18 @@ LIBRARY_EXPORT int LVMessageTypeUrl(Descriptor* descriptor, grpc_labview::LStrHa
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+LIBRARY_EXPORT int LVMessageHasOneof(Descriptor* descriptor, int* hasOneof)
+{
+    if (descriptor == nullptr)
+    {
+        return -1;
+    }
+    *hasOneof = descriptor->real_oneof_decl_count();
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int LVEnumName(EnumDescriptor* descriptor, grpc_labview::LStrHandle* name)
 {
     if (descriptor == nullptr)
@@ -645,6 +660,13 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
     SetLVString(&info->fieldName, field->name());
     info->protobufIndex = field->number();
     info->isRepeated = field->is_repeated();
+    info->isInOneof = (field->real_containing_oneof() != nullptr);
+    if (info->isInOneof)
+    {
+        SetLVString(&info->oneofContainerName, field->real_containing_oneof()->name());
+        //info->type = 17; // The numeric value comes from Message Element Type.ctl. TODO: Change this to an enum on the C++ side instead of 
+    }
+
     if (info->type == 99)
     {
         error = -2;

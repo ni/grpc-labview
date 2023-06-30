@@ -15,6 +15,7 @@
 			<Item Name="Set package_templatemessage.vi" Type="VI" URL="../RPC Messages/Set package_templatemessage.vi"/>
 			<Item Name="Get package_template_enum for Value.vi" Type="VI" URL="../RPC Messages/Get package_template_enum for Value.vi"/>
 			<Item Name="Get Value for package_template_enum.vi" Type="VI" URL="../RPC Messages/Get Value for package_template_enum.vi"/>
+			<Item Name="MessageConverterProxy.vim" Type="VI" URL="../RPC Messages/MessageConverterProxy.vim"/>
 		</Item>
 		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../RPC Messages/Register gRPC Messages.vi"/>
 	</Item>
