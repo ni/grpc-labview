@@ -246,7 +246,7 @@
 			<Item Name="Create Type Data Clusters.vi" Type="VI" URL="../Top Level API/Create Type Data Clusters.vi"/>
 			<Item Name="Delete Message Template Files.vi" Type="VI" URL="../Top Level API/Delete Message Template Files.vi"/>
 			<Item Name="Generate RPC Messages.vi" Type="VI" URL="../Top Level API/Generate RPC Messages.vi"/>
-			<Item Name="Get LV Object Type for Proto Field Type.vi" Type="VI" URL="../Top Level API/Get LV Object Type for Proto Field Type.vi"/>
+			<Item Name="Get LV Object Controls for Proto Field Type.vi" Type="VI" URL="../Top Level API/Get LV Object Controls for Proto Field Type.vi"/>
 			<Item Name="Get Message Placement Cluster.vi" Type="VI" URL="../Top Level API/Get Message Placement Cluster.vi"/>
 			<Item Name="Get Or Create Typedef.vi" Type="VI" URL="../Top Level API/Get Or Create Typedef.vi"/>
 			<Item Name="Set Enum Control Strings.vi" Type="VI" URL="../Top Level API/Set Enum Control Strings.vi"/>
@@ -255,6 +255,7 @@
 			<Item Name="Update Message Getter.vi" Type="VI" URL="../Top Level API/Update Message Getter.vi"/>
 			<Item Name="Update Message Setter.vi" Type="VI" URL="../Top Level API/Update Message Setter.vi"/>
 			<Item Name="Update Messages MetaData.vi" Type="VI" URL="../Top Level API/Update Messages MetaData.vi"/>
+			<Item Name="Get LV Object Indicators for Proto Field Type.vi" Type="VI" URL="../Top Level API/Get LV Object Indicators for Proto Field Type.vi"/>
 		</Item>
 		<Item Name="RPC Methods" Type="Folder">
 			<Item Name="Clear Methods Registration.vi" Type="VI" URL="../Top Level API/Clear Methods Registration.vi"/>
