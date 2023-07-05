@@ -137,6 +137,7 @@
 		<Item Name="Wire Between Unbundle And Bundle For Message Converter With Oneof.vi" Type="VI" URL="../Oneof API/Wire Between Unbundle And Bundle For Message Converter With Oneof.vi"/>
 		<Item Name="Wire Selected_Index To Case Selector.vi" Type="VI" URL="../Oneof API/Wire Selected_Index To Case Selector.vi"/>
 		<Item Name="Get Oneof Template Directory.vi" Type="VI" URL="../Oneof API/Get Oneof Template Directory.vi"/>
+		<Item Name="Create OneOf Field Accessors.vi" Type="VI" URL="../Oneof API/Create OneOf Field Accessors.vi"/>
 	</Item>
 	<Item Name="Project API" Type="Folder">
 		<Property Name="NI.SortType" Type="Int">3</Property>
