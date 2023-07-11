@@ -257,6 +257,11 @@
 			<Item Name="Update Message Setter.vi" Type="VI" URL="../Top Level API/Update Message Setter.vi"/>
 			<Item Name="Update Messages MetaData.vi" Type="VI" URL="../Top Level API/Update Messages MetaData.vi"/>
 			<Item Name="Get LV Object Indicators for Proto Field Type.vi" Type="VI" URL="../Top Level API/Get LV Object Indicators for Proto Field Type.vi"/>
+			<Item Name="Create Enum Accessor.vi" Type="VI" URL="../Top Level API/Create Enum Accessor.vi"/>
+			<Item Name="Create Enum Getter.vi" Type="VI" URL="../Top Level API/Create Enum Getter.vi"/>
+			<Item Name="Create Enum Setter.vi" Type="VI" URL="../Top Level API/Create Enum Setter.vi"/>
+			<Item Name="Update Enum Getter.vi" Type="VI" URL="../Top Level API/Update Enum Getter.vi"/>
+			<Item Name="Update Enum Setter.vi" Type="VI" URL="../Top Level API/Update Enum Setter.vi"/>
 		</Item>
 		<Item Name="RPC Methods" Type="Folder">
 			<Item Name="Clear Methods Registration.vi" Type="VI" URL="../Top Level API/Clear Methods Registration.vi"/>
