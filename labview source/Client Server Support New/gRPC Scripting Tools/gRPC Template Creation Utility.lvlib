@@ -55,6 +55,11 @@
 		<Item Name="Open LVClass.vi" Type="VI" URL="../Class API/Open LVClass.vi"/>
 		<Item Name="Ref to LVClass.vi" Type="VI" URL="../Class API/Ref to LVClass.vi"/>
 		<Item Name="Save LVClass.vi" Type="VI" URL="../Class API/Save LVClass.vi"/>
+		<Item Name="Create LV Class in Library.vi" Type="VI" URL="../Class API/Create LV Class in Library.vi"/>
+		<Item Name="Change Inheritance.vi" Type="VI" URL="../Class API/Change Inheritance.vi"/>
+		<Item Name="MemberTemplate.vi" Type="VI" URL="../Class API/MemberTemplate.vi"/>
+		<Item Name="Create Dynamic Member VI In LVClass.vi" Type="VI" URL="../Class API/Create Dynamic Member VI In LVClass.vi"/>
+		<Item Name="Create VI Override.vi" Type="VI" URL="../Class API/Create VI Override.vi"/>
 	</Item>
 	<Item Name="Error Handling" Type="Folder">
 		<Property Name="NI.SortType" Type="Int">0</Property>
@@ -300,6 +305,10 @@
 			<Item Name="Create Server Library from Template.vi" Type="VI" URL="../Top Level API/Create Server Library from Template.vi"/>
 			<Item Name="Delete Template Files.vi" Type="VI" URL="../Top Level API/Delete Template Files.vi"/>
 			<Item Name="Update Template Files.vi" Type="VI" URL="../Top Level API/Update Template Files.vi"/>
+			<Item Name="Add RPC Memeber VIs.vi" Type="VI" URL="../Top Level API/Add RPC Memeber VIs.vi"/>
+			<Item Name="Generate ServiceImpl Class.vi" Type="VI" URL="../Top Level API/Generate ServiceImpl Class.vi"/>
+			<Item Name="Create Child Service Class.vi" Type="VI" URL="../Top Level API/Create Child Service Class.vi"/>
+			<Item Name="Create Child Class Override VIs.vi" Type="VI" URL="../Top Level API/Create Child Class Override VIs.vi"/>
 		</Item>
 	</Item>
 	<Item Name="TypeDefs" Type="Folder">
