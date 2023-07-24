@@ -1,0 +1,18 @@
+[
+  {
+    "input": { "name": "Yash" },
+    "output": { "message": "Hello Yash!!!" }
+  },
+  {
+    "input": { "name": "Sachin" },
+    "output": { "message": "Hello Sachin!!!" }
+  },
+  {
+    "input": { "name": "Shivangi" },
+    "output": { "message": "Hello Shivangi!!!" }
+  },
+  {
+    "input": { "name": "Chakith" },
+    "output": { "message": "Hello Chakith!!!" }
+  }
+]

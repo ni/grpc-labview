@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package Greeter;
+
+service GreeterService {
+  rpc GetFeature(req) returns (res) {}
+}
+
+message res {
+  int32 res_latitude = 1;
+  oneof res_oneof {
+    int32 res_int32 = 2;
+    int64 res_int64 = 3;
+    uint32 res_uint32 = 4;
+    uint64 res_uint64 = 5;
+    sint32 res_sint32 = 6;
+    sint64 res_sint64 = 7;
+    fixed32 res_fixed32 = 8;    // fixed32 -> uint32 (always encoded using 4 bytes)
+    fixed64 res_fixed64 = 9;    // fixed64 -> uint64 (always encoded using 8 bytes)
+    sfixed32 res_sfixed32 = 10; // sfixed32 -> int32 (same as above but using two's complement representation)
+    sfixed64 res_sfixed64 = 11; // sfixed64 -> int64 (,,)
+    float res_float = 12;
+    double res_double = 13;
+    bool res_bool = 14;
+    string res_string = 15;
+    bytes res_bytes = 16;
+  }
+}
+
+message req {
+  int32 req_latitude = 1;
+  oneof req_oneof {
+    int32 req_int32 = 2;
+    int64 req_int64 = 3;
+    uint32 req_uint32 = 4;
+    uint64 req_uint64 = 5;
+    sint32 req_sint32 = 6;
+    sint64 req_sint64 = 7;
+    fixed32 req_fixed32 = 8;    // fixed32 -> uint32 (always encoded using 4 bytes)
+    fixed64 req_fixed64 = 9;    // fixed64 -> uint64 (always encoded using 8 bytes)
+    sfixed32 req_sfixed32 = 10; // sfixed32 -> int32 (same as above but using two's complement representation)
+    sfixed64 req_sfixed64 = 11; // sfixed64 -> int64 (,,)
+    float req_float = 12;
+    double req_double = 13;
+    bool req_bool = 14;
+    string req_string = 15;
+    bytes req_bytes = 16;
+  }
+}
