@@ -49,7 +49,7 @@ endif()
 #----------------------------------------------------------------------
 # Include generated *.pb.h files
 #----------------------------------------------------------------------
-include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src" "./third_party/grpc")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src" "./third_party/grpc" "${CMAKE_CURRENT_BINARY_DIR}/gens")
 
 #----------------------------------------------------------------------
 # LabVIEW support for grpc and protobuf
@@ -67,6 +67,8 @@ add_library(labview_grpc_server SHARED
   src/any_support.cc
   src/unpacked_fields.cc
   src/grpc_load.cc
+  src/lv_proto_server_reflection_service.cc
+  src/lv_proto_server_reflection_plugin.cc
   )
 target_link_libraries(labview_grpc_server
    ${_REFLECTION}

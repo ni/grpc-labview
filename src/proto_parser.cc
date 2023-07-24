@@ -308,15 +308,20 @@ LIBRARY_EXPORT int LVGetMessages(grpc_labview::LVProtoParser* parser, grpc_labvi
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void AddTopLevelEnums(grpc_labview::LVProtoParser* parser, std::set<const google::protobuf::EnumDescriptor*>& allEnums)
+void AddTopLevelEnums(const google::protobuf::FileDescriptor& descriptor, std::set<const google::protobuf::EnumDescriptor*>& allEnums)
 {
-    // Get global enums defined in the proto file.
+    // Get global enums defined in the proto file and other imported proto files.
     // FileDescriptor is being used to fetch these enum descriptors.
-    const FileDescriptor* descriptor = parser->m_FileDescriptor;
-    int topLevelEnumCount = descriptor->enum_type_count();
+    auto noOfImportedFiles = descriptor.dependency_count();
+    for (int x = 0; x < noOfImportedFiles; ++x)
+    {
+        AddTopLevelEnums(*descriptor.dependency(x), allEnums);
+    }
+
+    int topLevelEnumCount = descriptor.enum_type_count();
     for (int x = 0; x < topLevelEnumCount; ++x)
     {
-        auto current = descriptor->enum_type(x);
+        auto current = descriptor.enum_type(x);
         allEnums.emplace(current);
     }
 }
@@ -359,7 +364,7 @@ LIBRARY_EXPORT int LVGetEnums(grpc_labview::LVProtoParser* parser, grpc_labview:
     }
 
     std::set<const google::protobuf::EnumDescriptor*> allEnums;
-    AddTopLevelEnums(parser, allEnums);
+    AddTopLevelEnums(*(parser->m_FileDescriptor), allEnums);
     AddNestedEnums(messages, allEnums);    
 
     auto count = allEnums.size();
@@ -531,6 +536,15 @@ LIBRARY_EXPORT int LVEnumTypeUrl(EnumDescriptor* descriptor, grpc_labview::LStrH
     }
     SetLVString(name, descriptor->full_name());
     return 0;
+}
+
+LIBRARY_EXPORT void SerializeReflectionInfo(grpc_labview::LVProtoParser *parser, grpc_labview::LStrHandle *outbuffer)
+{
+    FileDescriptorProto fProto;
+    parser->m_FileDescriptor->CopyTo(&fProto);
+    std::string output;
+    fProto.SerializeToString(&output);
+    grpc_labview::SetLVString(outbuffer, output);
 }
 
 //---------------------------------------------------------------------
