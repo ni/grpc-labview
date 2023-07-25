@@ -89,3 +89,18 @@ Follow the below steps to add more tests in the testing suite.
 9. Inside the `testcases` folder, create a json file for each rpc method defined in the protofile. The name of the json file will be same as the rpc method's name. These will contain the testcases that the testing suite will run corresponding to each rpc method.
 
 10. Create a python client that will interact with the LabVIEW gRPC Server. The name of the client will be like `<test_name>_client.py`.
+
+### TODO:
+
+1. Add the following tests:
+
+   - Streaming tests (client streaming, server streaming, bi-directional streaming)
+   - Reflection tests
+   - Client tests (currently we are only testing gRPC Server)
+   - Modification scenarios (do some modification after first generation and then generate and test again)
+     - Add/Remove/modify RPC
+     - Add/Remove/modify services
+     - Add/Remove/modify messages
+   - Backward compatibility tests (server generated without the current feature but needs to work with the changes to the current features)
+   - Imported proto-file tests
+   - Multiple RPC methods tests
