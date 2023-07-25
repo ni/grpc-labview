@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package Greeter;
+
+service GreeterService {
+  rpc GetFeature(req) returns (res) {}
+}
+
+message req {
+  int32 req_id = 1;
+  oneof req_oneof {
+    MessageA message_a = 2;
+    double req_price = 3;
+  }
+}
+
+message res {
+  int32 res_id = 1;
+  oneof res_oneof {
+    MessageA message_a = 2;
+    double res_price = 3;
+  }
+}
+
+message MessageA {
+  oneof oneof_a {
+    string data_a1 = 1;
+    string data_a2 = 2;
+  }
+}
