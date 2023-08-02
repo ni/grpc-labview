@@ -41,9 +41,13 @@
 		<Item Name="Hide Loader.vi" Type="VI" URL="../Animation API/Hide Loader.vi"/>
 	</Item>
 	<Item Name="Class API" Type="Folder">
+		<Item Name="Change Inheritance.vi" Type="VI" URL="../Class API/Change Inheritance.vi"/>
 		<Item Name="Clear Private Data Cluster.vi" Type="VI" URL="../Class API/Clear Private Data Cluster.vi"/>
 		<Item Name="Copy Class Item.vi" Type="VI" URL="../Class API/Copy Class Item.vi"/>
+		<Item Name="Create Dynamic VI In Class.vi" Type="VI" URL="../Class API/Create Dynamic VI In Class.vi"/>
 		<Item Name="Create LVClass Copy.vi" Type="VI" URL="../Class API/Create LVClass Copy.vi"/>
+		<Item Name="Create LVClass in Library.vi" Type="VI" URL="../Class API/Create LVClass in Library.vi"/>
+		<Item Name="Create VI Override.vi" Type="VI" URL="../Class API/Create VI Override.vi"/>
 		<Item Name="Delete Item from LVClass.vi" Type="VI" URL="../Class API/Delete Item from LVClass.vi"/>
 		<Item Name="Delete LVClass Item.vi" Type="VI" URL="../Class API/Delete LVClass Item.vi"/>
 		<Item Name="Find Class in ProjectItem.vi" Type="VI" URL="../Class API/Find Class in ProjectItem.vi"/>
@@ -52,14 +56,10 @@
 		<Item Name="Get LVClass Item Path.vi" Type="VI" URL="../Class API/Get LVClass Item Path.vi"/>
 		<Item Name="Get Static Methods in LVClass.vi" Type="VI" URL="../Class API/Get Static Methods in LVClass.vi"/>
 		<Item Name="Get VIRef from ClassItem.vi" Type="VI" URL="../Class API/Get VIRef from ClassItem.vi"/>
+		<Item Name="MemberTemplate.vi" Type="VI" URL="../Class API/MemberTemplate.vi"/>
 		<Item Name="Open LVClass.vi" Type="VI" URL="../Class API/Open LVClass.vi"/>
 		<Item Name="Ref to LVClass.vi" Type="VI" URL="../Class API/Ref to LVClass.vi"/>
 		<Item Name="Save LVClass.vi" Type="VI" URL="../Class API/Save LVClass.vi"/>
-		<Item Name="Create LV Class in Library.vi" Type="VI" URL="../Class API/Create LV Class in Library.vi"/>
-		<Item Name="Change Inheritance.vi" Type="VI" URL="../Class API/Change Inheritance.vi"/>
-		<Item Name="MemberTemplate.vi" Type="VI" URL="../Class API/MemberTemplate.vi"/>
-		<Item Name="Create Dynamic Member VI In LVClass.vi" Type="VI" URL="../Class API/Create Dynamic Member VI In LVClass.vi"/>
-		<Item Name="Create VI Override.vi" Type="VI" URL="../Class API/Create VI Override.vi"/>
 	</Item>
 	<Item Name="Error Handling" Type="Folder">
 		<Property Name="NI.SortType" Type="Int">0</Property>
@@ -297,6 +297,13 @@
 			<Item Name="Update RPC Template Accessors.vi" Type="VI" URL="../Top Level API/Update RPC Template Accessors.vi"/>
 			<Item Name="Update Server Start Async.vi" Type="VI" URL="../Top Level API/Update Server Start Async.vi"/>
 			<Item Name="Update SyncMethod Event Structure.vi" Type="VI" URL="../Top Level API/Update SyncMethod Event Structure.vi"/>
+			<Item Name="Drop RPC Methods in SyncMethod Event Structure.vi" Type="VI" URL="../Top Level API/Drop RPC Methods in SyncMethod Event Structure.vi"/>
+			<Item Name="Find RPC VI For Event.vi" Type="VI" URL="../Top Level API/Find RPC VI For Event.vi"/>
+			<Item Name="Get Event SubDiagram Terminals.vi" Type="VI" URL="../Top Level API/Get Event SubDiagram Terminals.vi"/>
+			<Item Name="Get gRPC Id Terminal For Event SubDiagram.vi" Type="VI" URL="../Top Level API/Get gRPC Id Terminal For Event SubDiagram.vi"/>
+			<Item Name="Drop RPC SubVI in Event Case.vi" Type="VI" URL="../Top Level API/Drop RPC SubVI in Event Case.vi"/>
+			<Item Name="Get Event Case Terminals For RPC VI connection.vi" Type="VI" URL="../Top Level API/Get Event Case Terminals For RPC VI connection.vi"/>
+			<Item Name="Get Src-Sink Terminal by Name.vi" Type="VI" URL="../Top Level API/Get Src-Sink Terminal by Name.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
 			<Item Name="Add Server Library to Project.vi" Type="VI" URL="../Top Level API/Add Server Library to Project.vi"/>
