@@ -144,11 +144,7 @@ namespace grpc_labview {
             {
                 clusterOffset = AlignClusterOffset(clusterOffset, element->type, element->isRepeated);
                 element->clusterOffset = clusterOffset;
-                int elementSize = 0;
-                if (element->isInOneof)
-                    elementSize = sizeof(void*); // TODO: Make this change in ClusterElementSize later.
-                else
-                    elementSize = ClusterElementSize(element->type, element->isRepeated);
+                int elementSize = ClusterElementSize(element->type, element->isRepeated);
                 clusterOffset += elementSize;
                 if (maxAlignmentRequirement < elementSize)
                 {
