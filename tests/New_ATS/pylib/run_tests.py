@@ -72,7 +72,7 @@ def run_test(test_config):
 
     # 7. Generate python grpc classes
     generate_command = ' '.join([
-        "python -m grpc_tools.protoc",
+        f"{test_config['python_path']} -m grpc_tools.protoc",
         f"--proto_path={test_config['test_folder']}",
         f"--python_out={test_config['test_folder']}",
         f"--pyi_out={test_config['test_folder']}",
@@ -123,6 +123,7 @@ def main():
             test_config['test_suite_pylib_folder'] = pathlib.Path(__file__).parent.absolute()
             test_config['test_suite_folder'] = test_config['test_suite_pylib_folder'].parent.absolute()
             test_config['tests_folder'] = test_config['test_suite_folder'] / 'Tests'
+            test_config['python_path'] = test_config['test_suite_folder'] / 'venv' / "Scripts" / "python.exe"
             tests_folder = test_config['tests_folder']
             # locals
             for test_name in test['name']:
