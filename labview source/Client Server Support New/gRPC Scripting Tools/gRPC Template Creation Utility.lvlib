@@ -114,6 +114,10 @@
 			<Item Name="GenOneOf_Set_Accessor.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GenOneOf_Set_Accessor.vi"/>
 			<Item Name="GetOneOfAccessorList.vi" Type="VI" URL="../Oneof API/Accessor Helpers/GetOneOfAccessorList.vi"/>
 		</Item>
+		<Item Name="OneOf Constants" Type="Folder">
+			<Item Name="Get Constant.vi" Type="VI" URL="../Oneof API/OneOf Constants/Get Constant.vi"/>
+			<Item Name="OneOfConstantsEnum.ctl" Type="VI" URL="../Oneof API/OneOf Constants/OneOfConstantsEnum.ctl"/>
+		</Item>
 		<Item Name="Add Oneof Indices To Metadata.vi" Type="VI" URL="../Oneof API/Add Oneof Indices To Metadata.vi"/>
 		<Item Name="Copy PDC To VI.vi" Type="VI" URL="../Oneof API/Copy PDC To VI.vi"/>
 		<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Oneof API/Create LVClass for Oneof.vi"/>
