@@ -45,7 +45,8 @@ def generate_server(test_config):
         f"-VIPath {main_wrapper_vi_path}",
         f"{test_config['proto_path']}",
         f"{test_config['project_path']}",
-        f"{test_config['gen_type']}"])
+        f"{test_config['gen_type']}"
+    ])
     run_command(CLI_command)
 
 
@@ -81,7 +82,8 @@ def run_test(test_config):
         f'-LabVIEWPath "{test_config["labview_path"]}"',
         '-OperationName RunVI',
         f"-VIPath {runservice_wrapper_vi_path}",
-        f"{test_config['test_folder']}"])
+        f"{test_config['test_folder']}"
+    ])
 
     # TODO Check whether labviewCLI is installed or not before running the command
     run_command(CLI_command)
@@ -107,7 +109,9 @@ def run_test(test_config):
     client_py_path = test_config['test_folder'] / str(test_config['test_name'] + '_client.py')
     run_client_command = ' '.join([
         str(test_config['test_suite_folder'] / 'RunPythonClient.bat'),
-        str(client_py_path)])
+        str(client_py_path),
+        test_config['test_name']
+    ])
     output = run_command(run_client_command)
     print(output)
     FAILED += count_failed_testcases(output)
