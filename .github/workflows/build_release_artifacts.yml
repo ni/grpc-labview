@@ -40,6 +40,13 @@ jobs:
       - name: Run CI Tests
         run: python ${{runner.workspace}}\grpc-labview\tests\run_tests.py
 
+      - name: Get current time
+        uses: josStorer/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYY-MM-DD_hh-mm-ss
+          utcOffset: "+05:30"
+
       - name: Run New Testing Suite's Tests
         run: python ${{runner.workspace}}\grpc-labview\tests\New_ATS\pylib\run_tests.py
 
@@ -53,22 +60,21 @@ jobs:
         name: Download Artifacts if logs exists in New_ATS
         uses: actions/upload-artifact@v3
         with:
-          name: Download New_ATS Test Results
+          name: Download New_ATS Test Results ${{ steps.current-time.outputs.formattedTime }}
           path: ${{runner.workspace}}/grpc-labview/tests/New_ATS/logs
 
-      - name: Show artifacts
+      - if: ${{always() && steps.check_files.outputs.files_exists == 'true' }}
+        name: Show artifacts
         run: |
-          @echo off
-          set "directory=${{runner.workspace}}/grpc-labview/tests/New_ATS/logs"
+          $directory = "${{runner.workspace}}/grpc-labview/tests/New_ATS/logs"
 
-          for %%F in ("%directory%\*") do (
-              if exist "%%F" (
-                  echo Contents of %%~nxF:
-                  type "%%F"
-                  echo.
-                  echo.
-              )
-          )
+          Get-ChildItem -Path $directory | ForEach-Object {
+              if ($_.PSIsContainer -eq $false) {
+                  Write-Host "Contents of $($_.Name):"
+                  Get-Content $_.FullName
+                  Write-Host ""
+              }
+          }
 
       - if: startsWith(github.ref, 'refs/tags/v')
         name: Create Draft Release
