@@ -43,6 +43,33 @@ jobs:
       - name: Run New Testing Suite's Tests
         run: python ${{runner.workspace}}\grpc-labview\tests\New_ATS\pylib\run_tests.py
 
+      - name: Check whether logs folder exists in New_ATS
+        id: check_files
+        uses: andstor/file-existence-action@v2.0.0
+        with:
+          files: "${{runner.workspace}}/grpc-labview/tests/New_ATS/logs/*.xml"
+
+      - if: ${{always() && steps.check_files.outputs.files_exists == 'true' }}
+        name: Download Artifacts if logs exists in New_ATS
+        uses: actions/upload-artifact@v3
+        with:
+          name: Download New_ATS Test Results
+          path: ${{runner.workspace}}/grpc-labview/tests/New_ATS/logs
+
+      - name: Show artifacts
+        run: |
+          @echo off
+          set "directory=${{runner.workspace}}/grpc-labview/tests/New_ATS/logs"
+
+          for %%F in ("%directory%\*") do (
+              if exist "%%F" (
+                  echo Contents of %%~nxF:
+                  type "%%F"
+                  echo.
+                  echo.
+              )
+          )
+
       - if: startsWith(github.ref, 'refs/tags/v')
         name: Create Draft Release
         id: create_release
