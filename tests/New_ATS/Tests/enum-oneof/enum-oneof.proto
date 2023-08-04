@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package Greeter;
+
+service GreeterService {
+  rpc GetFeature(req) returns (res) {}
+}
+
+enum Color {
+  RED = 0;
+  GREEN = 1;
+  BLUE = 2;
+}
+
+message res {
+  int32 res_latitude = 1;
+  oneof res_oneof {
+    Color res_color = 2;
+    string res_name = 3;    
+  }
+}
+
+message req {
+  int32 req_latitude = 1;
+  oneof req_oneof {
+    string req_name = 2;    
+    Color req_color = 3;
+  }
+}

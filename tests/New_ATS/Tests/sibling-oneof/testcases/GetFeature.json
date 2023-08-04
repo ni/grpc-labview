@@ -1,0 +1,98 @@
+[
+  {
+    "input": {
+      "req_latitude": 100,
+      "message_a": { "data_a1": "Yash" }
+    },
+    "output": {
+      "res_latitude": 101,
+      "message_a": { "data_a1": "Yash_response" },
+      "res_oneof": {}
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 470,
+      "req_oneof": {
+        "req_id": 120
+      }
+    },
+    "output": {
+      "res_latitude": 471,
+      "res_oneof": {
+        "res_id": 121
+      },
+      "message_a": { "data_a1": "_response" }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 470,
+      "req_oneof": {
+        "req_name": "Abcd"
+      }
+    },
+    "output": {
+      "res_latitude": 471,
+      "res_oneof": {
+        "res_name": "Abcd_response"
+      },
+      "message_a": { "data_a1": "_response" }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 470,
+      "message_a": {
+        "data_a1": "xyz"
+      },
+      "req_oneof": {
+        "req_id": 120
+      }
+    },
+    "output": {
+      "res_latitude": 471,
+      "res_oneof": {
+        "res_id": 121
+      },
+      "message_a": {
+        "data_a1": "xyz_response"
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 470,
+      "message_a": {
+        "data_a1": "xyz"
+      },
+      "req_oneof": {
+        "req_name": "Abcd"
+      }
+    },
+    "output": {
+      "res_latitude": 471,
+      "res_oneof": {
+        "res_name": "Abcd_response"
+      },
+      "message_a": {
+        "data_a1": "xyz_response"
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "message_a": {
+        "data_a1": "xyz"
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "message_a": {
+        "data_a1": "xyz_response"
+      },
+      "res_oneof": {}
+    }
+  }
+]

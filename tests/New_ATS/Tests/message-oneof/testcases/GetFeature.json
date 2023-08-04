@@ -1,0 +1,34 @@
+[
+  {
+    "input": {
+      "req_id": 100,
+      "req_oneof": {
+        "req_name": "Yash"
+      }
+    },
+    "output": {
+      "res_id": 2,
+      "res_oneof": {
+        "res_name": "Yash_response"
+      }
+    }
+  },
+  {
+    "input": {
+      "req_id": 100,
+      "req_oneof": {
+        "message_a": {
+          "data_a1": "Hello"
+        }
+      }
+    },
+    "output": {
+      "res_id": 3,
+      "res_oneof": {
+        "message_a": {
+          "data_a1": "Hello_nested"
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_name": "Yash"
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_name": "Yash_response"
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 470,
+      "req_oneof": {
+        "req_num": 120
+      }
+    },
+    "output": {
+      "res_latitude": 471,
+      "res_oneof": {
+        "res_num": 121
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 470,
+      "req_oneof": {
+        "flag": false
+      }
+    },
+    "output": {
+      "res_latitude": 471,
+      "res_oneof": {
+        "flag": true
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 470,
+      "req_oneof": {
+        "price": 100.5
+      }
+    },
+    "output": {
+      "res_latitude": 471,
+      "res_oneof": {
+        "price": 101.5
+      }
+    }
+  }
+]

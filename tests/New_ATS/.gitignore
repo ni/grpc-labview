@@ -1,0 +1,11 @@
+*.lvproj
+venv
+*.lvlpv
+*.aliases
+*.pyi
+*_pb2_grpc.py
+*_pb2.py
+*.aliases
+*.lvproj
+*.lvlps
+Generated_server
