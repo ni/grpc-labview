@@ -18,7 +18,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    // There's an enum equivalent to this on the LabVIEW side: Message Element Type.ctl
+    // Enum equivalent to this on the LabVIEW side: Message Element Type.ctl
     enum class LVMessageMetadataType
     {
         Int32Value = 0,
@@ -71,14 +71,13 @@ namespace grpc_labview
     // The struct gets used while creating message metadata. The .ctl constants array (Register Message
     //  Metadata.vi) from the LabVIEW side is parsed and those values are written to the instances of this
     //  struct. This is for parsing fields inside a message.
-    // What does the C++ layer do with this information now?
-    // It writes the data into another struct very similar to this one: MessageElementMetadata
+    // The C++ layer writes the data into another struct very similar to this one: MessageElementMetadata
     #ifdef _PS_4
     #pragma pack (push, 1)
     #endif
     struct LVMesageElementMetadata
     {
-        LStrHandle fieldName; // Change order in typedef?
+        LStrHandle fieldName;
         LStrHandle embeddedMessageName;
         int protobufIndex;
         int valueType;
@@ -131,8 +130,7 @@ namespace grpc_labview
     // The struct gets used while creating message metadata. The .ctl constants array (Register Message
     //  Metadata.vi) from the LabVIEW side is parsed and those values are written to the instances of this
     //  struct.
-    // What does the C++ layer do with this information now?
-    // It writes the data into another struct very similar to this one: MessageMetadata
+    // The C++ layer writes the data into another struct very similar to this one: MessageMetadata
     struct LVMessageMetadata2
     {
         int version;

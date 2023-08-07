@@ -29,7 +29,7 @@ namespace grpc_labview {
                     value = v.second;
                     break;
                 }
-            }            
+            }
             if (value != nullptr)
             {
                 if (fieldMetadata->isInOneof)
