@@ -138,6 +138,7 @@
 		<Item Name="Wire Selected_Index To Case Selector.vi" Type="VI" URL="../Oneof API/Wire Selected_Index To Case Selector.vi"/>
 		<Item Name="Get Oneof Template Directory.vi" Type="VI" URL="../Oneof API/Get Oneof Template Directory.vi"/>
 		<Item Name="Create OneOf Field Accessors.vi" Type="VI" URL="../Oneof API/Create OneOf Field Accessors.vi"/>
+		<Item Name="Delete Oneof Template Files.vi" Type="VI" URL="../Oneof API/Delete Oneof Template Files.vi"/>
 	</Item>
 	<Item Name="Project API" Type="Folder">
 		<Property Name="NI.SortType" Type="Int">3</Property>
