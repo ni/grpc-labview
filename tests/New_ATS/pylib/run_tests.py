@@ -34,17 +34,26 @@ def run_test(test_config):
     check_for_pre_requisites(test_config)
 
     # 2. Generate the server
+    print ("Generating server code for " + test_config['test_name'])
     generate_server(test_config)
 
     # 3. Copy the 'Run Service.vi' from the Impl folder to the Generated_server folder
     run_service_impl_path = test_config['impl'] / 'Run Service.vi'
     run_service_gen_path = test_config['generated_server'] / 'Run Service.vi'
-    shutil.copyfile(run_service_impl_path, run_service_gen_path)
+    if pathlib.Path(test_config['generated_server']).exists():
+        print (f"Copying 'Run Service.vi' to {run_service_gen_path}")
+        shutil.copyfile(run_service_impl_path, run_service_gen_path)
+    else:
+        print (f"{test_config['generated_server']} not generated")
 
     # 4. Copy the 'Start Sync.vi' from the Impl folder to the "Generated_server/RPC Service/GreeterService/Server API" folder
     start_sync_impl_path = test_config['impl'] / 'Start Sync.vi'
     start_sync_gen_path = test_config['generated_server'] / 'RPC Service' / 'GreeterService' / 'Server API' / 'Start Sync.vi'
-    shutil.copyfile(start_sync_impl_path, start_sync_gen_path)
+    if pathlib.Path(test_config['generated_server']).exists():
+        print (f"Copying 'Start Sync.vi' to {start_sync_gen_path}")
+        shutil.copyfile(start_sync_impl_path, start_sync_gen_path)
+    else:
+        print (f"{test_config['generated_server']} not generated")
 
     # 5. Quit LabVIEW if it is running
     subprocess.run(['taskkill', '/f', '/im', 'labview.exe'])
@@ -62,6 +71,7 @@ def run_test(test_config):
         f"{test_config['test_folder']}"])
 
     # TODO Check whether labviewCLI is installed or not before running the command
+    print ("Running the server on the LabVIEW side")
     subprocess.run(CLI_command)
 
     # 7. Create python virtual environment
@@ -79,6 +89,7 @@ def run_test(test_config):
         f"--grpc_python_out={test_config['test_folder']}",
         f"{test_config['test_name']}.proto"
     ])
+    print ("Compiling proto file")
     subprocess.run(generate_command)
 
     # 9. Call the TestServer() from test_folder/test_name_client.py and get the return value
@@ -86,6 +97,7 @@ def run_test(test_config):
     run_command = ' '.join([
         str(test_config['test_suite_folder'] / 'RunPythonClient.bat'),
         str(client_py_path)])
+    print ("Running python client")
     return_value = subprocess.run(run_command)
 
     if return_value.returncode == 0:
