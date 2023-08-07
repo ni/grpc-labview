@@ -23,6 +23,7 @@ message res {
 }
 
 message MessageA {
+  string anotherField = 3;
   oneof oneof_a {
     string data_a1 = 1;
     string data_a2 = 2;

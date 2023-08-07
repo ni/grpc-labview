@@ -20,7 +20,8 @@
         "message_a": {
           "oneof_a": {
             "data_a1": "Yash"
-          }
+          },
+          "anotherField": "bleh"
         }
       }
     },
@@ -30,7 +31,8 @@
         "message_a": {
           "oneof_a": {
             "data_a1": "Yash_response"
-          }
+          },
+          "anotherField": "bleh_response"
         }
       }
     }
@@ -42,7 +44,8 @@
         "message_a": {
           "oneof_a": {
             "data_a2": "Ankush"
-          }
+          },
+          "anotherField": "bleh"
         }
       }
     },
@@ -52,7 +55,8 @@
         "message_a": {
           "oneof_a": {
             "data_a2": "Ankush_response"
-          }
+          },
+          "anotherField": "bleh_response"
         }
       }
     }

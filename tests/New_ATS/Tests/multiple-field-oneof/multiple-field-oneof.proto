@@ -11,8 +11,8 @@ message res {
     oneof res_oneof {
         string res_name = 2;
         int32 res_num = 3;
-        bool flag = 4;
         float price = 5;
+        bool flag = 4;
     }
 }
 
@@ -21,7 +21,7 @@ message req {
     oneof req_oneof {
         string req_name = 2;
         int32 req_num = 3;
-        bool flag = 4;
         float price = 5;
+        bool flag = 4;
     }
 }

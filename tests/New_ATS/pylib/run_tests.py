@@ -70,9 +70,9 @@ def run_test(test_config):
     ])
     subprocess.run(run_command)
 
-    # 7. Generate python grpc classes
+    # 8. Generate python grpc classes
     generate_command = ' '.join([
-        "python -m grpc_tools.protoc",
+        f"{test_config['python_path']} -m grpc_tools.protoc",
         f"--proto_path={test_config['test_folder']}",
         f"--python_out={test_config['test_folder']}",
         f"--pyi_out={test_config['test_folder']}",
@@ -81,7 +81,7 @@ def run_test(test_config):
     ])
     subprocess.run(generate_command)
 
-    # 8. Call the TestServer() from test_folder/test_name_client.py and get the return value
+    # 9. Call the TestServer() from test_folder/test_name_client.py and get the return value
     client_py_path = test_config['test_folder'] / str(test_config['test_name'] + '_client.py')
     run_command = ' '.join([
         str(test_config['test_suite_folder'] / 'RunPythonClient.bat'),
@@ -93,10 +93,10 @@ def run_test(test_config):
     else:
         print(f'{test_config["test_name"]} failed')
 
-    # 8. Quit LabVIEW if it is running
+    # 9. Quit LabVIEW if it is running
     subprocess.run(['taskkill', '/f', '/im', 'labview.exe'])
 
-    # 9. Delete python grpc generated files
+    # 10. Delete python grpc generated files
     # for filename in os.listdir(test_config['test_folder']):
     #     if "pb2" in filename:
     #         os.remove(test_config['test_folder'] / filename)
@@ -123,6 +123,7 @@ def main():
             test_config['test_suite_pylib_folder'] = pathlib.Path(__file__).parent.absolute()
             test_config['test_suite_folder'] = test_config['test_suite_pylib_folder'].parent.absolute()
             test_config['tests_folder'] = test_config['test_suite_folder'] / 'Tests'
+            test_config['python_path'] = test_config['test_suite_folder'] / 'venv' / "Scripts" / "python.exe"
             tests_folder = test_config['tests_folder']
             # locals
             for test_name in test['name']:
