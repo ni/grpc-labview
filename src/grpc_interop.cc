@@ -82,13 +82,15 @@ namespace grpc_labview
             for (int x = 0; x < (*lvMetadata->elements)->cnt; ++x, ++lvElement)
             {
                 auto element = std::make_shared<MessageElementMetadata>(metadataOwner);
+                element->fieldName = GetLVString(lvElement->fieldName);
                 element->embeddedMessageName = GetLVString(lvElement->embeddedMessageName);
                 element->protobufIndex = lvElement->protobufIndex;
                 element->type = (LVMessageMetadataType)lvElement->valueType;
                 element->isRepeated = lvElement->isRepeated;
                 metadata->_elements.push_back(element);
                 metadata->_mappedElements.emplace(element->protobufIndex, element);
-
+                element->isInOneof = lvElement->isInOneof;
+                element->oneofContainerName = GetLVString(lvElement->oneofContainerName);
             }
         }
         return metadata;

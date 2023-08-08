@@ -3,11 +3,31 @@ import pathlib
 import shutil
 import subprocess
 import os
+import re
+
+FAILED = 0
+
+def count_failed_testcases(test_summary):
+    pattern = r'(\d+) failed(?=, \d+ passed)'
+    matches = re.findall(pattern, test_summary)
+    count = 0
+    if matches:
+        count = int(matches[-1])
+    return count
+
+
+def run_command(command):
+    output = subprocess.run(command, capture_output=True, text=True)
+    if output.stderr:
+        raise Exception(output.stderr)
+    return output.stdout
+
 
 def check_for_pre_requisites(test_config):
     # check if LabVIEW CLI is installed
     if not test_config["lvcli_path"].exists():
         raise Exception(f'LabVIEW CLI is not installed at {test_config["lvcli_path"]}')
+
 
 def generate_server(test_config):
     # 1. Delete the Generated_server folder. TODO: Take a boolean in the config to say whether the build should be a clean build
@@ -25,11 +45,14 @@ def generate_server(test_config):
         f"-VIPath {main_wrapper_vi_path}",
         f"{test_config['proto_path']}",
         f"{test_config['project_path']}",
-        f"{test_config['gen_type']}"])
-    subprocess.run(CLI_command)
+        f"{test_config['gen_type']}"
+    ])
+    run_command(CLI_command)
 
 
 def run_test(test_config):
+    global FAILED
+
     # 1. Check for pre_requisites
     check_for_pre_requisites(test_config)
 
@@ -56,7 +79,7 @@ def run_test(test_config):
         print (f"{test_config['generated_server']} not generated")
 
     # 5. Quit LabVIEW if it is running
-    subprocess.run(['taskkill', '/f', '/im', 'labview.exe'])
+    run_command(['taskkill', '/f', '/im', 'labview.exe'])
 
     # 6. Start Run Service.vi from command prompt by launching labview.exe form lv_folder with the following arguments:
     # this must be non-blocking
@@ -68,17 +91,18 @@ def run_test(test_config):
         f'-LabVIEWPath "{test_config["labview_path"]}"',
         '-OperationName RunVI',
         f"-VIPath {runservice_wrapper_vi_path}",
-        f"{test_config['test_folder']}"])
+        f"{test_config['test_folder']}"
+    ])
 
     # TODO Check whether labviewCLI is installed or not before running the command
     print ("Running the server on the LabVIEW side")
-    subprocess.run(CLI_command)
+    run_command(CLI_command)
 
     # 7. Create python virtual environment
-    run_command = ' '.join([
+    CLI_command = ' '.join([
         str(test_config['test_suite_folder'] / 'CreatePythonVirtualEnv.bat')
     ])
-    subprocess.run(run_command)
+    run_command(CLI_command)
 
     # 8. Generate python grpc classes
     generate_command = ' '.join([
@@ -90,23 +114,22 @@ def run_test(test_config):
         f"{test_config['test_name']}.proto"
     ])
     print ("Compiling proto file")
-    subprocess.run(generate_command)
+    run_command(generate_command)
 
     # 9. Call the TestServer() from test_folder/test_name_client.py and get the return value
     client_py_path = test_config['test_folder'] / str(test_config['test_name'] + '_client.py')
-    run_command = ' '.join([
+    run_client_command = ' '.join([
         str(test_config['test_suite_folder'] / 'RunPythonClient.bat'),
-        str(client_py_path)])
+        str(client_py_path),
+        test_config['test_name']
+    ])
     print ("Running python client")
-    return_value = subprocess.run(run_command)
+    output = run_command(run_client_command)
+    print(output)
+    FAILED += count_failed_testcases(output)
 
-    if return_value.returncode == 0:
-        print(f'{test_config["test_name"]} passed')
-    else:
-        print(f'{test_config["test_name"]} failed')
-
-    # 9. Quit LabVIEW if it is running
-    subprocess.run(['taskkill', '/f', '/im', 'labview.exe'])
+    # 10. Quit LabVIEW if it is running
+    run_command(['taskkill', '/f', '/im', 'labview.exe'])
 
     # 10. Delete python grpc generated files
     # for filename in os.listdir(test_config['test_folder']):
@@ -116,6 +139,7 @@ def run_test(test_config):
 
 # Desc: Run the tests in the testlist.json file
 def main():
+    global FAILED
     # read the list of tests from testlist.json
     test_list_json_path = pathlib.Path(__file__).parent.absolute() / 'testlist.json'
     with open(test_list_json_path) as f:
@@ -149,7 +173,8 @@ def main():
                 test_config['impl'] = test_config['test_folder'] / 'Impl'
                 test_config['gen_type'] = gen_type
                 run_test(test_config)
-
+            if FAILED:
+                raise Exception(f"{FAILED} test cases have failed. Please review the above results")            
 
 if __name__ == '__main__':
     main()

@@ -10,3 +10,4 @@ venv
 *.lvlps
 Generated_server
 Generated_client
+logs
