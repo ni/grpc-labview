@@ -16,7 +16,7 @@ def get_GetFeature_output(test_input):
     response_dict = {}
     response_dict['res_latitude'] = response.res_latitude
     response_dict['res_oneof'] = {}  
-    response_dict['res_oneof']['res_color'] = enum_oneof_pb2.Color(response.res_color) if response.HasField('res_color') else None
+    response_dict['res_oneof']['res_color'] = enum_oneof_pb2.Color.Name(response.res_color) if response.HasField('res_color') else None
     response_dict['res_oneof']['res_name'] = response.res_name if response.HasField('res_name') else None
 
     return(response_dict)

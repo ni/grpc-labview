@@ -57,17 +57,26 @@ def run_test(test_config):
     check_for_pre_requisites(test_config)
 
     # 2. Generate the server
+    print ("Generating server code for " + test_config['test_name'])
     generate_server(test_config)
 
     # 3. Copy the 'Run Service.vi' from the Impl folder to the Generated_server folder
     run_service_impl_path = test_config['impl'] / 'Run Service.vi'
     run_service_gen_path = test_config['generated_server'] / 'Run Service.vi'
-    shutil.copyfile(run_service_impl_path, run_service_gen_path)
+    if pathlib.Path(test_config['generated_server']).exists():
+        print (f"Copying 'Run Service.vi' to {run_service_gen_path}")
+        shutil.copyfile(run_service_impl_path, run_service_gen_path)
+    else:
+        print (f"{test_config['generated_server']} not generated")
 
     # 4. Copy the 'Start Sync.vi' from the Impl folder to the "Generated_server/RPC Service/GreeterService/Server API" folder
     start_sync_impl_path = test_config['impl'] / 'Start Sync.vi'
     start_sync_gen_path = test_config['generated_server'] / 'RPC Service' / 'GreeterService' / 'Server API' / 'Start Sync.vi'
-    shutil.copyfile(start_sync_impl_path, start_sync_gen_path)
+    if pathlib.Path(test_config['generated_server']).exists():
+        print (f"Copying 'Start Sync.vi' to {start_sync_gen_path}")
+        shutil.copyfile(start_sync_impl_path, start_sync_gen_path)
+    else:
+        print (f"{test_config['generated_server']} not generated")
 
     # 5. Quit LabVIEW if it is running
     run_command(['taskkill', '/f', '/im', 'labview.exe'])
@@ -86,6 +95,7 @@ def run_test(test_config):
     ])
 
     # TODO Check whether labviewCLI is installed or not before running the command
+    print ("Running the server on the LabVIEW side")
     run_command(CLI_command)
 
     # 7. Create python virtual environment
@@ -94,7 +104,7 @@ def run_test(test_config):
     ])
     run_command(CLI_command)
 
-    # 7. Generate python grpc classes
+    # 8. Generate python grpc classes
     generate_command = ' '.join([
         f"{test_config['python_path']} -m grpc_tools.protoc",
         f"--proto_path={test_config['test_folder']}",
@@ -103,23 +113,25 @@ def run_test(test_config):
         f"--grpc_python_out={test_config['test_folder']}",
         f"{test_config['test_name']}.proto"
     ])
+    print ("Compiling proto file")
     run_command(generate_command)
 
-    # 8. Call the TestServer() from test_folder/test_name_client.py
+    # 9. Call the TestServer() from test_folder/test_name_client.py and get the return value
     client_py_path = test_config['test_folder'] / str(test_config['test_name'] + '_client.py')
     run_client_command = ' '.join([
         str(test_config['test_suite_folder'] / 'RunPythonClient.bat'),
         str(client_py_path),
         test_config['test_name']
     ])
+    print ("Running python client")
     output = run_command(run_client_command)
     print(output)
     FAILED += count_failed_testcases(output)
 
-    # 8. Quit LabVIEW if it is running
+    # 10. Quit LabVIEW if it is running
     run_command(['taskkill', '/f', '/im', 'labview.exe'])
 
-    # 9. Delete python grpc generated files
+    # 10. Delete python grpc generated files
     # for filename in os.listdir(test_config['test_folder']):
     #     if "pb2" in filename:
     #         os.remove(test_config['test_folder'] / filename)
