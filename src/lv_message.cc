@@ -281,6 +281,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     const char *LVMessage::ParseUInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {    
+        static MyAllocator<LVUInt64MessageValue> myAllocator;
         if (fieldInfo.isRepeated)
         {
             auto v = std::make_shared<LVRepeatedUInt64MessageValue>(index);
@@ -291,8 +292,9 @@ namespace grpc_labview
         {
             uint64_t result;
             ptr = ReadUINT64(ptr, &result);
-            auto v = std::make_shared<LVUInt64MessageValue>(index, result);
-            _values.emplace(index, v);
+            // auto v = std::make_shared<LVUInt64MessageValue>(index, result);
+            auto v = std::allocate_shared<LVUInt64MessageValue>(myAllocator, index, result);
+            _values.emplace(index, std::move(v));
         }
         return ptr;
     }
@@ -352,7 +354,7 @@ namespace grpc_labview
             }
             else
             {
-                v = std::static_pointer_cast<LVRepeatedStringMessageValue>((*it).second);
+                v = std::static_pointer_cast<LVRepeatedStringMessageValue>((*it));
             }
             ptr -= 1;
             do {
@@ -536,7 +538,7 @@ namespace grpc_labview
                 }
                 else
                 {
-                    v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
+                    v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it));
                 }
                 ptr += 1;
                 auto nestedMessage = std::make_shared<LVMessage>(metadata);
@@ -562,9 +564,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     google::protobuf::uint8 *LVMessage::_InternalSerialize(google::protobuf::uint8 *target, google::protobuf::io::EpsCopyOutputStream *stream) const
     {
-        for (auto e : _values)
+        // for (auto e : _values)
+        // {
+        //     target = e->Serialize(target, stream);
+        // }
+        for (size_t i = 0; i != _values._values.size(); i++)
         {
-            target = e.second->Serialize(target, stream);
+            if (_values._values[i].get() == nullptr)
+                continue;
+            target = _values._values[i]->Serialize(target, stream);
         }
         return target;
     }
@@ -575,9 +583,15 @@ namespace grpc_labview
     {
         size_t totalSize = 0;
 
-        for (auto e : _values)
+        // for (auto e : _values)
+        // {
+        //     totalSize += e->ByteSizeLong();
+        // }
+        for (size_t i = 0; i != _values._values.size(); i++)
         {
-            totalSize += e.second->ByteSizeLong();
+            if (_values._values[i].get() == nullptr)
+                continue;
+            totalSize += _values._values[i]->ByteSizeLong();
         }
         int cachedSize = ToCachedSize(totalSize);
         SetCachedSize(cachedSize);
@@ -660,6 +674,65 @@ namespace grpc_labview
     {
         assert(false); // not expected to be called
         return google::protobuf::Metadata();
+    }
+
+    // ---
+    // VectorValuesMap
+    // ---
+    VectorValuesMapIterator::VectorValuesMapIterator(size_t index, const VectorValuesMap* valuesMap): _index(index), _valuesMap(valuesMap) { }
+    
+    std::shared_ptr<LVMessageValue> VectorValuesMapIterator::operator*(void) {
+        return _valuesMap->_values[_index];
+    }
+    std::shared_ptr<LVMessageValue> VectorValuesMapIterator::operator->(void) {
+        return _valuesMap->_values[_index];
+    }
+    VectorValuesMapIterator VectorValuesMapIterator::operator++() {
+        while (_index != _valuesMap->_values.size() && _valuesMap->_values[_index].get() != nullptr) ++_index;
+        return *this;
+    }
+    bool VectorValuesMapIterator::operator==(VectorValuesMapIterator rhs) {
+        return _index == rhs._index;
+    }
+    bool VectorValuesMapIterator::operator!=(VectorValuesMapIterator rhs) {
+        return _index != rhs._index;
+    }
+
+
+    VectorValuesMapIterator VectorValuesMap::begin() const {
+        return VectorValuesMapIterator(0, this);
+    }
+
+    VectorValuesMapIterator VectorValuesMap::end() const {
+        return VectorValuesMapIterator(_values.size(), this);
+    }
+
+    void VectorValuesMap::emplace(size_t index, std::shared_ptr<grpc_labview::LVMessageValue> value) {
+        static size_t maxSize = 0;
+        // Hack: heuristically increase the map size.
+        if (maxSize < _values.size()) {
+            maxSize = _values.size();
+        } else {
+            _values.resize(maxSize);
+        }
+
+        if (_values.size() <= index) {
+            // Asymptotically increase the vector size
+            // TODO: Find a way to avoid asymptotic resize
+            _values.resize(index * 2);
+        }
+        _values[index] = std::move(value);
+    }
+
+    VectorValuesMapIterator VectorValuesMap::find(size_t index) {
+        if (index < _values.size() && _values[index].get() != nullptr) {
+            return VectorValuesMapIterator(index, this);
+        }
+        return end();
+    }
+
+    void VectorValuesMap::clear() {
+        _values.clear();
     }
 }
 
