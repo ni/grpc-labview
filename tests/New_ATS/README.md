@@ -107,3 +107,4 @@ Follow the below steps to add more tests in the testing suite.
    - Oneof only inside a nested message
    - Multi services tests
    - Abort tests
+   - Add tests for repeated fields (arrays)
