@@ -69,6 +69,7 @@ namespace grpc_labview
 
         const grpc::protobuf::DescriptorPool* descriptor_pool_;
         grpc::protobuf::DescriptorPool other_pool;
+        const grpc::protobuf::FileDescriptor* other_pool_file_descriptor;
         std::vector<std::string>* services_;
     };
 }
