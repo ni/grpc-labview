@@ -316,6 +316,10 @@
 			<Item Name="Create Server Library from Template.vi" Type="VI" URL="../Top Level API/Create Server Library from Template.vi"/>
 			<Item Name="Delete Template Files.vi" Type="VI" URL="../Top Level API/Delete Template Files.vi"/>
 			<Item Name="Update Template Files.vi" Type="VI" URL="../Top Level API/Update Template Files.vi"/>
+			<Item Name="Add RPC Memeber VIs.vi" Type="VI" URL="../Top Level API/Add RPC Memeber VIs.vi"/>
+			<Item Name="Create Child Class Override VIs.vi" Type="VI" URL="../Top Level API/Create Child Class Override VIs.vi"/>
+			<Item Name="Create Child Service Class.vi" Type="VI" URL="../Top Level API/Create Child Service Class.vi"/>
+			<Item Name="Generate ServiceImpl Class.vi" Type="VI" URL="../Top Level API/Generate ServiceImpl Class.vi"/>
 		</Item>
 	</Item>
 	<Item Name="TypeDefs" Type="Folder">
