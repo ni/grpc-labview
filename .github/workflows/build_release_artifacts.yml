@@ -9,58 +9,90 @@ jobs:
     name: Download and Build artifacts
     runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
-    - uses: actions/download-artifact@v3
-      id: download_artifacts
-      with:
-        path: ${{ runner.temp }}\grpc-labview-artifacts
+      - uses: actions/download-artifact@v3
+        id: download_artifacts
+        with:
+          path: ${{ runner.temp }}\grpc-labview-artifacts
 
-    - name: Stage Artifacts
-      run:
-        python ${{runner.workspace}}\grpc-labview\build-it\stage_artifacts.py --downloaded_path ${{ steps.download_artifacts.outputs.download-path }} --staging_path ${{ runner.temp }}\grpc-labview-staged-artifacts
-    
-    - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-      name: Build VI Packages for Testing
-      run:
-        python ${{runner.workspace}}\grpc-labview\build-it\build.py --target All --pathToBinaries ${{ runner.temp }}\grpc-labview-staged-artifacts\TopLevelDlls
+      - name: Stage Artifacts
+        run: python ${{runner.workspace}}\grpc-labview\build-it\stage_artifacts.py --downloaded_path ${{ steps.download_artifacts.outputs.download-path }} --staging_path ${{ runner.temp }}\grpc-labview-staged-artifacts
 
-    - if: startsWith(github.ref, 'refs/tags/v')
-      name: Build VI Packages for release
-      run: 
-        python ${{runner.workspace}}\grpc-labview\build-it\build.py --libraryVersion ${{github.ref_name}} --target All --pathToBinaries ${{ runner.temp }}\grpc-labview-staged-artifacts\TopLevelDlls 
+      - if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        name: Build VI Packages for Testing
+        run: python ${{runner.workspace}}\grpc-labview\build-it\build.py --target All --pathToBinaries ${{ runner.temp }}\grpc-labview-staged-artifacts\TopLevelDlls
 
-    - if: startsWith(github.ref, 'refs/tags/v')
-      name: Zip Release Artifacts
-      run: |
-        cd "${{runner.workspace}}/grpc-labview/labview source/Builds"
-        tar -cavf grpc-labview.zip *.vip
+      - if: startsWith(github.ref, 'refs/tags/v')
+        name: Build VI Packages for release
+        run: python ${{runner.workspace}}\grpc-labview\build-it\build.py --libraryVersion ${{github.ref_name}} --target All --pathToBinaries ${{ runner.temp }}\grpc-labview-staged-artifacts\TopLevelDlls
 
-    - name: Run CI Tests
-      run: 
-        python ${{runner.workspace}}\grpc-labview\tests\run_tests.py
-    
-    - if: startsWith(github.ref, 'refs/tags/v')
-      name: Create Draft Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        name: Verison ${{ github.ref }}
-        draft: true
+      - if: startsWith(github.ref, 'refs/tags/v')
+        name: Zip Release Artifacts
+        run: |
+          cd "${{runner.workspace}}/grpc-labview/labview source/Builds"
+          tar -cavf grpc-labview.zip *.vip
 
-    - if: startsWith(github.ref, 'refs/tags/v')
-      name: Upload Release Artifacts to Draft Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
+      - name: Run CI Tests
+        run: python ${{runner.workspace}}\grpc-labview\tests\run_tests.py
+
+      - name: Get current time
+        uses: josStorer/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYY-MM-DD_hh-mm-ss
+          utcOffset: "+05:30"
+
+      - name: Run New Testing Suite's Tests
+        run: python ${{runner.workspace}}\grpc-labview\tests\New_ATS\pylib\run_tests.py
+
+      - name: Check whether logs folder exists in New_ATS
+        id: check_files
+        uses: andstor/file-existence-action@v2.0.0
+        with:
+          files: "${{runner.workspace}}/grpc-labview/tests/New_ATS/logs/*.xml"
+
+      - if: ${{always() && steps.check_files.outputs.files_exists == 'true' }}
+        name: Download New_ATS Test Results if logs folder exists
+        uses: actions/upload-artifact@v3
+        with:
+          name: New_ATS Test Results ${{ steps.current-time.outputs.formattedTime }}
+          path: ${{runner.workspace}}/grpc-labview/tests/New_ATS/logs
+
+      - if: ${{always() && steps.check_files.outputs.files_exists == 'true' }}
+        name: Show New_ATS Test Results
+        run: |
+          $directory = "${{runner.workspace}}/grpc-labview/tests/New_ATS/logs"
+
+          Get-ChildItem -Path $directory | ForEach-Object {
+              if ($_.PSIsContainer -eq $false) {
+                  Write-Host "Contents of $($_.Name):"
+                  Get-Content $_.FullName
+                  Write-Host ""
+              }
+          }
+
+      - if: startsWith(github.ref, 'refs/tags/v')
+        name: Create Draft Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          name: Verison ${{ github.ref }}
+          draft: true
+
+      - if: startsWith(github.ref, 'refs/tags/v')
+        name: Upload Release Artifacts to Draft Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{runner.workspace}}/grpc-labview/labview source/Builds/grpc-labview.zip
           asset_name: grpc-labview.zip

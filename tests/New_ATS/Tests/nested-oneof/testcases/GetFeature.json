@@ -1,0 +1,64 @@
+[
+  {
+    "input": {
+      "req_id": 100,
+      "req_oneof": {
+        "req_price": 200.1
+      }
+    },
+    "output": {
+      "res_id": 101,
+      "res_oneof": {
+        "res_price": 201.1
+      }
+    }
+  },
+  {
+    "input": {
+      "req_id": 470,
+      "req_oneof": {
+        "message_a": {
+          "oneof_a": {
+            "data_a1": "Yash"
+          },
+          "anotherField": "bleh"
+        }
+      }
+    },
+    "output": {
+      "res_id": 471,
+      "res_oneof": {
+        "message_a": {
+          "oneof_a": {
+            "data_a1": "Yash_response"
+          },
+          "anotherField": "bleh_response"
+        }
+      }
+    }
+  },
+  {
+    "input": {
+      "req_id": 560,
+      "req_oneof": {
+        "message_a": {
+          "oneof_a": {
+            "data_a2": "Ankush"
+          },
+          "anotherField": "bleh"
+        }
+      }
+    },
+    "output": {
+      "res_id": 561,
+      "res_oneof": {
+        "message_a": {
+          "oneof_a": {
+            "data_a2": "Ankush_response"
+          },
+          "anotherField": "bleh_response"
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,184 @@
+[
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_int32": 50
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_int32": 51
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_int64": 50
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_int64": 51
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_uint32": 50
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_uint32": 51
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_uint64": 50
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_uint64": 51
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_sint32": 50
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_sint32": 51
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_sint64": 50
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_sint64": 51
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_fixed32": 50
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_fixed32": 51
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_fixed64": 50
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_fixed64": 51
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_float": 50.5
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_float": 51.5
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_double": 50.5
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_double": 51.5
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_bool": false
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_bool": true
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_string": "Labview"
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_string": "Labview_response"
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_bytes": "Hello"
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_bytes": "Hello"
+      }
+    }
+  }
+]

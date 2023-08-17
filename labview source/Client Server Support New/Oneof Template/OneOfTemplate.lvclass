@@ -20,6 +20,15 @@
 	<Item Name="OneOfTemplate.ctl" Type="Class Private Data" URL="OneOfTemplate.ctl">
 		<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 	</Item>
+	<Item Name="FlatToRich.vim" Type="VI" URL="../FlatToRich.vim">
+		<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!#T!!!!"A!%!!!!$5!+!!&gt;/&gt;7VF=GFD!":!5!!"!!%.4X6U=(6U1WRV=X2F=A!;1&amp;!!!1!"%5^V&gt;("V&gt;%.M&gt;8.U:8*5?8"F!":!5!!"!!%-37ZQ&gt;82$&lt;(6T&gt;'6S!!"5!0!!$!!!!!!!!!!#!!!!!Q!!!!!!!!!!!!!!"!)!!(A!!!!!!!!!!!!!!!!!!!U&amp;!!!!!!!!#A!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#!!!!!!"!!5!!!!!</Property>
+		<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
+		<Property Name="NI.ClassItem.Flags" Type="Int">16777218</Property>
+		<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
+		<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
+		<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
+		<Property Name="NI.ClassItem.State" Type="Int">1342713856</Property>
+	</Item>
 	<Item Name="GetActiveFieldIndex.vi" Type="VI" URL="../GetActiveFieldIndex.vi">
 		<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!&amp;(!!!!#A!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!"F!!Q!317.U;8:F)%:J:7RE)%FO:'6Y!!!S1(!!(A!!&amp;R60&lt;G60:F2F&lt;8"M982F,GRW9WRB=X-!%5^O:5^G6'6N='RB&gt;'5A&lt;X6U!#"!5!!$!!!!!1!#%W6S=G^S)'FO)#BO&lt;S"F=H*P=CE!-E"Q!"Y!!"=64WZF4W:5:7VQ&lt;'&amp;U:3ZM&gt;G.M98.T!""0&lt;G60:F2F&lt;8"M982F)'FO!!"B!0!!$!!$!!1!"1!'!!1!"!!%!!1!"Q!%!!1!#!)!!(A!!!U)!!!!!!!!#1!!!!U,!!!!!!!!!!!!!!!!!!!!!!!!#!!!!!!!!!!!!!!!%!!!$1!!!!Q!!!!!!!!!!!!!!1!*!!!!!!</Property>
 		<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
@@ -56,7 +65,7 @@
 		<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
 		<Property Name="NI.ClassItem.State" Type="Int">1342710272</Property>
 	</Item>
-	<Item Name="Message_ConvertClassToCluster.vim" Type="VI" URL="../Message_ConvertClassToCluster.vim">
+	<Item Name="RichToFlat.vim" Type="VI" URL="../RichToFlat.vim">
 		<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!#T!!!!"A!%!!!!$5!+!!&gt;/&gt;7VF=GFD!":!5!!"!!%.4X6U=(6U1WRV=X2F=A!;1&amp;!!!1!"%5^V&gt;("V&gt;%.M&gt;8.U:8*5?8"F!":!5!!"!!%-37ZQ&gt;82$&lt;(6T&gt;'6S!!"5!0!!$!!!!!!!!!!#!!!!!Q!!!!!!!!!!!!!!"!)!!(A!!!!!!!!!!!!!!!!!!!U&amp;!!!!!!!!#A!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#!!!!!!"!!5!!!!!</Property>
 		<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
 		<Property Name="NI.ClassItem.Flags" Type="Int">16777216</Property>
@@ -64,15 +73,6 @@
 		<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
 		<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
 		<Property Name="NI.ClassItem.State" Type="Int">1107820544</Property>
-	</Item>
-	<Item Name="Message_ConvertClusterToClass.vim" Type="VI" URL="../Message_ConvertClusterToClass.vim">
-		<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!#T!!!!"A!%!!!!$5!+!!&gt;/&gt;7VF=GFD!":!5!!"!!%.4X6U=(6U1WRV=X2F=A!;1&amp;!!!1!"%5^V&gt;("V&gt;%.M&gt;8.U:8*5?8"F!":!5!!"!!%-37ZQ&gt;82$&lt;(6T&gt;'6S!!"5!0!!$!!!!!!!!!!#!!!!!Q!!!!!!!!!!!!!!"!)!!(A!!!!!!!!!!!!!!!!!!!U&amp;!!!!!!!!#A!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#!!!!!!"!!5!!!!!</Property>
-		<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
-		<Property Name="NI.ClassItem.Flags" Type="Int">16777218</Property>
-		<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
-		<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
-		<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
-		<Property Name="NI.ClassItem.State" Type="Int">1342713856</Property>
 	</Item>
 	<Item Name="SetTemplate.vi" Type="VI" URL="../SetTemplate.vi">
 		<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!%O!!!!#A!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!$*!=!!?!!!8&amp;5^O:5^G6'6N='RB&gt;'5O&lt;(:D&lt;'&amp;T=Q!24WZF4W:5:7VQ&lt;'&amp;U:3"P&gt;81!)%"1!!-!!!!"!!)4:8*S&lt;X)A;7YA+'ZP)'6S=G^S+1!.1!-!"V.F&gt;&amp;^797Q!-E"Q!"Y!!"=64WZF4W:5:7VQ&lt;'&amp;U:3ZM&gt;G.M98.T!""0&lt;G60:F2F&lt;8"M982F)'FO!!"5!0!!$!!$!!1!"!!&amp;!!1!"!!%!!1!"A!%!!=!#!)!!(A!!!U)!!!!!!!!!!!!!!U,!!!!!!!!!!!!!!!!!!!!!!!!#!!!!!!!!!!1!!!!%A!!!!!"!!E!!!!!</Property>

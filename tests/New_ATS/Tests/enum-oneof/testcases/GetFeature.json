@@ -1,0 +1,34 @@
+[
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_name": "Enum",
+        "req_color": null
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_name": "Enum_response",
+        "res_color": null
+      }
+    }
+  },
+  {
+    "input": {
+      "req_latitude": 100,
+      "req_oneof": {
+        "req_name": null,
+        "req_color": "GREEN"
+      }
+    },
+    "output": {
+      "res_latitude": 101,
+      "res_oneof": {
+        "res_name": null,
+        "res_color": "GREEN"
+      }
+    }
+  }
+]
