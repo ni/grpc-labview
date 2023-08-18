@@ -64,13 +64,21 @@
 				<Property Name="NI.ClassItem.State" Type="Int">276832256</Property>
 			</Item>
 			<Item Name="Write Server RPC Methods.vi" Type="VI" URL="../Accessor/Write Server RPC Methods.vi">
+<<<<<<< HEAD
 				<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!*;!!!!$1!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!%2!=!!?!!!?(&amp;.F=H:J9W6/97VF)&amp;2F&lt;8"M982F,GRW9WRB=X-!!"J4;7&gt;O97R(:7ZF=G&amp;U&lt;X*4:8*W;7.F)'^V&gt;!!!)%"1!!-!!!!"!!)4:8*S&lt;X)A;7YA+'ZP)'6S=G^S+1""!0(&lt;01`V!!!!!BRH=H"D,7RW=X6Q='^S&gt;#VS:7RF98.F,GRW&lt;'FC#G&gt;S='.*:#ZD&gt;'Q!%5!)!!:H5F"$;71!!%Y!]1!!!!!!!!!#('&gt;S='-N&lt;(:T&gt;8"Q&lt;X*U,8*F&lt;'6B=W5O&lt;(:M;7)3:V*11UFE)%.M&gt;8.U:8)O9X2M!":!5!!"!!=):8:F&lt;H1A;7Y!!#*!=!!:!!%!#":Q97.L97&gt;F8X.F=H:J9W6@&lt;76U;'^E!!":!0%!!!!!!!!!!BR4:8*W;7.F4G&amp;N:3"5:7VQ&lt;'&amp;U:3ZM&gt;G.M98.T%V.F=H:F=C"H5F"$)&amp;6&amp;=SZD&gt;'Q!)%"1!!%!#2*4:8*W:8)A5F"$)%VF&gt;'BP:(-!!%*!=!!?!!!?(&amp;.F=H:J9W6/97VF)&amp;2F&lt;8"M982F,GRW9WRB=X-!!"F4;7&gt;O97R(:7ZF=G&amp;U&lt;X*4:8*W;7.F)'FO!'%!]!!-!!-!"!!%!!5!"!!%!!1!"!!'!!1!#A!,!A!!?!!!$1A!!!!!!!!!!!!!$1M!!!!!!!!!!!!!!!!!!!!!!!!)!!!!!!!!!"!!!!!3!!!.!!!!$!!!!!!!!!!!!!!"!!Q!!!!!</Property>
+=======
+				<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!*;!!!!$1!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!%2!=!!?!!!?(&amp;.F=H:J9W6/97VF)&amp;2F&lt;8"M982F,GRW9WRB=X-!!"J4;7&gt;O97R(:7ZF=G&amp;U&lt;X*4:8*W;7.F)'^V&gt;!!!)%"1!!-!!!!"!!)4:8*S&lt;X)A;7YA+'ZP)'6S=G^S+1""!0(&lt;01`V!!!!!BRH=(*D,7RW=X6Q='^S&gt;#VS:7RF98.F,GRW&lt;'FC#G&gt;S='.*:#ZD&gt;'Q!%5!)!!:H5F"$;71!!%Y!]1!!!!!!!!!#('&gt;Q=G-N&lt;(:T&gt;8"Q&lt;X*U,8*F&lt;'6B=W5O&lt;(:M;7)3:V*11UFE)%.M&gt;8.U:8)O9X2M!":!5!!"!!=):8:F&lt;H1A;7Y!!#*!=!!:!!%!#":Q97.L97&gt;F8X.F=H:J9W6@&lt;76U;'^E!!":!0%!!!!!!!!!!BR4:8*W;7.F4G&amp;N:3"5:7VQ&lt;'&amp;U:3ZM&gt;G.M98.T%V.F=H:F=C"H5F"$)&amp;6&amp;=SZD&gt;'Q!)%"1!!%!#2*4:8*W:8)A5F"$)%VF&gt;'BP:(-!!%*!=!!?!!!?(&amp;.F=H:J9W6/97VF)&amp;2F&lt;8"M982F,GRW9WRB=X-!!"F4;7&gt;O97R(:7ZF=G&amp;U&lt;X*4:8*W;7.F)'FO!'%!]!!-!!-!"!!%!!5!"!!%!!1!"!!'!!1!#A!,!A!!?!!!$1A!!!!!!!!!!!!!$1M!!!!!!!!!!!!!!!!!!!!!!!!)!!!!!!!!!"!!!!!3!!!.!!!!$!!!!!!!!!!!!!!"!!Q!!!!!</Property>
+>>>>>>> master
 				<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
 				<Property Name="NI.ClassItem.Flags" Type="Int">16777216</Property>
 				<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
 				<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
 				<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
+<<<<<<< HEAD
 				<Property Name="NI.ClassItem.State" Type="Int">11018240</Property>
+=======
+				<Property Name="NI.ClassItem.State" Type="Int">10493952</Property>
+>>>>>>> master
 			</Item>
 		</Item>
 	</Item>
@@ -78,22 +86,37 @@
 		<Item Name="package_service_method" Type="Folder">
 			<Item Name="Messaging" Type="Folder">
 				<Item Name="Get package_service_method Request.vi" Type="VI" URL="../RPC Methods/Get package_service_method Request.vi">
+<<<<<<< HEAD
 					<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!'D!!!!#Q!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!!N!#1!%:'&amp;U91!!61$R!!!!!!!!!!)75W6S&gt;GFD:3"5:7VQ&lt;'&amp;U:3ZM&gt;GRJ9BNQ97.L97&gt;F8X2F&lt;8"M982F&lt;76T=W&amp;H:3ZD&gt;'Q!'E"1!!%!"1R.:8.T97&gt;F)%2B&gt;'%!!%5!]&gt;M^$`5!!!!#('&gt;S='-N&lt;(:T&gt;8"Q&lt;X*U,8*F&lt;'6B=W5O&lt;(:M;7)+:X*Q9UFE,G.U&lt;!!61!A!#G&gt;35%.J:#"P&gt;81!!#"!5!!$!!!!!1!#%W6S=G^S)'FO)#BO&lt;S"F=H*P=CE!11$RWTU0^1!!!!)=:X*Q9SVM&gt;H.V=("P=H1N=G6M:7&amp;T:3ZM&gt;GRJ9AJH=H"D371O9X2M!"&amp;!#!!':V*11WFE!!"5!0!!$!!$!!1!"A!(!!1!"!!%!!1!#!!%!!1!#1-!!(A!!!U)!!!!!!!!#1!!!!E!!!!!!!!!!!!!!!!!!!!!!!!!#A!!!!!!!!!!!!!!#!!!!!!"!!I!!!!!</Property>
+=======
+					<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!%&gt;!!!!#1!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!!N!#1!%:'&amp;U91!!61$R!!!!!!!!!!)75W6S&gt;GFD:3"5:7VQ&lt;'&amp;U:3ZM&gt;GRJ9BNQ97.L97&gt;F8X2F&lt;8"M982F&lt;76T=W&amp;H:3ZD&gt;'Q!'E"1!!%!"1R.:8.T97&gt;F)%2B&gt;'%!!#"!5!!$!!!!!1!#%W6S=G^S)'FO)#BO&lt;S"F=H*P=CE!6!$Q!!Q!!Q!%!!9!"!!%!!1!"!!%!!=!"!!%!!1$!!"Y!!!.#!!!!!!!!!E!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!I!!!!!!!!!!!!!!!!!!!!!!1!)!!!!!!</Property>
+>>>>>>> master
 					<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
 					<Property Name="NI.ClassItem.Flags" Type="Int">37748736</Property>
 					<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
 					<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
 					<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
+<<<<<<< HEAD
 					<Property Name="NI.ClassItem.State" Type="Int">1084240400</Property>
 				</Item>
 				<Item Name="Set package_service_method Response.vi" Type="VI" URL="../RPC Methods/Set package_service_method Response.vi">
 					<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!&amp;U!!!!#Q!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!"2!)1Z4&gt;(*F97VJ&lt;G=`)#B'+1!!)%"1!!-!!!!"!!)4:8*S&lt;X)A;7YA+'ZP)'6S=G^S+1!,1!E!"'2B&gt;'%!!&amp;5!]1!!!!!!!!!#&amp;F.F=H:J9W5A6'6N='RB&gt;'5O&lt;(:M;7)&lt;='&amp;D;W&amp;H:6^U:7VQ&lt;'&amp;U:7VF=X.B:W5O9X2M!"J!5!!"!!=-476T=W&amp;H:3"%982B!!"$!0(&lt;01`V!!!!!BRH=H"D,7RW=X6Q='^S&gt;#VS:7RF98.F,GRW&lt;'FC#G&gt;S='.*:#ZD&gt;'Q!%U!)!!FH5F"$;71A;7Y!6!$Q!!Q!!Q!%!!1!"!!%!!1!"!!&amp;!!9!"!!)!!E$!!"Y!!!.#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#A!!!!I!!!!!!!!!%A!!!")!!!!!!1!+!!!!!!</Property>
+=======
+					<Property Name="NI.ClassItem.State" Type="Int">1342710288</Property>
+				</Item>
+				<Item Name="Set package_service_method Response.vi" Type="VI" URL="../RPC Methods/Set package_service_method Response.vi">
+					<Property Name="NI.ClassItem.ConnectorPane" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!&amp;U!!!!#Q!-1#%'=X2B&gt;(6T!!!,1!-!"'.P:'5!!""!-0````]'=W^V=G.F!!!71&amp;!!!Q!!!!%!!AFF=H*P=C"P&gt;81!"!!!!"2!)1Z4&gt;(*F97VJ&lt;G=`)#B'+1!!)%"1!!-!!!!"!!)4:8*S&lt;X)A;7YA+'ZP)'6S=G^S+1!,1!E!"'2B&gt;'%!!&amp;5!]1!!!!!!!!!#&amp;F.F=H:J9W5A6'6N='RB&gt;'5O&lt;(:M;7)&lt;='&amp;D;W&amp;H:6^U:7VQ&lt;'&amp;U:7VF=X.B:W5O9X2M!"J!5!!"!!=-476T=W&amp;H:3"%982B!!"$!0(&lt;01`V!!!!!BRH=H"D,7RW=X6Q='^S&gt;#VS:7RF98.F,GRW&lt;'FC#G&gt;S='.*:#ZD&gt;'Q!%U!)!!FH5F"$;71A;7Y!6!$Q!!Q!!Q!%!!1!"!!%!!1!"!!&amp;!!9!"!!)!!E$!!"Y!!!.#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#A!!!!I!!!!!!!!!%!!!!")!!!!!!1!+!!!!!!</Property>
+>>>>>>> master
 					<Property Name="NI.ClassItem.ExecutionSystem" Type="Int">-1</Property>
 					<Property Name="NI.ClassItem.Flags" Type="Int">37748736</Property>
 					<Property Name="NI.ClassItem.IsStaticMethod" Type="Bool">true</Property>
 					<Property Name="NI.ClassItem.MethodScope" Type="UInt">1</Property>
 					<Property Name="NI.ClassItem.Priority" Type="Int">1</Property>
+<<<<<<< HEAD
 					<Property Name="NI.ClassItem.State" Type="Int">1084240400</Property>
+=======
+					<Property Name="NI.ClassItem.State" Type="Int">1109918224</Property>
+>>>>>>> master
 				</Item>
 			</Item>
 			<Item Name="Registration" Type="Folder">
