@@ -34,6 +34,14 @@ namespace grpc_labview
     class LVProtoServerReflectionService final : public grpc::reflection::v1alpha::ServerReflection::Service
     {
     public:
+        struct ListServicesInfo
+        {
+            const grpc::protobuf::FileDescriptor* other_pool_file_descriptor;
+            std::vector<std::string>* other_pool_services_;
+        };
+
+        std::unique_ptr<ListServicesInfo> list_services_info_ptr;
+
         LVProtoServerReflectionService();
         
         Status ServerReflectionInfo(
@@ -70,13 +78,5 @@ namespace grpc_labview
         const grpc::protobuf::DescriptorPool* descriptor_pool_;
         grpc::protobuf::DescriptorPool other_pool;
         std::vector<std::string>* services_;
-
-         struct ListServicesInfo
-         {
-            const grpc::protobuf::FileDescriptor* other_pool_file_descriptor;
-            std::vector<std::string>* other_pool_services_;
-         };
-
-         std::unique_ptr<ListServicesInfo> list_services_info_ptr;
     };
 }

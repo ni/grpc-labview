@@ -85,17 +85,21 @@ namespace grpc_labview
         FileDescriptorProto proto;
         proto.ParseFromString(serializedProtoStr);
         list_services_info_ptr->other_pool_file_descriptor = other_pool.BuildFile(proto);
+        
+        if (list_services_info_ptr->other_pool_file_descriptor != nullptr)
+        {
+            int numServices = list_services_info_ptr->other_pool_file_descriptor->service_count();
+            for (int i = 0; i < numServices; ++i)
+            {
+                const google::protobuf::ServiceDescriptor* serviceDescriptor = list_services_info_ptr->other_pool_file_descriptor->service(i);
+                list_services_info_ptr->other_pool_services_->push_back(serviceDescriptor->full_name());
+            }
+        }
     }
 
 
     Status LVProtoServerReflectionService::ListService(ServerContext* context,
         grpc::reflection::v1alpha::ListServiceResponse* response) {
-
-         int numServices = list_services_info_ptr->other_pool_file_descriptor->service_count();
-        for (int i = 0; i < numServices; ++i) {
-             const google::protobuf::ServiceDescriptor* serviceDescriptor = list_services_info_ptr->other_pool_file_descriptor->service(i);
-             list_services_info_ptr->other_pool_services_->push_back(serviceDescriptor->full_name());
-        }
 
         if (services_ == nullptr) {
             return Status(grpc::StatusCode::NOT_FOUND, "Services not found.");
