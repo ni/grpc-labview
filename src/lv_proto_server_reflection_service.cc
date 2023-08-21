@@ -80,7 +80,6 @@ namespace grpc_labview
 
 
     void LVProtoServerReflectionService::AddFileDescriptorProto(const std::string& serializedProtoStr) {
-        // reflection_service_.get()->AddFileDescriptorProto(serializedProto); 
         FileDescriptorProto proto;
         proto.ParseFromString(serializedProtoStr);
         other_pool_file_descriptor = other_pool.BuildFile(proto);
