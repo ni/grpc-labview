@@ -104,3 +104,7 @@ Follow the below steps to add more tests in the testing suite.
    - Backward compatibility tests (server generated without the current feature but needs to work with the changes to the current features)
    - Imported proto-file tests
    - Multiple RPC methods tests
+   - Oneof only inside a nested message
+   - Multi services tests
+   - Abort tests
+   - Add tests for repeated fields (arrays)
