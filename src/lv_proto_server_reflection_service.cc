@@ -17,6 +17,8 @@ namespace grpc_labview
 {
     LVProtoServerReflectionService::LVProtoServerReflectionService() :
         descriptor_pool_(grpc::protobuf::DescriptorPool::generated_pool()), services_(new std::vector<std::string>()) {
+             list_services_info_ptr = std::make_unique<ListServicesInfo>();
+             list_services_info_ptr->other_pool_services_ = (new std::vector<std::string>());
     }
 
     // Add the full names of registered services
@@ -82,23 +84,27 @@ namespace grpc_labview
     void LVProtoServerReflectionService::AddFileDescriptorProto(const std::string& serializedProtoStr) {
         FileDescriptorProto proto;
         proto.ParseFromString(serializedProtoStr);
-        other_pool_file_descriptor = other_pool.BuildFile(proto);
+        list_services_info_ptr->other_pool_file_descriptor = other_pool.BuildFile(proto);
     }
 
 
     Status LVProtoServerReflectionService::ListService(ServerContext* context,
         grpc::reflection::v1alpha::ListServiceResponse* response) {
 
-        int numServices = other_pool_file_descriptor->service_count();
+         int numServices = list_services_info_ptr->other_pool_file_descriptor->service_count();
         for (int i = 0; i < numServices; ++i) {
-            const google::protobuf::ServiceDescriptor* serviceDescriptor = other_pool_file_descriptor->service(i);
-            services_->push_back(serviceDescriptor->full_name());
+             const google::protobuf::ServiceDescriptor* serviceDescriptor = list_services_info_ptr->other_pool_file_descriptor->service(i);
+             list_services_info_ptr->other_pool_services_->push_back(serviceDescriptor->full_name());
         }
 
         if (services_ == nullptr) {
             return Status(grpc::StatusCode::NOT_FOUND, "Services not found.");
         }
         for (const auto& value : *services_) {
+            grpc::reflection::v1alpha::ServiceResponse* service_response = response->add_service();
+            service_response->set_name(value);
+        }
+        for (const auto& value : *(list_services_info_ptr->other_pool_services_)) {
             grpc::reflection::v1alpha::ServiceResponse* service_response = response->add_service();
             service_response->set_name(value);
         }
