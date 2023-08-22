@@ -17,8 +17,7 @@ namespace grpc_labview
 {
     LVProtoServerReflectionService::LVProtoServerReflectionService() :
         descriptor_pool_(grpc::protobuf::DescriptorPool::generated_pool()), services_(new std::vector<std::string>()) {
-             list_services_info_ptr = std::make_unique<ListServicesInfo>();
-             list_services_info_ptr->other_pool_services_ = (new std::vector<std::string>());
+             other_pool_services_info_ptr = std::make_unique<OtherPoolServiceInfo>();
     }
 
     // Add the full names of registered services
@@ -84,19 +83,19 @@ namespace grpc_labview
     void LVProtoServerReflectionService::AddFileDescriptorProto(const std::string& serializedProtoStr) {
         FileDescriptorProto proto;
         proto.ParseFromString(serializedProtoStr);
-        list_services_info_ptr->other_pool_file_descriptor = other_pool.BuildFile(proto);       
+        other_pool_services_info_ptr->other_pool_file_descriptor = other_pool.BuildFile(proto);       
         AddOtherPoolServices();
     }
 
     void LVProtoServerReflectionService::AddOtherPoolServices()
     {
-        if (list_services_info_ptr->other_pool_file_descriptor != nullptr)
+        if (other_pool_services_info_ptr->other_pool_file_descriptor != nullptr)
         {
-            int numServices = list_services_info_ptr->other_pool_file_descriptor->service_count();
+            int numServices = other_pool_services_info_ptr->other_pool_file_descriptor->service_count();
             for (int i = 0; i < numServices; ++i)
             {
-                const google::protobuf::ServiceDescriptor* serviceDescriptor = list_services_info_ptr->other_pool_file_descriptor->service(i);
-                list_services_info_ptr->other_pool_services_->push_back(serviceDescriptor->full_name());
+                const google::protobuf::ServiceDescriptor* serviceDescriptor = other_pool_services_info_ptr->other_pool_file_descriptor->service(i);
+                other_pool_services_info_ptr->other_pool_services_.push_back(serviceDescriptor->full_name());
             }
         }
     }
@@ -112,7 +111,7 @@ namespace grpc_labview
             grpc::reflection::v1alpha::ServiceResponse* service_response = response->add_service();
             service_response->set_name(value);
         }
-        for (const auto& value : *(list_services_info_ptr->other_pool_services_)) {
+        for (const auto value : other_pool_services_info_ptr->other_pool_services_) {
             grpc::reflection::v1alpha::ServiceResponse* service_response = response->add_service();
             service_response->set_name(value);
         }

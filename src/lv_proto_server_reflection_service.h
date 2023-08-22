@@ -72,12 +72,12 @@ namespace grpc_labview
         grpc::protobuf::DescriptorPool other_pool;
         std::vector<std::string>* services_;
 
-        struct ListServicesInfo
+        struct OtherPoolServiceInfo
         {
             const grpc::protobuf::FileDescriptor* other_pool_file_descriptor;
-            std::vector<std::string>* other_pool_services_;
+            std::vector<std::string> other_pool_services_;
         };
 
-        std::unique_ptr<ListServicesInfo> list_services_info_ptr;
+        std::unique_ptr<OtherPoolServiceInfo> other_pool_services_info_ptr;
     };
 }
