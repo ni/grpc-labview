@@ -320,6 +320,7 @@
 			<Item Name="Create Child Class Override VIs.vi" Type="VI" URL="../Top Level API/Create Child Class Override VIs.vi"/>
 			<Item Name="Create Child Service Class.vi" Type="VI" URL="../Top Level API/Create Child Service Class.vi"/>
 			<Item Name="Generate ServiceImpl Class.vi" Type="VI" URL="../Top Level API/Generate ServiceImpl Class.vi"/>
+			<Item Name="Add User Code Library to Project.vi" Type="VI" URL="../Top Level API/Add User Code Library to Project.vi"/>
 		</Item>
 	</Item>
 	<Item Name="TypeDefs" Type="Folder">
