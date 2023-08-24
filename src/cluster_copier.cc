@@ -22,14 +22,20 @@ namespace grpc_labview {
             auto fieldMetadata = val.second;
             auto start = cluster + fieldMetadata->clusterOffset;
             std::shared_ptr<LVMessageValue> value;
-            for (auto v : message._values)
+            /*for (auto v : message._values)
             {
                 if (v.second->_protobufId == fieldMetadata->protobufIndex)
                 {
                     value = v.second;
                     break;
                 }
+            }*/
+            auto valIt = message._values.find(fieldMetadata->protobufIndex);
+            if (valIt != message._values.end())
+            {
+                value = valIt->second;
             }
+
             if (value != nullptr)
             {
                 if (fieldMetadata->isInOneof)
