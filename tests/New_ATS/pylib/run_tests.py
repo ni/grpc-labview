@@ -4,6 +4,7 @@ import shutil
 import subprocess
 import os
 import re
+import argparse
 
 FAILED = 0
 
@@ -60,26 +61,50 @@ def run_test(test_config):
     print ("Generating server code for " + test_config['test_name'])
     generate_server(test_config)
 
-    # 3. Copy the 'Run Service.vi' from the Impl folder to the Generated_server folder
-    run_service_impl_path = test_config['impl'] / 'Run Service.vi'
-    run_service_gen_path = test_config['generated_server'] / 'Run Service.vi'
-    if pathlib.Path(test_config['generated_server']).exists():
-        print (f"Copying 'Run Service.vi' to {run_service_gen_path}")
-        shutil.copyfile(run_service_impl_path, run_service_gen_path)
-    else:
-        print (f"{test_config['generated_server']} not generated")
+    print("Codegen step exit")
 
-    # 4. Copy the 'Start Sync.vi' from the Impl folder to the "Generated_server/RPC Service/GreeterService/Server API" folder
-    start_sync_impl_path = test_config['impl'] / 'Start Sync.vi'
-    start_sync_gen_path = test_config['generated_server'] / 'RPC Service' / 'GreeterService' / 'Server API' / 'Start Sync.vi'
-    if pathlib.Path(test_config['generated_server']).exists():
-        print (f"Copying 'Start Sync.vi' to {start_sync_gen_path}")
-        shutil.copyfile(start_sync_impl_path, start_sync_gen_path)
-    else:
-        print (f"{test_config['generated_server']} not generated")
-
-    # 5. Quit LabVIEW if it is running
+    # 3. Quit LabVIEW if it is running
     run_command(['taskkill', '/f', '/im', 'labview.exe'])
+
+    codegen_style = test_config['codegen_style']
+
+    if codegen_style == 'legacy' :
+        # 4. Copy the 'Run Service.vi' from the Impl folder to the Generated_server folder
+        run_service_impl_path = test_config['impl'] / 'Run Service.vi'
+        run_service_gen_path = test_config['generated_server'] / 'Run Service.vi'
+        if pathlib.Path(test_config['generated_server']).exists():
+            print (f"Copying 'Run Service.vi' to {run_service_gen_path}")
+            shutil.copyfile(run_service_impl_path, run_service_gen_path)
+        else:
+            print (f"{test_config['generated_server']} not generated")
+
+        # 5. Copy the 'Start Sync.vi' from the Impl folder to the "Generated_server/RPC Service/GreeterService/Server API" folder
+        start_sync_impl_path = test_config['impl'] / 'Start Sync.vi'
+        start_sync_gen_path = test_config['generated_server'] / 'RPC Service' / 'GreeterService' / 'Server API' / 'Start Sync.vi'
+        if pathlib.Path(test_config['generated_server']).exists():
+            print (f"Copying 'Start Sync.vi' to {start_sync_gen_path}")
+            shutil.copyfile(start_sync_impl_path, start_sync_gen_path)
+        else:
+            print (f"{test_config['generated_server']} not generated")
+    else :
+       # 4. Coy Run Service.vi
+        run_service_impl_path = test_config['usercode_server_impl'] / 'Run Service.vi'
+        run_service_gen_path = test_config['generated_server'] / 'Run Service.vi'
+        if pathlib.Path(test_config['generated_server']).exists():
+            print (f"Copying 'Run Service.vi' to {run_service_gen_path}")
+            shutil.copyfile(run_service_impl_path, run_service_gen_path)
+        else:
+            print (f"{test_config['generated_server']} not generated, run service copy failed !")
+
+         # 5. Copy all the contents UserCode_server folder from the Impl/UserCode folder to UserCode_server folder adjacent to .lvproj
+        usercode_server_gen_path = test_config['usercode_server']
+        if pathlib.Path(usercode_server_gen_path).exists():
+            usercode_server_impl_path = test_config['usercode_server_impl'] / 'UserCode_server'
+            print (f"Copying {usercode_server_impl_path} contents to {usercode_server_gen_path}")
+            shutil.copytree(usercode_server_impl_path, usercode_server_gen_path, dirs_exist_ok=True)
+        else:
+            print (f"{usercode_server_gen_path} not generated, usercode_server copy failed")
+
 
     # 6. Start Run Service.vi from command prompt by launching labview.exe form lv_folder with the following arguments:
     # this must be non-blocking
@@ -140,6 +165,13 @@ def run_test(test_config):
 # Desc: Run the tests in the testlist.json file
 def main():
     global FAILED
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--codegen_style", default="decoupled", type=str, choices=("legacy", "decoupled"))
+
+    args = parser.parse_args()
+        
     # read the list of tests from testlist.json
     test_list_json_path = pathlib.Path(__file__).parent.absolute() / 'testlist.json'
     with open(test_list_json_path) as f:
@@ -170,8 +202,14 @@ def main():
                 test_config['project_path'] = test_config['test_folder'] / str(test_name + '.lvproj')
                 generated_server_path = test_config['test_folder'] / 'Generated_server'
                 test_config['generated_server'] = generated_server_path
+                
+                if args.codegen_style == 'decoupled':
+                    test_config['usercode_server'] = test_config['test_folder'] / 'UserCode_server'
+                    test_config['usercode_server_impl'] = test_config['test_folder'] / 'Impl' / 'UserCode'
+
                 test_config['impl'] = test_config['test_folder'] / 'Impl'
                 test_config['gen_type'] = gen_type
+                test_config['codegen_style'] = args.codegen_style
                 run_test(test_config)
             if FAILED:
                 raise Exception(f"{FAILED} test cases have failed. Please review the above results")            
