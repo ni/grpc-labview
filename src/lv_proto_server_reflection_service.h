@@ -44,7 +44,8 @@ namespace grpc_labview
 
         void SetServiceList(const std::vector<std::string>* snames);
         void AddService(const std::string serviceName);
-        void AddFileDescriptorProto(const std::string& serializedProtoStr);        
+        void AddFileDescriptorProto(const std::string& serializedProtoStr);
+        void AddOtherPoolServices();
 
     private:
         Status ListService(ServerContext* context, grpc::reflection::v1alpha::ListServiceResponse* response);
@@ -70,5 +71,13 @@ namespace grpc_labview
         const grpc::protobuf::DescriptorPool* descriptor_pool_;
         grpc::protobuf::DescriptorPool other_pool;
         std::vector<std::string>* services_;
+
+        struct OtherPoolServiceInfo
+        {
+            const grpc::protobuf::FileDescriptor* other_pool_file_descriptor;
+            std::vector<std::string> other_pool_services_;
+        };
+
+        std::unique_ptr<OtherPoolServiceInfo> other_pool_services_info_ptr;
     };
 }
