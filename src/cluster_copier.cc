@@ -286,7 +286,33 @@ namespace grpc_labview {
                 {
                     auto lvCluster = (LVCluster**)(*array)->bytes(x * clusterSize, nestedMetadata->alignmentRequirement);
                     *lvCluster = nullptr;
-                    CopyToCluster(*str, (int8_t*)lvCluster);
+                    // CopyToCluster(*str, (int8_t*)lvCluster);
+
+                    // hard code copytonumeric for now
+                    // create vector of pointers to value in message
+                    std::vector<std::shared_ptr<LVMessageValue>> values;
+
+                    for (auto val : str->_metadata->_mappedElements)
+                    {
+                        auto start = (int8_t*)lvCluster + val.second->clusterOffset;
+                        std::shared_ptr<LVMessageValue> value;
+                        auto it = str->_values.find(val.second->protobufIndex);
+                        if (it != str->_values.end())
+                        {
+                            // store the address of the value in the values vector
+                            values.push_back(it->second);
+                        }
+                    }
+                    
+                    // iterate over the values vector and copy the values to the cluster
+                    // since we know there are only 4 ints in the cluster, we can hard code the copy
+                    // *(int*)start + (8 * index) = ((LVInt32MessageValue*)value.get())->_value;
+                    for (auto iter = 0; iter < values.size(); iter++)
+                    {
+                        auto start = (int8_t*)lvCluster + (iter * 8);
+                        *(int64_t*)start = ((LVInt64MessageValue*)values[iter].get())->_value;
+                    }
+
                     x += 1;
                 }
             }
