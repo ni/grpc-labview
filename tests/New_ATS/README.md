@@ -94,7 +94,6 @@ Follow the below steps to add more tests in the testing suite.
 
 1. Add the following tests:
 
-   - Streaming tests (client streaming, server streaming, bi-directional streaming)
    - Reflection tests
    - Client tests (currently we are only testing gRPC Server)
    - Modification scenarios (do some modification after first generation and then generate and test again)
