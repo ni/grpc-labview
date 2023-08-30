@@ -4,6 +4,7 @@ import shutil
 import subprocess
 import os
 import re
+import utility
 
 FAILED = 0
 
@@ -69,9 +70,10 @@ def run_test(test_config):
     else:
         print (f"{test_config['generated_server']} not generated")
 
-    # 4. Copy the 'Start Sync.vi' from the Impl folder to the "Generated_server/RPC Service/GreeterService/Server API" folder
+    # 4. Copy the 'Start Sync.vi' from the Impl folder to the "Generated_server/RPC Service/serviceName/Server API" folder
+    serviceName = utility.get_service(test_config['test_folder'] / f"{test_config['test_name']}.proto")
     start_sync_impl_path = test_config['impl'] / 'Start Sync.vi'
-    start_sync_gen_path = test_config['generated_server'] / 'RPC Service' / 'GreeterService' / 'Server API' / 'Start Sync.vi'
+    start_sync_gen_path = test_config['generated_server'] / 'RPC Service' / f'{serviceName}' / 'Server API' / 'Start Sync.vi'
     if pathlib.Path(test_config['generated_server']).exists():
         print (f"Copying 'Start Sync.vi' to {start_sync_gen_path}")
         shutil.copyfile(start_sync_impl_path, start_sync_gen_path)
@@ -108,25 +110,30 @@ def run_test(test_config):
     generate_command = ' '.join([
         f"{test_config['python_path']} -m grpc_tools.protoc",
         f"--proto_path={test_config['test_folder']}",
-        f"--python_out={test_config['test_folder']}",
-        f"--pyi_out={test_config['test_folder']}",
-        f"--grpc_python_out={test_config['test_folder']}",
+        f"--python_out={test_config['python_client_folder']}",
+        f"--pyi_out={test_config['python_client_folder']}",
+        f"--grpc_python_out={test_config['python_client_folder']}",
         f"{test_config['test_name']}.proto"
     ])
     print ("Compiling proto file")
     run_command(generate_command)
 
     # 9. Call the TestServer() from test_folder/test_name_client.py and get the return value
-    client_py_path = test_config['test_folder'] / str(test_config['test_name'] + '_client.py')
-    run_client_command = ' '.join([
-        str(test_config['test_suite_folder'] / 'RunPythonClient.bat'),
-        str(client_py_path),
-        test_config['test_name']
-    ])
-    print ("Running python client")
-    output = run_command(run_client_command)
-    print(output)
-    FAILED += count_failed_testcases(output)
+    print(f"Running tests for all rpc's in {test_config['test_name']}")
+    for filename in os.listdir(test_config['python_client_folder']):
+        if "pb2" not in filename and filename.endswith(".py"):
+            client_py_path = test_config['python_client_folder'] / str(filename)
+            rpc_name = filename.split('.')[0]
+            run_client_command = ' '.join([
+                str(test_config['test_suite_folder'] / 'RunPythonClient.bat'),
+                str(client_py_path),
+                test_config['test_name'],
+                rpc_name
+            ])
+            print (f"Running python client for {rpc_name}")
+            output = run_command(run_client_command)
+            print(output+'\n')
+            FAILED += count_failed_testcases(output)
 
     # 10. Quit LabVIEW if it is running
     run_command(['taskkill', '/f', '/im', 'labview.exe'])
@@ -172,6 +179,7 @@ def main():
                 test_config['generated_server'] = generated_server_path
                 test_config['impl'] = test_config['test_folder'] / 'Impl'
                 test_config['gen_type'] = gen_type
+                test_config['python_client_folder'] = test_config['test_folder'] / 'Python_client'
                 run_test(test_config)
             if FAILED:
                 raise Exception(f"{FAILED} test cases have failed. Please review the above results")            
