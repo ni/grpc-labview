@@ -433,5 +433,9 @@
 			<Item Name="Validate Path Length.vi" Type="VI" URL="../VI API/General VI API/Validate Path Length.vi"/>
 		</Item>
 	</Item>
+	<Item Name="Logging API" Type="Folder">
+		<Item Name="Log CodeGen Run.vi" Type="VI" URL="../Logging API/Log CodeGen Run.vi"/>
+		<Item Name="Log gRPC Data.vi" Type="VI" URL="../Logging API/Log gRPC Data.vi"/>
+	</Item>
 	<Item Name="Main.vi" Type="VI" URL="../Main.vi"/>
 </Library>
