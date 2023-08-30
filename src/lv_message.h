@@ -7,6 +7,7 @@
 #include <message_value.h>
 #include <message_metadata.h>
 #include <google/protobuf/message.h>
+#include <unordered_map>
 
 namespace grpc_labview 
 {
@@ -46,7 +47,7 @@ namespace grpc_labview
         std::unique_ptr<grpc::ByteBuffer> SerializeToByteBuffer();
 
     public:
-        std::map<int, std::shared_ptr<LVMessageValue>> _values;
+        std::unordered_map<int, std::shared_ptr<LVMessageValue>> _values;
         std::shared_ptr<MessageMetadata> _metadata;
 
     private:

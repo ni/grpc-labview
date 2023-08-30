@@ -13,14 +13,21 @@ namespace grpc_labview {
         {
             auto start = cluster + val.second->clusterOffset;
             std::shared_ptr<LVMessageValue> value;
-            for (auto v : message._values)
+            /*for (auto v : message._values)
             {
                 if (v.second->_protobufId == val.second->protobufIndex)
                 {
                     value = v.second;
                     break;
                 }
+            }*/
+
+            auto it = message._values.find(val.second->protobufIndex);
+            if (it != message._values.end())
+            {
+                value = it->second;
             }
+
             if (value != nullptr)
             {
                 switch (val.second->type)
