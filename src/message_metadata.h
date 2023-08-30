@@ -8,7 +8,7 @@
 #include <lv_interop.h>
 #include <vector>
 #include <map>
-#include <unordered_map>
+// #include <unordered_map>
 #include <grpcpp/impl/codegen/proto_utils.h>
 
 namespace grpc_labview 
@@ -92,7 +92,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    using LVMessageMetadataMap = std::unordered_map<google::protobuf::uint32, std::shared_ptr<MessageElementMetadata>>;
+    using LVMessageMetadataMap = std::map<google::protobuf::uint32, std::shared_ptr<MessageElementMetadata>>;
     using LVMessageMetadataList = std::vector<std::shared_ptr<MessageElementMetadata>>;
 
     //---------------------------------------------------------------------

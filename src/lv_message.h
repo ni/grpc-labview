@@ -46,7 +46,7 @@ namespace grpc_labview
         std::unique_ptr<grpc::ByteBuffer> SerializeToByteBuffer();
 
     public:
-        std::unordered_map<int, std::shared_ptr<LVMessageValue>> _values;
+        std::map<int, std::shared_ptr<LVMessageValue>> _values;
         std::shared_ptr<MessageMetadata> _metadata;
 
     private:
