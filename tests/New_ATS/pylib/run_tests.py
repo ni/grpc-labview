@@ -20,8 +20,8 @@ def count_failed_testcases(test_summary):
 def run_command(command):
     output = subprocess.run(command, capture_output=True, text=True)
     if output.stderr:
-        # raise Exception(output.stderr)
-        print(output.stderr)
+        raise Exception(output.stderr)
+        # print(output.stderr)
     return output.stdout
 
 
@@ -132,7 +132,6 @@ def run_test(test_config):
                 rpc_name
             ])
             print (f"Running python client for {rpc_name}")
-            print(run_client_command)
             output = run_command(run_client_command)
             print(output+'\n')
             FAILED += count_failed_testcases(output)
