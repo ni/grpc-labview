@@ -21,7 +21,6 @@ def run_command(command):
     output = subprocess.run(command, capture_output=True, text=True)
     if output.stderr:
         raise Exception(output.stderr)
-        # print(output.stderr)
     return output.stdout
 
 
@@ -122,16 +121,16 @@ def run_test(test_config):
     # 9. Call the TestServer() from test_folder/test_name_client.py and get the return value
     print(f"Running tests for all rpc's in {test_config['test_name']}")
     for filename in os.listdir(test_config['python_client_folder']):
-        if "pb2" not in filename and filename.endswith(".py"):
+        if "pb2" not in filename and filename.endswith("_client.py"):
             client_py_path = test_config['python_client_folder'] / str(filename)
-            rpc_name = filename.split('.')[0]
+            python_client_name = filename.split('.')[0]
             run_client_command = ' '.join([
                 str(test_config['test_suite_folder'] / 'RunPythonClient.bat'),
                 str(client_py_path),
                 test_config['test_name'],
-                rpc_name
+                python_client_name
             ])
-            print (f"Running python client for {rpc_name}")
+            print (f"Running python client for {python_client_name}")
             output = run_command(run_client_command)
             print(output+'\n')
             FAILED += count_failed_testcases(output)

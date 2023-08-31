@@ -6,13 +6,13 @@
 
 2. The configuration of the testing suite is saved in the [testlist.json](pylib/testlist.json) file. We can modify it to run specific tests with specific labview version and bitness according to our needs.
 
-3. For each test, inside the test folder, we have a protofile, a python client and an `Impl` folder that stores pre-implemented `Start Sync.vi` and `Run Service.vi` for that particular protofile.
+3. For each test, inside the test folder, we have a protofile, a `Python_client` folder that contains the python clients and an `Impl` folder that stores pre-implemented `Start Sync.vi` and `Run Service.vi` for that particular protofile.
 
 4. When executing the testing suite, the following steps are performed for each test:
    - Delete the pre-existing `Generated Server` folder that contains the gRPC Server.
    - Regenerate the gRPC server using the protofile.
    - Copy the `Start Sync.vi` and `Run Service.vi` from the `Impl` folder into the new `Generated Server` folder.
-   - Run the pre-written python client which uses pytest to run all the testcases for each rpc. The testcases are defined in the form of json files in the `testcases` folder.
+   - Run the pre-written python clients in the `Python_client` which uses pytest to run all the testcases for each rpc. The testcases are defined in the form of json files in the `testcases` folder.
    - Prints the verbose output of each testcase onto the terminal.
 
 ### How to run?
@@ -88,7 +88,7 @@ Follow the below steps to add more tests in the testing suite.
 
 9. Inside the `testcases` folder, create a json file for each rpc method defined in the protofile. The name of the json file will be same as the rpc method's name. These will contain the testcases that the testing suite will run corresponding to each rpc method.
 
-10. Create a python client that will interact with the LabVIEW gRPC Server. The name of the client will be like `<test_name>_client.py`.
+10. Create a `Python_client` folder and add python clients for each rpc into it that will interact with the LabVIEW gRPC Server. The name of the client will be like `<rpc_name>_client.py`.
 
 ### TODO:
 
