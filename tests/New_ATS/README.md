@@ -88,7 +88,7 @@ Follow the below steps to add more tests in the testing suite.
 
 9. Inside the `testcases` folder, create a json file for each rpc method defined in the protofile. The name of the json file will be same as the rpc method's name. These will contain the testcases that the testing suite will run corresponding to each rpc method.
 
-10. Create a `Python_client` folder and add python clients for each rpc into it that will interact with the LabVIEW gRPC Server. The name of the client will be like `<rpc_name>_client.py`.
+10. Create a `Python_client` folder and add python clients for each rpc into it that will interact with the LabVIEW gRPC Server. The name of the client can be anything but should strictly end with `_client.py` like `<client_name>_client.py`.
 
 ### TODO:
 
