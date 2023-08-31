@@ -18,7 +18,7 @@
       "point_count": 3,
       "feature_count": 3,
       "distance": 0,
-      "elapsed_time": 0
+      "elapsed_time": 1
     }
   },
   {
@@ -44,7 +44,7 @@
       "point_count": 4,
       "feature_count": 4,
       "distance": 0,
-      "elapsed_time": 0
+      "elapsed_time": 1
     }
   },
   {
@@ -58,7 +58,7 @@
       "point_count": 1,
       "feature_count": 1,
       "distance": 0,
-      "elapsed_time": 0
+      "elapsed_time": 1
     }
   }
 ]
