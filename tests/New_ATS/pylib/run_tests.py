@@ -35,7 +35,9 @@ def generate_server(test_config):
     # 1. Delete the Generated_server folder. TODO: Take a boolean in the config to say whether the build should be a clean build
     if test_config['generated_server'].exists():
         shutil.rmtree(test_config['generated_server'])
-
+    if test_config['codegen_style'] == 'decoupled':
+        if test_config['usercode_server'].exists():
+            shutil.rmtree(test_config['usercode_server'])
     # 2. Generate the server
     # todo: call the LabVIEW VI from LabVIEW CLI
     main_wrapper_vi_path = test_config['test_suite_folder'] / 'Main_CLIWrapper.vi'
