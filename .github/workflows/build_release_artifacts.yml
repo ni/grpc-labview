@@ -54,7 +54,7 @@ jobs:
         id: check_files
         uses: andstor/file-existence-action@v2.0.0
         with:
-          files: "${{runner.workspace}}/grpc-labview/tests/New_ATS/logs/*.xml"
+          files: "${{runner.workspace}}/grpc-labview/tests/New_ATS/logs/"
 
       - if: ${{always() && steps.check_files.outputs.files_exists == 'true' }}
         name: Download New_ATS Test Results if logs folder exists

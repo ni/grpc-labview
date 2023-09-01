@@ -1,6 +1,16 @@
 [
   {
-    "name": [ "all-datatypes-oneof", "enum-oneof", "helloworld", "message-oneof", "multiple-field-oneof", "nested-oneof", "sibling-oneof", "simple-oneof" ],
+    "name": [
+      "helloworld",
+      "routeguide",
+      "all-datatypes-oneof",
+      "enum-oneof",
+      "message-oneof",
+      "multiple-field-oneof",
+      "nested-oneof",
+      "sibling-oneof",
+      "simple-oneof"
+    ],
     "gen_type": "0",
     "labview_version": "2019",
     "labview_bitness": "32"

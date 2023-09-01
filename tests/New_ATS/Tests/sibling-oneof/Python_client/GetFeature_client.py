@@ -35,7 +35,7 @@ def read_json(filepath):
         test_data = json.load(file)
     return test_data
 
-GetFeature_json_file_path = f'{os.path.dirname(os.path.abspath(__file__))}/testcases/GetFeature.json'
+GetFeature_json_file_path = f'{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/testcases/GetFeature.json'
 
 @pytest.mark.parametrize('testcase', read_json(GetFeature_json_file_path))
 def test_GetFeature(testcase):

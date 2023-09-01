@@ -35,7 +35,8 @@ def backup_server_impl(test_folder_path):
     # copy the run_service.vi at run_service_path to impl/run_service.vi
     shutil.copyfile(run_service_path, os.path.join(impl_path, 'Run Service.vi'))
 
-    start_sync_path = os.path.join(generated_server_path, 'RPC Service', 'GreeterService', 'Server API', 'Start Sync.vi')
+    services = [filename for filename in os.listdir(os.path.join(generated_server_path, 'RPC Service'))]
+    start_sync_path = os.path.join(generated_server_path, 'RPC Service', f'{services[0]}', 'Server API', 'Start Sync.vi')
     if not os.path.exists(start_sync_path):
         print(f'{start_sync_path} does not exist. Regenerate the server to backup')
         return
