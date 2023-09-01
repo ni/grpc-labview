@@ -1,0 +1,64 @@
+[
+  {
+    "input": [
+      { "location": { "latitude": 1, "longitude": 4 }, "message": "Point 1" },
+      { "location": { "latitude": 2, "longitude": 3 }, "message": "Point 2" },
+      { "location": { "latitude": 3, "longitude": 2 }, "message": "Point 3" },
+      { "location": { "latitude": 4, "longitude": 1 }, "message": "Point 4" }
+    ],
+    "output": [
+      { "location": { "latitude": 1, "longitude": 4 }, "message": "Point 1" },
+      { "location": { "latitude": 2, "longitude": 3 }, "message": "Point 2" },
+      { "location": { "latitude": 3, "longitude": 2 }, "message": "Point 3" },
+      { "location": { "latitude": 4, "longitude": 1 }, "message": "Point 4" }
+    ]
+  },
+  {
+    "input": [
+      { "location": { "latitude": 5, "longitude": 8 }, "message": "Point 5" },
+      { "location": { "latitude": 6, "longitude": 7 }, "message": "Point 6" },
+      { "location": { "latitude": 7, "longitude": 6 }, "message": "Point 7" }
+    ],
+    "output": [
+      { "location": { "latitude": 5, "longitude": 8 }, "message": "Point 5" },
+      { "location": { "latitude": 6, "longitude": 7 }, "message": "Point 6" },
+      { "location": { "latitude": 7, "longitude": 6 }, "message": "Point 7" }
+    ]
+  },
+  {
+    "input": [
+      { "location": { "latitude": 12, "longitude": 45 }, "message": "Point 8" },
+      { "location": { "latitude": 30, "longitude": 72 }, "message": "Point 9" },
+      { "location": { "latitude": 81, "longitude": 19 }, "message": "Point 10" }
+    ],
+    "output": [
+      { "location": { "latitude": 12, "longitude": 45 }, "message": "Point 8" },
+      { "location": { "latitude": 30, "longitude": 72 }, "message": "Point 9" },
+      { "location": { "latitude": 81, "longitude": 19 }, "message": "Point 10" }
+    ]
+  },
+  {
+    "input": [
+      {
+        "location": { "latitude": 50, "longitude": 30 },
+        "message": "Point 11"
+      },
+      {
+        "location": { "latitude": 18, "longitude": 88 },
+        "message": "Point 12"
+      },
+      { "location": { "latitude": 92, "longitude": 7 }, "message": "Point 13" }
+    ],
+    "output": [
+      {
+        "location": { "latitude": 50, "longitude": 30 },
+        "message": "Point 11"
+      },
+      {
+        "location": { "latitude": 18, "longitude": 88 },
+        "message": "Point 12"
+      },
+      { "location": { "latitude": 92, "longitude": 7 }, "message": "Point 13" }
+    ]
+  }
+]
