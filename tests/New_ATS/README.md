@@ -12,7 +12,7 @@
    - Delete the pre-existing `Generated Server` folder that contains the gRPC Server.
    - Regenerate the gRPC server using the protofile.
    - Copy the `Start Sync.vi` and `Run Service.vi` from the `Impl` folder into the new `Generated Server` folder.
-   - Run the pre-written python clients in the `Python_client` which uses pytest to run all the testcases for each rpc. The testcases are defined in the form of json files in the `testcases` folder.
+   - Run the pre-written python clients in the `Python_client` folder which uses pytest to run all the testcases for each rpc. The testcases are defined in the form of json files in the `testcases` folder.
    - Prints the verbose output of each testcase onto the terminal.
 
 ### How to run?
@@ -94,16 +94,17 @@ Follow the below steps to add more tests in the testing suite.
 
 1. Add the following tests:
 
-   - Reflection tests
-   - Client tests (currently we are only testing gRPC Server)
-   - Modification scenarios (do some modification after first generation and then generate and test again)
-     - Add/Remove/modify RPC
-     - Add/Remove/modify services
-     - Add/Remove/modify messages
-   - Backward compatibility tests (server generated without the current feature but needs to work with the changes to the current features)
-   - Imported proto-file tests
-   - Multiple RPC methods tests
-   - Oneof only inside a nested message
-   - Multi services tests
-   - Abort tests
-   - Add tests for repeated fields (arrays)
+   - [x] Streaming tests
+   - [ ] Reflection tests
+   - [ ] Client tests (currently we are only testing gRPC Server)
+   - [ ] Modification scenarios (do some modification after first generation and then generate and test again)
+      - Add/Remove/modify RPC
+      - Add/Remove/modify services
+      - Add/Remove/modify messages 
+   - [ ] Backward compatibility tests (server generated without the current feature but needs to work with the changes to the current features)
+   - [ ] Imported proto-file tests
+   - [x] Multiple RPC methods tests
+   - [ ] Oneof only inside a nested message
+   - [ ] Multi services tests
+   - [ ] Abort tests
+   - [ ] Add tests for repeated fields (arrays)
