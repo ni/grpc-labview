@@ -1,0 +1,134 @@
+[
+  {
+    "input": {
+      "lo": { "latitude": 1, "longitude": 2 },
+      "hi": { "latitude": 3, "longitude": 4 }
+    },
+    "output": [
+      {
+        "name": "1 x 2",
+        "location": { "latitude": 1, "longitude": 2 }
+      },
+      {
+        "name": "1 x 3",
+        "location": { "latitude": 1, "longitude": 3 }
+      },
+      {
+        "name": "1 x 4",
+        "location": { "latitude": 1, "longitude": 4 }
+      },
+      {
+        "name": "2 x 2",
+        "location": { "latitude": 2, "longitude": 2 }
+      },
+      {
+        "name": "2 x 3",
+        "location": { "latitude": 2, "longitude": 3 }
+      },
+      {
+        "name": "2 x 4",
+        "location": { "latitude": 2, "longitude": 4 }
+      },
+      {
+        "name": "3 x 2",
+        "location": { "latitude": 3, "longitude": 2 }
+      },
+      {
+        "name": "3 x 3",
+        "location": { "latitude": 3, "longitude": 3 }
+      },
+      {
+        "name": "3 x 4",
+        "location": { "latitude": 3, "longitude": 4 }
+      }
+    ]
+  },
+  {
+    "input": {
+      "lo": { "latitude": 4, "longitude": 5 },
+      "hi": { "latitude": 7, "longitude": 9 }
+    },
+    "output": [
+      {
+        "name": "4 x 5",
+        "location": { "latitude": 4, "longitude": 5 }
+      },
+      {
+        "name": "4 x 6",
+        "location": { "latitude": 4, "longitude": 6 }
+      },
+      {
+        "name": "4 x 7",
+        "location": { "latitude": 4, "longitude": 7 }
+      },
+      {
+        "name": "4 x 8",
+        "location": { "latitude": 4, "longitude": 8 }
+      },
+      {
+        "name": "4 x 9",
+        "location": { "latitude": 4, "longitude": 9 }
+      },
+      {
+        "name": "5 x 5",
+        "location": { "latitude": 5, "longitude": 5 }
+      },
+      {
+        "name": "5 x 6",
+        "location": { "latitude": 5, "longitude": 6 }
+      },
+      {
+        "name": "5 x 7",
+        "location": { "latitude": 5, "longitude": 7 }
+      },
+      {
+        "name": "5 x 8",
+        "location": { "latitude": 5, "longitude": 8 }
+      },
+      {
+        "name": "5 x 9",
+        "location": { "latitude": 5, "longitude": 9 }
+      },
+      {
+        "name": "6 x 5",
+        "location": { "latitude": 6, "longitude": 5 }
+      },
+      {
+        "name": "6 x 6",
+        "location": { "latitude": 6, "longitude": 6 }
+      },
+      {
+        "name": "6 x 7",
+        "location": { "latitude": 6, "longitude": 7 }
+      },
+      {
+        "name": "6 x 8",
+        "location": { "latitude": 6, "longitude": 8 }
+      },
+      {
+        "name": "6 x 9",
+        "location": { "latitude": 6, "longitude": 9 }
+      },
+      {
+        "name": "7 x 5",
+        "location": { "latitude": 7, "longitude": 5 }
+      },
+      {
+        "name": "7 x 6",
+        "location": { "latitude": 7, "longitude": 6 }
+      },
+      {
+        "name": "7 x 7",
+        "location": { "latitude": 7, "longitude": 7 }
+      },
+      {
+        "name": "7 x 8",
+        "location": { "latitude": 7, "longitude": 8 }
+      },
+      {
+        "name": "7 x 9",
+        "location": { "latitude": 7, "longitude": 9 }
+      }
+    ]
+  }
+]

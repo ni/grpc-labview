@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+message Request {
+  int age = 1;
+  oneof request_oneof {
+    string message = 2;
+    int req_id = 3;
+  }
+}
+
+message Response {
+  int new_age = 1;
+  oneof response_oneof {
+    string result = 2;
+    int res_id = 3;
+  }
+}
+
+service StreamingService {
+  rpc UnaryMethod(Request) returns (Response);
+
+  rpc ServerStreamingMethod(Request) returns (stream Response);
+
+  rpc ClientStreamingMethod(stream Request) returns (Response);
+
+  rpc BidirectionalStreamingMethod(stream Request) returns (stream Response);
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "input": { "latitude": 1, "longitude": 2 },
+    "output": {
+      "name": "1 x 2",
+      "location": { "latitude": 1, "longitude": 2 }
+    }
+  },
+  {
+    "input": { "latitude": 10, "longitude": 20 },
+    "output": {
+      "name": "10 x 20",
+      "location": { "latitude": 10, "longitude": 20 }
+    }
+  },
+  {
+    "input": { "latitude": 49, "longitude": 25 },
+    "output": {
+      "name": "49 x 25",
+      "location": { "latitude": 49, "longitude": 25 }
+    }
+  },
+  {
+    "input": { "latitude": 19, "longitude": 9 },
+    "output": {
+      "name": "19 x 9",
+      "location": { "latitude": 19, "longitude": 9 }
+    }
+  }
+]
