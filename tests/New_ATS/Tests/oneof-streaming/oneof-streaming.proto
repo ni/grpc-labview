@@ -7,7 +7,7 @@ service GreeterService {
   // streams 'age' number of Response messages and does the same operation
   rpc ServerStreamingMethod(Request) returns (stream Response);
 
-  // counts the number of request messages and supplies them in the age variable, rest same operation
+  // sums all the age variables and supplies them in the new_age variable and does same operation on the last message of the input stream
   rpc ClientStreamingMethod(stream Request) returns (Response);
 
   // does same operation on each Request message and returns corresponding Response Message
