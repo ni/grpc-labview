@@ -106,17 +106,19 @@ def run_test(test_config):
     ])
     run_command(CLI_command)
 
-    # 8. Generate python grpc classes
-    generate_command = ' '.join([
-        f"{test_config['python_path']} -m grpc_tools.protoc",
-        f"--proto_path={test_config['test_folder']}",
-        f"--python_out={test_config['python_client_folder']}",
-        f"--pyi_out={test_config['python_client_folder']}",
-        f"--grpc_python_out={test_config['python_client_folder']}",
-        f"{test_config['test_name']}.proto"
-    ])
-    print ("Compiling proto file")
-    run_command(generate_command)
+    # 8. Generate python client and server grpc classes
+    for path in ['python_client_folder', 'python_server_folder']:
+        if os.path.exists(test_config[f'{path}']):
+            generate_command = ' '.join([
+                f"{test_config['python_path']} -m grpc_tools.protoc",
+                f"--proto_path={test_config['test_folder']}",
+                f"--python_out={test_config[f'{path}']}",
+                f"--pyi_out={test_config[f'{path}']}",
+                f"--grpc_python_out={test_config[f'{path}']}",
+                f"{test_config['test_name']}.proto"
+            ])
+            print ("Compiling proto file for "+path.split('_')[1])
+            run_command(generate_command)
 
     # 9. Call the TestServer() from test_folder/test_name_client.py and get the return value
     print(f"Running tests for all rpc's in {test_config['test_name']}")
@@ -180,6 +182,7 @@ def main():
                 test_config['impl'] = test_config['test_folder'] / 'Impl'
                 test_config['gen_type'] = gen_type
                 test_config['python_client_folder'] = test_config['test_folder'] / 'Python_client'
+                test_config['python_server_folder'] = test_config['test_folder'] / 'Python_server'
                 run_test(test_config)
             if FAILED:
                 raise Exception(f"{FAILED} test cases have failed. Please review the above results")            
