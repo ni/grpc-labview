@@ -1,27 +1,31 @@
 syntax = "proto3";
 
+service GreeterService {
+  // operation - increments and request_id by 1, appends _response to message
+  rpc UnaryMethod(Request) returns (Response);
+
+  // streams 'age' number of Response messages and does the same operation
+  rpc ServerStreamingMethod(Request) returns (stream Response);
+
+  // counts the number of request messages and supplies them in the age variable, rest same operation
+  rpc ClientStreamingMethod(stream Request) returns (Response);
+
+  // does same operation on each Request message and returns corresponding Response Message
+  rpc BidirectionalStreamingMethod(stream Request) returns (stream Response);
+}
+
 message Request {
-  int age = 1;
+  int32 age = 1;
   oneof request_oneof {
     string message = 2;
-    int req_id = 3;
+    int32 request_id = 3;
   }
 }
 
 message Response {
-  int new_age = 1;
+  int32 new_age = 1;
   oneof response_oneof {
     string result = 2;
-    int res_id = 3;
+    int32 response_id = 3;
   }
-}
-
-service StreamingService {
-  rpc UnaryMethod(Request) returns (Response);
-
-  rpc ServerStreamingMethod(Request) returns (stream Response);
-
-  rpc ClientStreamingMethod(stream Request) returns (Response);
-
-  rpc BidirectionalStreamingMethod(stream Request) returns (stream Response);
 }
