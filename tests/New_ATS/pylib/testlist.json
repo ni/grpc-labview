@@ -6,9 +6,12 @@
       "enum-oneof",
       "message-oneof",
       "multiple-field-oneof",
+      "all-datatypes-oneof",
       "nested-oneof",
       "sibling-oneof",
-      "simple-oneof"
+      "simple-oneof",
+      "oneof-streaming",
+      "enum-streaming"
     ],
     "gen_type": "0",
     "labview_version": "2019",

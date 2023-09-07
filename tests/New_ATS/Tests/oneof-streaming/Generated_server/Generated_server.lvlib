@@ -14,8 +14,8 @@
 			<Item Name="Request_request_oneof.lvclass" Type="LVClass" URL="../RPC Messages/Request_request_oneof/Request_request_oneof.lvclass"/>
 			<Item Name="FlatToRichRequest.vi" Type="VI" URL="../RPC Messages/FlatToRichRequest.vi"/>
 			<Item Name="RichToFlatRequest.vi" Type="VI" URL="../RPC Messages/RichToFlatRequest.vi"/>
-			<Item Name="Set Request.vi" Type="VI" URL="../RPC Messages/Set Request.vi"/>
 			<Item Name="Get Request.vi" Type="VI" URL="../RPC Messages/Get Request.vi"/>
+			<Item Name="Set Request.vi" Type="VI" URL="../RPC Messages/Set Request.vi"/>
 		</Item>
 		<Item Name="Response" Type="Folder">
 			<Item Name="Response.ctl" Type="VI" URL="../RPC Messages/Response.ctl"/>
