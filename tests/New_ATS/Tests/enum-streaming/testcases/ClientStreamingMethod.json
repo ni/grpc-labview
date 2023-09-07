@@ -1,0 +1,178 @@
+[
+  {
+    "input": [
+      {
+        "request_number": 10,
+        "request_message": "Hello, world!",
+        "request_color": "RED"
+      },
+      {
+        "request_number": 95,
+        "request_message": "Goodbye, world!",
+        "request_color": "GREEN"
+      },
+      {
+        "request_number": 20,
+        "request_message": "Test Input 1",
+        "request_color": "GREEN"
+      }
+    ],
+    "output": {
+      "response_number": 125,
+      "response_message": "Hello, world!Goodbye, world!Test Input 1",
+      "response_color": "GREEN"
+    }
+  },
+  {
+    "input": [
+      {
+        "request_number": 5,
+        "request_message": "Input A",
+        "request_color": "BLUE"
+      },
+      {
+        "request_number": 15,
+        "request_message": "Input B",
+        "request_color": "RED"
+      },
+      {
+        "request_number": 30,
+        "request_message": "Input C",
+        "request_color": "GREEN"
+      }
+    ],
+    "output": {
+      "response_number": 50,
+      "response_message": "Input AInput BInput C",
+      "response_color": "GREEN"
+    }
+  },
+  {
+    "input": [
+      {
+        "request_number": 8,
+        "request_message": "Input X",
+        "request_color": "RED"
+      },
+      {
+        "request_number": 42,
+        "request_message": "Input Y",
+        "request_color": "BLUE"
+      }
+    ],
+    "output": {
+      "response_number": 50,
+      "response_message": "Input XInput Y",
+      "response_color": "BLUE"
+    }
+  },
+  {
+    "input": [
+      {
+        "request_number": 12,
+        "request_message": "Sample 1",
+        "request_color": "GREEN"
+      },
+      {
+        "request_number": 18,
+        "request_message": "Sample 2",
+        "request_color": "RED"
+      }
+    ],
+    "output": {
+      "response_number": 30,
+      "response_message": "Sample 1Sample 2",
+      "response_color": "RED"
+    }
+  },
+  {
+    "input": [
+      {
+        "request_number": 9,
+        "request_message": "Input P",
+        "request_color": "BLUE"
+      }
+    ],
+    "output": {
+      "response_number": 9,
+      "response_message": "Input P",
+      "response_color": "BLUE"
+    }
+  },
+  {
+    "input": [
+      {
+        "request_number": 7,
+        "request_message": "Input Q",
+        "request_color": "GREEN"
+      },
+      {
+        "request_number": 21,
+        "request_message": "Input R",
+        "request_color": "RED"
+      },
+      {
+        "request_number": 16,
+        "request_message": "Input S",
+        "request_color": "GREEN"
+      }
+    ],
+    "output": {
+      "response_number": 44,
+      "response_message": "Input QInput RInput S",
+      "response_color": "GREEN"
+    }
+  },
+  {
+    "input": [
+      {
+        "request_number": 10,
+        "request_message": "Test Input 3",
+        "request_color": "BLUE"
+      }
+    ],
+    "output": {
+      "response_number": 10,
+      "response_message": "Test Input 3",
+      "response_color": "BLUE"
+    }
+  },
+  {
+    "input": [
+      {
+        "request_number": 5,
+        "request_message": "Input T",
+        "request_color": "RED"
+      },
+      {
+        "request_number": 25,
+        "request_message": "Input U",
+        "request_color": "GREEN"
+      }
+    ],
+    "output": {
+      "response_number": 30,
+      "response_message": "Input TInput U",
+      "response_color": "GREEN"
+    }
+  },
+  {
+    "input": [
+      {
+        "request_number": 3,
+        "request_message": "Test Input 4",
+        "request_color": "BLUE"
+      },
+      {
+        "request_number": 12,
+        "request_message": "Test Input 5",
+        "request_color": "RED"
+      }
+    ],
+    "output": {
+      "response_number": 15,
+      "response_message": "Test Input 4Test Input 5",
+      "response_color": "RED"
+    }
+  }
+]

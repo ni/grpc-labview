@@ -9,40 +9,20 @@ enum Color {
 }
 
 service RouteGuide{
-  rpc GetFeature(Point) returns (Feature) {}
-  rpc ListFeatures(Rectangle) returns (stream Feature) {}
-  rpc RecordRoute(stream Point) returns (RouteSummary) {}
-  rpc RouteChat(stream RouteNote) returns (stream RouteNote) {}
+  rpc UnaryMethod(request) returns (response) {}
+  rpc ServerStreamingMethod(request) returns (stream response) {}
+  rpc ClientStreamingMethod(stream request) returns (response) {}
+  rpc BidirectionalStreamingMethod(stream request) returns (stream response) {}
 }
 
-message Point {
-  int32 latitude = 1;
-  int32 longitude = 2;
-  Color clr = 3;
+message request {
+  int32 request_number = 1;
+  string request_message = 2;
+  Color request_color = 3;
 }
 
-message Rectangle {
-  Point lo = 1;
-  Point hi = 2;
-  Color clr = 3;
-}
-
-message Feature {
-  string name = 1;
-  Point location = 2;
-  Color clr = 3;
-}
-
-message RouteNote {
-  Point location = 1;
-  string message = 2;
-  Color clr = 3; 
-}
-
-message RouteSummary {
-  int32 point_count = 1;
-  int32 feature_count = 2;
-  int32 distance = 3;
-  int32 elapsed_time = 4;
-  Color clr = 5;
+message response {
+  int32 response_number = 1;
+  string response_message = 2;
+  Color response_color = 3;
 }
