@@ -31,8 +31,8 @@ def check_for_pre_requisites(test_config):
 
 
 def generate_server(test_config):
-    # 1. Delete the Generated_server folder. TODO: Take a boolean in the config to say whether the build should be a clean build
-    if test_config['generated_server'].exists():
+    # 1. Delete the Generated_server folder.
+    if test_config['generated_server'].exists() and test_config['clean_gen'] == True:
         shutil.rmtree(test_config['generated_server'])
 
     # 2. Generate the server
@@ -58,7 +58,7 @@ def run_test(test_config):
     check_for_pre_requisites(test_config)
 
     # 2. Generate the server
-    print ("Generating server code for " + test_config['test_name'])
+    print("Generating server code for " + test_config['test_name'])
     generate_server(test_config)
 
     # 3. Copy the 'Run Service.vi' from the Impl folder to the Generated_server folder
@@ -81,7 +81,10 @@ def run_test(test_config):
         print (f"{test_config['generated_server']} not generated")
 
     # 5. Quit LabVIEW if it is running
-    run_command(['taskkill', '/f', '/im', 'labview.exe'])
+    try:
+        run_command(['taskkill', '/f', '/im', 'labview.exe'])
+    except Exception:
+        pass
 
     # 6. Start Run Service.vi from command prompt by launching labview.exe form lv_folder with the following arguments:
     # this must be non-blocking
@@ -170,6 +173,7 @@ def main():
             test_config['tests_folder'] = test_config['test_suite_folder'] / 'Tests'
             test_config['python_path'] = test_config['test_suite_folder'] / 'venv' / "Scripts" / "python.exe"
             tests_folder = test_config['tests_folder']
+            test_config['clean_gen'] = test['clean_gen']
             # locals
             for test_name in test['name']:
                 print(f'\nRunning test for "{test_name}"...')

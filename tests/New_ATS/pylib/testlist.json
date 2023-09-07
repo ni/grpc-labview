@@ -15,6 +15,7 @@
     ],
     "gen_type": "0",
     "labview_version": "2019",
-    "labview_bitness": "32"
+    "labview_bitness": "32",
+    "clean_gen": true
   }
 ]
