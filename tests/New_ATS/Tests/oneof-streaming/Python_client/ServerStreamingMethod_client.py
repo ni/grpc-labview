@@ -8,7 +8,7 @@ import os
 def get_ServerStreamingMethod_output(test_input):
     age = test_input['age']
     message = test_input['request_oneof'].get('message')
-    request_id=request['request_oneof'].get('request_id')
+    request_id=test_input['request_oneof'].get('request_id')
     
     response_list = []
     with grpc.insecure_channel('localhost:50051') as channel:
