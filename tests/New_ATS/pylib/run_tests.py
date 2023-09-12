@@ -29,13 +29,8 @@ def check_for_pre_requisites(test_config):
     if not test_config["lvcli_path"].exists():
         raise Exception(f'LabVIEW CLI is not installed at {test_config["lvcli_path"]}')
 
-
-def generate_server(test_config):
-    # 1. Delete the Generated_server folder.
-    if test_config['generated_server'].exists() and test_config['clean_gen'] == True:
-        shutil.rmtree(test_config['generated_server'])
-
-    # 2. Generate the server
+def call_code_generator(test_config):
+    # 1. Generate the server
     # todo: call the LabVIEW VI from LabVIEW CLI
     main_wrapper_vi_path = test_config['test_suite_folder'] / 'Main_CLIWrapper.vi'
     # subprocess.run([f'{labviewCLI_path} -OperationName RunVI',
@@ -51,6 +46,14 @@ def generate_server(test_config):
     run_command(CLI_command)
 
 
+def clean_server_generation(test_config):
+    # 1. Delete the Generated_server folder.
+    if test_config['generated_server'].exists() and test_config['clean_gen']:
+        shutil.rmtree(test_config['generated_server'])
+
+    # 2. Call the code generator.
+    call_code_generator(test_config)
+
 def run_test(test_config):
     global FAILED
 
@@ -59,7 +62,7 @@ def run_test(test_config):
 
     # 2. Generate the server
     print("Generating server code for " + test_config['test_name'])
-    generate_server(test_config)
+    clean_server_generation(test_config)
 
     # 3. Copy the 'Run Service.vi' from the Impl folder to the Generated_server folder
     run_service_impl_path = test_config['impl'] / 'Run Service.vi'
@@ -80,7 +83,12 @@ def run_test(test_config):
     else:
         print (f"{test_config['generated_server']} not generated")
 
-    # 5. Quit LabVIEW if it is running
+    # 5. Generate server again if clean_gen is false
+    if not test_config['clean_gen']:
+        print("Generating server again")
+        call_code_generator(test_config)
+
+    # 6. Quit LabVIEW if it is running
     try:
         run_command(['taskkill', '/f', '/im', 'labview.exe'])
     except Exception:

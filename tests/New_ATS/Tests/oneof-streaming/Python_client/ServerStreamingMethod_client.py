@@ -8,11 +8,12 @@ import os
 def get_ServerStreamingMethod_output(test_input):
     age = test_input['age']
     message = test_input['request_oneof'].get('message')
+    request_id=request['request_oneof'].get('request_id')
     
     response_list = []
     with grpc.insecure_channel('localhost:50051') as channel:
         stub = oneof_streaming_pb2_grpc.GreeterServiceStub(channel)   
-        request = oneof_streaming_pb2.Request(age=age, message=message)
+        request = oneof_streaming_pb2.Request(age=age, message=message, request_id=request_id)
         response_stream = stub.ServerStreamingMethod(request)
 
         for response in response_stream:
