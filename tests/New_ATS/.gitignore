@@ -9,4 +9,5 @@ venv
 *.lvproj
 *.lvlps
 Generated_client
+Generated_server
 logs
