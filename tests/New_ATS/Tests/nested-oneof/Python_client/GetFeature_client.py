@@ -5,6 +5,11 @@ import json
 import pytest
 import os
 
+# 'GetFeature' rpc performs the following operations on the 'req' message fields:
+# 1) Increments req_id by 1 and saves in res_id of 'res' message.
+# 2) Increments req_price of req_oneof by 1 and saves in res_oneof's res_price field of 'res' message. 
+# 3) Appends '_response' to the anotherField field of message_a in req_oneof and saves in corresponding res_oneof's message_a field of 'res' message.
+# 4) Appends '_response' to the data_a1 and data_a2 fields of oneof_a field of message_a field in req_oneof and saves in corresponding res_oneof's message_a field of 'res' message.
 def get_GetFeature_output(test_input):
     req_id = test_input.get('req_id')
     req_price = data_a1 = data_a2 = anotherField = None

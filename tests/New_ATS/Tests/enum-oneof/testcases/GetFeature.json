@@ -3,15 +3,13 @@
     "input": {
       "req_latitude": 100,
       "req_oneof": {
-        "req_name": "Enum",
-        "req_color": null
+        "req_name": "Enum"
       }
     },
     "output": {
       "res_latitude": 101,
       "res_oneof": {
-        "res_name": "Enum_response",
-        "res_color": null
+        "res_name": "Enum_response"
       }
     }
   },
@@ -19,14 +17,12 @@
     "input": {
       "req_latitude": 100,
       "req_oneof": {
-        "req_name": null,
         "req_color": "GREEN"
       }
     },
     "output": {
       "res_latitude": 101,
       "res_oneof": {
-        "res_name": null,
         "res_color": "GREEN"
       }
     }

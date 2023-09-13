@@ -8,6 +8,6 @@ venv
 *.aliases
 *.lvproj
 *.lvlps
-Generated_server
 Generated_client
+Generated_server
 logs

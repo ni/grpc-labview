@@ -5,6 +5,7 @@ import helloworld_pb2
 import helloworld_pb2_grpc
 
 class Greeter(helloworld_pb2_grpc.GreeterServiceServicer):
+    # Sends a greeting by appending 'Hello ' prefix and "!!!" suffix to the name field of HelloRequest message
     def SayHello(self, request, context):
         print("Got request " + str(request))
         return helloworld_pb2.HelloReply(message=f'Hello {request.name}!!!')

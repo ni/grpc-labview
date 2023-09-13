@@ -5,6 +5,11 @@ import json
 import pytest
 import os
 
+# A client-to-server streaming RPC.
+#
+# Accepts a stream of Points on a route being traversed, returning a
+# RouteSummary when traversal is completed.
+
 def read_json(filepath):
     with open(filepath, 'r') as file:
         test_data = json.load(file)

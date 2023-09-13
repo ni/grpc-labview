@@ -5,6 +5,7 @@ import json
 import pytest
 import os
 
+# Sends a greeting by appending 'Hello ' prefix and "!!!" suffix to the name field of HelloRequest message
 def read_json(filepath):
     with open(filepath, 'r') as file:
         test_data = json.load(file)

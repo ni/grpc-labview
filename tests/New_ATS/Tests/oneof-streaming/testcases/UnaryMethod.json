@@ -1,0 +1,128 @@
+[
+  {
+    "input": {
+      "age": 25,
+      "request_oneof": {
+        "message": "Hello, World!"
+      }
+    },
+    "output": {
+      "new_age": 26,
+      "response_oneof": {
+        "result": "Hello, World!_response"
+      }
+    }
+  },
+  {
+    "input": {
+      "age": 18,
+      "request_oneof": {
+        "message": "Good morning"
+      }
+    },
+    "output": {
+      "new_age": 19,
+      "response_oneof": {
+        "result": "Good morning_response"
+      }
+    }
+  },
+  {
+    "input": {
+      "age": 40,
+      "request_oneof": {
+        "request_id": 123
+      }
+    },
+    "output": {
+      "new_age": 41,
+      "response_oneof": {
+        "response_id": 124
+      }
+    }
+  },
+  {
+    "input": {
+      "age": 60,
+      "request_oneof": {
+        "request_id": 456
+      }
+    },
+    "output": {
+      "new_age": 61,
+      "response_oneof": {
+        "response_id": 457
+      }
+    }
+  },
+  {
+    "input": {
+      "age": 30,
+      "request_oneof": {
+        "message": "Testing"
+      }
+    },
+    "output": {
+      "new_age": 31,
+      "response_oneof": {
+        "result": "Testing_response"
+      }
+    }
+  },
+  {
+    "input": {
+      "age": 22,
+      "request_oneof": {
+        "request_id": 789
+      }
+    },
+    "output": {
+      "new_age": 23,
+      "response_oneof": {
+        "response_id": 790
+      }
+    }
+  },
+  {
+    "input": {
+      "age": 35,
+      "request_oneof": {
+        "message": "Greetings"
+      }
+    },
+    "output": {
+      "new_age": 36,
+      "response_oneof": {
+        "result": "Greetings_response"
+      }
+    }
+  },
+  {
+    "input": {
+      "age": 50,
+      "request_oneof": {
+        "request_id": 1000
+      }
+    },
+    "output": {
+      "new_age": 51,
+      "response_oneof": {
+        "response_id": 1001
+      }
+    }
+  },
+  {
+    "input": {
+      "age": 28,
+      "request_oneof": {
+        "message": "How are you?"
+      }
+    },
+    "output": {
+      "new_age": 29,
+      "response_oneof": {
+        "result": "How are you?_response"
+      }
+    }
+  }
+]

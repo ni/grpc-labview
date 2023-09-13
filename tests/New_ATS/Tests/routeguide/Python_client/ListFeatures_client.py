@@ -5,6 +5,13 @@ import json
 import pytest
 import os
 
+# A server-to-client streaming RPC.
+#
+# Obtains the Features available within the given Rectangle.  Results are
+# streamed rather than returned at once (e.g. in a response message with a
+# repeated field), as the rectangle may cover a large area and contain a
+# huge number of features.
+
 def read_json(filepath):
     with open(filepath, 'r') as file:
         test_data = json.load(file)

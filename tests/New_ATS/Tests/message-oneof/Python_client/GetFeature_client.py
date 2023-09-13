@@ -5,6 +5,10 @@ import json
 import pytest
 import os
 
+# 'GetFeature' rpc performs the following operations on the 'req' message fields:
+# 1) Saves req_oneof's active index in res_id (either 2 or 3)
+# 2) Appends '_response' to the req_name field of req_oneof and saves in res_name field of res_oneof.
+# 3) Appends '_nested' to the message_a's (of req_oneof) data_a1 field and saves in corresponding message_a in res_oneof. 
 def get_GetFeature_output(test_input):
     req_id = test_input.get('req_id')
     req_name = test_input['req_oneof'].get('req_name')

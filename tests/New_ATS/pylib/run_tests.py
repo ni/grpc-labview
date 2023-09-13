@@ -29,13 +29,8 @@ def check_for_pre_requisites(test_config):
     if not test_config["lvcli_path"].exists():
         raise Exception(f'LabVIEW CLI is not installed at {test_config["lvcli_path"]}')
 
-
-def generate_server(test_config):
-    # 1. Delete the Generated_server folder. TODO: Take a boolean in the config to say whether the build should be a clean build
-    if test_config['generated_server'].exists():
-        shutil.rmtree(test_config['generated_server'])
-
-    # 2. Generate the server
+def call_code_generator(test_config):
+    # 1. Generate the server
     # todo: call the LabVIEW VI from LabVIEW CLI
     main_wrapper_vi_path = test_config['test_suite_folder'] / 'Main_CLIWrapper.vi'
     # subprocess.run([f'{labviewCLI_path} -OperationName RunVI',
@@ -51,6 +46,14 @@ def generate_server(test_config):
     run_command(CLI_command)
 
 
+def clean_server_generation(test_config):
+    # 1. Delete the Generated_server folder.
+    if test_config['generated_server'].exists() and test_config['clean_gen']:
+        shutil.rmtree(test_config['generated_server'])
+
+    # 2. Call the code generator.
+    call_code_generator(test_config)
+
 def run_test(test_config):
     global FAILED
 
@@ -58,8 +61,8 @@ def run_test(test_config):
     check_for_pre_requisites(test_config)
 
     # 2. Generate the server
-    print ("Generating server code for " + test_config['test_name'])
-    generate_server(test_config)
+    print("Generating server code for " + test_config['test_name'])
+    clean_server_generation(test_config)
 
     # 3. Copy the 'Run Service.vi' from the Impl folder to the Generated_server folder
     run_service_impl_path = test_config['impl'] / 'Run Service.vi'
@@ -80,8 +83,16 @@ def run_test(test_config):
     else:
         print (f"{test_config['generated_server']} not generated")
 
-    # 5. Quit LabVIEW if it is running
-    run_command(['taskkill', '/f', '/im', 'labview.exe'])
+    # 5. Generate server again if clean_gen is false
+    if not test_config['clean_gen']:
+        print("Generating server again")
+        call_code_generator(test_config)
+
+    # 6. Quit LabVIEW if it is running
+    try:
+        run_command(['taskkill', '/f', '/im', 'labview.exe'])
+    except Exception:
+        pass
 
     # 6. Start Run Service.vi from command prompt by launching labview.exe form lv_folder with the following arguments:
     # this must be non-blocking
@@ -106,17 +117,19 @@ def run_test(test_config):
     ])
     run_command(CLI_command)
 
-    # 8. Generate python grpc classes
-    generate_command = ' '.join([
-        f"{test_config['python_path']} -m grpc_tools.protoc",
-        f"--proto_path={test_config['test_folder']}",
-        f"--python_out={test_config['python_client_folder']}",
-        f"--pyi_out={test_config['python_client_folder']}",
-        f"--grpc_python_out={test_config['python_client_folder']}",
-        f"{test_config['test_name']}.proto"
-    ])
-    print ("Compiling proto file")
-    run_command(generate_command)
+    # 8. Generate python client and server grpc classes
+    for path in ['python_client_folder', 'python_server_folder']:
+        if os.path.exists(test_config[f'{path}']):
+            generate_command = ' '.join([
+                f"{test_config['python_path']} -m grpc_tools.protoc",
+                f"--proto_path={test_config['test_folder']}",
+                f"--python_out={test_config[f'{path}']}",
+                f"--pyi_out={test_config[f'{path}']}",
+                f"--grpc_python_out={test_config[f'{path}']}",
+                f"{test_config['test_name']}.proto"
+            ])
+            print ("Compiling proto file for "+path.split('_')[1])
+            run_command(generate_command)
 
     # 9. Call the TestServer() from test_folder/test_name_client.py and get the return value
     print(f"Running tests for all rpc's in {test_config['test_name']}")
@@ -168,6 +181,7 @@ def main():
             test_config['tests_folder'] = test_config['test_suite_folder'] / 'Tests'
             test_config['python_path'] = test_config['test_suite_folder'] / 'venv' / "Scripts" / "python.exe"
             tests_folder = test_config['tests_folder']
+            test_config['clean_gen'] = test['clean_gen']
             # locals
             for test_name in test['name']:
                 print(f'\nRunning test for "{test_name}"...')
@@ -180,6 +194,7 @@ def main():
                 test_config['impl'] = test_config['test_folder'] / 'Impl'
                 test_config['gen_type'] = gen_type
                 test_config['python_client_folder'] = test_config['test_folder'] / 'Python_client'
+                test_config['python_server_folder'] = test_config['test_folder'] / 'Python_server'
                 run_test(test_config)
             if FAILED:
                 raise Exception(f"{FAILED} test cases have failed. Please review the above results")            
