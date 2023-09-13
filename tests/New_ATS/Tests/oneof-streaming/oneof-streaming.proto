@@ -1,16 +1,29 @@
 syntax = "proto3";
 
 service GreeterService {
-  // operation - increments and request_id by 1, appends _response to message
+
+  // 'UnaryMethod' rpc performs the following operations on the 'Request' message fields:
+  // 1) Increments age by 1 and saves in new_age of 'Response' message.
+  // 2) Increments request_id of request_oneof by 1 and saves in response_oneof's response_id field of 'Response' message. 
+  // 3) Appends '_response' to the message field of request_oneof and saves in result field of response_oneof of 'Response' message.
   rpc UnaryMethod(Request) returns (Response);
 
-  // streams 'age' number of Response messages and does the same operation
+  // 'ServerStreamingMethod' rpc performs the following operations on the 'Request' message fields and streams 'age' number of identical 'Response' messages:
+  // 1) Increments age by 1 and saves in new_age of 'Response' message.
+  // 2) Increments request_id of request_oneof by 1 and saves in response_oneof's response_id field of 'Response' message. 
+  // 3) Appends '_response' to the message field of request_oneof and saves in result field of response_oneof of 'Response' message.
   rpc ServerStreamingMethod(Request) returns (stream Response);
 
-  // sums all the age variables and supplies them in the new_age variable and does same operation on the last message of the input stream
+  // 'ClientStreamingMethod' rpc performs the following operations on the 'Request' message fields returns one single 'Response' message:
+  // 1) Sums up the values of age field in all 'Request' messages and saves the sum in new_age of 'Response' message.
+  // 2) Increments request_id of request_oneof of the last 'Request' message by 1 and saves in response_oneof's response_id field of 'Response' message. 
+  // 3) Appends '_response' to the message field of request_oneof of the last 'Request' message and saves in result field of response_oneof of 'Response' message.
   rpc ClientStreamingMethod(stream Request) returns (Response);
 
-  // does same operation on each Request message and returns corresponding Response Message
+  // 'BidirectionalStreamingMethod' rpc performs the following operations on the 'Request' message fields and returns one 'Response' message for each 'Request' message:
+  // 1) Increments age by 1 and saves in new_age of 'Response' message.
+  // 2) Increments request_id of request_oneof by 1 and saves in response_oneof's response_id field of 'Response' message. 
+  // 3) Appends '_response' to the message field of request_oneof and saves in result field of response_oneof of 'Response' message.
   rpc BidirectionalStreamingMethod(stream Request) returns (stream Response);
 }
 

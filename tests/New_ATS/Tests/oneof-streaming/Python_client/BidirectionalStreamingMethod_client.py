@@ -5,6 +5,10 @@ import json
 import pytest
 import os
 
+# 'BidirectionalStreamingMethod' rpc performs the following operations on the 'Request' message fields and returns one 'Response' message for each 'Request' message:
+# 1) Increments age by 1 and saves in new_age of 'Response' message.
+# 2) Increments request_id of request_oneof by 1 and saves in response_oneof's response_id field of 'Response' message. 
+# 3) Appends '_response' to the message field of request_oneof and saves in result field of response_oneof of 'Response' message.
 def read_json(filepath):
     with open(filepath, 'r') as file:
         test_data = json.load(file)

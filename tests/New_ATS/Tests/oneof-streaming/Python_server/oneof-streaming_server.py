@@ -5,6 +5,11 @@ import oneof_streaming_pb2
 import oneof_streaming_pb2_grpc
 
 class GreeterService(oneof_streaming_pb2_grpc.GreeterServiceServicer):
+
+    # 'UnaryMethod' rpc performs the following operations on the 'Request' message fields:
+    # 1) Increments age by 1 and saves in new_age of 'Response' message.
+    # 2) Increments request_id of request_oneof by 1 and saves in response_oneof's response_id field of 'Response' message. 
+    # 3) Appends '_response' to the message field of request_oneof and saves in result field of response_oneof of 'Response' message.
     def UnaryMethod(self, request, context):
         age = request.age
         message = request_id = None
@@ -17,6 +22,11 @@ class GreeterService(oneof_streaming_pb2_grpc.GreeterServiceServicer):
         response = oneof_streaming_pb2.Response(new_age=new_age, result=result, response_id=request_id)
         return response
     
+
+    # 'ServerStreamingMethod' rpc performs the following operations on the 'Request' message fields and streams 'age' number of identical 'Response' messages:
+    # 1) Increments age by 1 and saves in new_age of 'Response' message.
+    # 2) Increments request_id of request_oneof by 1 and saves in response_oneof's response_id field of 'Response' message. 
+    # 3) Appends '_response' to the message field of request_oneof and saves in result field of response_oneof of 'Response' message.
     def ServerStreamingMethod(self, request, context):
         age = request.age
         message = request_id = None
@@ -32,6 +42,11 @@ class GreeterService(oneof_streaming_pb2_grpc.GreeterServiceServicer):
             response = oneof_streaming_pb2.Response(new_age=new_age, result=result, response_id=response_id)
             yield response 
 
+
+    # 'ClientStreamingMethod' rpc performs the following operations on the 'Request' message fields returns one single 'Response' message:
+    # 1) Sums up the values of age field in all 'Request' messages and saves the sum in new_age of 'Response' message.
+    # 2) Increments request_id of request_oneof of the last 'Request' message by 1 and saves in response_oneof's response_id field of 'Response' message. 
+    # 3) Appends '_response' to the message field of request_oneof of the last 'Request' message and saves in result field of response_oneof of 'Response' message.
     def ClientStreamingMethod(self, request_iterator, context):
         age_sum = 0
         last_message = None
@@ -53,6 +68,11 @@ class GreeterService(oneof_streaming_pb2_grpc.GreeterServiceServicer):
         response = oneof_streaming_pb2.Response(new_age=new_age, result=result, response_id=response_id)
         return response
     
+    
+    # 'BidirectionalStreamingMethod' rpc performs the following operations on the 'Request' message fields and returns one 'Response' message for each 'Request' message:
+    # 1) Increments age by 1 and saves in new_age of 'Response' message.
+    # 2) Increments request_id of request_oneof by 1 and saves in response_oneof's response_id field of 'Response' message. 
+    # 3) Appends '_response' to the message field of request_oneof and saves in result field of response_oneof of 'Response' message.
     def BidirectionalStreamingMethod(self, request_iterator, context):
         for request in request_iterator:
             new_age = request.age + 1

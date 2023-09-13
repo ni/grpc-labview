@@ -6,6 +6,10 @@ import pytest
 import os
 from enum import Enum
  
+# 'BidirectionalStreamingMethod' rpc performs the following operations on a stream of 'request' message fields and outputs a stream of corresonding 'response' messages:
+# 1) Increments request_number by 1 and saves in response_number of 'response' message.
+# 2) Appends '_response' to the request_message field and saves in response_message field of 'response' message.
+# 3) Save the same request_color enum value in response_color
 class Color(Enum):
     RED = 0
     GREEN = 1

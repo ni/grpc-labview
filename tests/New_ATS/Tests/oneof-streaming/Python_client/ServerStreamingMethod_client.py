@@ -5,6 +5,10 @@ import json
 import pytest
 import os
 
+# 'ServerStreamingMethod' rpc performs the following operations on the 'Request' message fields and streams 'age' number of identical 'Response' messages:
+# 1) Increments age by 1 and saves in new_age of 'Response' message.
+# 2) Increments request_id of request_oneof by 1 and saves in response_oneof's response_id field of 'Response' message. 
+# 3) Appends '_response' to the message field of request_oneof and saves in result field of response_oneof of 'Response' message.
 def get_ServerStreamingMethod_output(test_input):
     age = test_input['age']
     message = test_input['request_oneof'].get('message')

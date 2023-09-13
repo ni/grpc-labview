@@ -5,6 +5,10 @@ import json
 import pytest
 import os
 
+# 'ClientStreamingMethod' rpc performs the following operations on the 'Request' message fields returns one single 'Response' message:
+# 1) Sums up the values of age field in all 'Request' messages and saves the sum in new_age of 'Response' message.
+# 2) Increments request_id of request_oneof of the last 'Request' message by 1 and saves in response_oneof's response_id field of 'Response' message. 
+# 3) Appends '_response' to the message field of request_oneof of the last 'Request' message and saves in result field of response_oneof of 'Response' message.
 def read_json(filepath):
     with open(filepath, 'r') as file:
         test_data = json.load(file)

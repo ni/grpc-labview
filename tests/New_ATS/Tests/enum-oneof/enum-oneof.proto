@@ -3,6 +3,11 @@ syntax = "proto3";
 package Greeter;
 
 service GreeterService {
+
+  // 'GetFeature' rpc performs the following operations on the 'req' message fields:
+  // 1) Increments req_latitude by 1 and saves in res_latitude. 
+  // 2) Appends '_response' to the req_name field of req_oneof and saves in res_name field of res_oneof.
+  // 3) Returns the same value of req_color field of req_oneof and saves in res_color field of res_oneof.
   rpc GetFeature(req) returns (res) {}
 }
 

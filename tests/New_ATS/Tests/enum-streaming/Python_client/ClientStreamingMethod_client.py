@@ -6,6 +6,10 @@ import pytest
 import os
 from enum import Enum
  
+# 'ClientStreamingMethod' rpc performs the following operations on a stream of 'request' message fields and outputs a single 'response' message:
+# 1) Adds the values of request_number of each 'request' message and saves the sum in the response_number of the 'response' message.
+# 2) Appends the values of all request_message fields and saves the result in response_message of 'response' message.
+# 3) Save the same request_color enum value of the last 'request' message in response_color of each 'response' message
 class Color(Enum):
     RED = 0
     GREEN = 1

@@ -6,6 +6,10 @@ import pytest
 import os
 from enum import Enum
  
+# 'ServerStreamingMethod' rpc performs the following operations on the 'request' message fields and streams 'request_number' number of 'response' messages:
+# 1) Increments response_number from the previous response_number by 1 starting with the request_number value in the first 'response' message's response_number.
+# 2) Appends '_response' to the request_message field and saves in response_message field of each 'response' message.
+# 3) Save the same request_color enum value in response_color of each 'response' message
 class Color(Enum):
     RED = 0
     GREEN = 1
