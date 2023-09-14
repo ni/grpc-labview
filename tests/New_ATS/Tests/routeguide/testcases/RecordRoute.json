@@ -1,0 +1,64 @@
+[
+  {
+    "input": [
+      {
+        "latitude": 1,
+        "longitude": 2
+      },
+      {
+        "latitude": 3,
+        "longitude": 4
+      },
+      {
+        "latitude": 5,
+        "longitude": 6
+      }
+    ],
+    "output": {
+      "point_count": 3,
+      "feature_count": 3,
+      "distance": 0,
+      "elapsed_time": 1
+    }
+  },
+  {
+    "input": [
+      {
+        "latitude": 2,
+        "longitude": 10
+      },
+      {
+        "latitude": 22,
+        "longitude": 26
+      },
+      {
+        "latitude": 99,
+        "longitude": 46
+      },
+      {
+        "latitude": 9,
+        "longitude": 6
+      }
+    ],
+    "output": {
+      "point_count": 4,
+      "feature_count": 4,
+      "distance": 0,
+      "elapsed_time": 1
+    }
+  },
+  {
+    "input": [
+      {
+        "latitude": 5,
+        "longitude": 2
+      }
+    ],
+    "output": {
+      "point_count": 1,
+      "feature_count": 1,
+      "distance": 0,
+      "elapsed_time": 1
+    }
+  }
+]

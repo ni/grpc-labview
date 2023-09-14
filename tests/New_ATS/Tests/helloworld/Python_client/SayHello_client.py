@@ -10,7 +10,7 @@ def read_json(filepath):
         test_data = json.load(file)
     return test_data
 
-SayHello_json_file_path = f'{os.path.dirname(os.path.abspath(__file__))}/testcases/SayHello.json'
+SayHello_json_file_path = f'{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/testcases/SayHello.json'
 
 def get_SayHello_output(test_input):
     name = test_input['name']
