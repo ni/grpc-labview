@@ -1,0 +1,364 @@
+[
+  {
+    "input": [
+      {
+        "age": 2,
+        "request_oneof": {
+          "message": "Hello, World!"
+        }
+      },
+      {
+        "age": 2,
+        "request_oneof": {
+          "message": "Hello, World!"
+        }
+      }
+    ],
+    "output": {
+      "new_age": 4,
+      "response_oneof": {
+        "result": "Hello, World!_response"
+      }
+    }
+  },
+  {
+    "input": [
+      {
+        "age": 5,
+        "request_oneof": {
+          "message": "Good morning"
+        }
+      },
+      {
+        "age": 5,
+        "request_oneof": {
+          "message": "Good morning"
+        }
+      },
+      {
+        "age": 5,
+        "request_oneof": {
+          "message": "Good morning"
+        }
+      },
+      {
+        "age": 5,
+        "request_oneof": {
+          "message": "Good morning"
+        }
+      },
+      {
+        "age": 5,
+        "request_oneof": {
+          "message": "Good morning"
+        }
+      }
+    ],
+    "output": {
+      "new_age": 25,
+      "response_oneof": {
+        "result": "Good morning_response"
+      }
+    }
+  },
+  {
+    "input": [
+      {
+        "age": 10,
+        "request_oneof": {
+          "message": "Hi there"
+        }
+      },
+      {
+        "age": 10,
+        "request_oneof": {
+          "message": "Hi there"
+        }
+      },
+      {
+        "age": 10,
+        "request_oneof": {
+          "message": "Hi there"
+        }
+      },
+      {
+        "age": 10,
+        "request_oneof": {
+          "message": "Hi there"
+        }
+      },
+      {
+        "age": 10,
+        "request_oneof": {
+          "message": "Hi there"
+        }
+      },
+      {
+        "age": 10,
+        "request_oneof": {
+          "message": "Hi there"
+        }
+      },
+      {
+        "age": 10,
+        "request_oneof": {
+          "message": "Hi there"
+        }
+      },
+      {
+        "age": 10,
+        "request_oneof": {
+          "message": "Hi there"
+        }
+      },
+      {
+        "age": 10,
+        "request_oneof": {
+          "message": "Hi there"
+        }
+      },
+      {
+        "age": 10,
+        "request_oneof": {
+          "message": "Hi there"
+        }
+      }
+    ],
+    "output": {
+      "new_age": 100,
+      "response_oneof": {
+        "result": "Hi there_response"
+      }
+    }
+  },
+  {
+    "input": [
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      },
+      {
+        "age": 15,
+        "request_oneof": {
+          "message": "How are you?"
+        }
+      }
+    ],
+    "output": {
+      "new_age": 225,
+      "response_oneof": {
+        "result": "How are you?_response"
+      }
+    }
+  },
+  {
+    "input": [
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      },
+      {
+        "age": 20,
+        "request_oneof": {
+          "message": "Greetings!"
+        }
+      }
+    ],
+    "output": {
+      "new_age": 400,
+      "response_oneof": {
+        "result": "Greetings!_response"
+      }
+    }
+  }
+]

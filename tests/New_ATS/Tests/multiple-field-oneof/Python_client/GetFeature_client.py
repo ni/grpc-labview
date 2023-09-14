@@ -5,6 +5,11 @@ import json
 import pytest
 import os
 
+# 'GetFeature' rpc performs the following operations on the 'req' message fields:
+# 1) Increments req_latitude by 1 and saves in res_latitude of 'res' message.
+# 2) Increments all the integer and decimal fields of req_oneof by 1 and saves in corresponding res_oneof fields of 'res' message. 
+# 3) Appends '_response' to the string fields of req_oneof and saves in corresponding res_oneof fields of 'res' message.
+# 4) Does a NOT operation on the boolean fields of req_oneof and saves in corresponding res_oneof fields of 'res' message. 
 def get_GetFeature_output(test_input):
     req_latitude = test_input.get('req_latitude')
     req_name = test_input['req_oneof'].get('req_name')

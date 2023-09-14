@@ -68,12 +68,23 @@ jobs:
         run: |
           $directory = "${{runner.workspace}}/grpc-labview/tests/New_ATS/logs"
 
-          Get-ChildItem -Path $directory | ForEach-Object {
-              if ($_.PSIsContainer -eq $false) {
-                  Write-Host "Contents of $($_.Name):"
-                  Get-Content $_.FullName
+          # Recursively iterate through all files in subfolders
+          Get-ChildItem -Path $directory -File -Recurse | Group-Object Directory | ForEach-Object {
+              $subfolderName = $_.Name
+
+              Write-Host "Folder: $subfolderName"
+
+              $_.Group | ForEach-Object {
+                  $file = $_
+                  Write-Host "Filename: $($file.Name)"
+                  Write-Host "Contents:"
+
+                  # Print the content of the file
+                  Get-Content $file.FullName
+
                   Write-Host ""
               }
+              Write-Host ""
           }
 
       - if: startsWith(github.ref, 'refs/tags/v')

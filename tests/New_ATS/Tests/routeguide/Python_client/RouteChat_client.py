@@ -5,6 +5,11 @@ import json
 import pytest
 import os
 
+# A Bidirectional streaming RPC.
+#
+# Accepts a stream of RouteNotes sent while a route is being traversed,
+# while receiving other RouteNotes (e.g. from other users).
+
 def read_json(filepath):
     with open(filepath, 'r') as file:
         test_data = json.load(file)

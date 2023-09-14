@@ -4,7 +4,7 @@ package helloworld;
 
 // The greeting service definition.
 service GreeterService {
-  // Sends a greeting
+  // Sends a greeting by appending 'Hello ' prefix and "!!!" suffix to the name field of HelloRequest message
   rpc SayHello (HelloRequest) returns (HelloReply) {}
 }
 

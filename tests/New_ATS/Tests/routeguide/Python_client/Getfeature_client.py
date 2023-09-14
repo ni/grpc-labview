@@ -5,6 +5,13 @@ import json
 import pytest
 import os
 
+# A simple RPC.
+#
+# Obtains the feature at a given position.
+#
+# A feature with an empty name is returned if there's no feature at the given
+# position.
+
 def read_json(filepath):
     with open(filepath, 'r') as file:
         test_data = json.load(file)

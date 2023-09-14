@@ -5,6 +5,11 @@ import json
 import pytest
 import os
 
+# 'GetFeature' rpc performs the following operations on the 'req' message fields:
+# 1) Increments req_latitude by 1 and saves in res_latitude of 'res' message.
+# 2) Increments req_id of req_oneof by 1 and saves in res_oneof's res_id field of 'res' message. 
+# 3) Appends '_response' to the req_name field of req_oneof and save in res_name field of res_oneof of 'res' message.
+# 4) Appends '_response' to the data_a1 field of message_a field and saves in corresponding message_a field of 'res' message.
 def get_GetFeature_output(test_input):
     req_latitude = test_input.get('req_latitude')
     message_a = req_id = req_name = None
