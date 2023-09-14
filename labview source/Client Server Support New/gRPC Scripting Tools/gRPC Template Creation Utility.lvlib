@@ -56,10 +56,6 @@
 		<Item Name="Ref to LVClass.vi" Type="VI" URL="../Class API/Ref to LVClass.vi"/>
 		<Item Name="Save LVClass.vi" Type="VI" URL="../Class API/Save LVClass.vi"/>
 		<Item Name="Change Inheritance.vi" Type="VI" URL="../Class API/Change Inheritance.vi"/>
-		<Item Name="Create Dynamic VI In Class.vi" Type="VI" URL="../Class API/Create Dynamic VI In Class.vi"/>
-		<Item Name="Create LVClass in Library.vi" Type="VI" URL="../Class API/Create LVClass in Library.vi"/>
-		<Item Name="Create VI Override.vi" Type="VI" URL="../Class API/Create VI Override.vi"/>
-		<Item Name="MemberTemplate.vi" Type="VI" URL="../Class API/MemberTemplate.vi"/>
 	</Item>
 	<Item Name="Error Handling" Type="Folder">
 		<Property Name="NI.SortType" Type="Int">0</Property>
@@ -310,17 +306,26 @@
 			<Item Name="Get gRPC Id Terminal For Event SubDiagram.vi" Type="VI" URL="../Top Level API/Get gRPC Id Terminal For Event SubDiagram.vi"/>
 		</Item>
 		<Item Name="RPC Server" Type="Folder">
+			<Item Name="ServiceConstants" Type="Folder">
+				<Item Name="ServiceConstants.ctl" Type="VI" URL="../Top Level API/ServiceConstants.ctl"/>
+				<Item Name="Get Service Constant.vi" Type="VI" URL="../Top Level API/Get Service Constant.vi"/>
+			</Item>
 			<Item Name="Add Server Library to Project.vi" Type="VI" URL="../Top Level API/Add Server Library to Project.vi"/>
 			<Item Name="Copy Template Files.vi" Type="VI" URL="../Top Level API/Copy Template Files.vi"/>
 			<Item Name="Create Server Class from Template.vi" Type="VI" URL="../Top Level API/Create Server Class from Template.vi"/>
 			<Item Name="Create Server Library from Template.vi" Type="VI" URL="../Top Level API/Create Server Library from Template.vi"/>
 			<Item Name="Delete Template Files.vi" Type="VI" URL="../Top Level API/Delete Template Files.vi"/>
 			<Item Name="Update Template Files.vi" Type="VI" URL="../Top Level API/Update Template Files.vi"/>
-			<Item Name="Add RPC Memeber VIs.vi" Type="VI" URL="../Top Level API/Add RPC Memeber VIs.vi"/>
-			<Item Name="Create Child Class Override VIs.vi" Type="VI" URL="../Top Level API/Create Child Class Override VIs.vi"/>
-			<Item Name="Create Child Service Class.vi" Type="VI" URL="../Top Level API/Create Child Service Class.vi"/>
-			<Item Name="Generate ServiceImpl Class.vi" Type="VI" URL="../Top Level API/Generate ServiceImpl Class.vi"/>
+			<Item Name="Add RPC Impl VIs.vi" Type="VI" URL="../Top Level API/Add RPC Impl VIs.vi"/>
+			<Item Name="Create Impl Class.vi" Type="VI" URL="../Top Level API/Create Impl Class.vi"/>
+			<Item Name="Generate User Service.vi" Type="VI" URL="../Top Level API/Generate User Service.vi"/>
 			<Item Name="Add User Code Library to Project.vi" Type="VI" URL="../Top Level API/Add User Code Library to Project.vi"/>
+			<Item Name="Generate Stub Service.vi" Type="VI" URL="../Top Level API/Generate Stub Service.vi"/>
+			<Item Name="Get Path To ServiceImpl Template.vi" Type="VI" URL="../Top Level API/Get Path To ServiceImpl Template.vi"/>
+			<Item Name="Get RPC VI template.vi" Type="VI" URL="../Top Level API/Get RPC VI template.vi"/>
+			<Item Name="Replace Class References.vi" Type="VI" URL="../Top Level API/Replace Class References.vi"/>
+			<Item Name="Create RPC Impl VI.vi" Type="VI" URL="../Top Level API/Create RPC Impl VI.vi"/>
+			<Item Name="Delete RPC VI Template.vi" Type="VI" URL="../Top Level API/Delete RPC VI Template.vi"/>
 		</Item>
 	</Item>
 	<Item Name="TypeDefs" Type="Folder">
