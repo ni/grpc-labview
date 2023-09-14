@@ -58,10 +58,19 @@
 			<Item Name="Apply Package Name.vi" Type="VI" URL="../Server API/Cluster to gRPC message/Apply Package Name.vi">
 				<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 			</Item>
+			<Item Name="Apply Package Name to Enum Metadata.vi" Type="VI" URL="../Server API/Cluster to gRPC message/Apply Package Name to Enum Metadata.vi">
+				<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
+			</Item>
 			<Item Name="Cluster to Element Details.vi" Type="VI" URL="../Server API/Cluster to gRPC message/Cluster to Element Details.vi">
 				<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 			</Item>
+			<Item Name="Get Embedded Message Name.vi" Type="VI" URL="../Server API/Cluster to gRPC message/Get Embedded Message Name.vi">
+				<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
+			</Item>
 			<Item Name="LabVIEW DataType to Message Element DataType.vi" Type="VI" URL="../Server API/Cluster to gRPC message/LabVIEW DataType to Message Element DataType.vi">
+				<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
+			</Item>
+			<Item Name="Element to Enum Metadata.vi" Type="VI" URL="../Server API/Cluster to gRPC message/Element to Enum Metadata.vi">
 				<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 			</Item>
 		</Item>
