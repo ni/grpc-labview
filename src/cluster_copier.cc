@@ -255,32 +255,28 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    struct LVCluster
-    {
-    };
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
     void ClusterDataCopier::CopyMessageToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
-            auto repeatedNested = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>(value);
-            if (repeatedNested->_value.size() != 0)
-            {
-                auto nestedMetadata = repeatedNested->_value.front()->_metadata;
-                auto clusterSize = nestedMetadata->clusterSize;
-
-                NumericArrayResize(0x08, 1, start, repeatedNested->_value.size() * clusterSize);
-                auto array = *(LV1DArrayHandle*)start;
-                (*array)->cnt = repeatedNested->_value.size();
-                int x = 0;
-                for (auto str : repeatedNested->_value)
+            if (!useHardCodedParse){
+                auto repeatedNested = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>(value);
+                if (repeatedNested->_value.size() != 0)
                 {
-                    auto lvCluster = (LVCluster**)(*array)->bytes(x * clusterSize, nestedMetadata->alignmentRequirement);
-                    *lvCluster = nullptr;
-                    CopyToCluster(*str, (int8_t*)lvCluster);
-                    x += 1;
+                    auto nestedMetadata = repeatedNested->_value.front()->_metadata;
+                    auto clusterSize = nestedMetadata->clusterSize;
+
+                    NumericArrayResize(0x08, 1, start, repeatedNested->_value.size() * clusterSize);
+                    auto array = *(LV1DArrayHandle*)start;
+                    (*array)->cnt = repeatedNested->_value.size();
+                    int x = 0;
+                    for (auto str : repeatedNested->_value)
+                    {
+                        auto lvCluster = (LVCluster**)(*array)->bytes(x * clusterSize, nestedMetadata->alignmentRequirement);
+                        *lvCluster = nullptr;
+                        CopyToCluster(*str, (int8_t*)lvCluster);
+                        x += 1;
+                    }
                 }
             }
         }

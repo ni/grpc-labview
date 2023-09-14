@@ -274,7 +274,8 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     int8_t* requestCluster,
     grpc_labview::gRPCid** callId,
     int32_t timeoutMs,
-    grpc_labview::gRPCid* contextId)
+    grpc_labview::gRPCid* contextId,
+    int8_t* responseCluster)
 {
     auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
@@ -320,6 +321,12 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
         return e.code;
     }
 
+    clientCall->_response->_lvResponseCluster._lvResponseClusterPtrStack.clear();
+    // store the lv response cluster pointer in the message
+    clientCall->_response->_lvResponseCluster._lvResponseClusterPtrStack.push_back(responseCluster);
+    // set iter count
+    clientCall->_response->_lvResponseCluster.clientCallIter++;
+
     clientCall->_runFuture = std::async(
         std::launch::async, 
         [clientCall]() 
@@ -334,6 +341,8 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     client->ActiveClientCalls.push_back(clientCall);
     return 0;
 }
+
+extern bool grpc_labview::useHardCodedParse;
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -356,7 +365,9 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
     {
         try
         {
-            grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
+            if (!grpc_labview::useHardCodedParse) {
+                grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
+            }
         }
         catch (grpc_labview::InvalidEnumValueException& e)
         {

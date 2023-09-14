@@ -10,6 +10,16 @@
 
 namespace grpc_labview 
 {
+    extern bool useHardCodedParse;
+    extern bool ackPtrChange;
+    extern bool callCtxDone;
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    struct LVCluster
+    {
+    };
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     class LVMessage : public google::protobuf::Message, public gRPCid
@@ -48,6 +58,26 @@ namespace grpc_labview
     public:
         std::map<int, std::shared_ptr<LVMessageValue>> _values;
         std::shared_ptr<MessageMetadata> _metadata;
+
+        class LabVIEWResponseCluster
+        {
+        public:
+            // create stack of _lvResponseClusterPtr
+            // push and pop from the stack based on nested message level
+            std::vector<int8_t*> _lvResponseClusterPtrStack;
+
+            // int8_t* _lvResponseClusterPtr = nullptr;
+            // bool _isLVResponseClusterFilled = false;
+            bool _fillDuringParse = false;
+
+            // void* array to hold values from protobuf
+            // this is used to fill the _lvResponseClusterPtr
+            void* _lvResponseClusterValues = nullptr;
+            int _lvResponseClusterValuesSize = 0;
+
+            int clientCallIter = 0;
+        };
+        static LabVIEWResponseCluster _lvResponseCluster;
 
     private:
         mutable google::protobuf::internal::CachedSize _cached_size_;
