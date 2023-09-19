@@ -326,6 +326,7 @@
 			<Item Name="Replace Class References.vi" Type="VI" URL="../Top Level API/Replace Class References.vi"/>
 			<Item Name="Create RPC Impl VI.vi" Type="VI" URL="../Top Level API/Create RPC Impl VI.vi"/>
 			<Item Name="Delete RPC VI Template.vi" Type="VI" URL="../Top Level API/Delete RPC VI Template.vi"/>
+			<Item Name="Get Path To User Service Template Library.vi" Type="VI" URL="../Top Level API/Get Path To User Service Template Library.vi"/>
 		</Item>
 	</Item>
 	<Item Name="TypeDefs" Type="Folder">
