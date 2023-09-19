@@ -328,6 +328,7 @@
 			<Item Name="Delete RPC VI Template.vi" Type="VI" URL="../Top Level API/Delete RPC VI Template.vi"/>
 			<Item Name="Get Path To User Service Template Library.vi" Type="VI" URL="../Top Level API/Get Path To User Service Template Library.vi"/>
 			<Item Name="Delete Generated Server Code.vi" Type="VI" URL="../Top Level API/Delete Generated Server Code.vi"/>
+			<Item Name="Update Run Service.vi" Type="VI" URL="../Top Level API/Update Run Service.vi"/>
 		</Item>
 	</Item>
 	<Item Name="TypeDefs" Type="Folder">
