@@ -93,17 +93,17 @@ def run_test(test_config):
     else :
        # 4. Coy Run Service.vi
         run_service_impl_path = test_config['usercode_server_impl'] / 'Run Service.vi'
-        run_service_gen_path = test_config['generated_server'] / 'Run Service.vi'
+        run_service_gen_path = test_config['usercode_server'] / 'Run Service.vi'
         if pathlib.Path(test_config['generated_server']).exists():
             print (f"Copying 'Run Service.vi' to {run_service_gen_path}")
             shutil.copyfile(run_service_impl_path, run_service_gen_path)
         else:
             print (f"{test_config['generated_server']} not generated, run service copy failed !")
 
-         # 5. Copy all the contents UserCode_server folder from the Impl/UserCode folder to UserCode_server folder adjacent to .lvproj
+         # 5. Copy all the contents UserCode_impl_server folder from the Impl/UserCode_impl_serverfolder to UserCode_impl_server folder adjacent to .lvproj
         usercode_server_gen_path = test_config['usercode_server']
         if pathlib.Path(usercode_server_gen_path).exists():
-            usercode_server_impl_path = test_config['usercode_server_impl'] / 'UserCode_server'
+            usercode_server_impl_path = test_config['usercode_server_impl']
             print (f"Copying {usercode_server_impl_path} contents to {usercode_server_gen_path}")
             shutil.copytree(usercode_server_impl_path, usercode_server_gen_path, dirs_exist_ok=True)
         else:
@@ -209,12 +209,12 @@ def main():
                 test_config['test_folder'] = tests_folder / test_name
                 test_config['proto_path'] = test_config['test_folder'] / str(test_name + '.proto')
                 test_config['project_path'] = test_config['test_folder'] / str(test_name + '.lvproj')
-                generated_server_path = test_config['test_folder'] / 'Generated_server'
+                generated_server_path = test_config['test_folder'] / 'Generated_stub_server'
                 test_config['generated_server'] = generated_server_path
                 
                 if args.codegen_style == 'decoupled':
-                    test_config['usercode_server'] = test_config['test_folder'] / 'UserCode_server'
-                    test_config['usercode_server_impl'] = test_config['test_folder'] / 'Impl' / 'UserCode'
+                    test_config['usercode_server'] = test_config['test_folder'] / 'UserCode_impl_server'
+                    test_config['usercode_server_impl'] = test_config['test_folder'] / 'Impl' / 'UserCode_impl_server'
 
                 test_config['impl'] = test_config['test_folder'] / 'Impl'
                 test_config['gen_type'] = gen_type

@@ -1,15 +1,7 @@
 [
   {
     "name": [
-      "helloworld",
-      "routeguide",
-      "all-datatypes-oneof",
-      "enum-oneof",
-      "message-oneof",
-      "multiple-field-oneof",
-      "nested-oneof",
-      "sibling-oneof",
-      "simple-oneof"
+      "helloworld"
     ],
     "gen_type": "0",
     "labview_version": "2019",
