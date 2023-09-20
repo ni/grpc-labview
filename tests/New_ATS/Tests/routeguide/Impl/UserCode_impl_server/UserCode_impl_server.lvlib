@@ -4,4 +4,5 @@
 	<Property Name="NI.Lib.SourceVersion" Type="Int">419463168</Property>
 	<Property Name="NI.Lib.Version" Type="Str">1.0.0.0</Property>
 	<Item Name="RouteGuideImpl.lvclass" Type="LVClass" URL="../RPC Service/RouteGuideImpl/RouteGuideImpl.lvclass"/>
+	<Item Name="Run Service.vi" Type="VI" URL="../Run Service.vi"/>
 </Library>
