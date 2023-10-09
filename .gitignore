@@ -33,3 +33,5 @@ labview source/Servers/Generated Server/
 
 *.so
 tests/gRPC_ATS/TimeStamp.txt
+
+*.srctrl*

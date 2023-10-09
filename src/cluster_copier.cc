@@ -284,7 +284,7 @@ namespace grpc_labview {
     {
         if (metadata->isRepeated)
         {
-            auto repeatedString = static_cast<const LVRepeatedStringMessageValue&>(*value);
+            auto repeatedString = static_cast<const LVRepeatedMessageValue<std::string>&>(*value);
             if (repeatedString._value.size() != 0)
             {
                 NumericArrayResize(0x08, 1, start, repeatedString._value.size());
@@ -356,7 +356,7 @@ namespace grpc_labview {
     {
         if (metadata->isRepeated)
         {
-            auto repeatedInt32 = std::static_pointer_cast<LVRepeatedInt32MessageValue>(value);
+            auto repeatedInt32 = std::static_pointer_cast<LVRepeatedMessageValue<int>>(value);
             if (repeatedInt32->_value.size() != 0)
             {
                 NumericArrayResize(0x03, 1, start, repeatedInt32->_value.size());
@@ -378,7 +378,7 @@ namespace grpc_labview {
     {
         if (metadata->isRepeated)
         {
-            auto repeatedUInt32 = std::static_pointer_cast<LVRepeatedUInt32MessageValue>(value);
+            auto repeatedUInt32 = std::static_pointer_cast<LVRepeatedMessageValue<uint32_t>>(value);
             if (repeatedUInt32->_value.size() != 0)
             {
                 NumericArrayResize(0x03, 1, start, repeatedUInt32->_value.size());
@@ -479,7 +479,7 @@ namespace grpc_labview {
     {
         if (metadata->isRepeated)
         {
-            auto repeatedBoolean = std::static_pointer_cast<LVRepeatedBooleanMessageValue>(value);
+            auto repeatedBoolean = std::static_pointer_cast<LVRepeatedMessageValue<bool>>(value);
             if (repeatedBoolean->_value.size() != 0)
             {
                 NumericArrayResize(0x01, 1, start, repeatedBoolean->_value.size());
@@ -681,7 +681,7 @@ namespace grpc_labview {
             auto array = *(LV1DArrayHandle*)start;
             if (array && *array && ((*array)->cnt != 0))
             {
-                auto repeatedStringValue = std::make_shared<LVRepeatedStringMessageValue>(metadata->protobufIndex);
+                auto repeatedStringValue = std::make_shared<LVRepeatedMessageValue<std::string>>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedStringValue);
                 auto lvStr = (*array)->bytes<LStrHandle>();
                 for (int x = 0; x < (*array)->cnt; ++x)
@@ -717,7 +717,7 @@ namespace grpc_labview {
             if (array && *array && ((*array)->cnt != 0))
             {
                 auto count = (*array)->cnt;
-                auto repeatedValue = std::make_shared<LVRepeatedBooleanMessageValue>(metadata->protobufIndex);
+                auto repeatedValue = std::make_shared<LVRepeatedMessageValue<bool>>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedValue);
                 auto data = (*array)->bytes<bool>();
                 repeatedValue->_value.Reserve(count);
@@ -742,7 +742,7 @@ namespace grpc_labview {
             if (array && *array && ((*array)->cnt != 0))
             {
                 auto count = (*array)->cnt;
-                auto repeatedValue = std::make_shared<LVRepeatedInt32MessageValue>(metadata->protobufIndex);
+                auto repeatedValue = std::make_shared<LVRepeatedMessageValue<int>>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedValue);
                 auto data = (*array)->bytes<int32_t>();
                 repeatedValue->_value.Reserve(count);
@@ -767,7 +767,7 @@ namespace grpc_labview {
             if (array && *array && ((*array)->cnt != 0))
             {
                 auto count = (*array)->cnt;
-                auto repeatedValue = std::make_shared<LVRepeatedUInt32MessageValue>(metadata->protobufIndex);
+                auto repeatedValue = std::make_shared<LVRepeatedMessageValue<uint32_t>>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedValue);
                 auto data = (*array)->bytes<uint32_t>();
                 repeatedValue->_value.Reserve(count);

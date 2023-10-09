@@ -274,7 +274,8 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     int8_t* requestCluster,
     grpc_labview::gRPCid** callId,
     int32_t timeoutMs,
-    grpc_labview::gRPCid* contextId)
+    grpc_labview::gRPCid* contextId,
+    int8_t* responseCluster)
 {
     auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
@@ -310,6 +311,8 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
     clientCall->_context = clientContext;
+    clientCall->_request->setLVClusterHandle(requestCluster);
+    clientCall->_response->setLVClusterHandle(responseCluster);
 
     try
     {
@@ -354,18 +357,18 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
     int32_t result = 0;
     if (call->_status.ok())
     {
-        try
-        {
-            grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
-        }
-        catch (grpc_labview::InvalidEnumValueException& e)
-        {
-            if (errorMessage != nullptr)
-            {
-                grpc_labview::SetLVString(errorMessage, e.what());
-            }
-            return e.code;
-        }
+        // try
+        // {
+        //     grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
+        // }
+        // catch (grpc_labview::InvalidEnumValueException& e)
+        // {
+        //     if (errorMessage != nullptr)
+        //     {
+        //         grpc_labview::SetLVString(errorMessage, e.what());
+        //     }
+        //     return e.code;
+        // }
     }
     else
     {

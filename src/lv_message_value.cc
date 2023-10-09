@@ -2,6 +2,7 @@
 //---------------------------------------------------------------------
 #include <grpc_server.h>
 #include <lv_message.h>
+#include <message_value.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -96,14 +97,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedStringMessageValue::LVRepeatedStringMessageValue(int protobufId) :
+    LVRepeatedMessageValue<std::string>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVRepeatedStringMessageValue::ByteSizeLong()
+    size_t LVRepeatedMessageValue<std::string>::ByteSizeLong()
     {    
         size_t totalSize = 0;
         totalSize += 1 * FromIntSize(_value.size());
@@ -116,7 +117,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedStringMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVRepeatedMessageValue<std::string>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {    
         for (int i = 0, n = _value.size(); i < n; i++)
         {
@@ -151,14 +152,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedBooleanMessageValue::LVRepeatedBooleanMessageValue(int protobufId) :
+    LVRepeatedMessageValue<bool>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVRepeatedBooleanMessageValue::ByteSizeLong()
+    size_t LVRepeatedMessageValue<bool>::ByteSizeLong()
     {    
         size_t totalSize = 0;
         unsigned int count = static_cast<unsigned int>(_value.size());
@@ -174,7 +175,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedBooleanMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVRepeatedMessageValue<bool>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {
         if (_value.size() > 0)
         {
@@ -300,14 +301,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedInt32MessageValue::LVRepeatedInt32MessageValue(int protobufId) :
+    LVRepeatedMessageValue<int>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVRepeatedInt32MessageValue::ByteSizeLong()
+    size_t LVRepeatedMessageValue<int>::ByteSizeLong()
     {    
         size_t totalSize = 0;
         size_t dataSize = WireFormatLite::Int32Size(_value);
@@ -323,7 +324,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedInt32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVRepeatedMessageValue<int>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {
         if (_cachedSize > 0)
         {
@@ -334,14 +335,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedUInt32MessageValue::LVRepeatedUInt32MessageValue(int protobufId) :
+    LVRepeatedMessageValue<uint32_t>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVRepeatedUInt32MessageValue::ByteSizeLong()
+    size_t LVRepeatedMessageValue<uint32_t>::ByteSizeLong()
     {    
         size_t totalSize = 0;
         size_t dataSize = WireFormatLite::UInt32Size(_value);
@@ -357,7 +358,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedUInt32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVRepeatedMessageValue<uint32_t>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {
         if (_cachedSize > 0)
         {
@@ -369,7 +370,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     LVRepeatedEnumMessageValue::LVRepeatedEnumMessageValue(int protobufId) :
-        LVMessageValue(protobufId)
+        LVRepeatedMessageValue<int>(protobufId)
     {    
     }
 
