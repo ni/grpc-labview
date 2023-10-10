@@ -51,6 +51,7 @@ namespace grpc_labview
         std::map<int, std::shared_ptr<LVMessageValue>> _values;
         std::shared_ptr<MessageMetadata> _metadata;
         bool _use_hardcoded_parse;
+        bool _skipCopyOnFirstParse;
 
         void setLVClusterHandle(int8_t* lvClusterHandle) {
             _LVClusterHandle = std::make_shared<int8_t*>(lvClusterHandle);

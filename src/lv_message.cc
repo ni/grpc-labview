@@ -12,7 +12,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     LVMessage::LVMessage(std::shared_ptr<MessageMetadata> metadata) : 
-        _metadata(metadata), _use_hardcoded_parse(true)
+        _metadata(metadata), _use_hardcoded_parse(true), _skipCopyOnFirstParse(false)
     {
     }
 
@@ -546,42 +546,101 @@ namespace grpc_labview
         return ptr;
     }
 
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    struct LVCluster
+    {
+    }; // TODO: Do not check this in.
+
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     const char *LVMessage::ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {    
         auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
-        if (fieldInfo.isRepeated)
+        if (_use_hardcoded_parse)
         {
-            ptr -= 1;
-            do {
-                std::shared_ptr<LVRepeatedNestedMessageMessageValue> v;
-                auto it = _values.find(index);
-                if (it == _values.end())
+            if (fieldInfo.isRepeated){
+                // backup ptr
+                auto _backup_ptr = ptr;
+                auto _backup_ctx = ctx;
+
+                // Call parse on the nested message
+                // get the count
+                uint64_t numElements = 0;
+
+                ptr -= 1;
+                do{
+                    ptr += 1;
+                    auto nestedMessage = std::make_shared<LVMessage>(metadata, true, true);
+                    ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
+                    if (!ctx->DataAvailable(ptr))
+                    {
+                        break;
+                    }
+                    numElements++;
+                } while (ExpectTag(tag, ptr));
+
+                // restore ptr
+                ptr = _backup_ptr;
+                ctx = _backup_ctx;
+                auto start = reinterpret_cast<int8_t*>(*(this->getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
+                auto array = *(LV1DArrayHandle*)start;
+                (*array)->cnt = numElements;
+                
+                int i = 0;
+                while (i < numElements)
                 {
-                    v = std::make_shared<LVRepeatedNestedMessageMessageValue>(index);
-                    _values.emplace(index, v);
+                    ptr = i ? ptr + 1 : ptr;
+                    auto nestedMessage = std::make_shared<LVMessage>(metadata); // check if we can avoid this!
+                    
+                    auto next_ptr = (LVCluster**)(*array)->bytes(i * clusterSize, alignment);
+                    nestedMessage->SetCurLVPtr(reinterpret_cast<const char*>(next_ptr));
+                    ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
+                    i++;
+
+                    if (!ctx->DataAvailable(ptr)){
+                        break;
+                    }
                 }
-                else
-                {
-                    v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
-                }
-                ptr += 1;
+            }
+            else {
+            }
+        }
+        else {
+            if (fieldInfo.isRepeated)
+            {
+                ptr -= 1;
+                do {
+                    std::shared_ptr<LVRepeatedNestedMessageMessageValue> v;
+                    auto it = _values.find(index);
+                    if (it == _values.end())
+                    {
+                        v = std::make_shared<LVRepeatedNestedMessageMessageValue>(index);
+                        _values.emplace(index, v);
+                    }
+                    else
+                    {
+                        v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
+                    }
+                    ptr += 1;
+                    auto nestedMessage = std::make_shared<LVMessage>(metadata);
+                    ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
+                    v->_value.push_back(nestedMessage);
+                    if (!ctx->DataAvailable(ptr))
+                    {
+                        break;
+                    }
+                } while (ExpectTag(tag, ptr));
+            }
+            else
+            {
                 auto nestedMessage = std::make_shared<LVMessage>(metadata);
                 ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
-                v->_value.push_back(nestedMessage);
-                if (!ctx->DataAvailable(ptr))
-                {
-                    break;
-                }
-            } while (ExpectTag(tag, ptr));
-        }
-        else
-        {
-            auto nestedMessage = std::make_shared<LVMessage>(metadata);
-            ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
-            auto v = std::make_shared<LVNestedMessageMessageValue>(index, nestedMessage);
-            _values.emplace(index, v);
+                auto v = std::make_shared<LVNestedMessageMessageValue>(index, nestedMessage);
+                _values.emplace(index, v);
+            }
         }
         return ptr;
     }
