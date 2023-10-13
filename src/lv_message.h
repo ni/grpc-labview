@@ -18,6 +18,7 @@ namespace grpc_labview
     {
     public:
         LVMessage(std::shared_ptr<MessageMetadata> metadata);
+        LVMessage(std::shared_ptr<MessageMetadata> metadata, bool use_hardcoded_parse, bool skipCopyOnFirstParse);
         ~LVMessage();
 
         google::protobuf::UnknownFieldSet& UnknownFields();
@@ -50,21 +51,23 @@ namespace grpc_labview
     public:
         std::map<int, std::shared_ptr<LVMessageValue>> _values;
         std::shared_ptr<MessageMetadata> _metadata;
+        // std::vector<uint64_t> _messageValues;
+        // std::vector<> _repeatedMessageValues;
         bool _use_hardcoded_parse;
         bool _skipCopyOnFirstParse;
 
-        void setLVClusterHandle(int8_t* lvClusterHandle) {
-            _LVClusterHandle = std::make_shared<int8_t*>(lvClusterHandle);
+        void setLVClusterHandle(const char* lvClusterHandle) {
+            _LVClusterHandle = std::make_shared<const char*>(lvClusterHandle);
         };
 
-        std::shared_ptr<int8_t*> getLVClusterHandleSharedPtr() {
+        std::shared_ptr<const char*> getLVClusterHandleSharedPtr() {
             return _LVClusterHandle;
         };
 
     private:
         mutable google::protobuf::internal::CachedSize _cached_size_;
         google::protobuf::UnknownFieldSet _unknownFields;
-        std::shared_ptr<int8_t*> _LVClusterHandle;
+        std::shared_ptr<const char*> _LVClusterHandle;
 
         const char *ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
         const char *ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
@@ -102,7 +105,7 @@ namespace grpc_labview
                     uint64_t numElements;
                     auto v = PackedMessageType(ptr, ctx, &numElements);
                     // get the LVClusterHandle
-                    auto start = reinterpret_cast<int8_t*>(*(_message.getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
+                    auto start = reinterpret_cast<const char*>(*(_message.getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
 
                     // copy into LVCluster
                     if (numElements != 0)
@@ -116,7 +119,7 @@ namespace grpc_labview
                 }
                 else
                 {
-                    auto _lv_ptr = reinterpret_cast<int8_t*>(*(_message.getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
+                    auto _lv_ptr = reinterpret_cast<const char*>(*(_message.getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
                     ptr = ReadMessageType(ptr, reinterpret_cast<MessageType*>(_lv_ptr));
                 }
             }

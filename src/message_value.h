@@ -10,6 +10,28 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    class LVMessageValueBase
+    {};
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    template <typename T>
+    class LVRepeatedMessage : public LVMessageValueBase
+    {
+    public:
+        LVRepeatedMessage(int protobufId);
+    
+    public:
+        google::protobuf::RepeatedField<T> _value;
+
+    public:
+        void* RawValue() override { return &_value; };
+        size_t ByteSizeLong() override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     class LVMessageValue
     {
     public:

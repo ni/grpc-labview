@@ -311,8 +311,8 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
     clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
     clientCall->_context = clientContext;
-    clientCall->_request->setLVClusterHandle(requestCluster);
-    clientCall->_response->setLVClusterHandle(responseCluster);
+    clientCall->_request->setLVClusterHandle(reinterpret_cast<const char *>(requestCluster));
+    clientCall->_response->setLVClusterHandle(reinterpret_cast<const char *>(responseCluster));
 
     try
     {

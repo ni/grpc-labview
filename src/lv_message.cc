@@ -16,6 +16,11 @@ namespace grpc_labview
     {
     }
 
+    LVMessage::LVMessage(std::shared_ptr<MessageMetadata> metadata, bool use_hardcoded_parse, bool skipCopyOnFirstParse) :
+        _metadata(metadata), _use_hardcoded_parse(use_hardcoded_parse), _skipCopyOnFirstParse(skipCopyOnFirstParse)
+    {
+    }
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     LVMessage::~LVMessage()
@@ -306,6 +311,8 @@ namespace grpc_labview
         {
             // SinglePassMessageParser<uint64_t> parser(*this);
             // parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
+            auto _lv_ptr = reinterpret_cast<const char*>(*(this->getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
+            ptr = ReadUINT64(ptr, const_cast<uint64_t*>(reinterpret_cast<const uint64_t*>(_lv_ptr)));
         } 
         else {
             if (fieldInfo.isRepeated)
@@ -562,48 +569,45 @@ namespace grpc_labview
         if (_use_hardcoded_parse)
         {
             if (fieldInfo.isRepeated){
-                // backup ptr
-                auto _backup_ptr = ptr;
-                auto _backup_ctx = ctx;
+                // start with numElements = 16
+                // if the array is not big enough, resize it to 2x the size
+                auto num_elements = 16;
+                auto element_count = 0;
 
-                // Call parse on the nested message
-                // get the count
-                uint64_t numElements = 0;
+                auto clusterSize = metadata->clusterSize;
+                auto alignment = metadata->alignmentRequirement;
 
-                ptr -= 1;
-                do{
-                    ptr += 1;
-                    auto nestedMessage = std::make_shared<LVMessage>(metadata, true, true);
-                    ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
-                    if (!ctx->DataAvailable(ptr))
-                    {
-                        break;
-                    }
-                    numElements++;
-                } while (ExpectTag(tag, ptr));
-
-                // restore ptr
-                ptr = _backup_ptr;
-                ctx = _backup_ctx;
-                auto start = reinterpret_cast<int8_t*>(*(this->getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
-                auto array = *(LV1DArrayHandle*)start;
-                (*array)->cnt = numElements;
+                const char* val_ptr = (*(this->getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
+                NumericArrayResize(0x08, 1, (void**)val_ptr, num_elements * 4 * sizeof(uint64_t));
+                auto array = *(LV1DArrayHandle*)val_ptr;
+                (*array)->cnt = num_elements;
                 
-                int i = 0;
-                while (i < numElements)
+                do
                 {
-                    ptr = i ? ptr + 1 : ptr;
-                    auto nestedMessage = std::make_shared<LVMessage>(metadata); // check if we can avoid this!
-                    
-                    auto next_ptr = (LVCluster**)(*array)->bytes(i * clusterSize, alignment);
-                    nestedMessage->SetCurLVPtr(reinterpret_cast<const char*>(next_ptr));
+                    ptr = element_count ? ptr + 1 : ptr;
+                    auto nestedMessage = std::make_shared<LVMessage>(metadata);
+
+                    if (element_count == num_elements) {
+                        num_elements *= 2;
+                        NumericArrayResize(0x08, 1, (void**)val_ptr, num_elements * 4 * sizeof(uint64_t));
+                        array = *(LV1DArrayHandle*)val_ptr;
+                        (*array)->cnt = num_elements;
+                    }
+
+                    auto next_ptr = (LVCluster**)(*array)->bytes(element_count * clusterSize, alignment);
+                    nestedMessage->setLVClusterHandle(reinterpret_cast<const char*>(next_ptr));
                     ptr = ctx->ParseMessage(nestedMessage.get(), ptr);
-                    i++;
+
+                    element_count++;
 
                     if (!ctx->DataAvailable(ptr)){
                         break;
                     }
-                }
+                } while (ExpectTag(tag, ptr));
+
+                NumericArrayResize(0x08, 1, (void**)val_ptr, (element_count - 1) * 4 * sizeof(uint64_t));
+                array = *(LV1DArrayHandle*)val_ptr;
+                (*array)->cnt = element_count;
             }
             else {
             }
