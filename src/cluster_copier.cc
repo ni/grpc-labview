@@ -457,7 +457,7 @@ namespace grpc_labview {
     {
         if (metadata->isRepeated)
         {
-            auto repeatedUInt64 = std::static_pointer_cast<LVRepeatedUInt64MessageValue>(value);
+            auto repeatedUInt64 = std::static_pointer_cast<LVRepeatedMessageValue<uint64_t>>(value);
             if (repeatedUInt64->_value.size() != 0)
             {
                 NumericArrayResize(0x08, 1, start, repeatedUInt64->_value.size());
@@ -858,7 +858,7 @@ namespace grpc_labview {
             if (array && *array && ((*array)->cnt != 0))
             {
                 auto count = (*array)->cnt;
-                auto repeatedValue = std::make_shared<LVRepeatedUInt64MessageValue>(metadata->protobufIndex);
+                auto repeatedValue = std::make_shared<LVRepeatedMessageValue<uint64_t>>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedValue);
                 auto data = (*array)->bytes<uint64_t>();
                 repeatedValue->_value.Reserve(count);

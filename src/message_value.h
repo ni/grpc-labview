@@ -8,27 +8,6 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     class LVMessage;
 
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    class LVMessageValueBase
-    {};
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    template <typename T>
-    class LVRepeatedMessage : public LVMessageValueBase
-    {
-    public:
-        LVRepeatedMessage(int protobufId);
-    
-    public:
-        google::protobuf::RepeatedField<T> _value;
-
-    public:
-        void* RawValue() override { return &_value; };
-        size_t ByteSizeLong() override;
-        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
-    };
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -46,6 +25,26 @@ namespace grpc_labview
         virtual google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const = 0;
     };
 
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    template <typename T>
+    class LVRepeatedMessageValue : public LVMessageValue
+    {
+    public:
+        LVRepeatedMessageValue(int protobufId);
+        
+        google::protobuf::RepeatedField<T> _value;
+
+        void* RawValue() override { return &_value; };
+        size_t ByteSizeLong() override;
+        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+    
+    protected:
+        int _cachedSize;
+    };
+
+    
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     class LVNestedMessageMessageValue : public LVMessageValue
@@ -92,24 +91,6 @@ namespace grpc_labview
         void* RawValue() override { return (void*)(_value.c_str()); };
         size_t ByteSizeLong() override;
         google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
-    };
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    template <typename T>
-    class LVRepeatedMessageValue : public LVMessageValue
-    {
-    public:
-        LVRepeatedMessageValue(int protobufId);
-        
-        google::protobuf::RepeatedField<T> _value;
-
-        void* RawValue() override { return &_value; };
-        size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
-    
-    protected:
-        int _cachedSize;
     };
 
 
@@ -241,23 +222,6 @@ namespace grpc_labview
         int _cachedSize;
     };
 
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    class LVRepeatedUInt64MessageValue : public LVMessageValue
-    {
-    public:
-        LVRepeatedUInt64MessageValue(int protobufId);
-
-    public:
-        google::protobuf::RepeatedField<uint64_t> _value;    
-
-        void* RawValue() override { return &_value; };
-        size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
-
-    private:
-        int _cachedSize;
-    };
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------

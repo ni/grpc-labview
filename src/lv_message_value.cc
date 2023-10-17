@@ -437,14 +437,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedUInt64MessageValue::LVRepeatedUInt64MessageValue(int protobufId) :
+    LVRepeatedMessageValue<uint64_t>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVRepeatedUInt64MessageValue::ByteSizeLong()
+    size_t LVRepeatedMessageValue<uint64_t>::ByteSizeLong()
     {    
         size_t totalSize = 0;
         size_t dataSize = WireFormatLite::UInt64Size(_value);
@@ -460,7 +460,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedUInt64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVRepeatedMessageValue<uint64_t>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {
         if (_cachedSize > 0)
         {
