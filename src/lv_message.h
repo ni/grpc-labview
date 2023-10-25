@@ -148,13 +148,64 @@ namespace grpc_labview
         return PackedInt32Parser(value, ptr, ctx);
     }
 
+    const char* SinglePassMessageParser<uint32_t>::ReadMessageType(const char* ptr, uint32_t* lv_ptr)
+    {
+        return ReadUINT32(ptr, lv_ptr);
+    }
+
+    const char* SinglePassMessageParser<uint32_t>::PackedMessageType(const char* ptr, ParseContext* ctx, int index, google::protobuf::RepeatedField<uint32_t>* value)
+    {
+        return PackedUInt32Parser(value, ptr, ctx);
+    }
+
+    const char* SinglePassMessageParser<int64_t>::ReadMessageType(const char* ptr, int64_t* lv_ptr)
+    {
+        return ReadINT64(ptr, lv_ptr);
+    }
+    
+    const char* SinglePassMessageParser<int64_t>::PackedMessageType(const char* ptr, ParseContext* ctx, int index, google::protobuf::RepeatedField<int64_t>* value)
+    {
+        return PackedInt64Parser(value, ptr, ctx);
+    }
+
     const char* SinglePassMessageParser<uint64_t>::ReadMessageType(const char* ptr, uint64_t* lv_ptr)
     {
         return ReadUINT64(ptr, lv_ptr);
     }
-    
+
     const char* SinglePassMessageParser<uint64_t>::PackedMessageType(const char* ptr, ParseContext* ctx, int index, google::protobuf::RepeatedField<uint64_t>* value)
     {
         return PackedUInt64Parser(value, ptr, ctx);
     }
+
+    const char* SinglePassMessageParser<bool>::ReadMessageType(const char* ptr, bool* lv_ptr)
+    {
+        return ReadBOOL(ptr, lv_ptr);
+    }
+
+    const char* SinglePassMessageParser<bool>::PackedMessageType(const char* ptr, ParseContext* ctx, int index, google::protobuf::RepeatedField<bool>* value)
+    {
+        return PackedBoolParser(value, ptr, ctx);
+    }
+
+    const char* SinglePassMessageParser<float>::ReadMessageType(const char* ptr, float* lv_ptr)
+    {
+        return ReadFLOAT(ptr, lv_ptr);
+    }
+
+    const char* SinglePassMessageParser<float>::PackedMessageType(const char* ptr, ParseContext* ctx, int index, google::protobuf::RepeatedField<float>* value)
+    {
+        return PackedFloatParser(value, ptr, ctx);
+    }
+
+    const char* SinglePassMessageParser<double>::ReadMessageType(const char* ptr, double* lv_ptr)
+    {
+        return ReadDOUBLE(ptr, lv_ptr);
+    }
+
+    const char* SinglePassMessageParser<double>::PackedMessageType(const char* ptr, ParseContext* ctx, int index, google::protobuf::RepeatedField<double>* value)
+    {
+        return PackedDoubleParser(value, ptr, ctx);
+    }
+
 }

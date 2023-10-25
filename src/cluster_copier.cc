@@ -368,7 +368,7 @@ namespace grpc_labview {
         }
         else
         {
-            *(int*)start = ((LVInt32MessageValue*)value.get())->_value;
+            *(int*)start = ((LVVariableMessageValue<int>*)value.get())->_value;
         }
     }
 
@@ -390,7 +390,7 @@ namespace grpc_labview {
         }
         else
         {
-            *(int*)start = ((LVUInt32MessageValue*)value.get())->_value;
+            *(int*)start = ((LVVariableMessageValue<uint32_t>*)value.get())->_value;
         }
     }
 
@@ -435,7 +435,7 @@ namespace grpc_labview {
     {
         if (metadata->isRepeated)
         {
-            auto repeatedInt64 = std::static_pointer_cast<LVRepeatedInt64MessageValue>(value);
+            auto repeatedInt64 = std::static_pointer_cast<LVRepeatedMessageValue<int64_t>>(value);
             if (repeatedInt64->_value.size() != 0)
             {
                 NumericArrayResize(0x04, 1, start, repeatedInt64->_value.size());
@@ -447,7 +447,7 @@ namespace grpc_labview {
         }
         else
         {
-            *(int64_t*)start = ((LVInt64MessageValue*)value.get())->_value;
+            *(int64_t*)start = ((LVVariableMessageValue<int64_t>*)value.get())->_value;
         }
     }
 
@@ -469,7 +469,7 @@ namespace grpc_labview {
         }
         else
         {
-            *(uint64_t*)start = ((LVUInt64MessageValue*)value.get())->_value;
+            *(uint64_t*)start = ((LVVariableMessageValue<uint64_t>*)value.get())->_value;
         }
     }
 
@@ -491,7 +491,7 @@ namespace grpc_labview {
         }
         else
         {
-            *(bool*)start = ((LVBooleanMessageValue*)value.get())->_value;
+            *(bool*)start = ((LVVariableMessageValue<bool>*)value.get())->_value;
         }
     }
 
@@ -501,7 +501,7 @@ namespace grpc_labview {
     {
         if (metadata->isRepeated)
         {
-            auto repeatedDouble = std::static_pointer_cast<LVRepeatedDoubleMessageValue>(value);
+            auto repeatedDouble = std::static_pointer_cast<LVRepeatedMessageValue<double>>(value);
             if (repeatedDouble->_value.size() != 0)
             {
                 auto array = *(LV1DArrayHandle*)start;
@@ -514,7 +514,7 @@ namespace grpc_labview {
         }
         else
         {
-            *(double*)start = ((LVDoubleMessageValue*)value.get())->_value;
+            *(double*)start = ((LVVariableMessageValue<double>*)value.get())->_value;
         }
     }
 
@@ -524,7 +524,7 @@ namespace grpc_labview {
     {
         if (metadata->isRepeated)
         {
-            auto repeatedFloat = std::static_pointer_cast<LVRepeatedFloatMessageValue>(value);
+            auto repeatedFloat = std::static_pointer_cast<LVRepeatedMessageValue<float>>(value);
             if (repeatedFloat->_value.size() != 0)
             {
                 NumericArrayResize(0x03, 1, start, repeatedFloat->_value.size());
@@ -536,7 +536,7 @@ namespace grpc_labview {
         }
         else
         {
-            *(float*)start = ((LVFloatMessageValue*)value.get())->_value;
+            *(float*)start = ((LVVariableMessageValue<float>*)value.get())->_value;
         }
     }
 
@@ -727,7 +727,7 @@ namespace grpc_labview {
         }
         else
         {
-            auto value = std::make_shared<LVBooleanMessageValue>(metadata->protobufIndex, *(bool*)start);
+            auto value = std::make_shared<LVVariableMessageValue<bool>>(metadata->protobufIndex, *(bool*)start);
             message._values.emplace(metadata->protobufIndex, value);
         }
     }
@@ -752,7 +752,7 @@ namespace grpc_labview {
         }
         else
         {
-            auto value = std::make_shared<LVInt32MessageValue>(metadata->protobufIndex, *(int*)start);
+            auto value = std::make_shared<LVVariableMessageValue<int>>(metadata->protobufIndex, *(int*)start);
             message._values.emplace(metadata->protobufIndex, value);
         }
     }
@@ -777,7 +777,7 @@ namespace grpc_labview {
         }
         else
         {
-            auto value = std::make_shared<LVUInt32MessageValue>(metadata->protobufIndex, *(uint32_t*)start);
+            auto value = std::make_shared<LVVariableMessageValue<uint32_t>>(metadata->protobufIndex, *(uint32_t*)start);
             message._values.emplace(metadata->protobufIndex, value);
         }
     }
@@ -833,7 +833,7 @@ namespace grpc_labview {
             if (array && *array && ((*array)->cnt != 0))
             {
                 auto count = (*array)->cnt;
-                auto repeatedValue = std::make_shared<LVRepeatedInt64MessageValue>(metadata->protobufIndex);
+                auto repeatedValue = std::make_shared<LVRepeatedMessageValue<int64_t>>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedValue);
                 auto data = (*array)->bytes<int64_t>();
                 repeatedValue->_value.Reserve(count);
@@ -843,7 +843,7 @@ namespace grpc_labview {
         }
         else
         {
-            auto value = std::make_shared<LVInt64MessageValue>(metadata->protobufIndex, *(int64_t*)start);
+            auto value = std::make_shared<LVVariableMessageValue<int64_t>>(metadata->protobufIndex, *(int64_t*)start);
             message._values.emplace(metadata->protobufIndex, value);
         }
     }
@@ -868,7 +868,7 @@ namespace grpc_labview {
         }
         else
         {
-            auto value = std::make_shared<LVUInt64MessageValue>(metadata->protobufIndex, *(uint64_t*)start);
+            auto value = std::make_shared<LVVariableMessageValue<uint64_t>>(metadata->protobufIndex, *(uint64_t*)start);
             message._values.emplace(metadata->protobufIndex, value);
         }
     }
@@ -883,7 +883,7 @@ namespace grpc_labview {
             if (array && *array && ((*array)->cnt != 0))
             {
                 auto count = (*array)->cnt;
-                auto repeatedValue = std::make_shared<LVRepeatedDoubleMessageValue>(metadata->protobufIndex);
+                auto repeatedValue = std::make_shared<LVRepeatedMessageValue<double>>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedValue);
                 auto data = (*array)->bytes<double>();
                 repeatedValue->_value.Reserve(count);
@@ -893,7 +893,7 @@ namespace grpc_labview {
         }
         else
         {
-            auto value = std::make_shared<LVDoubleMessageValue>(metadata->protobufIndex, *(double*)start);
+            auto value = std::make_shared<LVVariableMessageValue<double>>(metadata->protobufIndex, *(double*)start);
             message._values.emplace(metadata->protobufIndex, value);
         }
     }
@@ -908,7 +908,7 @@ namespace grpc_labview {
             if (array && *array && ((*array)->cnt != 0))
             {
                 auto count = (*array)->cnt;
-                auto repeatedValue = std::make_shared<LVRepeatedFloatMessageValue>(metadata->protobufIndex);
+                auto repeatedValue = std::make_shared<LVRepeatedMessageValue<float>>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedValue);
                 auto data = (*array)->bytes<float>();
                 repeatedValue->_value.Reserve(count);
@@ -918,7 +918,7 @@ namespace grpc_labview {
         }
         else
         {
-            auto value = std::make_shared<LVFloatMessageValue>(metadata->protobufIndex, *(float*)start);
+            auto value = std::make_shared<LVVariableMessageValue<float>>(metadata->protobufIndex, *(float*)start);
             message._values.emplace(metadata->protobufIndex, value);
         }
     }

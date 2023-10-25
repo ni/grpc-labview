@@ -202,7 +202,7 @@ namespace grpc_labview
             {
                 bool result;
                 ptr = ReadBOOL(ptr, &result);
-                auto v = std::make_shared<LVBooleanMessageValue>(index, result);
+                auto v = std::make_shared<LVVariableMessageValue<bool>>(index, result);
                 _values.emplace(index, v);
             }
         }
@@ -229,7 +229,7 @@ namespace grpc_labview
             {
                 int32_t result;
                 ptr = ReadINT32(ptr, &result);
-                auto v = std::make_shared<LVInt32MessageValue>(index, result);
+                auto v = std::make_shared<LVVariableMessageValue<int>>(index, result);
                 _values.emplace(index, v);
             }
         }
@@ -256,7 +256,7 @@ namespace grpc_labview
             {
                 uint32_t result;
                 ptr = ReadUINT32(ptr, &result);
-                auto v = std::make_shared<LVUInt32MessageValue>(index, result);
+                auto v = std::make_shared<LVVariableMessageValue<uint32_t>>(index, result);
                 _values.emplace(index, v);
             }
         }
@@ -268,8 +268,8 @@ namespace grpc_labview
     const char *LVMessage::ParseEnum(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {    
         if(_use_hardcoded_parse){
-            grpc_labview::SinglePassMessageParser<int32_t> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
+           /* grpc_labview::SinglePassMessageParser<int32_t> parser(*this);
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);*/
         }
         else{
             if (fieldInfo.isRepeated)
@@ -301,7 +301,7 @@ namespace grpc_labview
         else {
             if (fieldInfo.isRepeated)
             {
-                auto v = std::make_shared<LVRepeatedInt64MessageValue>(index);
+                auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(index);
                 ptr = PackedInt64Parser(&(v->_value), ptr, ctx);
                 _values.emplace(index, v);
             }
@@ -309,7 +309,7 @@ namespace grpc_labview
             {
                 int64_t result;
                 ptr = ReadINT64(ptr, &result);
-                auto v = std::make_shared<LVInt64MessageValue>(index, result);
+                auto v = std::make_shared<LVVariableMessageValue<int64_t>>(index, result);
                 _values.emplace(index, v);
             }
         }
@@ -336,7 +336,7 @@ namespace grpc_labview
             {
                 uint64_t result;
                 ptr = ReadUINT64(ptr, &result);
-                auto v = std::make_shared<LVUInt64MessageValue>(index, result);
+                auto v = std::make_shared<LVVariableMessageValue<uint64_t>>(index, result);
                 _values.emplace(index, v);
             }
         }
@@ -348,14 +348,13 @@ namespace grpc_labview
     const char *LVMessage::ParseFloat(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {    
         if(_use_hardcoded_parse){
-
             grpc_labview::SinglePassMessageParser<float> parser(*this);
             ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
         }
         else{
             if (fieldInfo.isRepeated)
             {
-                auto v = std::make_shared<LVRepeatedFloatMessageValue>(index);
+                auto v = std::make_shared<LVRepeatedMessageValue<float>>(index);
                 ptr = PackedFloatParser(&(v->_value), ptr, ctx);
                 _values.emplace(index, v);
             }
@@ -363,7 +362,7 @@ namespace grpc_labview
             {
                 float result;
                 ptr = ReadFLOAT(ptr, &result);
-                auto v = std::make_shared<LVFloatMessageValue>(index, result);
+                auto v = std::make_shared<LVVariableMessageValue<float>>(index, result);
                 _values.emplace(index, v);
             }
         }
@@ -375,14 +374,13 @@ namespace grpc_labview
     const char *LVMessage::ParseDouble(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {    
         if(_use_hardcoded_parse){
-
             grpc_labview::SinglePassMessageParser<double> parser(*this);
             ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
         }
         else{
             if (fieldInfo.isRepeated)
             {
-                auto v = std::make_shared<LVRepeatedDoubleMessageValue>(index);
+                auto v = std::make_shared<LVRepeatedMessageValue<double>>(index);
                 ptr = PackedDoubleParser(&(v->_value), ptr, ctx);
                 _values.emplace(index, v);
             }
@@ -390,7 +388,7 @@ namespace grpc_labview
             {
                 double result;
                 ptr = ReadDOUBLE(ptr, &result);
-                auto v = std::make_shared<LVDoubleMessageValue>(index, result);
+                auto v = std::make_shared<LVVariableMessageValue<double>>(index, result);
                 _values.emplace(index, v);
             }
         }
@@ -402,9 +400,8 @@ namespace grpc_labview
     const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {    
         if(_use_hardcoded_parse){
-
-            grpc_labview::SinglePassMessageParser<std::string> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
+           /* grpc_labview::SinglePassMessageParser<std::string> parser(*this);
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);*/
         }
         else{
 
@@ -470,9 +467,8 @@ namespace grpc_labview
     const char* LVMessage::ParseSInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
     {
         if(_use_hardcoded_parse){
-
-            grpc_labview::SinglePassMessageParser<int32_t> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
+            //grpc_labview::SinglePassMessageParser<int32_t> parser(*this);
+            //ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
         }
         else{
             if (fieldInfo.isRepeated)
@@ -497,9 +493,8 @@ namespace grpc_labview
     const char* LVMessage::ParseSInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
     {
         if(_use_hardcoded_parse){
-
-            grpc_labview::SinglePassMessageParser<int64_t> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
+            /*grpc_labview::SinglePassMessageParser<int64_t> parser(*this);
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);*/
         }
         else{
             if (fieldInfo.isRepeated)
@@ -524,9 +519,8 @@ namespace grpc_labview
     const char* LVMessage::ParseFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
     {
         if(_use_hardcoded_parse){
-
-            grpc_labview::SinglePassMessageParser<uint32_t> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
+            /*grpc_labview::SinglePassMessageParser<uint32_t> parser(*this);
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);*/
         }
         else{
             if (fieldInfo.isRepeated)
@@ -552,9 +546,8 @@ namespace grpc_labview
     const char* LVMessage::ParseFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
     {
         if(_use_hardcoded_parse){
-
-            grpc_labview::SinglePassMessageParser<uint64_t> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
+            /*grpc_labview::SinglePassMessageParser<uint64_t> parser(*this);
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);*/
         }
         else{
             if (fieldInfo.isRepeated)
@@ -579,9 +572,8 @@ namespace grpc_labview
     const char* LVMessage::ParseSFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
     {
         if(_use_hardcoded_parse){
-
-            grpc_labview::SinglePassMessageParser<int32_t> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
+            /*grpc_labview::SinglePassMessageParser<int32_t> parser(*this);
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);*/
         }
         else{
             if (fieldInfo.isRepeated)
@@ -606,9 +598,8 @@ namespace grpc_labview
     const char* LVMessage::ParseSFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
     {
         if(_use_hardcoded_parse){
-
-            grpc_labview::SinglePassMessageParser<int64_t> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
+           /* grpc_labview::SinglePassMessageParser<int64_t> parser(*this);
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);*/
         }
         else{
             if (fieldInfo.isRepeated)

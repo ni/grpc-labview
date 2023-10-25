@@ -14,7 +14,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     LVMessageValue::LVMessageValue(int protobufId) :
         _protobufId(protobufId)
-    {    
+    {
     }
 
     //---------------------------------------------------------------------
@@ -129,7 +129,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVBooleanMessageValue::LVBooleanMessageValue(int protobufId, bool value) :
+    LVVariableMessageValue<bool>::LVVariableMessageValue(int protobufId, bool value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
@@ -137,14 +137,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVBooleanMessageValue::ByteSizeLong()
+    size_t LVVariableMessageValue<bool>::ByteSizeLong()
     {
         return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_BOOL) + WireFormatLite::kBoolSize;    
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVBooleanMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVVariableMessageValue<bool>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {    
         target = stream->EnsureSpace(target);
         return WireFormatLite::WriteBoolToArray(_protobufId, _value, target);
@@ -186,7 +186,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVInt32MessageValue::LVInt32MessageValue(int protobufId, int value) :
+    LVVariableMessageValue<int>::LVVariableMessageValue(int protobufId, int value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
@@ -194,14 +194,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVInt32MessageValue::ByteSizeLong()
+    size_t LVVariableMessageValue<int>::ByteSizeLong()
     {
         return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_INT32) +  WireFormatLite::Int32Size(_value);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVInt32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVVariableMessageValue<int>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {    
         target = stream->EnsureSpace(target);
         return WireFormatLite::WriteInt32ToArray(_protobufId, _value, target);
@@ -209,7 +209,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVUInt32MessageValue::LVUInt32MessageValue(int protobufId, uint32_t value) :
+    LVVariableMessageValue<uint32_t>::LVVariableMessageValue(int protobufId, uint32_t value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
@@ -217,14 +217,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVUInt32MessageValue::ByteSizeLong()
+    size_t LVVariableMessageValue<uint32_t>::ByteSizeLong()
     {
         return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_UINT32) +  WireFormatLite::UInt32Size(_value);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVUInt32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVVariableMessageValue<uint32_t>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {    
         target = stream->EnsureSpace(target);
         return WireFormatLite::WriteUInt32ToArray(_protobufId, _value, target);
@@ -255,7 +255,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVInt64MessageValue::LVInt64MessageValue(int protobufId, int64_t value) :
+    LVVariableMessageValue<int64_t>::LVVariableMessageValue(int protobufId, int64_t value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
@@ -263,14 +263,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVInt64MessageValue::ByteSizeLong()
+    size_t LVVariableMessageValue<int64_t>::ByteSizeLong()
     {
         return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_INT64) + WireFormatLite::Int64Size(_value);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVInt64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVVariableMessageValue<int64_t>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {    
         target = stream->EnsureSpace(target);
         return WireFormatLite::WriteInt64ToArray(_protobufId, _value, target);
@@ -278,7 +278,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVUInt64MessageValue::LVUInt64MessageValue(int protobufId, uint64_t value) :
+    LVVariableMessageValue<uint64_t>::LVVariableMessageValue(int protobufId, uint64_t value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
@@ -286,14 +286,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVUInt64MessageValue::ByteSizeLong()
+    size_t LVVariableMessageValue<uint64_t>::ByteSizeLong()
     {
         return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_UINT64) +  WireFormatLite::UInt64Size(_value);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVUInt64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVVariableMessageValue<uint64_t>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {    
         target = stream->EnsureSpace(target);
         return WireFormatLite::WriteUInt64ToArray(_protobufId, _value, target);
@@ -403,14 +403,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedInt64MessageValue::LVRepeatedInt64MessageValue(int protobufId) :
+    LVRepeatedMessageValue<int64_t>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVRepeatedInt64MessageValue::ByteSizeLong()
+    size_t LVRepeatedMessageValue<int64_t>::ByteSizeLong()
     {    
         size_t totalSize = 0;
         size_t dataSize = WireFormatLite::Int64Size(_value);
@@ -426,7 +426,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedInt64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVRepeatedMessageValue<int64_t>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {
         if (_cachedSize > 0)
         {
@@ -471,7 +471,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVFloatMessageValue::LVFloatMessageValue(int protobufId, float value) :
+    LVVariableMessageValue<float>::LVVariableMessageValue(int protobufId, float value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
@@ -479,14 +479,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVFloatMessageValue::ByteSizeLong()
+    size_t LVVariableMessageValue<float>::ByteSizeLong()
     {    
         return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_STRING) + WireFormatLite::kFloatSize;    
     }
         
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVFloatMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVVariableMessageValue<float>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {    
         target = stream->EnsureSpace(target);
         return WireFormatLite::WriteFloatToArray(_protobufId, _value, target);
@@ -494,14 +494,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedFloatMessageValue::LVRepeatedFloatMessageValue(int protobufId) :
+    LVRepeatedMessageValue<float>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVRepeatedFloatMessageValue::ByteSizeLong()
+    size_t LVRepeatedMessageValue<float>::ByteSizeLong()
     {    
         size_t totalSize = 0;
         unsigned int count = static_cast<unsigned int>(_value.size());
@@ -517,7 +517,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedFloatMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVRepeatedMessageValue<float>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {    
         if (_value.size() > 0)
         {
@@ -529,7 +529,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVDoubleMessageValue::LVDoubleMessageValue(int protobufId, double value) :
+    LVVariableMessageValue<double>::LVVariableMessageValue(int protobufId, double value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
@@ -537,14 +537,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVDoubleMessageValue::ByteSizeLong()
+    size_t LVVariableMessageValue<double>::ByteSizeLong()
     {    
         return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_DOUBLE) +  WireFormatLite::kDoubleSize;    
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVDoubleMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVVariableMessageValue<double>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {
         target = stream->EnsureSpace(target);
         return WireFormatLite::WriteDoubleToArray(_protobufId, _value, target);
@@ -552,14 +552,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedDoubleMessageValue::LVRepeatedDoubleMessageValue(int protobufId) :
+    LVRepeatedMessageValue<double>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    size_t LVRepeatedDoubleMessageValue::ByteSizeLong()
+    size_t LVRepeatedMessageValue<double>::ByteSizeLong()
     {    
         size_t totalSize = 0;
         unsigned int count = static_cast<unsigned int>(_value.size());
@@ -575,7 +575,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedDoubleMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    google::protobuf::uint8* LVRepeatedMessageValue<double>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {    
         if (_value.size() > 0)
         {
