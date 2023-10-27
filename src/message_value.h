@@ -32,7 +32,10 @@ namespace grpc_labview
     class LVRepeatedMessageValue : public LVMessageValue
     {
     public:
-        LVRepeatedMessageValue(int protobufId);
+        LVRepeatedMessageValue(int protobufId) :
+            LVMessageValue(protobufId)
+        {
+        }
         
         google::protobuf::RepeatedField<T> _value;
 
@@ -62,7 +65,7 @@ namespace grpc_labview
         google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
     };
 
-    
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     class LVNestedMessageMessageValue : public LVMessageValue

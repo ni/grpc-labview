@@ -97,10 +97,10 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedMessageValue<std::string>::LVRepeatedMessageValue(int protobufId) :
+    /*LVRepeatedMessageValue<std::string>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -129,11 +129,11 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVVariableMessageValue<bool>::LVVariableMessageValue(int protobufId, bool value) :
+    /*LVVariableMessageValue<bool>::LVVariableMessageValue(int protobufId, bool value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -152,10 +152,10 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedMessageValue<bool>::LVRepeatedMessageValue(int protobufId) :
+    /*LVRepeatedMessageValue<bool>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -186,11 +186,11 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVVariableMessageValue<int>::LVVariableMessageValue(int protobufId, int value) :
+    /*LVVariableMessageValue<int>::LVVariableMessageValue(int protobufId, int value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -209,11 +209,11 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVVariableMessageValue<uint32_t>::LVVariableMessageValue(int protobufId, uint32_t value) :
+    /*LVVariableMessageValue<uint32_t>::LVVariableMessageValue(int protobufId, uint32_t value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -278,11 +278,11 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVVariableMessageValue<uint64_t>::LVVariableMessageValue(int protobufId, uint64_t value) :
+    /*LVVariableMessageValue<uint64_t>::LVVariableMessageValue(int protobufId, uint64_t value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -301,10 +301,10 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedMessageValue<int>::LVRepeatedMessageValue(int protobufId) :
+    /*LVRepeatedMessageValue<int>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -335,10 +335,10 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedMessageValue<uint32_t>::LVRepeatedMessageValue(int protobufId) :
+    /*LVRepeatedMessageValue<uint32_t>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -403,10 +403,10 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedMessageValue<int64_t>::LVRepeatedMessageValue(int protobufId) :
+    /*LVRepeatedMessageValue<int64_t>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -437,10 +437,10 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedMessageValue<uint64_t>::LVRepeatedMessageValue(int protobufId) :
+    /*LVRepeatedMessageValue<uint64_t>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -471,11 +471,11 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVVariableMessageValue<float>::LVVariableMessageValue(int protobufId, float value) :
+    /*LVVariableMessageValue<float>::LVVariableMessageValue(int protobufId, float value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -494,10 +494,10 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedMessageValue<float>::LVRepeatedMessageValue(int protobufId) :
+    /*LVRepeatedMessageValue<float>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -529,11 +529,11 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVVariableMessageValue<double>::LVVariableMessageValue(int protobufId, double value) :
+    /*LVVariableMessageValue<double>::LVVariableMessageValue(int protobufId, double value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -552,10 +552,10 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVRepeatedMessageValue<double>::LVRepeatedMessageValue(int protobufId) :
+    /*LVRepeatedMessageValue<double>::LVRepeatedMessageValue(int protobufId) :
         LVMessageValue(protobufId)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
