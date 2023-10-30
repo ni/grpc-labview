@@ -112,6 +112,12 @@ namespace grpc_labview
                 {
                     auto fieldInfo = (*fieldIt).second;
                     LVMessageMetadataType dataType = fieldInfo->type;
+                    if (_LVClusterHandle.get() == nullptr) {
+                        _use_hardcoded_parse = false;
+                    }
+                    else {
+                        _use_hardcoded_parse = true;
+                    }
                     switch (dataType)
                     {
                         case LVMessageMetadataType::Int32Value:
@@ -187,7 +193,6 @@ namespace grpc_labview
     const char *LVMessage::ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {
         if(_use_hardcoded_parse){
-
             grpc_labview::SinglePassMessageParser<bool> parser(*this);
             ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
         }
