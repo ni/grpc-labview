@@ -296,7 +296,7 @@ namespace grpc_labview
         if (_use_hardcoded_parse)
         {
             SinglePassMessageParser<int64_t> parser(*this);
-            parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);
         }
         else {
             if (fieldInfo.isRepeated)

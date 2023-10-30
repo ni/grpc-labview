@@ -255,11 +255,11 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVVariableMessageValue<int64_t>::LVVariableMessageValue(int protobufId, int64_t value) :
+    /*LVVariableMessageValue<int64_t>::LVVariableMessageValue(int protobufId, int64_t value) :
         LVMessageValue(protobufId),
         _value(value)
     {    
-    }
+    }*/
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------

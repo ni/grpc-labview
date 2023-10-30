@@ -56,15 +56,14 @@ namespace grpc_labview
             _value(value)
         {
         }
+
     public:
         T _value;
 
-    public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
         google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
     };
-
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
