@@ -440,8 +440,8 @@ namespace grpc_labview
                 auto v = std::make_shared<LVStringMessageValue>(index, str);
                 _values.emplace(index, v);
             }
-            return ptr;
         }
+        return ptr;
     }
 
     //---------------------------------------------------------------------
