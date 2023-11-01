@@ -408,41 +408,40 @@ namespace grpc_labview
            /* grpc_labview::SinglePassMessageParser<std::string> parser(*this);
             ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx);*/
         }
-        else{
-
-        }
-        if (fieldInfo.isRepeated)
-        {
-            std::shared_ptr<LVRepeatedMessageValue<std::string>> v;
-            auto it = _values.find(index);
-            if (it == _values.end())
+        else {
+            if (fieldInfo.isRepeated)
             {
-                v = std::make_shared<LVRepeatedMessageValue<std::string>>(index);
-                _values.emplace(index, v);
+                std::shared_ptr<LVRepeatedMessageValue<std::string>> v;
+                auto it = _values.find(index);
+                if (it == _values.end())
+                {
+                    v = std::make_shared<LVRepeatedMessageValue<std::string>>(index);
+                    _values.emplace(index, v);
+                }
+                else
+                {
+                    v = std::static_pointer_cast<LVRepeatedMessageValue<std::string>>((*it).second);
+                }
+                ptr -= 1;
+                do {
+                    ptr += 1;
+                    auto str = v->_value.Add();
+                    ptr = InlineGreedyStringParser(str, ptr, ctx);
+                    if (!ctx->DataAvailable(ptr))
+                    {
+                        break;
+                    }
+                } while (ExpectTag(tag, ptr));
             }
             else
             {
-                v = std::static_pointer_cast<LVRepeatedMessageValue<std::string>>((*it).second);
+                auto str = std::string();
+                ptr = InlineGreedyStringParser(&str, ptr, ctx);
+                auto v = std::make_shared<LVStringMessageValue>(index, str);
+                _values.emplace(index, v);
             }
-            ptr -= 1;
-            do {
-                ptr += 1;
-                auto str = v->_value.Add();
-                ptr = InlineGreedyStringParser(str, ptr, ctx);
-                if (!ctx->DataAvailable(ptr))
-                {
-                    break;
-                }
-            } while (ExpectTag(tag, ptr));
+            return ptr;
         }
-        else
-        {
-            auto str = std::string();
-            ptr = InlineGreedyStringParser(&str, ptr, ctx);
-            auto v = std::make_shared<LVStringMessageValue>(index, str);
-            _values.emplace(index, v);
-        }
-        return ptr;
     }
 
     //---------------------------------------------------------------------
