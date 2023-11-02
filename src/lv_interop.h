@@ -25,6 +25,8 @@
 
 namespace grpc_labview 
 {
+    extern bool g_use_hardcoded_parse;
+
     class gRPCid;
     extern PointerManager<gRPCid> gPointerManager;
 

@@ -51,23 +51,26 @@ namespace grpc_labview
     public:
         std::map<int, std::shared_ptr<LVMessageValue>> _values;
         std::shared_ptr<MessageMetadata> _metadata;
+        std::unordered_map<std::string, uint32_t> _repeatedField_continueIndex;
+
         // std::vector<uint64_t> _messageValues;
-        // std::vector<> _repeatedMessageValues;
+        //std::vector<char> _repeatedMessageValues;
+        google::protobuf::RepeatedField<char> _repeatedMessageValues;
         bool _use_hardcoded_parse;
         bool _skipCopyOnFirstParse;
 
         void setLVClusterHandle(const char* lvClusterHandle) {
-            _LVClusterHandle = std::make_shared<const char*>(lvClusterHandle);
+            _LVClusterHandle = lvClusterHandle;
         };
 
-        std::shared_ptr<const char*> getLVClusterHandleSharedPtr() {
+        const char* getLVClusterHandleSharedPtr() {
             return _LVClusterHandle;
         };
 
     private:
         mutable google::protobuf::internal::CachedSize _cached_size_;
         google::protobuf::UnknownFieldSet _unknownFields;
-        std::shared_ptr<const char*> _LVClusterHandle;
+        const char* _LVClusterHandle;
 
         const char *ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
         const char *ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
@@ -99,6 +102,9 @@ namespace grpc_labview
 
         // Parse and copy message in a single pass.
         const char* ParseAndCopyMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx) {
+            // get the LVClusterHandle
+            auto _lv_ptr = reinterpret_cast<const char*>(_message.getLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
+
             if (fieldInfo.isRepeated)
             {
                 // Read the repeated elements into a temporary vector
@@ -106,14 +112,12 @@ namespace grpc_labview
                 auto v = std::make_shared<LVRepeatedMessageValue<MessageType>>(index);
                 ptr = PackedMessageType(ptr, ctx, index, &(v->_value));
                 numElements = v->_value.size();
-                // get the LVClusterHandle
-                auto start = reinterpret_cast<const char*>(*(_message.getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
-
+                
                 // copy into LVCluster
                 if (numElements != 0)
                 {
-                    NumericArrayResize(0x08, 1, reinterpret_cast<void *>(const_cast<char *>(start)), numElements);
-                    auto array = *(LV1DArrayHandle*)start;
+                    NumericArrayResize(0x08, 1, reinterpret_cast<void *>(const_cast<char *>(_lv_ptr)), numElements);
+                    auto array = *(LV1DArrayHandle*)_lv_ptr;
                     (*array)->cnt = numElements;
                     auto byteCount = numElements * sizeof(MessageType);
                     std::memcpy((*array)->bytes<MessageType>(), v->_value.data(), byteCount);
@@ -121,7 +125,6 @@ namespace grpc_labview
             }
             else
             {
-                auto _lv_ptr = reinterpret_cast<const char*>(*(_message.getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
                 ptr = ReadMessageType(ptr, reinterpret_cast<MessageType*>(const_cast<char *>(_lv_ptr)));
             }
             return ptr;
@@ -146,6 +149,16 @@ namespace grpc_labview
     const char* SinglePassMessageParser<int32_t>::PackedMessageType(const char* ptr, ParseContext* ctx, int index, google::protobuf::RepeatedField<int32_t>* value)
     {
         return PackedInt32Parser(value, ptr, ctx);
+    }
+
+    const char* SinglePassMessageParser<uint32_t>::ReadMessageType(const char* ptr, uint32_t* lv_ptr)
+    {
+        return ReadUINT32(ptr, lv_ptr);
+    }
+
+    const char* SinglePassMessageParser<uint32_t>::PackedMessageType(const char* ptr, ParseContext* ctx, int index, google::protobuf::RepeatedField<uint32_t>* value)
+    {
+        return PackedUInt32Parser(value, ptr, ctx);
     }
 
     const char* SinglePassMessageParser<uint64_t>::ReadMessageType(const char* ptr, uint64_t* lv_ptr)

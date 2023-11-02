@@ -13,6 +13,8 @@
 
 namespace grpc_labview
 {
+    extern bool g_use_hardcoded_parse;
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     LabVIEWgRPCClient::LabVIEWgRPCClient()
@@ -357,18 +359,20 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
     int32_t result = 0;
     if (call->_status.ok())
     {
-        // try
-        // {
-        //     grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
-        // }
-        // catch (grpc_labview::InvalidEnumValueException& e)
-        // {
-        //     if (errorMessage != nullptr)
-        //     {
-        //         grpc_labview::SetLVString(errorMessage, e.what());
-        //     }
-        //     return e.code;
-        // }
+        if (grpc_labview::g_use_hardcoded_parse) {
+            try
+            {
+                grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
+            }
+            catch (grpc_labview::InvalidEnumValueException& e)
+            {
+                if (errorMessage != nullptr)
+                {
+                    grpc_labview::SetLVString(errorMessage, e.what());
+                }
+                return e.code;
+            }
+        }
     }
     else
     {
