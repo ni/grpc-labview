@@ -98,45 +98,57 @@ namespace grpc_labview
         SinglePassMessageParser(LVMessage& message) : _message(message) {}
 
         // Parse and copy message in a single pass.
-        const char* ParseAndCopyMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx, const std::string type="") {
+        const char* ParseAndCopyMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx, const LVMessageType type=LVMessageType::DEFAULT) {
             if (fieldInfo.isRepeated)
             {
                 // Read the repeated elements into a temporary vector
-                
-                if (type == "enum") {
-                    auto v = std::make_shared<LVRepeatedEnumMessageValue>(index);
-                    ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedEnumMessageValue>>(v, ptr, ctx, index, fieldInfo);
-                }
-                else if (type == "sint32") {
-                    auto v = std::make_shared<LVRepeatedSInt32MessageValue>(index);
-                    ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedSInt32MessageValue>>(v, ptr, ctx, index, fieldInfo);
-                }
-                else if (type == "sint64") {
-                    auto v = std::make_shared<LVRepeatedSInt64MessageValue>(index);
-                    ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedSInt64MessageValue>>(v, ptr, ctx, index, fieldInfo);
-                }
-                else if (type == "fixed32") {
-                    auto v = std::make_shared<LVRepeatedFixed32MessageValue>(index);
-                    ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedFixed32MessageValue>>(v, ptr, ctx, index, fieldInfo);
+                switch (type) {
+                    case LVMessageType::ENUM:{
+                        auto v = std::make_shared<LVRepeatedEnumMessageValue>(index);
+                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedEnumMessageValue>>(v, ptr, ctx, index, fieldInfo);
+                        break;
+                    }
 
-                }
-                else if (type == "fixed64") {
-                    auto v = std::make_shared<LVRepeatedFixed64MessageValue>(index);
-                    ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedFixed64MessageValue>>(v, ptr, ctx, index, fieldInfo);
+                    case LVMessageType::SINT32:{
+                        auto v = std::make_shared<LVRepeatedSInt32MessageValue>(index);
+                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedSInt32MessageValue>>(v, ptr, ctx, index, fieldInfo);
+                        break;
+                    }
 
-                }
-                else if (type == "sfixed32") {
-                    auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(index);
-                    ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedSFixed32MessageValue>>(v, ptr, ctx, index, fieldInfo);
-                }
-                else if (type == "sfixed64") {
-                    auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(index);
-                    ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedSFixed64MessageValue>>(v, ptr, ctx, index, fieldInfo);
+                    case LVMessageType::SINT64:{
+                        auto v = std::make_shared<LVRepeatedSInt64MessageValue>(index);
+                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedSInt64MessageValue>>(v, ptr, ctx, index, fieldInfo);
+                        break;
+                    }
 
-                }
-                else {
-                    auto v = std::make_shared<LVRepeatedMessageValue<MessageType>>(index);
-                    ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedMessageValue<MessageType>>>(v, ptr, ctx, index, fieldInfo);
+                    case LVMessageType::FIXED32:{
+                        auto v = std::make_shared<LVRepeatedFixed32MessageValue>(index);
+                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedFixed32MessageValue>>(v, ptr, ctx, index, fieldInfo);
+                        break;
+                    }
+
+                    case LVMessageType::FIXED64:{
+                        auto v = std::make_shared<LVRepeatedFixed64MessageValue>(index);
+                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedFixed64MessageValue>>(v, ptr, ctx, index, fieldInfo);
+                        break;
+                    }
+
+                    case LVMessageType::SFIXED32:{
+                        auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(index);
+                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedSFixed32MessageValue>>(v, ptr, ctx, index, fieldInfo);
+                        break;
+                    }
+
+                    case LVMessageType::SFIXED64:{
+                        auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(index);
+                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedSFixed64MessageValue>>(v, ptr, ctx, index, fieldInfo);
+                        break; 
+                    }
+
+                    case LVMessageType::DEFAULT:{
+                        auto v = std::make_shared<LVRepeatedMessageValue<MessageType>>(index);
+                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedMessageValue<MessageType>>>(v, ptr, ctx, index, fieldInfo);
+                    }
                 }
             }
             else

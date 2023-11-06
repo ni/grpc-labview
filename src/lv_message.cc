@@ -274,7 +274,7 @@ namespace grpc_labview
     {    
         if(_use_hardcoded_parse){
             grpc_labview::SinglePassMessageParser<int32_t, ReadENUM, PackedEnumParser> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, "enum");
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, LVMessageType::ENUM);
         }
         else{
             if (fieldInfo.isRepeated)
@@ -472,7 +472,7 @@ namespace grpc_labview
     {
         if(_use_hardcoded_parse){
             grpc_labview::SinglePassMessageParser<int32_t, ReadSINT32, PackedSInt32Parser> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, "sint32");
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, LVMessageType::SINT32);
         }
         else{
             if (fieldInfo.isRepeated)
@@ -498,7 +498,7 @@ namespace grpc_labview
     {
         if(_use_hardcoded_parse){
             grpc_labview::SinglePassMessageParser<int64_t, ReadSINT64, PackedSInt64Parser> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, "sint64");
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, LVMessageType::SINT64);
         }
         else{
             if (fieldInfo.isRepeated)
@@ -524,7 +524,7 @@ namespace grpc_labview
     {
         if(_use_hardcoded_parse){
             grpc_labview::SinglePassMessageParser<uint32_t, ReadFIXED32, PackedFixed32Parser> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, "fixed32");
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, LVMessageType::FIXED32);
         }
         else{
             if (fieldInfo.isRepeated)
@@ -551,7 +551,7 @@ namespace grpc_labview
     {
         if(_use_hardcoded_parse){
             grpc_labview::SinglePassMessageParser<uint64_t, ReadFIXED64, PackedFixed64Parser> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, "fixed64");
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, LVMessageType::FIXED64);
         }
         else{
             if (fieldInfo.isRepeated)
@@ -577,7 +577,7 @@ namespace grpc_labview
     {
         if(_use_hardcoded_parse){
             grpc_labview::SinglePassMessageParser<int32_t, ReadSFIXED32, PackedSFixed32Parser> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, "sfixed32");
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, LVMessageType::SFIXED32);
         }
         else{
             if (fieldInfo.isRepeated)
@@ -603,7 +603,7 @@ namespace grpc_labview
     {
         if(_use_hardcoded_parse){
             grpc_labview::SinglePassMessageParser<int64_t, ReadSFIXED64, PackedSFixed64Parser> parser(*this);
-            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, "sfixed64");
+            ptr = parser.ParseAndCopyMessage(fieldInfo, index, ptr, ctx, LVMessageType::SFIXED64);
         }
         else{
             if (fieldInfo.isRepeated)
