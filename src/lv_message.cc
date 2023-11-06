@@ -573,109 +573,74 @@ namespace grpc_labview
             const char* lv_ptr = (this->getLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
             LVMessage nestedMessage(metadata);
 
-            if (fieldInfo.isRepeated){
-                // start with numElements = 16
+            if (fieldInfo.isRepeated) {
                 // if the array is not big enough, resize it to 2x the size
                 auto numElements = 128;
-                // auto numElements = 100000;
                 auto elementIndex = 0;
-
                 auto clusterSize = metadata->clusterSize;
                 auto alignment = metadata->alignmentRequirement;
-
                 auto arraySize = numElements * clusterSize;
-                LV1DArrayHandle array;
-                // NumericArrayResize(0x08, 1, (void**)lv_ptr, arraySize);
-                // array = *(LV1DArrayHandle*)lv_ptr;
-                // (*array)->cnt = arraySize;
-                // We need to divide arraySize by 8 as we are allocating 
-                // numElements * message_size of 8 byte elements.
-                // Element size of typecode 0x08 is 8 bytes.
-
+                LV1DArrayHandle arrayHandle;
                 char _fillData = '\0';
 
+                // Get the _repeatedMessageValues vector from the map
+                auto _repeatedMessageValuesIt = _repeatedMessageValuesMap.find(metadata->messageName);
+                if (_repeatedMessageValuesIt == _repeatedMessageValuesMap.end())
+                {
+                    _repeatedMessageValuesIt = _repeatedMessageValuesMap.emplace(metadata->messageName, google::protobuf::RepeatedField<char>()).first;
+                }
+
+                // There are situations where the protobuf message is not complete, and we need to continue from the last index.
+                // This function returns to _internalParse, and then gets back to this function.
+                // If we are continuing from a previous parse, then we need to continue from the last index
                 auto _continueFromIndex = _repeatedField_continueIndex.find(metadata->messageName);
                 if (_continueFromIndex != _repeatedField_continueIndex.end()) {
                     elementIndex = _continueFromIndex->second;
                     _repeatedField_continueIndex.erase(_continueFromIndex);
                     // find next largest power of 2, as we assume that we previously resized it to a power of 2
-                    numElements = 1 << (int)ceil(log2(elementIndex));
+                    auto _size = (int)ceil(log2(elementIndex));
+                    numElements = ((1 << _size) > 128) ? (1 << _size) : 128;
                 }
                 else {
-                    _repeatedMessageValues.Resize(arraySize, _fillData);
+                    // occurs on the first time this function is called
+                    _repeatedMessageValuesIt->second.Resize(arraySize, _fillData);
                 }
-                auto _vectorPtr = _repeatedMessageValues.data();
 
                 protobuf_ptr -= 1;
                 do
                 {
                     protobuf_ptr += 1;
-                    //protobuf_ptr = elementIndex ? protobuf_ptr + 1 : protobuf_ptr;
-                    //auto nestedMessage = std::make_shared<LVMessage>(metadata);
 
+                    // Resize the vector if we need more memory
                     if (elementIndex >= numElements - 1) {
-                        //std::string d_message = "elementIndex = " + std::to_string(elementIndex);
-                        //d_message += " numElements = " + std::to_string(numElements);
-                        ////d_message += "\nChanging numElements to = " + std::to_string(numElements*2);
-                        //d_message += "\nChanging numElements to = " + std::to_string(numElements+1);
-                        //std::ostringstream ss1;
-                        //ss1 << std::hex << std::showbase << reinterpret_cast<unsigned long long>((void*)(*array));
-                        //d_message += "\nOld Array pointer = " + ss1.str() + "\n";
-                        //OutputDebugStringA(d_message.c_str());
                         numElements *= 2;
-                        //numElements += 1;
                         arraySize = numElements * clusterSize;
-                        //NumericArrayResize(0x08, 1, (void**)lv_ptr, arraySize);
-                        //array = *(LV1DArrayHandle*)lv_ptr;
-                        //(*array)->cnt = arraySize;
-                        //                     
-                        //// print array pointer in hex
-                        //std::ostringstream ss2;
-                        //ss2 << std::hex << std::showbase << reinterpret_cast<unsigned long long>((void*)(*array));
-                        //d_message = "New Array pointer = " + ss2.str() + "\n";
-                        //OutputDebugStringA(d_message.c_str());
-
-                        auto s = _repeatedMessageValues.size();
-                        _repeatedMessageValues.Resize(arraySize, _fillData);
+                        auto s = _repeatedMessageValuesIt->second.size();
+                        _repeatedMessageValuesIt->second.Resize(arraySize, _fillData);
                     }
 
-                    /*auto lv_elem_ptr = (LVCluster**)(*array)->bytes(elementIndex * clusterSize, alignment);
-                    nestedMessage.setLVClusterHandle(reinterpret_cast<const char*>(lv_elem_ptr));
-                    protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);*/
-
-                    /* initialize vector _repeatedMessageValues element with 0s
-                    std::vector<char> chunk(clusterSize, '0');
-                    this->_repeatedMessageValues.emplace_back(chunk);*/
-
-                    auto _vectorPtr = _repeatedMessageValues.data();
+                    auto _vectorPtr = _repeatedMessageValuesIt->second.data();
                     _vectorPtr = _vectorPtr + (elementIndex * clusterSize);
                     nestedMessage.setLVClusterHandle(_vectorPtr);
                     protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
-                    auto s = _repeatedMessageValues.size();
 
                     elementIndex++;
 
-                    //Sleep(100);
-                    if (!ctx->DataAvailable(protobuf_ptr)){
-                        /*std::string d_message = "Data unavailable! Send help...\n";
-                        OutputDebugStringA(d_message.c_str());*/
+                    if (!ctx->DataAvailable(protobuf_ptr)) {
                         break;
                     }
                 } while (ExpectTag(tag, protobuf_ptr));
 
-                /*std::cout << "Element Index while parsing repeated: " << elementIndex;
-                std::string d_message = "Element Index while parsing repeated: " + std::to_string(elementIndex) + "\n";
-                OutputDebugStringA(d_message.c_str());*/
-
                 // shrink the array to the correct size
-                // elementIndex = this->_repeatedMessageValues.size();
                 arraySize = elementIndex * clusterSize;
-                NumericArrayResize(0x08, 1, (void**)lv_ptr, arraySize);
-                array = *(LV1DArrayHandle*)lv_ptr;
-                (*array)->cnt = elementIndex;
+                auto old_arrayHandle = *(void**)lv_ptr;
+                DSDisposeHandle(old_arrayHandle);
+                *(void**)lv_ptr = DSNewHandle(arraySize);
+                arrayHandle = *(LV1DArrayHandle*)lv_ptr;
+                (*arrayHandle)->cnt = elementIndex;
 
-                auto _vectorDataPtr = _repeatedMessageValues.data();
-                auto _lvArrayDataPtr = (*array)->bytes(0, alignment);
+                auto _vectorDataPtr = _repeatedMessageValuesIt->second.data();
+                auto _lvArrayDataPtr = (*arrayHandle)->bytes(0, alignment);
                 memcpy(_lvArrayDataPtr, _vectorDataPtr, arraySize);
 
                 _repeatedField_continueIndex.emplace(metadata->messageName, elementIndex);
