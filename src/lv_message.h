@@ -98,83 +98,30 @@ namespace grpc_labview
         SinglePassMessageParser(LVMessage& message) : _message(message) {}
 
         // Parse and copy message in a single pass.
-        const char* ParseAndCopyMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx, const LVMessageType type=LVMessageType::DEFAULT) {
+        template<typename RepeatedMessageValuePointer>
+        const char* ParseAndCopyMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx, RepeatedMessageValuePointer v, const LVMessageType type=LVMessageType::DEFAULT) {
             if (fieldInfo.isRepeated)
             {
-                // Read the repeated elements into a temporary vector
-                switch (type) {
-                    case LVMessageType::ENUM:{
-                        auto v = std::make_shared<LVRepeatedEnumMessageValue>(index);
-                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedEnumMessageValue>>(v, ptr, ctx, index, fieldInfo);
-                        break;
-                    }
+                uint64_t numElements;
+                ptr = PackedMessageType(ptr, ctx, index, reinterpret_cast<google::protobuf::RepeatedField<MessageType>*>(&(v->_value)));
+                numElements = v->_value.size();
+                // get the LVClusterHandle
+                auto start = reinterpret_cast<const char*>(*(_message.getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
 
-                    case LVMessageType::SINT32:{
-                        auto v = std::make_shared<LVRepeatedSInt32MessageValue>(index);
-                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedSInt32MessageValue>>(v, ptr, ctx, index, fieldInfo);
-                        break;
-                    }
-
-                    case LVMessageType::SINT64:{
-                        auto v = std::make_shared<LVRepeatedSInt64MessageValue>(index);
-                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedSInt64MessageValue>>(v, ptr, ctx, index, fieldInfo);
-                        break;
-                    }
-
-                    case LVMessageType::FIXED32:{
-                        auto v = std::make_shared<LVRepeatedFixed32MessageValue>(index);
-                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedFixed32MessageValue>>(v, ptr, ctx, index, fieldInfo);
-                        break;
-                    }
-
-                    case LVMessageType::FIXED64:{
-                        auto v = std::make_shared<LVRepeatedFixed64MessageValue>(index);
-                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedFixed64MessageValue>>(v, ptr, ctx, index, fieldInfo);
-                        break;
-                    }
-
-                    case LVMessageType::SFIXED32:{
-                        auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(index);
-                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedSFixed32MessageValue>>(v, ptr, ctx, index, fieldInfo);
-                        break;
-                    }
-
-                    case LVMessageType::SFIXED64:{
-                        auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(index);
-                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedSFixed64MessageValue>>(v, ptr, ctx, index, fieldInfo);
-                        break; 
-                    }
-
-                    case LVMessageType::DEFAULT:{
-                        auto v = std::make_shared<LVRepeatedMessageValue<MessageType>>(index);
-                        ptr = CopyRepeatedMessageToCluster<std::shared_ptr<LVRepeatedMessageValue<MessageType>>>(v, ptr, ctx, index, fieldInfo);
-                    }
+                // copy into LVCluster
+                if (numElements != 0)
+                {
+                    NumericArrayResize(0x08, 1, reinterpret_cast<void*>(const_cast<char*>(start)), numElements);
+                    auto array = *(LV1DArrayHandle*)start;
+                    (*array)->cnt = numElements;
+                    auto byteCount = numElements * sizeof(MessageType);
+                    std::memcpy((*array)->bytes<MessageType>(), v->_value.data(), byteCount);
                 }
             }
             else
             {
                 auto _lv_ptr = reinterpret_cast<const char*>(*(_message.getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
                 ptr = ReadMessageType(ptr, reinterpret_cast<MessageType*>(const_cast<char *>(_lv_ptr)));
-            }
-            return ptr;
-        }
-
-        template <typename RepeatedMessageType>
-        const char* CopyRepeatedMessageToCluster(RepeatedMessageType v, const char *ptr, ParseContext* ctx, uint32_t index, MessageElementMetadata fieldInfo) {
-            uint64_t numElements;
-            ptr = PackedMessageType(ptr, ctx, index, reinterpret_cast<google::protobuf::RepeatedField<MessageType>*>(&(v->_value)));
-            numElements = v->_value.size();
-            // get the LVClusterHandle
-            auto start = reinterpret_cast<const char*>(*(_message.getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
-
-            // copy into LVCluster
-            if (numElements != 0)
-            {
-                NumericArrayResize(0x08, 1, reinterpret_cast<void*>(const_cast<char*>(start)), numElements);
-                auto array = *(LV1DArrayHandle*)start;
-                (*array)->cnt = numElements;
-                auto byteCount = numElements * sizeof(MessageType);
-                std::memcpy((*array)->bytes<MessageType>(), v->_value.data(), byteCount);
             }
             return ptr;
         }
