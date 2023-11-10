@@ -2,6 +2,8 @@
 //---------------------------------------------------------------------
 #include <grpc_server.h>
 #include <lv_message.h>
+#include <Windows.h>
+#include <sstream>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -9,10 +11,12 @@ using namespace google::protobuf::internal;
 
 namespace grpc_labview
 {
+    bool g_use_hardcoded_parse = true;
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     LVMessage::LVMessage(std::shared_ptr<MessageMetadata> metadata) : 
-        _metadata(metadata), _use_hardcoded_parse(true), _skipCopyOnFirstParse(false)
+        _metadata(metadata), _use_hardcoded_parse(g_use_hardcoded_parse), _skipCopyOnFirstParse(false)
     {
     }
 
@@ -410,40 +414,87 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
     {    
-        if (fieldInfo.isRepeated)
+        const char* lv_ptr = (this->getLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
+
+        if (_use_hardcoded_parse)
         {
-            std::shared_ptr<LVRepeatedMessageValue<std::string>> v;
-            auto it = _values.find(index);
-            if (it == _values.end())
+            if (fieldInfo.isRepeated)
             {
-                v = std::make_shared<LVRepeatedMessageValue<std::string>>(index);
-                _values.emplace(index, v);
+                // Get the _repeatedMessageValues vector from the map
+                auto _repeatedStringValuesIt = _repeatedStringValuesMap.find(fieldInfo.fieldName);
+                if (_repeatedStringValuesIt == _repeatedStringValuesMap.end())
+                {
+                    _repeatedStringValuesIt = _repeatedStringValuesMap.emplace(fieldInfo.fieldName, google::protobuf::RepeatedField<std::string>()).first;
+                }
+
+                protobuf_ptr -= 1;
+                do {
+                    protobuf_ptr += 1;
+                    auto str = _repeatedStringValuesIt->second.Add();
+                    protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
+                    if (!ctx->DataAvailable(protobuf_ptr))
+                    {
+                        break;
+                    }
+                } while (ExpectTag(tag, protobuf_ptr));
+
+                auto arraySize = sizeof(void*) * _repeatedStringValuesIt->second.size();
+                auto _lvProvidedArrayHandle = *(void**)lv_ptr; 
+                *(void**)lv_ptr = DSNewHandle(arraySize);
+                auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
+                (*arrayHandle)->cnt = _repeatedStringValuesIt->second.size();
+
+                // Copy the repeated string values into the LabVIEW array
+                auto lvStringPtr = (*arrayHandle)->bytes<LStrHandle>();
+                for (auto str:_repeatedStringValuesIt->second)
+                {
+                    *lvStringPtr = nullptr;
+                    SetLVString(lvStringPtr, str);
+                    lvStringPtr++;
+                }
+            }
+            else {
+                auto str = std::string();
+                protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
+                SetLVString((LStrHandle*)lv_ptr, str);
+            }
+        }
+        else {
+            if (fieldInfo.isRepeated)
+            {
+                std::shared_ptr<LVRepeatedMessageValue<std::string>> v;
+                auto it = _values.find(index);
+                if (it == _values.end())
+                {
+                    v = std::make_shared<LVRepeatedMessageValue<std::string>>(index);
+                    _values.emplace(index, v);
+                }
+                else
+                {
+                    v = std::static_pointer_cast<LVRepeatedMessageValue<std::string>>((*it).second);
+                }
+                protobuf_ptr -= 1;
+                do {
+                    protobuf_ptr += 1;
+                    auto str = v->_value.Add();
+                    protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
+                    if (!ctx->DataAvailable(protobuf_ptr))
+                    {
+                        break;
+                    }
+                } while (ExpectTag(tag, protobuf_ptr));
             }
             else
             {
-                v = std::static_pointer_cast<LVRepeatedMessageValue<std::string>>((*it).second);
+                auto str = std::string();
+                protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
+                auto v = std::make_shared<LVStringMessageValue>(index, str);
+                _values.emplace(index, v);
             }
-            ptr -= 1;
-            do {
-                ptr += 1;
-                auto str = v->_value.Add();
-                ptr = InlineGreedyStringParser(str, ptr, ctx);
-                if (!ctx->DataAvailable(ptr))
-                {
-                    break;
-                }
-            } while (ExpectTag(tag, ptr));
         }
-        else
-        {
-            auto str = std::string();
-            ptr = InlineGreedyStringParser(&str, ptr, ctx);
-            auto v = std::make_shared<LVStringMessageValue>(index, str);
-            _values.emplace(index, v);
-        }
-        return ptr;
+        return protobuf_ptr;
     }
 
     //---------------------------------------------------------------------
@@ -646,54 +697,84 @@ namespace grpc_labview
         auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
         if (_use_hardcoded_parse)
         {
-            const char* lv_ptr = (*(this->getLVClusterHandleSharedPtr().get())) + fieldInfo.clusterOffset;
+            const char* lv_ptr = (this->getLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
+            LVMessage nestedMessage(metadata);
 
-            if (fieldInfo.isRepeated){
-                // start with numElements = 16
+            if (fieldInfo.isRepeated) {
                 // if the array is not big enough, resize it to 2x the size
-                auto num_elements = 16;
-                auto element_count = 0;
-
+                auto numElements = 128;
+                auto elementIndex = 0;
                 auto clusterSize = metadata->clusterSize;
                 auto alignment = metadata->alignmentRequirement;
+                auto arraySize = numElements * clusterSize;
+                LV1DArrayHandle arrayHandle;
+                char _fillData = '\0';
 
-                NumericArrayResize(0x08, 1, (void**)lv_ptr, num_elements * clusterSize);
-                auto array = *(LV1DArrayHandle*)lv_ptr;
-                (*array)->cnt = num_elements;
-                
+                // Get the _repeatedMessageValues vector from the map
+                auto _repeatedMessageValuesIt = _repeatedMessageValuesMap.find(metadata->messageName);
+                if (_repeatedMessageValuesIt == _repeatedMessageValuesMap.end())
+                {
+                    _repeatedMessageValuesIt = _repeatedMessageValuesMap.emplace(metadata->messageName, google::protobuf::RepeatedField<char>()).first;
+                }
+
+                // There are situations where the protobuf message is not complete, and we need to continue from the last index.
+                // This function returns to _internalParse, and then gets back to this function.
+                // If we are continuing from a previous parse, then we need to continue from the last index
+                auto _continueFromIndex = _repeatedField_continueIndex.find(metadata->messageName);
+                if (_continueFromIndex != _repeatedField_continueIndex.end()) {
+                    elementIndex = _continueFromIndex->second;
+                    _repeatedField_continueIndex.erase(_continueFromIndex);
+                    // find next largest power of 2, as we assume that we previously resized it to a power of 2
+                    auto _size = (int)ceil(log2(elementIndex));
+                    numElements = ((1 << _size) > 128) ? (1 << _size) : 128;
+                }
+                else {
+                    // occurs on the first time this function is called
+                    _repeatedMessageValuesIt->second.Resize(arraySize, _fillData);
+                }
+
+                protobuf_ptr -= 1;
                 do
                 {
-                    protobuf_ptr = element_count ? protobuf_ptr + 1 : protobuf_ptr;
-                    auto nestedMessage = std::make_shared<LVMessage>(metadata);
+                    protobuf_ptr += 1;
 
-                    if (element_count * clusterSize >= num_elements) {
-                        num_elements *= 2;
-                        NumericArrayResize(0x08, 1, (void**)lv_ptr, num_elements * clusterSize);
-                        array = *(LV1DArrayHandle*)lv_ptr;
-                        (*array)->cnt = num_elements;
+                    // Resize the vector if we need more memory
+                    if (elementIndex >= numElements - 1) {
+                        numElements *= 2;
+                        arraySize = numElements * clusterSize;
+                        auto s = _repeatedMessageValuesIt->second.size();
+                        _repeatedMessageValuesIt->second.Resize(arraySize, _fillData);
                     }
 
-                    auto lv_elem_ptr = (LVCluster**)(*array)->bytes(element_count * clusterSize, alignment);
-                    nestedMessage->setLVClusterHandle(reinterpret_cast<const char*>(lv_elem_ptr));
-                    protobuf_ptr = ctx->ParseMessage(nestedMessage.get(), protobuf_ptr);
+                    auto _vectorPtr = _repeatedMessageValuesIt->second.data();
+                    _vectorPtr = _vectorPtr + (elementIndex * clusterSize);
+                    nestedMessage.setLVClusterHandle(_vectorPtr);
+                    protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
 
-                    element_count++;
+                    elementIndex++;
 
-                    if (!ctx->DataAvailable(protobuf_ptr)){
+                    if (!ctx->DataAvailable(protobuf_ptr)) {
                         break;
                     }
                 } while (ExpectTag(tag, protobuf_ptr));
 
                 // shrink the array to the correct size
-                NumericArrayResize(0x08, 1, (void**)lv_ptr, (element_count - 1) * clusterSize);
-                array = *(LV1DArrayHandle*)lv_ptr;
-                (*array)->cnt = element_count;
+                arraySize = elementIndex * clusterSize;
+                auto old_arrayHandle = *(void**)lv_ptr;
+                DSDisposeHandle(old_arrayHandle);
+                *(void**)lv_ptr = DSNewHandle(arraySize);
+                arrayHandle = *(LV1DArrayHandle*)lv_ptr;
+                (*arrayHandle)->cnt = elementIndex;
+
+                auto _vectorDataPtr = _repeatedMessageValuesIt->second.data();
+                auto _lvArrayDataPtr = (*arrayHandle)->bytes(0, alignment);
+                memcpy(_lvArrayDataPtr, _vectorDataPtr, arraySize);
+
+                _repeatedField_continueIndex.emplace(metadata->messageName, elementIndex);
             }
             else {
-                auto nestedMessage = std::make_shared<LVMessage>(metadata);
-                auto val_ptr = lv_ptr + fieldInfo.clusterOffset;
-                nestedMessage->setLVClusterHandle(val_ptr);
-                protobuf_ptr = ctx->ParseMessage(nestedMessage.get(), protobuf_ptr);
+                nestedMessage.setLVClusterHandle(lv_ptr);
+                protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
             }
         }
         else {
