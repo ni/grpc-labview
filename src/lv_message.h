@@ -99,7 +99,7 @@ namespace grpc_labview
 
         // Parse and copy message in a single pass.
         template<typename RepeatedMessageValuePointer>
-        const char* ParseAndCopyMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx, RepeatedMessageValuePointer v, const LVMessageType type=LVMessageType::DEFAULT) {
+        const char* ParseAndCopyMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx, RepeatedMessageValuePointer v) {
             if (fieldInfo.isRepeated)
             {
                 uint64_t numElements;
