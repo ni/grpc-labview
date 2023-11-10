@@ -53,6 +53,7 @@ namespace grpc_labview
         std::shared_ptr<MessageMetadata> _metadata;
         std::unordered_map<std::string, uint32_t> _repeatedField_continueIndex;
         std::unordered_map<std::string, google::protobuf::RepeatedField<char>> _repeatedMessageValuesMap;
+        std::unordered_map<std::string, google::protobuf::RepeatedField<std::string>> _repeatedStringValuesMap;
         // std::vector<uint64_t> _messageValues;
         //std::vector<char> _repeatedMessageValues;
         bool _use_hardcoded_parse;

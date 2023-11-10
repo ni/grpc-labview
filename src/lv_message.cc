@@ -376,40 +376,87 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
     {    
-        if (fieldInfo.isRepeated)
+        const char* lv_ptr = (this->getLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
+
+        if (_use_hardcoded_parse)
         {
-            std::shared_ptr<LVRepeatedMessageValue<std::string>> v;
-            auto it = _values.find(index);
-            if (it == _values.end())
+            if (fieldInfo.isRepeated)
             {
-                v = std::make_shared<LVRepeatedMessageValue<std::string>>(index);
-                _values.emplace(index, v);
+                // Get the _repeatedMessageValues vector from the map
+                auto _repeatedStringValuesIt = _repeatedStringValuesMap.find(fieldInfo.fieldName);
+                if (_repeatedStringValuesIt == _repeatedStringValuesMap.end())
+                {
+                    _repeatedStringValuesIt = _repeatedStringValuesMap.emplace(fieldInfo.fieldName, google::protobuf::RepeatedField<std::string>()).first;
+                }
+
+                protobuf_ptr -= 1;
+                do {
+                    protobuf_ptr += 1;
+                    auto str = _repeatedStringValuesIt->second.Add();
+                    protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
+                    if (!ctx->DataAvailable(protobuf_ptr))
+                    {
+                        break;
+                    }
+                } while (ExpectTag(tag, protobuf_ptr));
+
+                auto arraySize = sizeof(void*) * _repeatedStringValuesIt->second.size();
+                auto _lvProvidedArrayHandle = *(void**)lv_ptr; 
+                *(void**)lv_ptr = DSNewHandle(arraySize);
+                auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
+                (*arrayHandle)->cnt = _repeatedStringValuesIt->second.size();
+
+                // Copy the repeated string values into the LabVIEW array
+                auto lvStringPtr = (*arrayHandle)->bytes<LStrHandle>();
+                for (auto str:_repeatedStringValuesIt->second)
+                {
+                    *lvStringPtr = nullptr;
+                    SetLVString(lvStringPtr, str);
+                    lvStringPtr++;
+                }
+            }
+            else {
+                auto str = std::string();
+                protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
+                SetLVString((LStrHandle*)lv_ptr, str);
+            }
+        }
+        else {
+            if (fieldInfo.isRepeated)
+            {
+                std::shared_ptr<LVRepeatedMessageValue<std::string>> v;
+                auto it = _values.find(index);
+                if (it == _values.end())
+                {
+                    v = std::make_shared<LVRepeatedMessageValue<std::string>>(index);
+                    _values.emplace(index, v);
+                }
+                else
+                {
+                    v = std::static_pointer_cast<LVRepeatedMessageValue<std::string>>((*it).second);
+                }
+                protobuf_ptr -= 1;
+                do {
+                    protobuf_ptr += 1;
+                    auto str = v->_value.Add();
+                    protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
+                    if (!ctx->DataAvailable(protobuf_ptr))
+                    {
+                        break;
+                    }
+                } while (ExpectTag(tag, protobuf_ptr));
             }
             else
             {
-                v = std::static_pointer_cast<LVRepeatedMessageValue<std::string>>((*it).second);
+                auto str = std::string();
+                protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
+                auto v = std::make_shared<LVStringMessageValue>(index, str);
+                _values.emplace(index, v);
             }
-            ptr -= 1;
-            do {
-                ptr += 1;
-                auto str = v->_value.Add();
-                ptr = InlineGreedyStringParser(str, ptr, ctx);
-                if (!ctx->DataAvailable(ptr))
-                {
-                    break;
-                }
-            } while (ExpectTag(tag, ptr));
         }
-        else
-        {
-            auto str = std::string();
-            ptr = InlineGreedyStringParser(&str, ptr, ctx);
-            auto v = std::make_shared<LVStringMessageValue>(index, str);
-            _values.emplace(index, v);
-        }
-        return ptr;
+        return protobuf_ptr;
     }
 
     //---------------------------------------------------------------------
