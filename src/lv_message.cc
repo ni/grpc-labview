@@ -116,7 +116,7 @@ namespace grpc_labview
                 {
                     auto fieldInfo = (*fieldIt).second;
                     LVMessageMetadataType dataType = fieldInfo->type;
-                    if (_LVClusterHandle.get() == nullptr) {
+                    if (_LVClusterHandle == nullptr) {
                         _use_hardcoded_parse = false;
                     }
                     else {
