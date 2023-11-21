@@ -609,14 +609,16 @@ LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId
     *success = reader->_readFuture.get();
     if (*success)
     {
-        /*try
-        {
-            grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
+        if (!grpc_labview::g_use_hardcoded_parse) {
+            try
+            {
+                grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
+            }
+            catch (grpc_labview::InvalidEnumValueException& e)
+            {
+                return e.code;
+            }
         }
-        catch (grpc_labview::InvalidEnumValueException& e)
-        {
-            return e.code;
-        }*/
     }
     return 0;
 }
@@ -676,18 +678,20 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
     int32_t result = 0;
     if (call->_status.ok())
     {
-        /*try
-        {
-            grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
-        }
-        catch (grpc_labview::InvalidEnumValueException& e)
-        {
-            result = e.code;
-            if (errorMessage != nullptr)
+        if (!grpc_labview::g_use_hardcoded_parse) {
+            try
             {
-                grpc_labview::SetLVString(errorMessage, e.what());
+                grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
             }
-        }*/
+            catch (grpc_labview::InvalidEnumValueException& e)
+            {
+                result = e.code;
+                if (errorMessage != nullptr)
+                {
+                    grpc_labview::SetLVString(errorMessage, e.what());
+                }
+            }
+        }
     }
     else
     {

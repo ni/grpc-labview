@@ -8,25 +8,26 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     class LVMessage;
 
-    enum class LVMessageType {
-        INT32 = 0,
-        INT64 = 1,
-        UINT32 = 2,
-        UINT64 = 3,
-        FLOAT = 4,
-        DOUBLE = 5,
-        BOOL = 6,
-        STRING = 7,
-        BYTES = 8,
-        ENUM = 9,
-        SINT32 = 10,
-        SINT64 = 11,
-        FIXED32 = 12,
-        FIXED64 = 13,
-        SFIXED32 = 14,
-        SFIXED64 = 15,
-        DEFAULT = 100,
-    };
+    // This enum contains all the gRPC datatypes. Might be useful in future.
+    // enum class LVMessageType {
+    //     INT32 = 0,
+    //     INT64 = 1,
+    //     UINT32 = 2,
+    //     UINT64 = 3,
+    //     FLOAT = 4,
+    //     DOUBLE = 5,
+    //     BOOL = 6,
+    //     STRING = 7,
+    //     BYTES = 8,
+    //     ENUM = 9,
+    //     SINT32 = 10,
+    //     SINT64 = 11,
+    //     FIXED32 = 12,
+    //     FIXED64 = 13,
+    //     SFIXED32 = 14,
+    //     SFIXED64 = 15,
+    //     DEFAULT = 100,
+    // };
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
