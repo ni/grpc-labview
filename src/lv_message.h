@@ -92,7 +92,7 @@ namespace grpc_labview
         bool ExpectTag(google::protobuf::uint32 tag, const char* ptr);
     };
 
-    template <typename MessageType>
+    template <typename MessageType, const char* (*ReadFunc)(const char*, MessageType*), const char* (*PackedFunc)(void*, const char*, google::protobuf::internal::ParseContext*)>
     class SinglePassMessageParser {
     private:
         LVMessage& _message;
@@ -101,22 +101,20 @@ namespace grpc_labview
         SinglePassMessageParser(LVMessage& message) : _message(message) {}
 
         // Parse and copy message in a single pass.
-        const char* ParseAndCopyMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx) {
-            // get the LVClusterHandle
+        template<typename RepeatedMessageValuePointer>
+        const char* ParseAndCopyMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx, RepeatedMessageValuePointer v) {
             auto _lv_ptr = reinterpret_cast<const char*>(_message.getLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
-
             if (fieldInfo.isRepeated)
             {
-                // Read the repeated elements into a temporary vector
                 uint64_t numElements;
-                auto v = std::make_shared<LVRepeatedMessageValue<MessageType>>(index);
-                ptr = PackedMessageType(ptr, ctx, index, &(v->_value));
+                ptr = PackedMessageType(ptr, ctx, index, reinterpret_cast<google::protobuf::RepeatedField<MessageType>*>(&(v->_value)));
                 numElements = v->_value.size();
-                
+                // get the LVClusterHandle
+
                 // copy into LVCluster
                 if (numElements != 0)
                 {
-                    NumericArrayResize(0x08, 1, reinterpret_cast<void *>(const_cast<char *>(_lv_ptr)), numElements);
+                    NumericArrayResize(0x08, 1, reinterpret_cast<void*>(const_cast<char*>(_lv_ptr)), numElements);
                     auto array = *(LV1DArrayHandle*)_lv_ptr;
                     (*array)->cnt = numElements;
                     auto byteCount = numElements * sizeof(MessageType);
@@ -132,42 +130,12 @@ namespace grpc_labview
 
         const char* ReadMessageType(const char* ptr, MessageType* lv_ptr)
         {
-            return nullptr;
+            return ReadFunc(ptr, lv_ptr);
         }
 
         const char* PackedMessageType(const char* ptr, ParseContext* ctx, int index, google::protobuf::RepeatedField<MessageType>* value)
         {
-            return nullptr;
+            return PackedFunc(value, ptr, ctx);
         }
     };
-
-    const char* SinglePassMessageParser<int32_t>::ReadMessageType(const char* ptr, int32_t* lv_ptr)
-    {
-        return ReadINT32(ptr, lv_ptr);
-    }
-    
-    const char* SinglePassMessageParser<int32_t>::PackedMessageType(const char* ptr, ParseContext* ctx, int index, google::protobuf::RepeatedField<int32_t>* value)
-    {
-        return PackedInt32Parser(value, ptr, ctx);
-    }
-
-    const char* SinglePassMessageParser<uint32_t>::ReadMessageType(const char* ptr, uint32_t* lv_ptr)
-    {
-        return ReadUINT32(ptr, lv_ptr);
-    }
-
-    const char* SinglePassMessageParser<uint32_t>::PackedMessageType(const char* ptr, ParseContext* ctx, int index, google::protobuf::RepeatedField<uint32_t>* value)
-    {
-        return PackedUInt32Parser(value, ptr, ctx);
-    }
-
-    const char* SinglePassMessageParser<uint64_t>::ReadMessageType(const char* ptr, uint64_t* lv_ptr)
-    {
-        return ReadUINT64(ptr, lv_ptr);
-    }
-    
-    const char* SinglePassMessageParser<uint64_t>::PackedMessageType(const char* ptr, ParseContext* ctx, int index, google::protobuf::RepeatedField<uint64_t>* value)
-    {
-        return PackedUInt64Parser(value, ptr, ctx);
-    }
 }

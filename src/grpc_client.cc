@@ -359,7 +359,7 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
     int32_t result = 0;
     if (call->_status.ok())
     {
-        if (grpc_labview::g_use_hardcoded_parse) {
+        if (!grpc_labview::g_use_hardcoded_parse) {
             try
             {
                 grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
@@ -568,11 +568,11 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, grpc_labview::MagicCookie* occurrencePtr)
+LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, grpc_labview::MagicCookie* occurrencePtr, int8_t* responseCluster)
 {
     auto reader = callId->CastTo<grpc_labview::StreamReader>();
     auto call = callId->CastTo<grpc_labview::ClientCall>();
-
+    call->_response->setLVClusterHandle(reinterpret_cast<const char*>(responseCluster));
     auto occurrence = *occurrencePtr;
 
     if (!reader || !call)
@@ -609,13 +609,15 @@ LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId
     *success = reader->_readFuture.get();
     if (*success)
     {
-        try
-        {
-            grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
-        }
-        catch (grpc_labview::InvalidEnumValueException& e)
-        {
-            return e.code;
+        if (!grpc_labview::g_use_hardcoded_parse) {
+            try
+            {
+                grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
+            }
+            catch (grpc_labview::InvalidEnumValueException& e)
+            {
+                return e.code;
+            }
         }
     }
     return 0;
@@ -676,16 +678,18 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
     int32_t result = 0;
     if (call->_status.ok())
     {
-        try
-        {
-            grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
-        }
-        catch (grpc_labview::InvalidEnumValueException& e)
-        {
-            result = e.code;
-            if (errorMessage != nullptr)
+        if (!grpc_labview::g_use_hardcoded_parse) {
+            try
             {
-                grpc_labview::SetLVString(errorMessage, e.what());
+                grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
+            }
+            catch (grpc_labview::InvalidEnumValueException& e)
+            {
+                result = e.code;
+                if (errorMessage != nullptr)
+                {
+                    grpc_labview::SetLVString(errorMessage, e.what());
+                }
             }
         }
     }
@@ -710,9 +714,10 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpc_labview::gRPCid* callId, grpc_labview::MagicCookie* occurrencePtr)
+LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpc_labview::gRPCid* callId, grpc_labview::MagicCookie* occurrencePtr, int8_t* responseCluster)
 {
     auto call = callId->CastTo<grpc_labview::ClientCall>();
+    call->_response->setLVClusterHandle(reinterpret_cast<const char*>(responseCluster));
     if (!call)
     {
         return -1;
