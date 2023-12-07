@@ -109,7 +109,8 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void InitCallbacks();
+    void SetLVRTModulePath(std::string modulePath);
+	void InitCallbacks();
     void SetLVString(LStrHandle* lvString, std::string str);
     std::string GetLVString(LStrHandle lvString);
     int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size);
