@@ -96,35 +96,37 @@ namespace grpc_labview
     class SinglePassMessageParser {
     private:
         LVMessage& _message;
+        const char* _lv_ptr;
     public:
         // Constructor and other necessary member functions
-        SinglePassMessageParser(LVMessage& message) : _message(message) {}
+        SinglePassMessageParser(LVMessage& message, const MessageElementMetadata& fieldInfo) : _message(message) {
+            _lv_ptr = reinterpret_cast<const char*>(_message.getLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
+        }
 
         // Parse and copy message in a single pass.
         template<typename RepeatedMessageValuePointer>
-        const char* ParseAndCopyMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx, RepeatedMessageValuePointer v) {
-            auto _lv_ptr = reinterpret_cast<const char*>(_message.getLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
-            if (fieldInfo.isRepeated)
-            {
-                uint64_t numElements;
-                ptr = PackedMessageType(ptr, ctx, index, reinterpret_cast<google::protobuf::RepeatedField<MessageType>*>(&(v->_value)));
-                numElements = v->_value.size();
-                // get the LVClusterHandle
+        const char* ParseAndCopyRepeatedMessage(uint32_t index, const char *ptr, ParseContext *ctx, RepeatedMessageValuePointer v) {
+            
+            uint64_t numElements;
+            ptr = PackedMessageType(ptr, ctx, index, reinterpret_cast<google::protobuf::RepeatedField<MessageType>*>(&(v->_value)));
+            numElements = v->_value.size();
+            // get the LVClusterHandle
 
-                // copy into LVCluster
-                if (numElements != 0)
-                {
-                    NumericArrayResize(0x08, 1, reinterpret_cast<void*>(const_cast<char*>(_lv_ptr)), numElements);
-                    auto array = *(LV1DArrayHandle*)_lv_ptr;
-                    (*array)->cnt = numElements;
-                    auto byteCount = numElements * sizeof(MessageType);
-                    std::memcpy((*array)->bytes<MessageType>(), v->_value.data(), byteCount);
-                }
-            }
-            else
+            // copy into LVCluster
+            if (numElements != 0)
             {
-                ptr = ReadMessageType(ptr, reinterpret_cast<MessageType*>(const_cast<char *>(_lv_ptr)));
+                NumericArrayResize(0x08, 1, reinterpret_cast<void*>(const_cast<char*>(_lv_ptr)), numElements);
+                auto array = *(LV1DArrayHandle*)_lv_ptr;
+                (*array)->cnt = numElements;
+                auto byteCount = numElements * sizeof(MessageType);
+                std::memcpy((*array)->bytes<MessageType>(), v->_value.data(), byteCount);
             }
+            
+            return ptr;
+        }
+
+        const char* ParseAndCopyMessage(const char *ptr) {
+            ptr = ReadMessageType(ptr, reinterpret_cast<MessageType*>(const_cast<char *>(_lv_ptr)));
             return ptr;
         }
 
