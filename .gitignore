@@ -14,7 +14,6 @@ grpc
 
 Builds
 build
-build_bak
 .vs
 .vscode
 __pycache__
@@ -34,5 +33,3 @@ labview source/Servers/Generated Server/
 
 *.so
 tests/gRPC_ATS/TimeStamp.txt
-
-*.srctrl*
