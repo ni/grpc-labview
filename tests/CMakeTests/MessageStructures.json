@@ -12,7 +12,7 @@
       "int version",
       "LStrHandle messageName",
       "LStrHandle typeUrl",
-      "LV1DArrayHandle elements"
+      "LV1DArrayHandle element"
     ]
   }
 ]
