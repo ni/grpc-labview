@@ -54,6 +54,14 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src" "./third_party/grpc" "
 #----------------------------------------------------------------------
 # LabVIEW support for grpc and protobuf
 #----------------------------------------------------------------------
+
+add_custom_target(Detect_MessageMetadata_Structural_Changes
+    COMMAND ${CMAKE_COMMAND} -E echo "Running MessageMetadata structure test.py ..."
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeTests/run_test.py
+    RESULT_VARIABLE shell_command_result
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
+
 add_library(labview_grpc_server SHARED
   src/grpc_client.cc
   src/grpc_server.cc
@@ -180,3 +188,9 @@ target_link_libraries(test_server
  ${_REFLECTION}
  ${_GRPC_GRPCPP}
  ${_PROTOBUF_LIBPROTOBUF})
+
+add_dependencies(labview_grpc_server Detect_MessageMetadata_Structural_Changes)
+add_dependencies(labview_grpc_generator Detect_MessageMetadata_Structural_Changes)
+add_dependencies(test_client Detect_MessageMetadata_Structural_Changes)
+add_dependencies(test_server Detect_MessageMetadata_Structural_Changes)
+add_dependencies(example_client Detect_MessageMetadata_Structural_Changes)

@@ -1,0 +1,19 @@
+[
+  {
+    "name": "LVMessageMetadata",
+    "fields": [
+      "LStrHandle messageName", 
+      "LV1DArrayHandle elements"
+    ]
+  },
+  {
+    "name": "LVMessageMetadata2",
+    "fields": [
+      "int version",
+      "LStrHandle messageName",
+      "LStrHandle typeUrl",
+      "LV1DArrayHandle elements",
+      "bool hasOneoff"
+    ]
+  }
+]
