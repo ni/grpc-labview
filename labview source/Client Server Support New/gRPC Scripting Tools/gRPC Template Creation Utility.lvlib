@@ -402,6 +402,7 @@
 			<Item Name="Get String Control Terminal.vi" Type="VI" URL="../VI API/Front Panel API/Get String Control Terminal.vi"/>
 			<Item Name="Get VI FP Reference.vi" Type="VI" URL="../VI API/Front Panel API/Get VI FP Reference.vi"/>
 			<Item Name="Set Cluster AutoResize to Vertical.vi" Type="VI" URL="../VI API/Front Panel API/Set Cluster AutoResize to Vertical.vi"/>
+			<Item Name="Delete Front Panel Controls.vi" Type="VI" URL="../VI API/Front Panel API/Delete Front Panel Controls.vi"/>
 		</Item>
 		<Item Name="General VI API" Type="Folder">
 			<Item Name="Coordinates" Type="Folder">
