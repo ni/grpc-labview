@@ -14,5 +14,17 @@
       "LStrHandle typeUrl",
       "LV1DArrayHandle elements"
     ]
+  },
+  {
+    "name": "LVMesageElementMetadata",
+    "fields": [
+      "LStrHandle fieldName",
+      "LStrHandle embeddedMessageName",
+      "int protobufIndex",
+      "int valueType",
+      "bool isRepeated",
+      "bool isInOneof",
+      "LStrHandle oneofContainerName"
+    ]
   }
 ]
