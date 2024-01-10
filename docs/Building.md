@@ -18,6 +18,7 @@ To prepare for cmake + Microsoft Visual C++ compiler build
 - Install Visual Studio 2019 (Visual C++ compiler will be used).
 - Install [Git](https://git-scm.com/).
 - Install [CMake](https://cmake.org/download/).
+- Install [Python 3.7 or Higher](https://www.python.org/downloads/).
 
 
 #### Building 64-bit
