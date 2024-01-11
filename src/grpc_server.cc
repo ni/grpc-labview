@@ -9,6 +9,7 @@
 #include <future>
 #include <grpcpp/impl/server_initializer.h>
 #include "lv_proto_server_reflection_plugin.h"
+#include "feature_toggles.h"
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -178,6 +179,9 @@ namespace grpc_labview
         std::string serverKeyPath,
         ServerStartEventData *serverStarted)
     {
+        // Instantiating the feature toggles singleton that will read the feature configuration file
+        FeatureConfig::getInstance().readConfigFromFile("feature_config.ini");
+
         std::string server_address;
         if (address.length() != 0)
         {

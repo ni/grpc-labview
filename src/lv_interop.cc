@@ -5,6 +5,7 @@
 #include <cstring>
 #include <memory>
 #include <grpcpp/grpcpp.h>
+#include "feature_toggles.h"
 
 #ifndef _WIN32
 #include <dlfcn.h>
@@ -40,6 +41,9 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void InitCallbacks()
     {
+        // Instantiating the feature toggles singleton that will read the feature configuration file
+        FeatureConfig::getInstance().readConfigFromFile("feature_config.ini");
+
         if (NumericArrayResizeImp != nullptr)
         {
             return;
