@@ -10,6 +10,7 @@
 #include <grpcpp/support/channel_arguments.h>
 #include <ctime>
 #include <chrono>
+#include "feature_toggles.h"
 
 namespace grpc_labview
 {
@@ -279,6 +280,9 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     grpc_labview::gRPCid* contextId,
     int8_t* responseCluster)
 {
+    // Instantiating the feature toggles singleton that will read the feature configuration file
+    FeatureConfig::getInstance().readConfigFromFile("feature_config.ini");
+
     auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
     {
@@ -408,6 +412,9 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(
     int32_t timeoutMs,
     grpc_labview::gRPCid* contextId)
 {
+    // Instantiating the feature toggles singleton that will read the feature configuration file
+    FeatureConfig::getInstance().readConfigFromFile("feature_config.ini");
+
     auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
     {
@@ -462,6 +469,9 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
     int32_t timeoutMs,
     grpc_labview::gRPCid* contextId)
 {    
+    // Instantiating the feature toggles singleton that will read the feature configuration file
+    FeatureConfig::getInstance().readConfigFromFile("feature_config.ini");
+
     auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
     {
@@ -524,6 +534,9 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(
     int32_t timeoutMs,
     grpc_labview::gRPCid* contextId)
 {
+    // Instantiating the feature toggles singleton that will read the feature configuration file
+    FeatureConfig::getInstance().readConfigFromFile("feature_config.ini");
+
     auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
     {
@@ -570,6 +583,9 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, grpc_labview::MagicCookie* occurrencePtr, int8_t* responseCluster)
 {
+    // Instantiating the feature toggles singleton that will read the feature configuration file
+    FeatureConfig::getInstance().readConfigFromFile("feature_config.ini");
+
     auto reader = callId->CastTo<grpc_labview::StreamReader>();
     auto call = callId->CastTo<grpc_labview::ClientCall>();
     call->_response->setLVClusterHandle(reinterpret_cast<const char*>(responseCluster));
@@ -599,6 +615,9 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, g
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId, int* success, int8_t* responseCluster)
 {
+    // Instantiating the feature toggles singleton that will read the feature configuration file
+    FeatureConfig::getInstance().readConfigFromFile("feature_config.ini");
+
     auto reader = callId->CastTo<grpc_labview::StreamReader>();
     auto call = callId->CastTo<grpc_labview::ClientCall>();
     if (!reader || !call)
@@ -627,6 +646,9 @@ LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t ClientWriteToStream(grpc_labview::gRPCid* callId, int8_t* requestCluster, int* success)
 {
+    // Instantiating the feature toggles singleton that will read the feature configuration file
+    FeatureConfig::getInstance().readConfigFromFile("feature_config.ini");
+    
     auto writer = callId->CastTo<grpc_labview::StreamWriter>();
     if (!writer)
     {
