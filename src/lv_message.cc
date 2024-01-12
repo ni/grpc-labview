@@ -10,17 +10,9 @@ using namespace google::protobuf::internal;
 
 namespace grpc_labview
 {
-    bool g_use_hardcoded_parse = true;
-
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    LVMessage::LVMessage(std::shared_ptr<MessageMetadata> metadata) : 
-        _metadata(metadata), _use_hardcoded_parse(g_use_hardcoded_parse), _skipCopyOnFirstParse(false)
-    {
-    }
-
-    LVMessage::LVMessage(std::shared_ptr<MessageMetadata> metadata, bool use_hardcoded_parse, bool skipCopyOnFirstParse) :
-        _metadata(metadata), _use_hardcoded_parse(use_hardcoded_parse), _skipCopyOnFirstParse(skipCopyOnFirstParse)
+    LVMessage::LVMessage(std::shared_ptr<MessageMetadata> metadata) : _metadata(metadata)
     {
     }
 
@@ -32,14 +24,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::UnknownFieldSet& LVMessage::UnknownFields()
+    google::protobuf::UnknownFieldSet &LVMessage::UnknownFields()
     {
         return _unknownFields;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessage::ParseFromByteBuffer(const grpc::ByteBuffer& buffer)
+    bool LVMessage::ParseFromByteBuffer(const grpc::ByteBuffer &buffer)
     {
         Clear();
 
@@ -66,7 +58,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::Message* LVMessage::New(google::protobuf::Arena* arena) const
+    google::protobuf::Message *LVMessage::New(google::protobuf::Arena *arena) const
     {
         assert(false); // not expected to be called
         return nullptr;
@@ -115,71 +107,66 @@ namespace grpc_labview
                 {
                     auto fieldInfo = (*fieldIt).second;
                     LVMessageMetadataType dataType = fieldInfo->type;
-                    if (_LVClusterHandle == nullptr) {
-                        _use_hardcoded_parse = false;
-                    }
-                    else {
-                        _use_hardcoded_parse = true;
-                    }
                     switch (dataType)
                     {
-                        case LVMessageMetadataType::Int32Value:
-                            ptr = ParseInt32(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::FloatValue:
-                            ptr = ParseFloat(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::DoubleValue:
-                            ptr = ParseDouble(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::BoolValue:
-                            ptr = ParseBoolean(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::StringValue:
-                            ptr = ParseString(tag, *fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::BytesValue:
-                            ptr = ParseBytes(tag, *fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::MessageValue:
-                            ptr = ParseNestedMessage(tag, *fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::Int64Value:
-                            ptr = ParseInt64(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::UInt32Value:
-                            ptr = ParseUInt32(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::UInt64Value:
-                            ptr = ParseUInt64(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::EnumValue:
-                            ptr = ParseEnum(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::SInt32Value:
-                            ptr = ParseSInt32(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::SInt64Value:
-                            ptr = ParseSInt64(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::Fixed32Value:
-                            ptr = ParseFixed32(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::Fixed64Value:
-                            ptr = ParseFixed64(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::SFixed32Value:
-                            ptr = ParseSFixed32(*fieldInfo, index, ptr, ctx);
-                            break;
-                        case LVMessageMetadataType::SFixed64Value:
-                            ptr = ParseSFixed64(*fieldInfo, index, ptr, ctx);
-                            break;
+                    case LVMessageMetadataType::Int32Value:
+                        ptr = ParseInt32(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::FloatValue:
+                        ptr = ParseFloat(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::DoubleValue:
+                        ptr = ParseDouble(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::BoolValue:
+                        ptr = ParseBoolean(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::StringValue:
+                        ptr = ParseString(tag, *fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::BytesValue:
+                        ptr = ParseBytes(tag, *fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::MessageValue:
+                        ptr = ParseNestedMessage(tag, *fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::Int64Value:
+                        ptr = ParseInt64(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::UInt32Value:
+                        ptr = ParseUInt32(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::UInt64Value:
+                        ptr = ParseUInt64(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::EnumValue:
+                        ptr = ParseEnum(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::SInt32Value:
+                        ptr = ParseSInt32(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::SInt64Value:
+                        ptr = ParseSInt64(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::Fixed32Value:
+                        ptr = ParseFixed32(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::Fixed64Value:
+                        ptr = ParseFixed64(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::SFixed32Value:
+                        ptr = ParseSFixed32(*fieldInfo, index, ptr, ctx);
+                        break;
+                    case LVMessageMetadataType::SFixed64Value:
+                        ptr = ParseSFixed64(*fieldInfo, index, ptr, ctx);
+                        break;
                     }
                     assert(ptr != nullptr);
                 }
                 else
                 {
-                    if (tag == 0 || WireFormatLite::GetTagWireType(tag) == WireFormatLite::WIRETYPE_END_GROUP) {
+                    if (tag == 0 || WireFormatLite::GetTagWireType(tag) == WireFormatLite::WIRETYPE_END_GROUP)
+                    {
                         ctx->SetLastTag(tag);
                         return ptr;
                     }
@@ -193,380 +180,218 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char *LVMessage::ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    const char *LVMessage::ParseBoolean(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {
-        if(_use_hardcoded_parse){
-            grpc_labview::SinglePassMessageParser<bool, ReadBOOL, PackedBoolParser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<bool>>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
-        }
-        else{       
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<bool>>(index);
-                ptr = PackedBoolParser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                bool result;
-                ptr = ReadBOOL(ptr, &result);
-                auto v = std::make_shared<LVVariableMessageValue<bool>>(index, result);
-                _values.emplace(index, v);
-            }
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {    
-        if (_use_hardcoded_parse)
+        if (fieldInfo.isRepeated)
         {
-            grpc_labview::SinglePassMessageParser<int32_t, ReadINT32, PackedInt32Parser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<int>>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
+            auto v = std::make_shared<LVRepeatedMessageValue<bool>>(index);
+            ptr = PackedBoolParser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
         }
-        else {
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<int>>(index);
-                ptr = PackedInt32Parser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                int32_t result;
-                ptr = ReadINT32(ptr, &result);
-                auto v = std::make_shared<LVVariableMessageValue<int>>(index, result);
-                _values.emplace(index, v);
-            }
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseUInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {    
-        if (_use_hardcoded_parse)
+        else
         {
-            SinglePassMessageParser<uint32_t, ReadUINT32, PackedUInt32Parser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<uint32_t>>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
-        }
-        else {
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<uint32_t>>(index);
-                ptr = PackedUInt32Parser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                uint32_t result;
-                ptr = ReadUINT32(ptr, &result);
-                auto v = std::make_shared<LVVariableMessageValue<uint32_t>>(index, result);
-                _values.emplace(index, v);
-            }
+            bool result;
+            ptr = ReadBOOL(ptr, &result);
+            auto v = std::make_shared<LVVariableMessageValue<bool>>(index, result);
+            _values.emplace(index, v);
         }
         return ptr;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char *LVMessage::ParseEnum(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {    
-        if(_use_hardcoded_parse){
-            grpc_labview::SinglePassMessageParser<int32_t, ReadENUM, PackedEnumParser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedEnumMessageValue>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
-        }
-        else{
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedEnumMessageValue>(index);
-                ptr = PackedEnumParser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                int32_t result;
-                ptr = ReadENUM(ptr, &result);
-                auto v = std::make_shared<LVEnumMessageValue>(index, result);
-                _values.emplace(index, v);
-            }
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {    
-        if (_use_hardcoded_parse)
+    const char *LVMessage::ParseInt32(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    {
+        if (fieldInfo.isRepeated)
         {
-            SinglePassMessageParser<int64_t, ReadINT64, PackedInt64Parser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
+            auto v = std::make_shared<LVRepeatedMessageValue<int>>(index);
+            ptr = PackedInt32Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
         }
-        else {
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(index);
-                ptr = PackedInt64Parser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                int64_t result;
-                ptr = ReadINT64(ptr, &result);
-                auto v = std::make_shared<LVVariableMessageValue<int64_t>>(index, result);
-                _values.emplace(index, v);
-            }
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseUInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {   
-        if (_use_hardcoded_parse)
+        else
         {
-            grpc_labview::SinglePassMessageParser<uint64_t, ReadUINT64, PackedUInt64Parser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<uint64_t>>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
-        } 
-        else {
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<uint64_t>>(index);
-                ptr = PackedUInt64Parser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                uint64_t result;
-                ptr = ReadUINT64(ptr, &result);
-                auto v = std::make_shared<LVVariableMessageValue<uint64_t>>(index, result);
-                _values.emplace(index, v);
-            }
+            int32_t result;
+            ptr = ReadINT32(ptr, &result);
+            auto v = std::make_shared<LVVariableMessageValue<int>>(index, result);
+            _values.emplace(index, v);
         }
         return ptr;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char *LVMessage::ParseFloat(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {    
-        if(_use_hardcoded_parse){
-            grpc_labview::SinglePassMessageParser<float, ReadFLOAT, PackedFloatParser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<float>>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
-        }
-        else{
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<float>>(index);
-                ptr = PackedFloatParser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                float result;
-                ptr = ReadFLOAT(ptr, &result);
-                auto v = std::make_shared<LVVariableMessageValue<float>>(index, result);
-                _values.emplace(index, v);
-            }
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseDouble(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {    
-        if(_use_hardcoded_parse){
-            grpc_labview::SinglePassMessageParser<double, ReadDOUBLE, PackedDoubleParser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<double>>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
-        }
-        else{
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedMessageValue<double>>(index);
-                ptr = PackedDoubleParser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                double result;
-                ptr = ReadDOUBLE(ptr, &result);
-                auto v = std::make_shared<LVVariableMessageValue<double>>(index, result);
-                _values.emplace(index, v);
-            }
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
-    {    
-        const char* lv_ptr = (this->getLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
-
-        if (_use_hardcoded_parse)
+    const char *LVMessage::ParseUInt32(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    {
+        if (fieldInfo.isRepeated)
         {
-            if (fieldInfo.isRepeated)
+            auto v = std::make_shared<LVRepeatedMessageValue<uint32_t>>(index);
+            ptr = PackedUInt32Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            uint32_t result;
+            ptr = ReadUINT32(ptr, &result);
+            auto v = std::make_shared<LVVariableMessageValue<uint32_t>>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char *LVMessage::ParseEnum(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedEnumMessageValue>(index);
+            ptr = PackedEnumParser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            int32_t result;
+            ptr = ReadENUM(ptr, &result);
+            auto v = std::make_shared<LVEnumMessageValue>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char *LVMessage::ParseInt64(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(index);
+            ptr = PackedInt64Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            int64_t result;
+            ptr = ReadINT64(ptr, &result);
+            auto v = std::make_shared<LVVariableMessageValue<int64_t>>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char *LVMessage::ParseUInt64(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedMessageValue<uint64_t>>(index);
+            ptr = PackedUInt64Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            uint64_t result;
+            ptr = ReadUINT64(ptr, &result);
+            auto v = std::make_shared<LVVariableMessageValue<uint64_t>>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char *LVMessage::ParseFloat(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedMessageValue<float>>(index);
+            ptr = PackedFloatParser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            float result;
+            ptr = ReadFLOAT(ptr, &result);
+            auto v = std::make_shared<LVVariableMessageValue<float>>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char *LVMessage::ParseDouble(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedMessageValue<double>>(index);
+            ptr = PackedDoubleParser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            double result;
+            ptr = ReadDOUBLE(ptr, &result);
+            auto v = std::make_shared<LVVariableMessageValue<double>>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata &fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            std::shared_ptr<LVRepeatedMessageValue<std::string>> v;
+            auto it = _values.find(index);
+            if (it == _values.end())
             {
-                // Get the _repeatedMessageValues vector from the map
-                auto _repeatedStringValuesIt = _repeatedStringValuesMap.find(fieldInfo.fieldName);
-                if (_repeatedStringValuesIt == _repeatedStringValuesMap.end())
+                v = std::make_shared<LVRepeatedMessageValue<std::string>>(index);
+                _values.emplace(index, v);
+            }
+            else
+            {
+                v = std::static_pointer_cast<LVRepeatedMessageValue<std::string>>((*it).second);
+            }
+            protobuf_ptr -= 1;
+            do
+            {
+                protobuf_ptr += 1;
+                auto str = v->_value.Add();
+                protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
+                if (!ctx->DataAvailable(protobuf_ptr))
                 {
-                    _repeatedStringValuesIt = _repeatedStringValuesMap.emplace(fieldInfo.fieldName, google::protobuf::RepeatedField<std::string>()).first;
+                    break;
                 }
-
-                protobuf_ptr -= 1;
-                do {
-                    protobuf_ptr += 1;
-                    auto str = _repeatedStringValuesIt->second.Add();
-                    protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
-                    if (!ctx->DataAvailable(protobuf_ptr))
-                    {
-                        break;
-                    }
-                } while (ExpectTag(tag, protobuf_ptr));
-
-                auto arraySize = sizeof(void*) * _repeatedStringValuesIt->second.size();
-                auto _lvProvidedArrayHandle = *(void**)lv_ptr; 
-                *(void**)lv_ptr = DSNewHandle(arraySize);
-                auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
-                (*arrayHandle)->cnt = _repeatedStringValuesIt->second.size();
-
-                // Copy the repeated string values into the LabVIEW array
-                auto lvStringPtr = (*arrayHandle)->bytes<LStrHandle>();
-                for (auto str:_repeatedStringValuesIt->second)
-                {
-                    *lvStringPtr = nullptr;
-                    SetLVString(lvStringPtr, str);
-                    lvStringPtr++;
-                }
-            }
-            else {
-                auto str = std::string();
-                protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
-                SetLVString((LStrHandle*)lv_ptr, str);
-            }
+            } while (ExpectTag(tag, protobuf_ptr));
         }
-        else {
-            if (fieldInfo.isRepeated)
-            {
-                std::shared_ptr<LVRepeatedMessageValue<std::string>> v;
-                auto it = _values.find(index);
-                if (it == _values.end())
-                {
-                    v = std::make_shared<LVRepeatedMessageValue<std::string>>(index);
-                    _values.emplace(index, v);
-                }
-                else
-                {
-                    v = std::static_pointer_cast<LVRepeatedMessageValue<std::string>>((*it).second);
-                }
-                protobuf_ptr -= 1;
-                do {
-                    protobuf_ptr += 1;
-                    auto str = v->_value.Add();
-                    protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
-                    if (!ctx->DataAvailable(protobuf_ptr))
-                    {
-                        break;
-                    }
-                } while (ExpectTag(tag, protobuf_ptr));
-            }
-            else
-            {
-                auto str = std::string();
-                protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
-                auto v = std::make_shared<LVStringMessageValue>(index, str);
-                _values.emplace(index, v);
-            }
+        else
+        {
+            auto str = std::string();
+            protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
+            auto v = std::make_shared<LVStringMessageValue>(index, str);
+            _values.emplace(index, v);
         }
         return protobuf_ptr;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char *LVMessage::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    const char *LVMessage::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {
-        return ParseString(tag, fieldInfo, index, ptr, ctx);    
+        return ParseString(tag, fieldInfo, index, ptr, ctx);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessage::ExpectTag(google::protobuf::uint32 tag, const char* ptr)
+    bool LVMessage::ExpectTag(google::protobuf::uint32 tag, const char *ptr)
     {
         if (tag < 128)
         {
             return *ptr == tag;
-        } 
+        }
         else
         {
             char buf[2] = {static_cast<char>(tag | 0x80), static_cast<char>(tag >> 7)};
@@ -576,209 +401,123 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char* LVMessage::ParseSInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    const char *LVMessage::ParseSInt32(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {
-        if(_use_hardcoded_parse){
-            grpc_labview::SinglePassMessageParser<int32_t, ReadSINT32, PackedSInt32Parser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedSInt32MessageValue>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedSInt32MessageValue>(index);
+            ptr = PackedSInt32Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
         }
-        else{
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedSInt32MessageValue>(index);
-                ptr = PackedSInt32Parser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                int32_t result;
-                ptr = ReadSINT32(ptr, &result);
-                auto v = std::make_shared<LVSInt32MessageValue>(index, result);
-                _values.emplace(index, v);
-            }
+        else
+        {
+            int32_t result;
+            ptr = ReadSINT32(ptr, &result);
+            auto v = std::make_shared<LVSInt32MessageValue>(index, result);
+            _values.emplace(index, v);
         }
         return ptr;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char* LVMessage::ParseSInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    const char *LVMessage::ParseSInt64(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {
-        if(_use_hardcoded_parse){
-            grpc_labview::SinglePassMessageParser<int64_t, ReadSINT64, PackedSInt64Parser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedSInt64MessageValue>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedSInt64MessageValue>(index);
+            ptr = PackedSInt64Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
         }
-        else{
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedSInt64MessageValue>(index);
-                ptr = PackedSInt64Parser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                int64_t result;
-                ptr = ReadSINT64(ptr, &result);
-                auto v = std::make_shared<LVSInt64MessageValue>(index, result);
-                _values.emplace(index, v);
-            }
+        else
+        {
+            int64_t result;
+            ptr = ReadSINT64(ptr, &result);
+            auto v = std::make_shared<LVSInt64MessageValue>(index, result);
+            _values.emplace(index, v);
         }
         return ptr;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char* LVMessage::ParseFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    const char *LVMessage::ParseFixed32(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {
-        if(_use_hardcoded_parse){
-            grpc_labview::SinglePassMessageParser<uint32_t, ReadFIXED32, PackedFixed32Parser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedFixed32MessageValue>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedFixed32MessageValue>(index);
+            ptr = PackedFixed32Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
         }
-        else{
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedFixed32MessageValue>(index);
-                ptr = PackedFixed32Parser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                uint32_t result;
-                ptr = ReadFIXED32(ptr, &result);
-                auto v = std::make_shared<LVFixed32MessageValue>(index, result);
-                _values.emplace(index, v);
-            }
-        }
-        return ptr;
-    }
-
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char* LVMessage::ParseFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
-    {
-        if(_use_hardcoded_parse){
-            grpc_labview::SinglePassMessageParser<uint64_t, ReadFIXED64, PackedFixed64Parser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedFixed64MessageValue>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
-        }
-        else{
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedFixed64MessageValue>(index);
-                ptr = PackedFixed64Parser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                uint64_t result;
-                ptr = ReadFIXED64(ptr, &result);
-                auto v = std::make_shared<LVFixed64MessageValue>(index, result);
-                _values.emplace(index, v);
-            }
+        else
+        {
+            uint32_t result;
+            ptr = ReadFIXED32(ptr, &result);
+            auto v = std::make_shared<LVFixed32MessageValue>(index, result);
+            _values.emplace(index, v);
         }
         return ptr;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char* LVMessage::ParseSFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    const char *LVMessage::ParseFixed64(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {
-        if(_use_hardcoded_parse){
-            grpc_labview::SinglePassMessageParser<int32_t, ReadSFIXED32, PackedSFixed32Parser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedFixed64MessageValue>(index);
+            ptr = PackedFixed64Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
         }
-        else{
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(index);
-                ptr = PackedSFixed32Parser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                int32_t result;
-                ptr = ReadSFIXED32(ptr, &result);
-                auto v = std::make_shared<LVSFixed32MessageValue>(index, result);
-                _values.emplace(index, v);
-            }
+        else
+        {
+            uint64_t result;
+            ptr = ReadFIXED64(ptr, &result);
+            auto v = std::make_shared<LVFixed64MessageValue>(index, result);
+            _values.emplace(index, v);
         }
         return ptr;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char* LVMessage::ParseSFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    const char *LVMessage::ParseSFixed32(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
     {
-        if(_use_hardcoded_parse){
-            grpc_labview::SinglePassMessageParser<int64_t, ReadSFIXED64, PackedSFixed64Parser> parser(*this, fieldInfo);
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(index);
-                ptr = parser.ParseAndCopyRepeatedMessage(index, ptr, ctx, v);
-            }
-            else
-            {
-                ptr = parser.ParseAndCopyMessage(ptr);
-            }
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(index);
+            ptr = PackedSFixed32Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
         }
-        else{
-            if (fieldInfo.isRepeated)
-            {
-                auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(index);
-                ptr = PackedSFixed64Parser(&(v->_value), ptr, ctx);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                int64_t result;
-                ptr = ReadSFIXED64(ptr, &result);
-                auto v = std::make_shared<LVSFixed64MessageValue>(index, result);
-                _values.emplace(index, v);
-            }
+        else
+        {
+            int32_t result;
+            ptr = ReadSFIXED32(ptr, &result);
+            auto v = std::make_shared<LVSFixed32MessageValue>(index, result);
+            _values.emplace(index, v);
         }
         return ptr;
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char *LVMessage::ParseSFixed64(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    {
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(index);
+            ptr = PackedSFixed64Parser(&(v->_value), ptr, ctx);
+            _values.emplace(index, v);
+        }
+        else
+        {
+            int64_t result;
+            ptr = ReadSFIXED64(ptr, &result);
+            auto v = std::make_shared<LVSFixed64MessageValue>(index, result);
+            _values.emplace(index, v);
+        }
+        return ptr;
+    }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -786,127 +525,43 @@ namespace grpc_labview
     {
     }; // TODO: Do not check this in.
 
-
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char *LVMessage::ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
-    {    
+    const char *LVMessage::ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata &fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
+    {
         auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
-        if (_use_hardcoded_parse)
+        if (fieldInfo.isRepeated)
         {
-            const char* lv_ptr = (this->getLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
-            LVMessage nestedMessage(metadata);
-
-            if (fieldInfo.isRepeated) {
-                // if the array is not big enough, resize it to 2x the size
-                auto numElements = 128;
-                auto elementIndex = 0;
-                auto clusterSize = metadata->clusterSize;
-                auto alignment = metadata->alignmentRequirement;
-                auto arraySize = numElements * clusterSize;
-                LV1DArrayHandle arrayHandle;
-                char _fillData = '\0';
-
-                // Get the _repeatedMessageValues vector from the map
-                auto _repeatedMessageValuesIt = _repeatedMessageValuesMap.find(metadata->messageName);
-                if (_repeatedMessageValuesIt == _repeatedMessageValuesMap.end())
-                {
-                    _repeatedMessageValuesIt = _repeatedMessageValuesMap.emplace(metadata->messageName, google::protobuf::RepeatedField<char>()).first;
-                }
-
-                // There are situations where the protobuf message is not complete, and we need to continue from the last index.
-                // This function returns to _internalParse, and then gets back to this function.
-                // If we are continuing from a previous parse, then we need to continue from the last index
-                auto _continueFromIndex = _repeatedField_continueIndex.find(metadata->messageName);
-                if (_continueFromIndex != _repeatedField_continueIndex.end()) {
-                    elementIndex = _continueFromIndex->second;
-                    _repeatedField_continueIndex.erase(_continueFromIndex);
-                    // find next largest power of 2, as we assume that we previously resized it to a power of 2
-                    auto _size = (int)ceil(log2(elementIndex));
-                    numElements = ((1 << _size) > 128) ? (1 << _size) : 128;
-                }
-                else {
-                    // occurs on the first time this function is called
-                    _repeatedMessageValuesIt->second.Resize(arraySize, _fillData);
-                }
-
-                protobuf_ptr -= 1;
-                do
-                {
-                    protobuf_ptr += 1;
-
-                    // Resize the vector if we need more memory
-                    if (elementIndex >= numElements - 1) {
-                        numElements *= 2;
-                        arraySize = numElements * clusterSize;
-                        auto s = _repeatedMessageValuesIt->second.size();
-                        _repeatedMessageValuesIt->second.Resize(arraySize, _fillData);
-                    }
-
-                    auto _vectorPtr = _repeatedMessageValuesIt->second.data();
-                    _vectorPtr = _vectorPtr + (elementIndex * clusterSize);
-                    nestedMessage.setLVClusterHandle(_vectorPtr);
-                    protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
-
-                    elementIndex++;
-
-                    if (!ctx->DataAvailable(protobuf_ptr)) {
-                        break;
-                    }
-                } while (ExpectTag(tag, protobuf_ptr));
-
-                // shrink the array to the correct size
-                arraySize = elementIndex * clusterSize;
-                auto old_arrayHandle = *(void**)lv_ptr;
-                DSDisposeHandle(old_arrayHandle);
-                *(void**)lv_ptr = DSNewHandle(arraySize);
-                arrayHandle = *(LV1DArrayHandle*)lv_ptr;
-                (*arrayHandle)->cnt = elementIndex;
-
-                auto _vectorDataPtr = _repeatedMessageValuesIt->second.data();
-                auto _lvArrayDataPtr = (*arrayHandle)->bytes(0, alignment);
-                memcpy(_lvArrayDataPtr, _vectorDataPtr, arraySize);
-
-                _repeatedField_continueIndex.emplace(metadata->messageName, elementIndex);
-            }
-            else {
-                nestedMessage.setLVClusterHandle(lv_ptr);
-                protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
-            }
-        }
-        else {
-            if (fieldInfo.isRepeated)
+            protobuf_ptr -= 1;
+            do
             {
-                protobuf_ptr -= 1;
-                do {
-                    std::shared_ptr<LVRepeatedNestedMessageMessageValue> v;
-                    auto it = _values.find(index);
-                    if (it == _values.end())
-                    {
-                        v = std::make_shared<LVRepeatedNestedMessageMessageValue>(index);
-                        _values.emplace(index, v);
-                    }
-                    else
-                    {
-                        v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
-                    }
-                    protobuf_ptr += 1;
-                    auto nestedMessage = std::make_shared<LVMessage>(metadata);
-                    protobuf_ptr = ctx->ParseMessage(nestedMessage.get(), protobuf_ptr);
-                    v->_value.push_back(nestedMessage);
-                    if (!ctx->DataAvailable(protobuf_ptr))
-                    {
-                        break;
-                    }
-                } while (ExpectTag(tag, protobuf_ptr));
-            }
-            else
-            {
+                std::shared_ptr<LVRepeatedNestedMessageMessageValue> v;
+                auto it = _values.find(index);
+                if (it == _values.end())
+                {
+                    v = std::make_shared<LVRepeatedNestedMessageMessageValue>(index);
+                    _values.emplace(index, v);
+                }
+                else
+                {
+                    v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
+                }
+                protobuf_ptr += 1;
                 auto nestedMessage = std::make_shared<LVMessage>(metadata);
                 protobuf_ptr = ctx->ParseMessage(nestedMessage.get(), protobuf_ptr);
-                auto v = std::make_shared<LVNestedMessageMessageValue>(index, nestedMessage);
-                _values.emplace(index, v);
-            }
+                v->_value.push_back(nestedMessage);
+                if (!ctx->DataAvailable(protobuf_ptr))
+                {
+                    break;
+                }
+            } while (ExpectTag(tag, protobuf_ptr));
+        }
+        else
+        {
+            auto nestedMessage = std::make_shared<LVMessage>(metadata);
+            protobuf_ptr = ctx->ParseMessage(nestedMessage.get(), protobuf_ptr);
+            auto v = std::make_shared<LVNestedMessageMessageValue>(index, nestedMessage);
+            _values.emplace(index, v);
         }
         return protobuf_ptr;
     }
@@ -1015,4 +670,3 @@ namespace grpc_labview
         return google::protobuf::Metadata();
     }
 }
-

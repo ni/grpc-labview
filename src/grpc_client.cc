@@ -3,6 +3,7 @@
 #include <grpc_client.h>
 #include <lv_interop.h>
 #include <lv_message.h>
+#include <lv_message_efficient.h>
 #include <cluster_copier.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/impl/codegen/client_context.h>
@@ -10,12 +11,10 @@
 #include <grpcpp/support/channel_arguments.h>
 #include <ctime>
 #include <chrono>
-#include "feature_toggles.h"
+#include <feature_toggles.h>
 
 namespace grpc_labview
 {
-    extern bool g_use_hardcoded_parse;
-
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     LabVIEWgRPCClient::LabVIEWgRPCClient()
@@ -314,11 +313,18 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     clientCall->_client = client;
     clientCall->_methodName = methodName;
     clientCall->_occurrence = *occurrence;
-    clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
-    clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
     clientCall->_context = clientContext;
-    clientCall->_request->setLVClusterHandle(reinterpret_cast<const char *>(requestCluster));
-    clientCall->_response->setLVClusterHandle(reinterpret_cast<const char *>(responseCluster));
+
+    if (!FeatureConfig::getInstance().isFeatureEnabled("EfficientMessageCopy")){
+        clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+        clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
+    }
+    else {
+        clientCall->_request = std::make_shared<grpc_labview::LVMessageEfficient>(requestMetadata);
+        clientCall->_response = std::make_shared<grpc_labview::LVMessageEfficient>(responseMetadata);
+        clientCall->_request->SetLVClusterHandle(reinterpret_cast<const char *>(requestCluster));
+        clientCall->_response->SetLVClusterHandle(reinterpret_cast<const char *>(responseCluster));
+    }
 
     try
     {
@@ -363,7 +369,7 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
     int32_t result = 0;
     if (call->_status.ok())
     {
-        if (!grpc_labview::g_use_hardcoded_parse) {
+        if (!FeatureConfig::getInstance().isFeatureEnabled("EfficientMessageCopy")) {
             try
             {
                 grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
@@ -444,8 +450,16 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(
     auto clientCall = new grpc_labview::ClientStreamingClientCall();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
-    clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
-    clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
+
+    if (!FeatureConfig::getInstance().isFeatureEnabled("EfficientMessageCopy")){
+        clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+        clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
+    }
+    else {
+        clientCall->_request = std::make_shared<grpc_labview::LVMessageEfficient>(requestMetadata);
+        clientCall->_response = std::make_shared<grpc_labview::LVMessageEfficient>(responseMetadata);
+    }
+
     clientCall->_context = clientContext;
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::CLIENT_STREAMING);
@@ -501,8 +515,16 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
     auto clientCall = new grpc_labview::ServerStreamingClientCall();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
-    clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
-    clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
+
+    if (!FeatureConfig::getInstance().isFeatureEnabled("EfficientMessageCopy")){
+        clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+        clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
+    }
+    else {
+        clientCall->_request = std::make_shared<grpc_labview::LVMessageEfficient>(requestMetadata);
+        clientCall->_response = std::make_shared<grpc_labview::LVMessageEfficient>(responseMetadata);
+    }
+    
     clientCall->_context = clientContext;
 
     try
@@ -566,8 +588,16 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(
     auto clientCall = new grpc_labview::BidiStreamingClientCall();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
-    clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
-    clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
+    
+    if (!FeatureConfig::getInstance().isFeatureEnabled("EfficientMessageCopy")){
+        clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+        clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
+    }
+    else {
+        clientCall->_request = std::make_shared<grpc_labview::LVMessageEfficient>(requestMetadata);
+        clientCall->_response = std::make_shared<grpc_labview::LVMessageEfficient>(responseMetadata);
+    }
+    
     clientCall->_context = clientContext;
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::BIDI_STREAMING);
@@ -588,7 +618,7 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, g
 
     auto reader = callId->CastTo<grpc_labview::StreamReader>();
     auto call = callId->CastTo<grpc_labview::ClientCall>();
-    call->_response->setLVClusterHandle(reinterpret_cast<const char*>(responseCluster));
+    call->_response->SetLVClusterHandle(reinterpret_cast<const char*>(responseCluster));
     auto occurrence = *occurrencePtr;
 
     if (!reader || !call)
@@ -628,7 +658,7 @@ LIBRARY_EXPORT int32_t ClientCompleteReadFromStream(grpc_labview::gRPCid* callId
     *success = reader->_readFuture.get();
     if (*success)
     {
-        if (!grpc_labview::g_use_hardcoded_parse) {
+        if (!FeatureConfig::getInstance().isFeatureEnabled("EfficientMessageCopy")) {
             try
             {
                 grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
@@ -700,7 +730,7 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
     int32_t result = 0;
     if (call->_status.ok())
     {
-        if (!grpc_labview::g_use_hardcoded_parse) {
+        if (!FeatureConfig::getInstance().isFeatureEnabled("EfficientMessageCopy")) {
             try
             {
                 grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
@@ -739,7 +769,7 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
 LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpc_labview::gRPCid* callId, grpc_labview::MagicCookie* occurrencePtr, int8_t* responseCluster)
 {
     auto call = callId->CastTo<grpc_labview::ClientCall>();
-    call->_response->setLVClusterHandle(reinterpret_cast<const char*>(responseCluster));
+    call->_response->SetLVClusterHandle(reinterpret_cast<const char*>(responseCluster));
     if (!call)
     {
         return -1;

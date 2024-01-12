@@ -10,6 +10,7 @@ private:
     // Constructor to initialize with default values
     FeatureConfig() {
         featureFlags["gRPC"] = true; // Enable gRPC by default as an example, this will never be overridden by config file
+        featureFlags["EfficientMessageCopy"] = true;
     }
 
 public:

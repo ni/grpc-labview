@@ -5,7 +5,7 @@
 #include <cstring>
 #include <memory>
 #include <grpcpp/grpcpp.h>
-#include "feature_toggles.h"
+#include <feature_toggles.h>
 
 #ifndef _WIN32
 #include <dlfcn.h>
