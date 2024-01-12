@@ -46,12 +46,17 @@ def getFunctionSignatureList():
                         unsorted_signature_list.append({"id": 404, "function_name": function_name, "return_type": return_type, "parameter_list": parameter_list})
     sorted_signature_list["size"] = len(unsorted_signature_list)
     sorted_signature_list["signatures"] = sorted(unsorted_signature_list, key=lambda k: k['function_name'])
-    for i in range(1, len(sorted_signature_list["signatures"])+1):
-        sorted_signature_list["signatures"][i-1]["id"] = i
-    
-    return sorted_signature_list
 
-def get_function_map(sorted_signature_list):
+    # Setting the id and creating a function map that maps the function values to the name of the function
+    function_map = {}
+    for i in range(len(sorted_signature_list["signatures"])):
+        sorted_signature_list["signatures"][i]["id"] = i
+        signature = sorted_signature_list["signatures"][i]
+        function_map[signature['function_name']] = {"function_name": signature["function_name"], "return_type": signature['return_type'], "parameter_list": signature['parameter_list']}
+    
+    return [sorted_signature_list, function_map]
+
+def getFunctionMap(sorted_signature_list):
     function_map = {}
     for signature in sorted_signature_list['signatures']:
         function_map[signature['function_name']] = {"function_name": signature["function_name"], "return_type": signature['return_type'], "parameter_list": signature['parameter_list']}
@@ -59,4 +64,4 @@ def get_function_map(sorted_signature_list):
 
 if __name__ == '__main__':
     with open("exported_function_list.json",'w') as f:
-        json.dump(getFunctionSignatureList(),f, indent=2)
+        json.dump(getFunctionSignatureList()[0],f, indent=2)

@@ -11,11 +11,11 @@ def read_json(filepath):
         test_data = json.load(file)
     return test_data
 
-exported_function_list = get_exported_function_list.getFunctionSignatureList()
-function_map = get_exported_function_list.get_function_map(exported_function_list)
+exported_function_list, function_map = get_exported_function_list.getFunctionSignatureList()
+# function_map = get_exported_function_list.get_function_map(exported_function_list)
 
-@pytest.mark.parametrize('struct', read_json(struct_json_file_path)['signatures'])
-def test_structs(struct):
-    test_input = function_map[struct['function_name']]
-    expected_output = {"function_name": struct["function_name"], "return_type": struct["return_type"], "parameter_list": struct["parameter_list"]}
+@pytest.mark.parametrize('function', read_json(struct_json_file_path)['signatures'])
+def test_functions(function):
+    test_input = function_map.get(function['function_name'])
+    expected_output = {"function_name": function["function_name"], "return_type": function["return_type"], "parameter_list": function["parameter_list"]}
     assert test_input == expected_output

@@ -5,6 +5,7 @@ import os
 def run_tests():
     message_structures_test_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/message_structure_test.py")
     exported_functions_test_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/exported_functions_test.py")
+    exported_functions_addition_test_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/exported_functions_addition_test.py")
 
     # Check the exit code
     result_message_structure = subprocess.run(["python", "-m", "pytest", message_structures_test_path, "-vv"])
@@ -15,6 +16,10 @@ def run_tests():
     if result_exported_functions.returncode != 0:
         print(f"Function structural tests failed with exit code {result_exported_functions.returncode}. Exiting.")
         sys.exit(result_exported_functions.returncode)
+    result_exported_functions_addition = subprocess.run(["python", exported_functions_addition_test_path])
+    if result_exported_functions_addition.returncode != 0:
+        print(f"Function structural tests failed with exit code {result_exported_functions_addition.returncode}. Exiting.")
+        sys.exit(result_exported_functions_addition.returncode)
     
     print("All structural tests passed.")
 
