@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// This line is required, as it specifies the version of the .proto file format
 syntax = "proto3";
 
+// These are language-specific directives, optional but common in grpc .proto files.
+// Specifically for java code generation in this case - LabVIEW doesn't care about them.
+// For LabVIEW-only projects, they can be removed, but may be useful when interoperating with other languages.
+// As of now, grpc-labview has no such langaguage directives defined for LabVIEW.
 option java_multiple_files = true;
 option java_package = "io.grpc.examples.helloworld";
 option java_outer_classname = "HelloWorldProto";
 option objc_class_prefix = "HLW";
 
+// This option provides namespace scoping for the items in this file
 package helloworld;
 
 // The greeting service definition.
