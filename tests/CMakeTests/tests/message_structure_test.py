@@ -3,7 +3,7 @@ import json
 import pytest
 import os
 
-struct_json_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "MessageStructures.json")
+struct_json_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../testcases/MessageStructures.json")
 
 def read_json(filepath):
     with open(filepath, 'r') as file:
@@ -28,7 +28,7 @@ def extract_struct_by_name(file_path, target_struct_name):
 
     return {'name': '', 'fields': []}
 
-cpp_file_path = os.path.abspath(os.path.join(__file__, '../../../src/message_metadata.h'))
+cpp_file_path = os.path.abspath(os.path.join(__file__, '../../../../src/message_metadata.h'))
 
 @pytest.mark.parametrize('struct', read_json(struct_json_file_path))
 def test_structs(struct):
