@@ -1,5 +1,5 @@
 {
-  "size": 83,
+  "size": 84,
   "signatures": [
     {
       "id": 0,
@@ -740,6 +740,14 @@
     },
     {
       "id": 77,
+      "function_name": "SetLVRTModulePath",
+      "return_type": "int32_t",
+      "parameter_list": [
+        "const char*"
+      ]
+    },
+    {
+      "id": 78,
       "function_name": "SetResponseData",
       "return_type": "int32_t",
       "parameter_list": [
@@ -748,7 +756,7 @@
       ]
     },
     {
-      "id": 78,
+      "id": 79,
       "function_name": "TryUnpackFromAny",
       "return_type": "int32_t",
       "parameter_list": [
@@ -759,7 +767,7 @@
       ]
     },
     {
-      "id": 79,
+      "id": 80,
       "function_name": "UnpackFieldsFromAny",
       "return_type": "int32_t",
       "parameter_list": [
@@ -768,7 +776,7 @@
       ]
     },
     {
-      "id": 80,
+      "id": 81,
       "function_name": "UnpackFieldsFromBuffer",
       "return_type": "int32_t",
       "parameter_list": [
@@ -777,7 +785,7 @@
       ]
     },
     {
-      "id": 81,
+      "id": 82,
       "function_name": "UnpackFromAny",
       "return_type": "int32_t",
       "parameter_list": [
@@ -788,7 +796,7 @@
       ]
     },
     {
-      "id": 82,
+      "id": 83,
       "function_name": "UnpackFromBuffer",
       "return_type": "int32_t",
       "parameter_list": [

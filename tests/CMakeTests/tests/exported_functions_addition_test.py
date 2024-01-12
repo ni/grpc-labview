@@ -18,7 +18,7 @@ if new_function_list["size"] != old_function_list["size"]:
     cnt = 1
     for func in new_function_map.keys():
         if old_function_map.get(func) == None:
-           func_name += "    " + str(cnt) + ". " + func + '\n'
+           func_name += str(cnt) + ")" + func + ' '
            cnt += 1
 
-    print(f"::warning::You have not added these function in the 'Exported Functions' cmake test:\n{func_name}Please add these function(s) in tests/CMakeTests/testcases/ExportedFunctionList.json")
+    print(f"::warning::You have not added these function in the 'Exported Functions' cmake test: {func_name}. Please add these function(s) in tests/CMakeTests/testcases/ExportedFunctionList.json")
