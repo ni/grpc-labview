@@ -11,7 +11,7 @@ if os.name == 'nt':     # windows
 else: 
     venv_command = "python -m venv venv"
     activate_script = "venv/bin/activate"
-    activate_command = f"source {activate_script}"
+    activate_command = f". {activate_script}"
 
 def create_virtual_environment():
     venv_folder_path = Path(__file__).parent / "venv"
