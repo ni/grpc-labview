@@ -34,6 +34,8 @@ static NumericArrayResize_T NumericArrayResizeImp = nullptr;
 static PostLVUserEvent_T PostLVUserEvent = nullptr;
 static Occur_T Occur = nullptr;
 static RTSetCleanupProc_T RTSetCleanupProc = nullptr;
+
+static std::string ModulePath = "";
 static DSNewHandlePtr_T DSNewHandleImpl = nullptr;
 static DSSetHandleSize_T DSSetHandleSizeImpl = nullptr;
 static DSDisposeHandle_T DSDisposeHandleImpl = nullptr;
@@ -41,6 +43,15 @@ static DSDisposeHandle_T DSDisposeHandleImpl = nullptr;
 namespace grpc_labview
 {
     grpc_labview::PointerManager<grpc_labview::gRPCid> gPointerManager;
+
+	//---------------------------------------------------------------------
+	// Allows for definition of the LVRT DLL path to be used for callback functions
+	// This function should be called prior to calling InitCallbacks()
+    //---------------------------------------------------------------------
+	void SetLVRTModulePath(std::string modulePath)
+	{
+		ModulePath = modulePath;
+	}
 
 #ifdef _WIN32
 
@@ -56,16 +67,24 @@ namespace grpc_labview
             return;
         }
 
-        auto lvModule = GetModuleHandle("LabVIEW.exe");
-        if (lvModule == nullptr)
-        {
-            lvModule = GetModuleHandle("lvffrt.dll");
-        }
-        if (lvModule == nullptr)
-        {
-            lvModule = GetModuleHandle("lvrt.dll");
-        }
-        //NumericArrayResizeImp = (NumericArrayResize_T)GetProcAddress(lvModule, "NumericArrayResize");
+		HMODULE lvModule;
+
+		if(ModulePath != "")
+		{
+			lvModule = GetModuleHandle(ModulePath.c_str());
+		}
+		else
+		{
+			lvModule = GetModuleHandle("LabVIEW.exe");
+			if (lvModule == nullptr)
+			{
+				lvModule = GetModuleHandle("lvffrt.dll");
+			}
+			if (lvModule == nullptr)
+			{
+				lvModule = GetModuleHandle("lvrt.dll");
+			}
+		}
         NumericArrayResizeImp = (NumericArrayResize_T)GetProcAddress(lvModule, "NumericArrayResizeNoInit");
         PostLVUserEvent = (PostLVUserEvent_T)GetProcAddress(lvModule, "PostLVUserEvent");
         Occur = (Occur_T)GetProcAddress(lvModule, "Occur");
