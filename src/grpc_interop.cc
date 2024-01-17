@@ -456,3 +456,19 @@ LIBRARY_EXPORT int32_t IsCancelled(grpc_labview::gRPCid** id)
     }
     return data->_call->IsCancelled();
 }
+
+//---------------------------------------------------------------------
+// Allows for definition of the LVRT DLL path to be used for callback functions
+// This function should be called prior to any other gRPC functions in this library
+   //---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t SetLVRTModulePath(const char* modulePath)
+{
+    if (modulePath == nullptr)
+    {
+        return -1;
+    }
+	
+	grpc_labview::SetLVRTModulePath(modulePath);
+	
+	return 0;    
+}
