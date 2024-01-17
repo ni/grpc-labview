@@ -68,6 +68,9 @@ namespace grpc_labview
             numElements = v->_value.size();
             // get the LVClusterHandle
 
+            // ContinueIndex is not required here as the _value vector created is of the corresponding type, and is not being used a buffer.
+            // PackedMessageType will just be able to push_back or add the later parsed data to the type vector.
+
             // copy into LVCluster
             if (numElements != 0)
             {

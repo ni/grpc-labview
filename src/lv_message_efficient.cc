@@ -155,6 +155,22 @@ namespace grpc_labview
                 _repeatedMessageValuesIt = _repeatedMessageValuesMap.emplace(metadata->messageName, google::protobuf::RepeatedField<char>()).first;
             }
 
+            // There are situations where the protobuf message is not complete, and we need to continue from the last index.
+            // This function returns to _internalParse, and then gets back to this function.
+            // If we are continuing from a previous parse, then we need to continue from the last index
+            auto _continueFromIndex = _repeatedField_continueIndex.find(metadata->messageName);
+            if (_continueFromIndex != _repeatedField_continueIndex.end()) {
+                elementIndex = _continueFromIndex->second;
+                _repeatedField_continueIndex.erase(_continueFromIndex);
+                // find next largest power of 2, as we assume that we previously resized it to a power of 2
+                auto _size = (int)ceil(log2(elementIndex));
+                numElements = ((1 << _size) > 128) ? (1 << _size) : 128;
+            }
+            else {
+                // occurs on the first time this function is called
+                _repeatedMessageValuesIt->second.Resize(arraySize, _fillData);
+            }
+
             protobuf_ptr -= 1;
             do
             {
