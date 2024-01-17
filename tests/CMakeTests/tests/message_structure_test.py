@@ -1,9 +1,9 @@
 import re
 import json
 import pytest
-import os
+from pathlib import Path
 
-struct_json_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../testcases/MessageStructures.json")
+struct_json_file_path = Path(__file__).parent.parent / "testcases" / "MessageStructures.json"
 
 def read_json(filepath):
     with open(filepath, 'r') as file:
@@ -28,10 +28,10 @@ def extract_struct_by_name(file_path, target_struct_name):
 
     return {'name': '', 'fields': []}
 
-cpp_file_path = os.path.abspath(os.path.join(__file__, '../../../../src/message_metadata.h'))
+cpp_file_path = Path(__file__).parent.parent.parent.parent / "src" / "message_metadata.h"
 
 @pytest.mark.parametrize('struct', read_json(struct_json_file_path))
-def test_structs(struct):
+def test_struct_compatibility(struct):
     test_input = extract_struct_by_name(cpp_file_path, struct['name'])['fields']
     expected_output = struct['fields']
     assert test_input == expected_output

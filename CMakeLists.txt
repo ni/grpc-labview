@@ -55,8 +55,8 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src" "./third_party/grpc" "
 # LabVIEW support for grpc and protobuf
 #----------------------------------------------------------------------
 
-add_custom_target(Detect_MessageMetadata_Structural_Changes
-    COMMAND ${CMAKE_COMMAND} -E echo "Running MessageMetadata structure test.py ..."
+add_custom_target(Detect_Compatibility_Breaks
+    COMMAND ${CMAKE_COMMAND} -E echo "Detecting backward compatibility breakage ..."
     COMMAND python -m pip install -r ${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeTests/requirements.txt
     COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeTests/run_test.py
     RESULT_VARIABLE shell_command_result
@@ -190,8 +190,8 @@ target_link_libraries(test_server
  ${_GRPC_GRPCPP}
  ${_PROTOBUF_LIBPROTOBUF})
 
-add_dependencies(labview_grpc_server Detect_MessageMetadata_Structural_Changes)
-add_dependencies(labview_grpc_generator Detect_MessageMetadata_Structural_Changes)
-add_dependencies(test_client Detect_MessageMetadata_Structural_Changes)
-add_dependencies(test_server Detect_MessageMetadata_Structural_Changes)
-add_dependencies(example_client Detect_MessageMetadata_Structural_Changes)
+add_dependencies(labview_grpc_server Detect_Compatibility_Breaks)
+add_dependencies(labview_grpc_generator Detect_Compatibility_Breaks)
+add_dependencies(test_client Detect_Compatibility_Breaks)
+add_dependencies(test_server Detect_Compatibility_Breaks)
+add_dependencies(example_client Detect_Compatibility_Breaks)

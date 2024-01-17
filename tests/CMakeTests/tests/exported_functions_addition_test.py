@@ -1,8 +1,8 @@
 import Utils.get_exported_function_list as get_exported_functions
 import json
-import os
+from pathlib import Path
 
-struct_json_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../testcases/ExportedFunctionList.json")
+exported_functions_json_file_path = Path(__file__).parent.parent / "testcases" / "ExportedFunctionList.json"
 
 def read_json(filepath):
     with open(filepath, 'r') as file:
@@ -10,7 +10,7 @@ def read_json(filepath):
     return data
 
 new_function_list, new_function_map = get_exported_functions.getFunctionSignatureList()
-old_function_list = read_json(struct_json_file_path)
+old_function_list = read_json(exported_functions_json_file_path)
 old_function_map = get_exported_functions.getFunctionMap(old_function_list)
 
 if new_function_list["size"] != old_function_list["size"]:
