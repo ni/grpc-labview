@@ -57,7 +57,6 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src" "./third_party/grpc" "
 
 add_custom_target(Detect_Compatibility_Breaks
     COMMAND ${CMAKE_COMMAND} -E echo "Detecting backward compatibility breakage ..."
-    COMMAND python -m pip install -r ${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeTests/requirements.txt
     COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeTests/run_test.py
     RESULT_VARIABLE shell_command_result
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
