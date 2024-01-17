@@ -121,14 +121,6 @@ namespace grpc_labview
         return ParseString(tag, fieldInfo, index, ptr, ctx);    
     }
 
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    struct LVCluster
-    {
-    }; // TODO: Do not check this in.
-
-
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     const char *LVMessageEfficient::ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
