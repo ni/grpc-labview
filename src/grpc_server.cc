@@ -179,9 +179,6 @@ namespace grpc_labview
         std::string serverKeyPath,
         ServerStartEventData *serverStarted)
     {
-        // Instantiating the feature toggles singleton that will read the feature configuration file
-        FeatureConfig::getInstance().readConfigFromFile("feature_config.ini");
-
         std::string server_address;
         if (address.length() != 0)
         {
