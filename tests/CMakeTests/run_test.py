@@ -3,9 +3,9 @@ import sys
 from pathlib import Path
 
 def run_tests():
-    message_structures_test_path = Path(__file__) / "tests" / "message_structure_test.py"
-    exported_functions_test_path = Path(__file__) / "tests" / "exported_functions_test.py"
-    exported_functions_addition_test_path = Path(__file__) / "tests" / "exported_functions_addition_test.py"
+    message_structures_test_path = Path(__file__).parent / "tests" / "message_structure_test.py"
+    exported_functions_test_path = Path(__file__).parent / "tests" / "exported_functions_test.py"
+    exported_functions_addition_test_path = Path(__file__).parent / "tests" / "exported_functions_addition_test.py"
 
     # Check the exit code
     result_message_structure = subprocess.run(["python", "-m", "pytest", message_structures_test_path, "-vv"])
