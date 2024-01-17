@@ -10,7 +10,6 @@
 #include <grpcpp/support/channel_arguments.h>
 #include <ctime>
 #include <chrono>
-#include "feature_toggles.h"
 
 namespace grpc_labview
 {
