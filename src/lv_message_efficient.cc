@@ -127,7 +127,6 @@ namespace grpc_labview
     {    
         auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
         
-        const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
         LVMessageEfficient nestedMessage(metadata);
 
         if (fieldInfo.isRepeated) {
@@ -137,14 +136,14 @@ namespace grpc_labview
             auto clusterSize = metadata->clusterSize;
             auto alignment = metadata->alignmentRequirement;
             auto arraySize = numElements * clusterSize;
-            LV1DArrayHandle arrayHandle;
             char _fillData = '\0';
 
             // Get the _repeatedMessageValues vector from the map
             auto _repeatedMessageValuesIt = _repeatedMessageValuesMap.find(metadata->messageName);
             if (_repeatedMessageValuesIt == _repeatedMessageValuesMap.end())
             {
-                _repeatedMessageValuesIt = _repeatedMessageValuesMap.emplace(metadata->messageName, google::protobuf::RepeatedField<char>()).first;
+                auto m_val = std::make_shared<RepeatedMessageValue>(fieldInfo, google::protobuf::RepeatedField<char>());
+                _repeatedMessageValuesIt = _repeatedMessageValuesMap.emplace(metadata->messageName, m_val).first;
             }
 
             // There are situations where the protobuf message is not complete, and we need to continue from the last index.
@@ -160,7 +159,7 @@ namespace grpc_labview
             }
             else {
                 // occurs on the first time this function is called
-                _repeatedMessageValuesIt->second.Resize(arraySize, _fillData);
+                _repeatedMessageValuesIt->second.get()->_buffer.Resize(arraySize, _fillData);
             }
 
             protobuf_ptr -= 1;
@@ -172,11 +171,11 @@ namespace grpc_labview
                 if (elementIndex >= numElements - 1) {
                     numElements *= 2;
                     arraySize = numElements * clusterSize;
-                    auto s = _repeatedMessageValuesIt->second.size();
-                    _repeatedMessageValuesIt->second.Resize(arraySize, _fillData);
+                    auto s = _repeatedMessageValuesIt->second.get()->_buffer.size();
+                    _repeatedMessageValuesIt->second.get()->_buffer.Resize(arraySize, _fillData);
                 }
 
-                auto _vectorPtr = _repeatedMessageValuesIt->second.data();
+                auto _vectorPtr = _repeatedMessageValuesIt->second.get()->_buffer.data();
                 _vectorPtr = _vectorPtr + (elementIndex * clusterSize);
                 nestedMessage.SetLVClusterHandle(_vectorPtr);
                 protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
@@ -187,24 +186,45 @@ namespace grpc_labview
                     break;
                 }
             } while (ExpectTag(tag, protobuf_ptr));
-
-            // shrink the array to the correct size
-            arraySize = elementIndex * clusterSize;
-            auto old_arrayHandle = *(void**)lv_ptr;
-            DSDisposeHandle(old_arrayHandle);
-            *(void**)lv_ptr = DSNewHandle(arraySize);
-            arrayHandle = *(LV1DArrayHandle*)lv_ptr;
-            (*arrayHandle)->cnt = elementIndex;
-
-            auto _vectorDataPtr = _repeatedMessageValuesIt->second.data();
-            auto _lvArrayDataPtr = (*arrayHandle)->bytes(0, alignment);
-            memcpy(_lvArrayDataPtr, _vectorDataPtr, arraySize);
+            
+            _repeatedMessageValuesIt->second.get()->_numElements = elementIndex;
+            _repeatedField_continueIndex.emplace(metadata->messageName, elementIndex);
         }
         else {
+            const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
             nestedMessage.SetLVClusterHandle(lv_ptr);
             protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
         }
         return protobuf_ptr;
     }
+
+    void LVMessageEfficient::PostInteralParseAction()
+    {
+        for each (auto nestedMessage in _repeatedMessageValuesMap)
+        {
+            auto fieldInfo = nestedMessage.second.get()->_fieldInfo;
+            auto buffer = nestedMessage.second.get()->_buffer;
+            auto numElements = nestedMessage.second.get()->_numElements;
+
+            auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
+            const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
+            auto clusterSize = metadata->clusterSize;
+            auto alignment = metadata->alignmentRequirement;
+
+
+            // shrink the array to the correct size
+            auto arraySize = numElements * clusterSize;
+            auto old_arrayHandle = *(void**)lv_ptr;
+            DSDisposeHandle(old_arrayHandle);
+            *(void**)lv_ptr = DSNewHandle(arraySize);
+            auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
+            (*arrayHandle)->cnt = numElements;
+
+            auto _vectorDataPtr = buffer.data();
+            auto _lvArrayDataPtr = (*arrayHandle)->bytes(0, alignment);
+            memcpy(_lvArrayDataPtr, _vectorDataPtr, arraySize);
+        }
+    }
+
 }
 

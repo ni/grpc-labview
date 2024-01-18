@@ -175,6 +175,7 @@ namespace grpc_labview
                 }
             }
         }
+        PostInteralParseAction();
         return ptr;
     }
 

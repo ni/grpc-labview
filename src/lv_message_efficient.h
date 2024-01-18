@@ -22,10 +22,21 @@ namespace grpc_labview
         ~LVMessageEfficient() {}
 
         Message* New(google::protobuf::Arena* arena) const override;
+        void PostInteralParseAction() override;
 
+    protected:
+        struct RepeatedMessageValue {
+            const MessageElementMetadata& _fieldInfo;
+            google::protobuf::RepeatedField<char> _buffer;
+            uint64_t _numElements = 0;
+
+            RepeatedMessageValue(const MessageElementMetadata& fieldInfo, google::protobuf::RepeatedField<char> buffer) :
+                _fieldInfo(fieldInfo), _buffer(buffer) {}
+        };
+    
     public:
         std::unordered_map<std::string, uint32_t> _repeatedField_continueIndex;
-        std::unordered_map<std::string, google::protobuf::RepeatedField<char>> _repeatedMessageValuesMap;
+        std::unordered_map<std::string, std::shared_ptr<RepeatedMessageValue>> _repeatedMessageValuesMap;
         std::unordered_map<std::string, google::protobuf::RepeatedField<std::string>> _repeatedStringValuesMap;
 
     protected:
