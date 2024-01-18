@@ -1,0 +1,30 @@
+[
+  {
+    "name": "LVMessageMetadata",
+    "fields": [
+      "LStrHandle messageName", 
+      "LV1DArrayHandle elements"
+    ]
+  },
+  {
+    "name": "LVMessageMetadata2",
+    "fields": [
+      "int version",
+      "LStrHandle messageName",
+      "LStrHandle typeUrl",
+      "LV1DArrayHandle elements"
+    ]
+  },
+  {
+    "name": "LVMesageElementMetadata",
+    "fields": [
+      "LStrHandle fieldName",
+      "LStrHandle embeddedMessageName",
+      "int protobufIndex",
+      "int valueType",
+      "bool isRepeated",
+      "bool isInOneof",
+      "LStrHandle oneofContainerName"
+    ]
+  }
+]
