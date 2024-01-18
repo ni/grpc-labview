@@ -123,11 +123,18 @@ jobs:
       name: Print CMakeTests logs
       run: |
         folder="${{runner.workspace}}/grpc-labview/tests/CMakeTests/logs/"
+            
+        # Check if the folder exists
         if [ ! -d "$folder" ]; then
-          echo "CMakeTests log folder (grpc-labview/tests/CmakeTests/logs) does not exist."
-          exit 1
+          echo "CMakeTests log folder ('$folder') does not exist."
+          echo "Exiting the script."
+          exit
         fi
-        cd "$folder" || exit 1
+            
+        # Change to the folder
+        cd "$folder" || exit
+            
+        # Iterate through files and print their contents
         for file in *; do
             if [ -f "$file" ]; then
                 cat "$file"
