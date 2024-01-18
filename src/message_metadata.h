@@ -137,5 +137,6 @@ namespace grpc_labview
         LStrHandle messageName;
         LStrHandle typeUrl;
         LV1DArrayHandle elements;
+        int new_var;
     };
 }

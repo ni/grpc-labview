@@ -80,8 +80,8 @@ def run_tests():
             print(result_exported_functions_addition_output ,'\n')
             log_file.write(result_exported_functions_addition_output)
         else:
-            log_file.write("You have not added these function in the 'Exported Functions Cmake Test': " + "\n\n" + result_exported_functions_addition_output + "Please add these function(s) in tests/CMakeTests/testcases/ExportedFunctionList.json")
-            print("::warning::" + "You have not added these function in the 'Exported Functions Cmake Test': " + " ".join(result_exported_functions_addition_output.split('\n')) + ". Please add these function(s) in tests/CMakeTests/testcases/ExportedFunctionList.json", "\n")
+            log_file.write("You have not added these function in the 'Exported Functions Cmake Test: " + "\n\n" + result_exported_functions_addition_output + "Please add these function(s) in tests/CMakeTests/testcases/ExportedFunctionList.json")
+            print("::warning::" + "You have not added these function in the 'Exported Functions Cmake Test: " + " ".join(result_exported_functions_addition_output.split('\n')) + ". Please add these function(s) in tests/CMakeTests/testcases/ExportedFunctionList.json", "\n")
     if result_exported_functions_addition.returncode != 0:
         result_exported_functions_addition = subprocess.run(["python", str(exported_functions_addition_test_path)])
     if result_exported_functions_addition.returncode != 0:
