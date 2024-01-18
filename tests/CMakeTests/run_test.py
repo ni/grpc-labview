@@ -75,7 +75,7 @@ def run_tests():
         log_file.write("\n------------------------------------------------------------------------\n\n")
         if os.name == 'nt':
             result_exported_functions_addition_output = result_exported_functions_addition_output.replace("\r", "")
-        if(result_exported_functions_addition_output == ""):
+        if result_exported_functions_addition_output == "":
             result_exported_functions_addition_output = "All tests passed. No addition in exported functions."
             print(result_exported_functions_addition_output ,'\n')
             log_file.write(result_exported_functions_addition_output)
