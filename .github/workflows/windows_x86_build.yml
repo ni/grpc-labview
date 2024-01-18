@@ -33,6 +33,32 @@ jobs:
       working-directory: ${{runner.workspace}}\grpc-labview\build
       run: cmake --build . --config ${{env.BUILD_TYPE}} -j 16
 
+    - name: Check whether logs folder exists for CMakeTests
+      id: check_files
+      uses: andstor/file-existence-action@v2.0.0
+      with:
+        files: "${{runner.workspace}}/grpc-labview/tests/CMakeTests/logs/"
+
+    - if: ${{always() && steps.check_files.outputs.files_exists == 'true' }}
+      name: Print CMakeTests logs if logs folder exists
+      run: |
+        $directory = "${{runner.workspace}}/grpc-labview/tests/CMakeTests/logs"
+        # Recursively iterate through all files in subfolders
+        Get-ChildItem -Path $directory -File -Recurse | Group-Object Directory | ForEach-Object {
+            $subfolderName = $_.Name
+
+            Write-Host "Folder: $subfolderName"
+
+            $_.Group | ForEach-Object {
+                $file = $_
+                # Print the content of the file
+                Get-Content $file.FullName
+
+                Write-Host ""
+            }
+            Write-Host ""
+        }
+        
     - name: Tar Build Artifacts
       run: >-
         tar -czvf labview-grpc-server-windows-x86.tar.gz -C ${{runner.workspace}}\grpc-labview\build\Release

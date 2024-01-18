@@ -22,3 +22,6 @@ if new_function_list["size"] != old_function_list["size"]:
            cnt += 1
 
     print(f"::warning::You have not added these function in the 'Exported Functions' cmake test: {func_name}. Please add these function(s) in tests/CMakeTests/testcases/ExportedFunctionList.json")
+
+else:
+    print("All tests passed. No addition in exported functions.")

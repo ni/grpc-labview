@@ -2,6 +2,7 @@ import subprocess
 import sys
 import os
 from pathlib import Path
+import datetime
 
 # Setting global variables
 if os.name == 'nt':     # windows
@@ -22,25 +23,51 @@ def install_dependencies():
     subprocess.run(f"{activate_command} && pip install pytest", shell=True)
 
 def run_tests():
+
+    current_time = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+    log_file_path = Path(__file__).parent / "logs" / f"CMakeTests_log_{current_time}.txt"
+    logs_folder_path = Path(__file__).parent / "logs"
+
+    if not logs_folder_path.exists():
+        logs_folder_path.mkdir(parents=True)
+
     message_structures_test_path = Path(__file__).parent / "tests" / "message_structure_test.py"
     exported_functions_test_path = Path(__file__).parent / "tests" / "exported_functions_test.py"
     exported_functions_addition_test_path = Path(__file__).parent / "tests" / "exported_functions_addition_test.py"
 
-    result_message_structure = subprocess.run(f"{activate_command} && python -m pytest {str(message_structures_test_path)} -vv", shell=True)
+    result_message_structure = subprocess.run(f"{activate_command} && python -m pytest {str(message_structures_test_path)} -vv", shell=True, stdout=subprocess.PIPE)
+    print(result_message_structure.stdout.decode('utf-8'))
+    with open(log_file_path, "a") as log_file:
+        log_file.write("-----------------------------------------------------------------------")
+        log_file.write("\n----------------------- Message structure tests -----------------------")
+        log_file.write("\n-----------------------------------------------------------------------\n\n")
+        log_file.write(result_message_structure.stdout.decode('utf-8'))
     if result_message_structure.returncode != 0:
         result_message_structure = subprocess.run(["python", "-m", "pytest", str(message_structures_test_path), "-vv"])
     if result_message_structure.returncode != 0:
         print(f"Message structural tests failed with exit code {result_message_structure.returncode}. Exiting.")
         sys.exit(result_message_structure.returncode)
 
-    result_exported_functions = subprocess.run(f"{activate_command} && python -m pytest {str(exported_functions_test_path)} -vv", shell=True)
+    result_exported_functions = subprocess.run(f"{activate_command} && python -m pytest {str(exported_functions_test_path)} -vv", shell=True,stdout=subprocess.PIPE)
+    print(result_exported_functions.stdout.decode('utf-8'))
+    with open(log_file_path, "a") as log_file:
+        log_file.write("\n------------------------------------------------------------------------")
+        log_file.write("\n----------------------- Exported functions tests -----------------------")
+        log_file.write("\n------------------------------------------------------------------------\n\n")
+        log_file.write(result_exported_functions.stdout.decode('utf-8'))
     if result_exported_functions.returncode != 0:
         result_exported_functions = subprocess.run(["python", "-m", "pytest", str(exported_functions_test_path), "-vv"])
     if result_exported_functions.returncode != 0:
         print(f"Function structural tests failed with exit code {result_exported_functions.returncode}. Exiting.")
         sys.exit(result_exported_functions.returncode)
     
-    result_exported_functions_addition = subprocess.run(f"{activate_command} && python {str(exported_functions_addition_test_path)}", shell=True)
+    result_exported_functions_addition = subprocess.run(f"{activate_command} && python {str(exported_functions_addition_test_path)}", shell=True, stdout=subprocess.PIPE)
+    print(result_exported_functions_addition.stdout.decode('utf-8'))
+    with open(log_file_path, "a") as log_file:
+        log_file.write("\n------------------------------------------------------------------------")
+        log_file.write("\n------------------- Exported function addition tests -------------------")
+        log_file.write("\n------------------------------------------------------------------------\n\n")
+        log_file.write(result_exported_functions_addition.stdout.decode('utf-8'))
     if result_exported_functions_addition.returncode != 0:
         result_exported_functions_addition = subprocess.run(["python", str(exported_functions_addition_test_path)])
     if result_exported_functions_addition.returncode != 0:
