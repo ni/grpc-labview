@@ -39,30 +39,30 @@ jobs:
       # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: cmake --build . --config ${{env.BUILD_TYPE}} -j 16
     
-    - name: Check whether logs folder exists for CMakeTests
-      id: check_files
-      uses: andstor/file-existence-action@v2.0.0
-      with:
-        files: "${{runner.workspace}}/grpc-labview/tests/CMakeTests/logs/"
-
-    - if: ${{always() && steps.check_files.outputs.files_exists == 'true' }}
-      name: Print CMakeTests logs if logs folder exists
+    - if: ${{ always() }}
+      name: Print CMakeTests logs
       run: |
         $directory = "${{runner.workspace}}/grpc-labview/tests/CMakeTests/logs"
-        # Recursively iterate through all files in subfolders
-        Get-ChildItem -Path $directory -File -Recurse | Group-Object Directory | ForEach-Object {
-            $subfolderName = $_.Name
+        
+        # Check if the folder exists
+        if (Test-Path $directory -PathType Container) {
+            # Recursively iterate through all files in subfolders
+            Get-ChildItem -Path $directory -File -Recurse | Group-Object Directory | ForEach-Object {
+                $subfolderName = $_.Name
 
-            Write-Host "Folder: $subfolderName"
+                Write-Host "Folder: $subfolderName"
 
-            $_.Group | ForEach-Object {
-                $file = $_
-                # Print the content of the file
-                Get-Content $file.FullName
+                $_.Group | ForEach-Object {
+                    $file = $_
+                    # Print the content of the file
+                    Get-Content $file.FullName
 
+                    Write-Host ""
+                }
                 Write-Host ""
             }
-            Write-Host ""
+        } else {
+            Write-Host "CMakeTests log folder (grpc-labview/tests/CmakeTests/logs) does not exist."
         }
 
     - name: Tar Build Artifacts

@@ -118,6 +118,22 @@ jobs:
           message("::error::${error_message}")
           message(FATAL_ERROR "Build failed")
         endif()
+
+    - if: ${{always() }}
+      name: Print CMakeTests logs
+      run: |
+        folder="${{runner.workspace}}/grpc-labview/tests/CMakeTests/logs/"
+        if [ ! -d "$folder" ]; then
+          echo "CMakeTests log folder (grpc-labview/tests/CmakeTests/logs) does not exist."
+          exit 1
+        fi
+        cd "$folder" || exit 1
+        for file in *; do
+            if [ -f "$file" ]; then
+                cat "$file"
+                echo
+            fi
+        done
         
     - name: Tar Build Artifacts
       run: >-
