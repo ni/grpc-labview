@@ -12,6 +12,10 @@ else()
   add_definitions(-D_WIN32_WINNT=0x600)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4267 /wd4244")
+  add_compile_options("$<$<NOT:$<CONFIG:Debug>>:/Zi>")
+  add_link_options("$<$<NOT:$<CONFIG:Debug>>:/DEBUG>")
+  add_link_options("$<$<NOT:$<CONFIG:Debug>>:/OPT:REF>")
+  add_link_options("$<$<NOT:$<CONFIG:Debug>>:/OPT:ICF>")
 endif()
 
 find_package(Threads REQUIRED)
@@ -55,21 +59,22 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src" "./third_party/grpc" "
 # LabVIEW support for grpc and protobuf
 #----------------------------------------------------------------------
 add_library(labview_grpc_server SHARED
-  src/grpc_client.cc
-  src/grpc_server.cc
-  src/grpc_interop.cc
+  src/any_support.cc
   src/cluster_copier.cc
   src/event_data.cc
+  src/feature_toggles.cc
+  src/grpc_client.cc
+  src/grpc_interop.cc
+  src/grpc_load.cc
+  src/grpc_server.cc
   src/lv_interop.cc
   src/lv_message.cc
   src/lv_message_value.cc
-  src/message_element_metadata_owner.cc
-  src/any_support.cc
-  src/unpacked_fields.cc
-  src/grpc_load.cc
-  src/lv_proto_server_reflection_service.cc
   src/lv_proto_server_reflection_plugin.cc
-  )
+  src/lv_proto_server_reflection_service.cc
+  src/message_element_metadata_owner.cc
+  src/unpacked_fields.cc
+)
 target_link_libraries(labview_grpc_server
    ${_REFLECTION}
    ${_GRPC_GRPCPP}
@@ -80,8 +85,9 @@ target_link_libraries(labview_grpc_server
 # server VIs from a .proto file
 #----------------------------------------------------------------------
 add_library(labview_grpc_generator SHARED
-  src/proto_parser.cc
+  src/feature_toggles.cc
   src/lv_interop.cc
+  src/proto_parser.cc
   )
 target_link_libraries(labview_grpc_generator
    ${_REFLECTION}
