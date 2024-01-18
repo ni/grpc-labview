@@ -41,7 +41,7 @@ def run_tests():
         log_file.write("-----------------------------------------------------------------------")
         log_file.write("\n----------------------- Message structure tests -----------------------")
         log_file.write("\n-----------------------------------------------------------------------\n\n")
-        log_file.write(result_message_structure.stdout.decode('utf-8'))
+        log_file.write(result_message_structure.stdout.decode('utf-8').replace("\n", ""))
     if result_message_structure.returncode != 0:
         result_message_structure = subprocess.run(["python", "-m", "pytest", str(message_structures_test_path), "-vv"])
     if result_message_structure.returncode != 0:
@@ -54,7 +54,7 @@ def run_tests():
         log_file.write("\n------------------------------------------------------------------------")
         log_file.write("\n----------------------- Exported functions tests -----------------------")
         log_file.write("\n------------------------------------------------------------------------\n\n")
-        log_file.write(result_exported_functions.stdout.decode('utf-8'))
+        log_file.write(result_exported_functions.stdout.decode('utf-8').replace("\n", ""))
     if result_exported_functions.returncode != 0:
         result_exported_functions = subprocess.run(["python", "-m", "pytest", str(exported_functions_test_path), "-vv"])
     if result_exported_functions.returncode != 0:
@@ -67,7 +67,7 @@ def run_tests():
         log_file.write("\n------------------------------------------------------------------------")
         log_file.write("\n------------------- Exported function addition tests -------------------")
         log_file.write("\n------------------------------------------------------------------------\n\n")
-        log_file.write(result_exported_functions_addition.stdout.decode('utf-8'))
+        log_file.write(result_exported_functions_addition.stdout.decode('utf-8').replace("\n", ""))
     if result_exported_functions_addition.returncode != 0:
         result_exported_functions_addition = subprocess.run(["python", str(exported_functions_addition_test_path)])
     if result_exported_functions_addition.returncode != 0:
