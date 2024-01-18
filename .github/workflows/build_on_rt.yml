@@ -126,7 +126,7 @@ jobs:
             
         # Check if the folder exists
         if [ ! -d "$folder" ]; then
-          echo "CMakeTests log folder ('$folder') does not exist."
+          echo "CMakeTests log folder (grpc-labview/tests/CmakeTests/logs) does not exist."
           echo "Exiting the script."
           exit
         fi
