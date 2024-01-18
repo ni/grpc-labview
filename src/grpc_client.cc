@@ -389,10 +389,6 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall(grpc_labview::gRPCid* callId, int
 {
     return CompleteClientUnaryCall2(callId, responseCluster, nullptr, nullptr);
 }
-LIBRARY_EXPORT int32_t CompleteClientUnaryCall1000(grpc_labview::gRPCid* callId, int8_t* responseCluster)
-{
-    return CompleteClientUnaryCall2(callId, responseCluster, nullptr, nullptr);
-}
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
