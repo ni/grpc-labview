@@ -36,12 +36,17 @@ def run_tests():
     exported_functions_addition_test_path = Path(__file__).parent / "tests" / "exported_functions_addition_test.py"
 
     result_message_structure = subprocess.run(f"{activate_command} && python -m pytest {str(message_structures_test_path)} -vv", shell=True, stdout=subprocess.PIPE)
-    print(result_message_structure.stdout.decode('utf-8'))
+    result_message_structure_output = result_message_structure.stdout.decode('utf-8')
+    print(result_message_structure_output)
+    
     with open(log_file_path, "a") as log_file:
         log_file.write("-----------------------------------------------------------------------")
         log_file.write("\n----------------------- Message structure tests -----------------------")
         log_file.write("\n-----------------------------------------------------------------------\n\n")
-        log_file.write(result_message_structure.stdout.decode('utf-8').replace("\n", ""))
+        if os.name == 'nt':
+            log_file.write(result_message_structure_output.replace("\n", ""))
+        else:
+            log_file.write(result_message_structure_output)
     if result_message_structure.returncode != 0:
         result_message_structure = subprocess.run(["python", "-m", "pytest", str(message_structures_test_path), "-vv"])
     if result_message_structure.returncode != 0:
@@ -49,12 +54,16 @@ def run_tests():
         sys.exit(result_message_structure.returncode)
 
     result_exported_functions = subprocess.run(f"{activate_command} && python -m pytest {str(exported_functions_test_path)} -vv", shell=True,stdout=subprocess.PIPE)
-    print(result_exported_functions.stdout.decode('utf-8'))
+    result_exported_functions_output = result_exported_functions.stdout.decode('utf-8')
+    print(result_exported_functions_output)
     with open(log_file_path, "a") as log_file:
         log_file.write("\n------------------------------------------------------------------------")
         log_file.write("\n----------------------- Exported functions tests -----------------------")
         log_file.write("\n------------------------------------------------------------------------\n\n")
-        log_file.write(result_exported_functions.stdout.decode('utf-8').replace("\n", ""))
+        if os.name == 'nt':
+            log_file.write(result_exported_functions_output.replace("\n", ""))
+        else:
+            log_file.write(result_exported_functions_output)
     if result_exported_functions.returncode != 0:
         result_exported_functions = subprocess.run(["python", "-m", "pytest", str(exported_functions_test_path), "-vv"])
     if result_exported_functions.returncode != 0:
@@ -62,12 +71,16 @@ def run_tests():
         sys.exit(result_exported_functions.returncode)
     
     result_exported_functions_addition = subprocess.run(f"{activate_command} && python {str(exported_functions_addition_test_path)}", shell=True, stdout=subprocess.PIPE)
-    print(result_exported_functions_addition.stdout.decode('utf-8'))
+    result_exported_functions_addition_output = result_exported_functions_addition.stdout.decode('utf-8')
+    print(result_exported_functions_addition_output)
     with open(log_file_path, "a") as log_file:
         log_file.write("\n------------------------------------------------------------------------")
         log_file.write("\n------------------- Exported function addition tests -------------------")
         log_file.write("\n------------------------------------------------------------------------\n\n")
-        log_file.write(result_exported_functions_addition.stdout.decode('utf-8').replace("\n", ""))
+        if os.name == 'nt':
+            log_file.write(result_exported_functions_addition_output.replace("\n", ""))
+        else:
+            log_file.write(result_exported_functions_addition_output)
     if result_exported_functions_addition.returncode != 0:
         result_exported_functions_addition = subprocess.run(["python", str(exported_functions_addition_test_path)])
     if result_exported_functions_addition.returncode != 0:
