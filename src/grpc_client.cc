@@ -464,16 +464,8 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(
     auto clientCall = new grpc_labview::ClientStreamingClientCall();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
-
-    if (!FeatureConfig::getInstance().isFeatureEnabled("EfficientMessageCopy")){
-        clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
-        clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
-    }
-    else {
-        clientCall->_request = std::make_shared<grpc_labview::LVMessageEfficient>(requestMetadata);
-        clientCall->_response = std::make_shared<grpc_labview::LVMessageEfficient>(responseMetadata);
-    }
-
+    clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+    clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
     clientCall->_context = clientContext;
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::CLIENT_STREAMING);
@@ -526,16 +518,8 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
     auto clientCall = new grpc_labview::ServerStreamingClientCall();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
-
-    if (!FeatureConfig::getInstance().isFeatureEnabled("EfficientMessageCopy")){
-        clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
-        clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
-    }
-    else {
-        clientCall->_request = std::make_shared<grpc_labview::LVMessageEfficient>(requestMetadata);
-        clientCall->_response = std::make_shared<grpc_labview::LVMessageEfficient>(responseMetadata);
-    }
-    
+    clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+    clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
     clientCall->_context = clientContext;
 
     try
@@ -596,16 +580,8 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(
     auto clientCall = new grpc_labview::BidiStreamingClientCall();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
-    
-    if (!FeatureConfig::getInstance().isFeatureEnabled("EfficientMessageCopy")){
-        clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
-        clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
-    }
-    else {
-        clientCall->_request = std::make_shared<grpc_labview::LVMessageEfficient>(requestMetadata);
-        clientCall->_response = std::make_shared<grpc_labview::LVMessageEfficient>(responseMetadata);
-    }
-    
+    clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+    clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
     clientCall->_context = clientContext;
 
     grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::BIDI_STREAMING);
@@ -623,6 +599,7 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, g
 {
     auto reader = callId->CastTo<grpc_labview::StreamReader>();
     auto call = callId->CastTo<grpc_labview::ClientCall>();
+
     auto occurrence = *occurrencePtr;
 
     if (!reader || !call)
