@@ -58,6 +58,14 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src" "./third_party/grpc" "
 #----------------------------------------------------------------------
 # LabVIEW support for grpc and protobuf
 #----------------------------------------------------------------------
+
+add_custom_target(Detect_Compatibility_Breaks
+    COMMAND ${CMAKE_COMMAND} -E echo "Detecting backward compatibility breakage ..."
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeTests/run_test.py
+    RESULT_VARIABLE shell_command_result
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
+
 add_library(labview_grpc_server SHARED
   src/any_support.cc
   src/cluster_copier.cc
@@ -187,3 +195,9 @@ target_link_libraries(test_server
  ${_REFLECTION}
  ${_GRPC_GRPCPP}
  ${_PROTOBUF_LIBPROTOBUF})
+
+add_dependencies(labview_grpc_server Detect_Compatibility_Breaks)
+add_dependencies(labview_grpc_generator Detect_Compatibility_Breaks)
+add_dependencies(test_client Detect_Compatibility_Breaks)
+add_dependencies(test_server Detect_Compatibility_Breaks)
+add_dependencies(example_client Detect_Compatibility_Breaks)
