@@ -315,7 +315,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall2(
 
     auto featureConfig = grpc_labview::FeatureConfig::getInstance();
     if (featureConfig.isFeatureEnabled("EfficientMessageCopy") && responseCluster != nullptr){
-        clientCall->_useLVEfficientMessage = false;
+        clientCall->_useLVEfficientMessage = true;
     }
 
     if (clientCall->_useLVEfficientMessage){
