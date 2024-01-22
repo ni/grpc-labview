@@ -11,6 +11,7 @@
 #include <grpcpp/support/channel_arguments.h>
 #include <ctime>
 #include <chrono>
+#include <feature_toggles.h>
 
 namespace grpc_labview
 {
@@ -264,26 +265,10 @@ LIBRARY_EXPORT int32_t CloseClientContext(grpc_labview::gRPCid* contextId)
     return 0;
 }
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientUnaryCall(
-    grpc_labview::gRPCid* clientId,
-    grpc_labview::MagicCookie* occurrence,
-    const char* methodName,
-    const char* requestMessageName,
-    const char* responseMessageName,
-    int8_t* requestCluster,
-    grpc_labview::gRPCid** callId,
-    int32_t timeoutMs,
-    grpc_labview::gRPCid* contextId)
-{
-    ClientUnaryCall(clientId, occurrence, methodName, requestMessageName, responseMessageName, requestCluster, callId, timeoutMs, contextId, nullptr);
-}
-
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientUnaryCall(
+LIBRARY_EXPORT int32_t ClientUnaryCall2(
     grpc_labview::gRPCid* clientId,
     grpc_labview::MagicCookie* occurrence,
     const char* methodName,
@@ -328,7 +313,8 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     clientCall->_occurrence = *occurrence;
     clientCall->_context = clientContext;
 
-    if (FeatureConfig::getInstance().isFeatureEnabled("EfficientMessageCopy") && responseCluster != nullptr){
+    auto featureConfig = grpc_labview::FeatureConfig::getInstance();
+    if (featureConfig.isFeatureEnabled("EfficientMessageCopy") && responseCluster != nullptr){
         clientCall->_useLVEfficientMessage = false;
     }
 
@@ -366,6 +352,24 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     client->ActiveClientCalls.push_back(clientCall);
     return 0;
 }
+
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t ClientUnaryCall(
+    grpc_labview::gRPCid* clientId,
+    grpc_labview::MagicCookie* occurrence,
+    const char* methodName,
+    const char* requestMessageName,
+    const char* responseMessageName,
+    int8_t* requestCluster,
+    grpc_labview::gRPCid** callId,
+    int32_t timeoutMs,
+    grpc_labview::gRPCid* contextId)
+{
+    return ClientUnaryCall2(clientId, occurrence, methodName, requestMessageName, responseMessageName, requestCluster, callId, timeoutMs, contextId, nullptr);
+}
+
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------

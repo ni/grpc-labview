@@ -1,5 +1,5 @@
 {
-  "size": 84,
+  "size": 85,
   "signatures": [
     {
       "id": 0,
@@ -187,6 +187,23 @@
     },
     {
       "id": 17,
+      "function_name": "ClientUnaryCall2",
+      "return_type": "int32_t",
+      "parameter_list": [
+        "grpc_labview::gRPCid*",
+        "grpc_labview::MagicCookie*",
+        "const char*",
+        "const char*",
+        "const char*",
+        "int8_t*",
+        "grpc_labview::gRPCid**",
+        "int32_t",
+        "grpc_labview::gRPCid*",
+        "int8_t*"
+      ]
+    },
+    {
+      "id": 18,
       "function_name": "ClientWriteToStream",
       "return_type": "int32_t",
       "parameter_list": [
@@ -196,7 +213,7 @@
       ]
     },
     {
-      "id": 18,
+      "id": 19,
       "function_name": "ClientWritesComplete",
       "return_type": "int32_t",
       "parameter_list": [
@@ -204,7 +221,7 @@
       ]
     },
     {
-      "id": 19,
+      "id": 20,
       "function_name": "CloseClient",
       "return_type": "int32_t",
       "parameter_list": [
@@ -212,7 +229,7 @@
       ]
     },
     {
-      "id": 20,
+      "id": 21,
       "function_name": "CloseClientContext",
       "return_type": "int32_t",
       "parameter_list": [
@@ -220,7 +237,7 @@
       ]
     },
     {
-      "id": 21,
+      "id": 22,
       "function_name": "CloseServerEvent",
       "return_type": "int32_t",
       "parameter_list": [
@@ -228,7 +245,7 @@
       ]
     },
     {
-      "id": 22,
+      "id": 23,
       "function_name": "CompleteClientUnaryCall",
       "return_type": "int32_t",
       "parameter_list": [
@@ -237,7 +254,7 @@
       ]
     },
     {
-      "id": 23,
+      "id": 24,
       "function_name": "CompleteClientUnaryCall2",
       "return_type": "int32_t",
       "parameter_list": [
@@ -248,7 +265,7 @@
       ]
     },
     {
-      "id": 24,
+      "id": 25,
       "function_name": "CompleteMetadataRegistration",
       "return_type": "int32_t",
       "parameter_list": [
@@ -256,7 +273,7 @@
       ]
     },
     {
-      "id": 25,
+      "id": 26,
       "function_name": "CreateClient",
       "return_type": "int32_t",
       "parameter_list": [
@@ -266,7 +283,7 @@
       ]
     },
     {
-      "id": 26,
+      "id": 27,
       "function_name": "CreateClientContext",
       "return_type": "int32_t",
       "parameter_list": [
@@ -274,7 +291,7 @@
       ]
     },
     {
-      "id": 27,
+      "id": 28,
       "function_name": "CreateSerializationSession",
       "return_type": "int32_t",
       "parameter_list": [
@@ -282,7 +299,7 @@
       ]
     },
     {
-      "id": 28,
+      "id": 29,
       "function_name": "DeserializeReflectionInfo",
       "return_type": "void",
       "parameter_list": [
@@ -290,7 +307,7 @@
       ]
     },
     {
-      "id": 29,
+      "id": 30,
       "function_name": "FinishClientCompleteClientStreamingCall",
       "return_type": "int32_t",
       "parameter_list": [
@@ -301,7 +318,7 @@
       ]
     },
     {
-      "id": 30,
+      "id": 31,
       "function_name": "FreeSerializationSession",
       "return_type": "int32_t",
       "parameter_list": [
@@ -309,7 +326,7 @@
       ]
     },
     {
-      "id": 31,
+      "id": 32,
       "function_name": "FreeUnpackedFields",
       "return_type": "int32_t",
       "parameter_list": [
@@ -317,7 +334,7 @@
       ]
     },
     {
-      "id": 32,
+      "id": 33,
       "function_name": "GetEnumInfo",
       "return_type": "int",
       "parameter_list": [
@@ -326,7 +343,7 @@
       ]
     },
     {
-      "id": 33,
+      "id": 34,
       "function_name": "GetLVEnumValueFromProtoValue",
       "return_type": "uint32_t",
       "parameter_list": [
@@ -337,7 +354,7 @@
       ]
     },
     {
-      "id": 34,
+      "id": 35,
       "function_name": "GetProtoValueFromLVEnumValue",
       "return_type": "int32_t",
       "parameter_list": [
@@ -348,7 +365,7 @@
       ]
     },
     {
-      "id": 35,
+      "id": 36,
       "function_name": "GetRequestData",
       "return_type": "int32_t",
       "parameter_list": [
@@ -357,7 +374,7 @@
       ]
     },
     {
-      "id": 36,
+      "id": 37,
       "function_name": "GetUnpackedField",
       "return_type": "int32_t",
       "parameter_list": [
@@ -369,7 +386,7 @@
       ]
     },
     {
-      "id": 37,
+      "id": 38,
       "function_name": "GetUnpackedMessageField",
       "return_type": "int32_t",
       "parameter_list": [
@@ -379,7 +396,7 @@
       ]
     },
     {
-      "id": 38,
+      "id": 39,
       "function_name": "IsAnyOfType",
       "return_type": "int32_t",
       "parameter_list": [
@@ -389,7 +406,7 @@
       ]
     },
     {
-      "id": 39,
+      "id": 40,
       "function_name": "IsCancelled",
       "return_type": "int32_t",
       "parameter_list": [
@@ -397,7 +414,7 @@
       ]
     },
     {
-      "id": 40,
+      "id": 41,
       "function_name": "LVAddParserSearchPath",
       "return_type": "int",
       "parameter_list": [
@@ -406,7 +423,7 @@
       ]
     },
     {
-      "id": 41,
+      "id": 42,
       "function_name": "LVCreateParser",
       "return_type": "int",
       "parameter_list": [
@@ -414,7 +431,7 @@
       ]
     },
     {
-      "id": 42,
+      "id": 43,
       "function_name": "LVCreateServer",
       "return_type": "int32_t",
       "parameter_list": [
@@ -422,7 +439,7 @@
       ]
     },
     {
-      "id": 43,
+      "id": 44,
       "function_name": "LVEnumName",
       "return_type": "int",
       "parameter_list": [
@@ -431,7 +448,7 @@
       ]
     },
     {
-      "id": 44,
+      "id": 45,
       "function_name": "LVEnumTypeUrl",
       "return_type": "int",
       "parameter_list": [
@@ -440,7 +457,7 @@
       ]
     },
     {
-      "id": 45,
+      "id": 46,
       "function_name": "LVFieldInfo",
       "return_type": "int",
       "parameter_list": [
@@ -449,7 +466,7 @@
       ]
     },
     {
-      "id": 46,
+      "id": 47,
       "function_name": "LVGetEnums",
       "return_type": "int",
       "parameter_list": [
@@ -459,7 +476,7 @@
       ]
     },
     {
-      "id": 47,
+      "id": 48,
       "function_name": "LVGetErrorString",
       "return_type": "int",
       "parameter_list": [
@@ -468,7 +485,7 @@
       ]
     },
     {
-      "id": 48,
+      "id": 49,
       "function_name": "LVGetFields",
       "return_type": "int",
       "parameter_list": [
@@ -477,7 +494,7 @@
       ]
     },
     {
-      "id": 49,
+      "id": 50,
       "function_name": "LVGetMessages",
       "return_type": "int",
       "parameter_list": [
@@ -486,7 +503,7 @@
       ]
     },
     {
-      "id": 50,
+      "id": 51,
       "function_name": "LVGetMethodFullName",
       "return_type": "int",
       "parameter_list": [
@@ -495,7 +512,7 @@
       ]
     },
     {
-      "id": 51,
+      "id": 52,
       "function_name": "LVGetMethodInput",
       "return_type": "int",
       "parameter_list": [
@@ -504,7 +521,7 @@
       ]
     },
     {
-      "id": 52,
+      "id": 53,
       "function_name": "LVGetMethodName",
       "return_type": "int",
       "parameter_list": [
@@ -513,7 +530,7 @@
       ]
     },
     {
-      "id": 53,
+      "id": 54,
       "function_name": "LVGetMethodOutput",
       "return_type": "int",
       "parameter_list": [
@@ -522,7 +539,7 @@
       ]
     },
     {
-      "id": 54,
+      "id": 55,
       "function_name": "LVGetServerListeningPort",
       "return_type": "int32_t",
       "parameter_list": [
@@ -531,7 +548,7 @@
       ]
     },
     {
-      "id": 55,
+      "id": 56,
       "function_name": "LVGetServiceMethods",
       "return_type": "int",
       "parameter_list": [
@@ -540,7 +557,7 @@
       ]
     },
     {
-      "id": 56,
+      "id": 57,
       "function_name": "LVGetServiceName",
       "return_type": "int",
       "parameter_list": [
@@ -549,7 +566,7 @@
       ]
     },
     {
-      "id": 57,
+      "id": 58,
       "function_name": "LVGetServices",
       "return_type": "int",
       "parameter_list": [
@@ -558,7 +575,7 @@
       ]
     },
     {
-      "id": 58,
+      "id": 59,
       "function_name": "LVGetgRPCAPIVersion",
       "return_type": "int",
       "parameter_list": [
@@ -566,7 +583,7 @@
       ]
     },
     {
-      "id": 59,
+      "id": 60,
       "function_name": "LVImportProto",
       "return_type": "int",
       "parameter_list": [
@@ -576,7 +593,7 @@
       ]
     },
     {
-      "id": 60,
+      "id": 61,
       "function_name": "LVImportProto2",
       "return_type": "int",
       "parameter_list": [
@@ -586,7 +603,7 @@
       ]
     },
     {
-      "id": 61,
+      "id": 62,
       "function_name": "LVIsMethodClientStreaming",
       "return_type": "int",
       "parameter_list": [
@@ -595,7 +612,7 @@
       ]
     },
     {
-      "id": 62,
+      "id": 63,
       "function_name": "LVIsMethodServerStreaming",
       "return_type": "int",
       "parameter_list": [
@@ -604,7 +621,7 @@
       ]
     },
     {
-      "id": 63,
+      "id": 64,
       "function_name": "LVMessageHasOneof",
       "return_type": "int",
       "parameter_list": [
@@ -613,7 +630,7 @@
       ]
     },
     {
-      "id": 64,
+      "id": 65,
       "function_name": "LVMessageName",
       "return_type": "int",
       "parameter_list": [
@@ -622,7 +639,7 @@
       ]
     },
     {
-      "id": 65,
+      "id": 66,
       "function_name": "LVMessageTypeUrl",
       "return_type": "int",
       "parameter_list": [
@@ -631,7 +648,7 @@
       ]
     },
     {
-      "id": 66,
+      "id": 67,
       "function_name": "LVStartServer",
       "return_type": "int32_t",
       "parameter_list": [
@@ -642,7 +659,7 @@
       ]
     },
     {
-      "id": 67,
+      "id": 68,
       "function_name": "LVStopServer",
       "return_type": "int32_t",
       "parameter_list": [
@@ -650,7 +667,7 @@
       ]
     },
     {
-      "id": 68,
+      "id": 69,
       "function_name": "PackToAny",
       "return_type": "int32_t",
       "parameter_list": [
@@ -661,7 +678,7 @@
       ]
     },
     {
-      "id": 69,
+      "id": 70,
       "function_name": "PackToBuffer",
       "return_type": "int32_t",
       "parameter_list": [
@@ -672,7 +689,7 @@
       ]
     },
     {
-      "id": 70,
+      "id": 71,
       "function_name": "RegisterEnumMetadata2",
       "return_type": "int32_t",
       "parameter_list": [
@@ -681,7 +698,7 @@
       ]
     },
     {
-      "id": 71,
+      "id": 72,
       "function_name": "RegisterGenericMethodServerEvent",
       "return_type": "int32_t",
       "parameter_list": [
@@ -690,7 +707,7 @@
       ]
     },
     {
-      "id": 72,
+      "id": 73,
       "function_name": "RegisterMessageMetadata",
       "return_type": "int32_t",
       "parameter_list": [
@@ -699,7 +716,7 @@
       ]
     },
     {
-      "id": 73,
+      "id": 74,
       "function_name": "RegisterMessageMetadata2",
       "return_type": "int32_t",
       "parameter_list": [
@@ -708,7 +725,7 @@
       ]
     },
     {
-      "id": 74,
+      "id": 75,
       "function_name": "RegisterServerEvent",
       "return_type": "int32_t",
       "parameter_list": [
@@ -720,7 +737,7 @@
       ]
     },
     {
-      "id": 75,
+      "id": 76,
       "function_name": "SerializeReflectionInfo",
       "return_type": "void",
       "parameter_list": [
@@ -729,7 +746,7 @@
       ]
     },
     {
-      "id": 76,
+      "id": 77,
       "function_name": "SetCallStatus",
       "return_type": "int32_t",
       "parameter_list": [
@@ -739,7 +756,7 @@
       ]
     },
     {
-      "id": 77,
+      "id": 78,
       "function_name": "SetLVRTModulePath",
       "return_type": "int32_t",
       "parameter_list": [
@@ -747,7 +764,7 @@
       ]
     },
     {
-      "id": 78,
+      "id": 79,
       "function_name": "SetResponseData",
       "return_type": "int32_t",
       "parameter_list": [
@@ -756,7 +773,7 @@
       ]
     },
     {
-      "id": 79,
+      "id": 80,
       "function_name": "TryUnpackFromAny",
       "return_type": "int32_t",
       "parameter_list": [
@@ -767,7 +784,7 @@
       ]
     },
     {
-      "id": 80,
+      "id": 81,
       "function_name": "UnpackFieldsFromAny",
       "return_type": "int32_t",
       "parameter_list": [
@@ -776,7 +793,7 @@
       ]
     },
     {
-      "id": 81,
+      "id": 82,
       "function_name": "UnpackFieldsFromBuffer",
       "return_type": "int32_t",
       "parameter_list": [
@@ -785,7 +802,7 @@
       ]
     },
     {
-      "id": 82,
+      "id": 83,
       "function_name": "UnpackFromAny",
       "return_type": "int32_t",
       "parameter_list": [
@@ -796,7 +813,7 @@
       ]
     },
     {
-      "id": 83,
+      "id": 84,
       "function_name": "UnpackFromBuffer",
       "return_type": "int32_t",
       "parameter_list": [
