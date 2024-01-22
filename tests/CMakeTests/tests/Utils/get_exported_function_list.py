@@ -54,16 +54,21 @@ def getFunctionSignatureList():
     for i in range(len(sorted_signature_list["signatures"])):
         sorted_signature_list["signatures"][i]["id"] = i
         signature = sorted_signature_list["signatures"][i]
-        function_map[signature['function_name']] = {"function_name": signature["function_name"], "return_type": signature['return_type'], "parameter_list": signature['parameter_list']}
+        if function_map.get(signature['function_name']) == None:
+            function_map[signature['function_name']] = []
+        function_map[signature['function_name']].append({"function_name": signature["function_name"], "return_type": signature['return_type'], "parameter_list": signature['parameter_list']})
     
     return [sorted_signature_list, function_map]
 
 def getFunctionMap(sorted_signature_list):
     function_map = {}
     for signature in sorted_signature_list['signatures']:
-        function_map[signature['function_name']] = {"function_name": signature["function_name"], "return_type": signature['return_type'], "parameter_list": signature['parameter_list']}
+        if function_map.get(signature['function_name']) == None:
+            function_map[signature['function_name']] = []
+        function_map[signature['function_name']].append({"function_name": signature["function_name"], "return_type": signature['return_type'], "parameter_list": signature['parameter_list']})
     return function_map
 
 if __name__ == '__main__':
-    with open("exported_function_list.json",'w') as f:
+    exported_function_list_file_path = Path(__file__).parent / "exported_function_list.json"
+    with open(exported_function_list_file_path,'w') as f:
         json.dump(getFunctionSignatureList()[0],f, indent=2)
