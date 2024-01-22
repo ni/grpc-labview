@@ -200,7 +200,7 @@ namespace grpc_labview
 
     void LVMessageEfficient::PostInteralParseAction()
     {
-        for each (auto nestedMessage in _repeatedMessageValuesMap)
+        for (auto nestedMessage : _repeatedMessageValuesMap)
         {
             auto fieldInfo = nestedMessage.second.get()->_fieldInfo;
             auto buffer = nestedMessage.second.get()->_buffer;
