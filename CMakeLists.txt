@@ -77,6 +77,7 @@ add_library(labview_grpc_server SHARED
   src/grpc_server.cc
   src/lv_interop.cc
   src/lv_message.cc
+  src/lv_message_efficient.cc
   src/lv_message_value.cc
   src/lv_proto_server_reflection_plugin.cc
   src/lv_proto_server_reflection_service.cc

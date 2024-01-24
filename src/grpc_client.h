@@ -61,6 +61,7 @@ namespace grpc_labview
         std::shared_ptr<LVMessage> _response;
         grpc::Status _status;
         std::future<int> _runFuture;
+        bool _useLVEfficientMessage;
     };
 
     //---------------------------------------------------------------------

@@ -3,25 +3,28 @@
 #include <sstream>
 #include <map>
 
-class FeatureConfig {
-private:
-    std::map<std::string, bool> featureFlags;
+namespace grpc_labview {
+    class FeatureConfig {
+    private:
+        std::map<std::string, bool> featureFlags;
 
-    // Constructor to initialize with default values
-    FeatureConfig() {
-        featureFlags["gRPC"] = true; // Enable gRPC by default as an example, this will never be overridden by config file
-    }
+        // Constructor to initialize with default values
+        FeatureConfig() {
+            featureFlags["gRPC"] = true; // Enable gRPC by default as an example, this will never be overridden by config file
+            featureFlags["EfficientMessageCopy"] = true;
+        }
 
-public:
-    // Singleton instance
-    static FeatureConfig& getInstance() {
-        static FeatureConfig instance;
-        return instance;
-    }
+    public:
+        // Singleton instance
+        static FeatureConfig& getInstance() {
+            static FeatureConfig instance;
+            return instance;
+        }
 
-    // Function to read feature configurations from an INI file
-    void readConfigFromFile(const std::string& filePath);
+        // Function to read feature configurations from an INI file
+        void readConfigFromFile(const std::string& filePath);
 
-    // Function to check if a feature is enabled
-    bool isFeatureEnabled(const std::string& featureName) const;
-};
+        // Function to check if a feature is enabled
+        bool isFeatureEnabled(const std::string& featureName) const;
+    };
+}

@@ -3,6 +3,7 @@
 #include <grpc_client.h>
 #include <lv_interop.h>
 #include <lv_message.h>
+#include <lv_message_efficient.h>
 #include <cluster_copier.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/impl/codegen/client_context.h>
@@ -10,6 +11,7 @@
 #include <grpcpp/support/channel_arguments.h>
 #include <ctime>
 #include <chrono>
+#include <feature_toggles.h>
 
 namespace grpc_labview
 {
@@ -263,9 +265,10 @@ LIBRARY_EXPORT int32_t CloseClientContext(grpc_labview::gRPCid* contextId)
     return 0;
 }
 
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t ClientUnaryCall(
+LIBRARY_EXPORT int32_t ClientUnaryCall2(
     grpc_labview::gRPCid* clientId,
     grpc_labview::MagicCookie* occurrence,
     const char* methodName,
@@ -274,7 +277,8 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     int8_t* requestCluster,
     grpc_labview::gRPCid** callId,
     int32_t timeoutMs,
-    grpc_labview::gRPCid* contextId)
+    grpc_labview::gRPCid* contextId,
+    int8_t* responseCluster)
 {
     auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
     if (!client)
@@ -307,9 +311,23 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     clientCall->_client = client;
     clientCall->_methodName = methodName;
     clientCall->_occurrence = *occurrence;
-    clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
-    clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
     clientCall->_context = clientContext;
+
+    auto featureConfig = grpc_labview::FeatureConfig::getInstance();
+    if (featureConfig.isFeatureEnabled("EfficientMessageCopy") && responseCluster != nullptr){
+        clientCall->_useLVEfficientMessage = true;
+    }
+
+    if (clientCall->_useLVEfficientMessage){
+        clientCall->_request = std::make_shared<grpc_labview::LVMessageEfficient>(requestMetadata);
+        clientCall->_response = std::make_shared<grpc_labview::LVMessageEfficient>(responseMetadata);
+        clientCall->_request->SetLVClusterHandle(reinterpret_cast<const char *>(requestCluster));
+        clientCall->_response->SetLVClusterHandle(reinterpret_cast<const char *>(responseCluster));
+    }
+    else {
+        clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+        clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);        
+    }
 
     try
     {
@@ -335,6 +353,24 @@ LIBRARY_EXPORT int32_t ClientUnaryCall(
     return 0;
 }
 
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t ClientUnaryCall(
+    grpc_labview::gRPCid* clientId,
+    grpc_labview::MagicCookie* occurrence,
+    const char* methodName,
+    const char* requestMessageName,
+    const char* responseMessageName,
+    int8_t* requestCluster,
+    grpc_labview::gRPCid** callId,
+    int32_t timeoutMs,
+    grpc_labview::gRPCid* contextId)
+{
+    return ClientUnaryCall2(clientId, occurrence, methodName, requestMessageName, responseMessageName, requestCluster, callId, timeoutMs, contextId, nullptr);
+}
+
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
@@ -343,8 +379,8 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
     grpc_labview::LStrHandle* errorMessage,
     grpc_labview::AnyCluster* errorDetailsCluster)
 {
-    auto call = callId->CastTo<grpc_labview::ClientCall>();
-    if (!call)
+    auto clientCall = callId->CastTo<grpc_labview::ClientCall>();
+    if (!clientCall)
     {
         return -1;
     }
@@ -352,34 +388,36 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
     grpc_labview::gPointerManager.UnregisterPointer(callId);
 
     int32_t result = 0;
-    if (call->_status.ok())
+    if (clientCall->_status.ok())
     {
-        try
-        {
-            grpc_labview::ClusterDataCopier::CopyToCluster(*call->_response.get(), responseCluster);
-        }
-        catch (grpc_labview::InvalidEnumValueException& e)
-        {
-            if (errorMessage != nullptr)
+        if (!clientCall->_useLVEfficientMessage) {
+            try
             {
-                grpc_labview::SetLVString(errorMessage, e.what());
+                grpc_labview::ClusterDataCopier::CopyToCluster(*clientCall->_response.get(), responseCluster);
             }
-            return e.code;
+            catch (grpc_labview::InvalidEnumValueException& e)
+            {
+                if (errorMessage != nullptr)
+                {
+                    grpc_labview::SetLVString(errorMessage, e.what());
+                }
+                return e.code;
+            }
         }
     }
     else
     {
-        result = -(1000 + call->_status.error_code());
+        result = -(1000 + clientCall->_status.error_code());
         if (errorMessage != nullptr)
         {
-            grpc_labview::SetLVString(errorMessage, call->_status.error_message());
+            grpc_labview::SetLVString(errorMessage, clientCall->_status.error_message());
         }
         if (errorDetailsCluster != nullptr)
         {
         }
     }
-    std::lock_guard<std::mutex> lock(call->_client->clientLock);
-    call->_client->ActiveClientCalls.remove(call.get());
+    std::lock_guard<std::mutex> lock(clientCall->_client->clientLock);
+    clientCall->_client->ActiveClientCalls.remove(clientCall.get());
     return result;
 }
 

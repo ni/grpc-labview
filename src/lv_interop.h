@@ -115,6 +115,9 @@ namespace grpc_labview
     std::string GetLVString(LStrHandle lvString);
     int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size);
     int PostUserEvent(LVUserEventRef ref, void *data);
+    unsigned char** DSNewHandle(size_t n);
+    int DSSetHandleSize(void* h, size_t n);
+    long DSDisposeHandle(void* h);
     int SignalOccurrence(MagicCookie occurrence);
     int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
     int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
