@@ -5,16 +5,17 @@ from pathlib import Path
 import datetime
 
 # Setting global variables
-venv_folder_path = Path(__file__).parent / "venv"
-venv_command = f"python -m venv {venv_folder_path}"
-if os.name == 'nt':     # windows   
-    activate_script = f"{venv_folder_path}\\Scripts\\activate"
+if os.name == 'nt':     # windows
+    venv_command = "python -m venv venv"
+    activate_script = "venv\\Scripts\\activate"
     activate_command = f"call {activate_script}"
-else:
-    activate_script = f"{venv_folder_path}/bin/activate"
+else: 
+    venv_command = "python -m venv venv"
+    activate_script = "venv/bin/activate"
     activate_command = f". {activate_script}"
 
 def create_virtual_environment():
+    venv_folder_path = Path(__file__).parent / "venv"
     if not venv_folder_path.exists():
         subprocess.run(venv_command, shell=True)
 
@@ -45,6 +46,8 @@ def run_tests():
         log_file.write(result_message_structure_output)
         print(result_message_structure_output)
     if result_message_structure.returncode != 0:
+        result_message_structure = subprocess.run(["python", "-m", "pytest", str(message_structures_test_path), "-vv"])
+    if result_message_structure.returncode != 0:
         print(f"Message structural tests failed with exit code {result_message_structure.returncode}. Exiting.")
         sys.exit(result_message_structure.returncode)
 
@@ -58,6 +61,8 @@ def run_tests():
             result_exported_functions_output = result_exported_functions_output.replace("\r", "")
         log_file.write(result_exported_functions_output)
         print(result_exported_functions_output)
+    if result_exported_functions.returncode != 0:
+        result_exported_functions = subprocess.run(["python", "-m", "pytest", str(exported_functions_test_path), "-vv"])
     if result_exported_functions.returncode != 0:
         print(f"Function structural tests failed with exit code {result_exported_functions.returncode}. Exiting.")
         sys.exit(result_exported_functions.returncode)
@@ -78,6 +83,8 @@ def run_tests():
             log_file.write("You have not added these function in the 'Exported Functions Cmake Test': " + "\n\n" + result_exported_functions_addition_output + "Please add these function(s) in tests/CMakeTests/testcases/ExportedFunctionList.json")
             warning_output = "::warning::" + "You have not added these function in the 'Exported Functions Cmake Test': " + " ".join(result_exported_functions_addition_output.split('\n')) + ". Please add these function(s) in tests/CMakeTests/testcases/ExportedFunctionList.json"
             print(warning_output)
+    if result_exported_functions_addition.returncode != 0:
+        result_exported_functions_addition = subprocess.run(["python", str(exported_functions_addition_test_path)])
     if result_exported_functions_addition.returncode != 0:
         print(f"Function structural tests failed with exit code {result_exported_functions_addition.returncode}. Exiting.")
         sys.exit(result_exported_functions_addition.returncode)
