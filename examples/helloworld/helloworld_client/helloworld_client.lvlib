@@ -11,16 +11,26 @@
 	<Item Name="RPC Messages" Type="Folder">
 		<Item Name="helloworld_HelloRequest" Type="Folder">
 			<Item Name="helloworld_HelloRequest.ctl" Type="VI" URL="../RPC Messages/helloworld_HelloRequest.ctl"/>
+			<Item Name="FlatToRichhelloworld_HelloRequest.vi" Type="VI" URL="../RPC Messages/FlatToRichhelloworld_HelloRequest.vi"/>
+			<Item Name="RichToFlathelloworld_HelloRequest.vi" Type="VI" URL="../RPC Messages/RichToFlathelloworld_HelloRequest.vi"/>
 		</Item>
 		<Item Name="helloworld_HelloReply" Type="Folder">
 			<Item Name="helloworld_HelloReply.ctl" Type="VI" URL="../RPC Messages/helloworld_HelloReply.ctl"/>
+			<Item Name="FlatToRichhelloworld_HelloReply.vi" Type="VI" URL="../RPC Messages/FlatToRichhelloworld_HelloReply.vi"/>
+			<Item Name="RichToFlathelloworld_HelloReply.vi" Type="VI" URL="../RPC Messages/RichToFlathelloworld_HelloReply.vi"/>
+		</Item>
+		<Item Name="helloworld_HelloRequest_Flat" Type="Folder">
+			<Item Name="helloworld_HelloRequest_Flat.ctl" Type="VI" URL="../RPC Messages/helloworld_HelloRequest_Flat.ctl"/>
+		</Item>
+		<Item Name="helloworld_HelloReply_Flat" Type="Folder">
+			<Item Name="helloworld_HelloReply_Flat.ctl" Type="VI" URL="../RPC Messages/helloworld_HelloReply_Flat.ctl"/>
 		</Item>
 		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../RPC Messages/Register gRPC Messages.vi"/>
 	</Item>
 	<Item Name="RPC Service" Type="Folder">
 		<Item Name="Greeter" Type="Folder">
-			<Item Name="helloworld_Greeter_SayHello" Type="Folder">
-				<Item Name="Unary helloworld_Greeter_SayHello.vi" Type="VI" URL="../RPC Service/Greeter/Unary helloworld_Greeter_SayHello.vi"/>
+			<Item Name="Greeter SayHello" Type="Folder">
+				<Item Name="Greeter SayHello.vi" Type="VI" URL="../RPC Service/Greeter/Greeter SayHello.vi"/>
 			</Item>
 		</Item>
 	</Item>
