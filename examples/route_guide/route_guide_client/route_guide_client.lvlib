@@ -11,41 +11,66 @@
 	<Item Name="RPC Messages" Type="Folder">
 		<Item Name="routeguide_Point" Type="Folder">
 			<Item Name="routeguide_Point.ctl" Type="VI" URL="../RPC Messages/routeguide_Point.ctl"/>
+			<Item Name="FlatToRichrouteguide_Point.vi" Type="VI" URL="../RPC Messages/FlatToRichrouteguide_Point.vi"/>
+			<Item Name="RichToFlatrouteguide_Point.vi" Type="VI" URL="../RPC Messages/RichToFlatrouteguide_Point.vi"/>
 		</Item>
 		<Item Name="routeguide_Rectangle" Type="Folder">
 			<Item Name="routeguide_Rectangle.ctl" Type="VI" URL="../RPC Messages/routeguide_Rectangle.ctl"/>
+			<Item Name="FlatToRichrouteguide_Rectangle.vi" Type="VI" URL="../RPC Messages/FlatToRichrouteguide_Rectangle.vi"/>
+			<Item Name="RichToFlatrouteguide_Rectangle.vi" Type="VI" URL="../RPC Messages/RichToFlatrouteguide_Rectangle.vi"/>
 		</Item>
 		<Item Name="routeguide_Feature" Type="Folder">
 			<Item Name="routeguide_Feature.ctl" Type="VI" URL="../RPC Messages/routeguide_Feature.ctl"/>
+			<Item Name="FlatToRichrouteguide_Feature.vi" Type="VI" URL="../RPC Messages/FlatToRichrouteguide_Feature.vi"/>
+			<Item Name="RichToFlatrouteguide_Feature.vi" Type="VI" URL="../RPC Messages/RichToFlatrouteguide_Feature.vi"/>
 		</Item>
 		<Item Name="routeguide_RouteNote" Type="Folder">
 			<Item Name="routeguide_RouteNote.ctl" Type="VI" URL="../RPC Messages/routeguide_RouteNote.ctl"/>
+			<Item Name="FlatToRichrouteguide_RouteNote.vi" Type="VI" URL="../RPC Messages/FlatToRichrouteguide_RouteNote.vi"/>
+			<Item Name="RichToFlatrouteguide_RouteNote.vi" Type="VI" URL="../RPC Messages/RichToFlatrouteguide_RouteNote.vi"/>
 		</Item>
 		<Item Name="routeguide_RouteSummary" Type="Folder">
 			<Item Name="routeguide_RouteSummary.ctl" Type="VI" URL="../RPC Messages/routeguide_RouteSummary.ctl"/>
+			<Item Name="FlatToRichrouteguide_RouteSummary.vi" Type="VI" URL="../RPC Messages/FlatToRichrouteguide_RouteSummary.vi"/>
+			<Item Name="RichToFlatrouteguide_RouteSummary.vi" Type="VI" URL="../RPC Messages/RichToFlatrouteguide_RouteSummary.vi"/>
+		</Item>
+		<Item Name="routeguide_Point_Flat" Type="Folder">
+			<Item Name="routeguide_Point_Flat.ctl" Type="VI" URL="../RPC Messages/routeguide_Point_Flat.ctl"/>
+		</Item>
+		<Item Name="routeguide_Rectangle_Flat" Type="Folder">
+			<Item Name="routeguide_Rectangle_Flat.ctl" Type="VI" URL="../RPC Messages/routeguide_Rectangle_Flat.ctl"/>
+		</Item>
+		<Item Name="routeguide_Feature_Flat" Type="Folder">
+			<Item Name="routeguide_Feature_Flat.ctl" Type="VI" URL="../RPC Messages/routeguide_Feature_Flat.ctl"/>
+		</Item>
+		<Item Name="routeguide_RouteNote_Flat" Type="Folder">
+			<Item Name="routeguide_RouteNote_Flat.ctl" Type="VI" URL="../RPC Messages/routeguide_RouteNote_Flat.ctl"/>
+		</Item>
+		<Item Name="routeguide_RouteSummary_Flat" Type="Folder">
+			<Item Name="routeguide_RouteSummary_Flat.ctl" Type="VI" URL="../RPC Messages/routeguide_RouteSummary_Flat.ctl"/>
 		</Item>
 		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../RPC Messages/Register gRPC Messages.vi"/>
 	</Item>
 	<Item Name="RPC Service" Type="Folder">
 		<Item Name="RouteGuide" Type="Folder">
-			<Item Name="routeguide_RouteGuide_GetFeature" Type="Folder">
-				<Item Name="Unary routeguide_RouteGuide_GetFeature.vi" Type="VI" URL="../RPC Service/RouteGuide/Unary routeguide_RouteGuide_GetFeature.vi"/>
+			<Item Name="RouteGuide GetFeature" Type="Folder">
+				<Item Name="RouteGuide GetFeature.vi" Type="VI" URL="../RPC Service/RouteGuide/RouteGuide GetFeature.vi"/>
 			</Item>
-			<Item Name="routeguide_RouteGuide_ListFeatures" Type="Folder">
-				<Item Name="Begin routeguide_RouteGuide_ListFeatures.vi" Type="VI" URL="../RPC Service/RouteGuide/Begin routeguide_RouteGuide_ListFeatures.vi"/>
-				<Item Name="ReadStream routeguide_RouteGuide_ListFeatures.vi" Type="VI" URL="../RPC Service/RouteGuide/ReadStream routeguide_RouteGuide_ListFeatures.vi"/>
-				<Item Name="End routeguide_RouteGuide_ListFeatures.vi" Type="VI" URL="../RPC Service/RouteGuide/End routeguide_RouteGuide_ListFeatures.vi"/>
+			<Item Name="RouteGuide ListFeatures" Type="Folder">
+				<Item Name="Begin RouteGuide ListFeatures.vi" Type="VI" URL="../RPC Service/RouteGuide/Begin RouteGuide ListFeatures.vi"/>
+				<Item Name="RouteGuide ListFeatures Read.vi" Type="VI" URL="../RPC Service/RouteGuide/RouteGuide ListFeatures Read.vi"/>
+				<Item Name="End RouteGuide ListFeatures.vi" Type="VI" URL="../RPC Service/RouteGuide/End RouteGuide ListFeatures.vi"/>
 			</Item>
-			<Item Name="routeguide_RouteGuide_RecordRoute" Type="Folder">
-				<Item Name="Begin routeguide_RouteGuide_RecordRoute.vi" Type="VI" URL="../RPC Service/RouteGuide/Begin routeguide_RouteGuide_RecordRoute.vi"/>
-				<Item Name="WriteStream routeguide_RouteGuide_RecordRoute.vi" Type="VI" URL="../RPC Service/RouteGuide/WriteStream routeguide_RouteGuide_RecordRoute.vi"/>
-				<Item Name="End routeguide_RouteGuide_RecordRoute.vi" Type="VI" URL="../RPC Service/RouteGuide/End routeguide_RouteGuide_RecordRoute.vi"/>
+			<Item Name="RouteGuide RecordRoute" Type="Folder">
+				<Item Name="Begin RouteGuide RecordRoute.vi" Type="VI" URL="../RPC Service/RouteGuide/Begin RouteGuide RecordRoute.vi"/>
+				<Item Name="RouteGuide RecordRoute Write.vi" Type="VI" URL="../RPC Service/RouteGuide/RouteGuide RecordRoute Write.vi"/>
+				<Item Name="End RouteGuide RecordRoute.vi" Type="VI" URL="../RPC Service/RouteGuide/End RouteGuide RecordRoute.vi"/>
 			</Item>
-			<Item Name="routeguide_RouteGuide_RouteChat" Type="Folder">
-				<Item Name="WriteStream routeguide_RouteGuide_RouteChat.vi" Type="VI" URL="../RPC Service/RouteGuide/WriteStream routeguide_RouteGuide_RouteChat.vi"/>
-				<Item Name="ReadStream routeguide_RouteGuide_RouteChat.vi" Type="VI" URL="../RPC Service/RouteGuide/ReadStream routeguide_RouteGuide_RouteChat.vi"/>
-				<Item Name="Begin routeguide_RouteGuide_RouteChat.vi" Type="VI" URL="../RPC Service/RouteGuide/Begin routeguide_RouteGuide_RouteChat.vi"/>
-				<Item Name="End routeguide_RouteGuide_RouteChat.vi" Type="VI" URL="../RPC Service/RouteGuide/End routeguide_RouteGuide_RouteChat.vi"/>
+			<Item Name="RouteGuide RouteChat" Type="Folder">
+				<Item Name="RouteGuide RouteChat Write.vi" Type="VI" URL="../RPC Service/RouteGuide/RouteGuide RouteChat Write.vi"/>
+				<Item Name="RouteGuide RouteChat Read.vi" Type="VI" URL="../RPC Service/RouteGuide/RouteGuide RouteChat Read.vi"/>
+				<Item Name="Begin RouteGuide RouteChat.vi" Type="VI" URL="../RPC Service/RouteGuide/Begin RouteGuide RouteChat.vi"/>
+				<Item Name="End RouteGuide RouteChat.vi" Type="VI" URL="../RPC Service/RouteGuide/End RouteGuide RouteChat.vi"/>
 			</Item>
 		</Item>
 	</Item>
@@ -53,8 +78,8 @@
 		<Item Name="Create Client.vi" Type="VI" URL="../Client API/Create Client.vi"/>
 		<Item Name="Destroy Client.vi" Type="VI" URL="../Client API/Destroy Client.vi"/>
 	</Item>
-	<Item Name="Unary RouteGuide Test.vi" Type="VI" URL="../Unary RouteGuide Test.vi"/>
-	<Item Name="ResponseStreaming RouteGuide Test.vi" Type="VI" URL="../ResponseStreaming RouteGuide Test.vi"/>
-	<Item Name="RequestStreaming RouteGuide Test.vi" Type="VI" URL="../RequestStreaming RouteGuide Test.vi"/>
 	<Item Name="Bidirectional Streaming RouteGuide Test.vi" Type="VI" URL="../Bidirectional Streaming RouteGuide Test.vi"/>
+	<Item Name="RequestStreaming RouteGuide Test.vi" Type="VI" URL="../RequestStreaming RouteGuide Test.vi"/>
+	<Item Name="ResponseStreaming RouteGuide Test.vi" Type="VI" URL="../ResponseStreaming RouteGuide Test.vi"/>
+	<Item Name="Unary RouteGuide Test.vi" Type="VI" URL="../Unary RouteGuide Test.vi"/>
 </Library>
