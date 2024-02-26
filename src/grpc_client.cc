@@ -232,7 +232,6 @@ int32_t ClientCleanUpProc(grpc_labview::gRPCid *clientId)
     std::unique_lock<std::mutex> lock(client->clientLock);
     for (auto activeClientCall = client->ActiveClientCalls.begin(); activeClientCall != client->ActiveClientCalls.end(); activeClientCall++)
     {
-        activeClientCall->first->_runFuture.wait();
         activeClientCall->first->Cancel();
     }
     client->ActiveClientCalls.clear();
