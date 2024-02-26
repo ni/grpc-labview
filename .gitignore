@@ -10,7 +10,6 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 gens
-grpc
 
 Builds
 build
