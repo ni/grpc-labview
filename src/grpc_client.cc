@@ -203,9 +203,7 @@ void CheckActiveAndSignalOccurenceForClientCall(grpc_labview::ClientCall *client
         return;
     }
     std::unique_lock<std::mutex> lock(clientCall->_client->clientLock);
-    std::list<grpc_labview::ClientCall *>::iterator it;
-    it = std::find(clientCall->_client->ActiveClientCalls.begin(), clientCall->_client->ActiveClientCalls.end(), clientCall);
-    if (it != clientCall->_client->ActiveClientCalls.end())
+    if (clientCall->_client->ActiveClientCalls[clientCall])
     {
         grpc_labview::SignalOccurrence(clientCall->_occurrence);
     }
@@ -234,9 +232,9 @@ int32_t ClientCleanUpProc(grpc_labview::gRPCid *clientId)
     std::unique_lock<std::mutex> lock(client->clientLock);
     for (auto activeClientCall = client->ActiveClientCalls.begin(); activeClientCall != client->ActiveClientCalls.end(); activeClientCall++)
     {
-        (*activeClientCall)->Cancel();
+        activeClientCall->first->_runFuture.wait();
+        activeClientCall->first->Cancel();
     }
-
     client->ActiveClientCalls.clear();
     lock.unlock();
     return CloseClient(client.get());
@@ -306,7 +304,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall2(
 
     auto clientCall = new grpc_labview::ClientCall();
     std::unique_lock<std::mutex> lock(client->clientLock);
-    client->ActiveClientCalls.push_back(clientCall);
+    client->ActiveClientCalls[clientCall] = true;
     lock.unlock();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
@@ -395,7 +393,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall2WithoutOccurrence(
 
     auto clientCall = new grpc_labview::ClientCall();
     std::unique_lock<std::mutex> lock(client->clientLock);
-    client->ActiveClientCalls.push_back(clientCall);
+    client->ActiveClientCalls[clientCall] = true;
     lock.unlock();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
@@ -505,7 +503,11 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
         }
     }
     std::unique_lock<std::mutex> lock(clientCall->_client->clientLock);
-    clientCall->_client->ActiveClientCalls.remove(clientCall.get());
+    auto call = clientCall->_client->ActiveClientCalls.find(clientCall.get());
+    if (call != clientCall->_client->ActiveClientCalls.end())
+    {
+        clientCall->_client->ActiveClientCalls.erase(call);
+    }
     lock.unlock();
     return result;
 }
@@ -558,7 +560,11 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2WithoutOccurrence(
         }
     }
     std::unique_lock<std::mutex> lock(clientCall->_client->clientLock);
-    clientCall->_client->ActiveClientCalls.remove(clientCall.get());
+    auto call = clientCall->_client->ActiveClientCalls.find(clientCall.get());
+    if (call != clientCall->_client->ActiveClientCalls.end())
+    {
+        clientCall->_client->ActiveClientCalls.erase(call);
+    }
     lock.unlock();
     return result;
 }
@@ -609,7 +615,7 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(
 
     auto clientCall = new grpc_labview::ClientStreamingClientCall();
     std::unique_lock<std::mutex> lock(client->clientLock);
-    client->ActiveClientCalls.push_back(clientCall);
+    client->ActiveClientCalls[clientCall] = true;
     lock.unlock();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
@@ -664,7 +670,7 @@ LIBRARY_EXPORT int32_t ClientBeginServerStreamingCall(
 
     auto clientCall = new grpc_labview::ServerStreamingClientCall();
     std::unique_lock<std::mutex> lock(client->clientLock);
-    client->ActiveClientCalls.push_back(clientCall);
+    client->ActiveClientCalls[clientCall] = true;
     lock.unlock();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
@@ -727,7 +733,7 @@ LIBRARY_EXPORT int32_t ClientBeginBidiStreamingCall(
 
     auto clientCall = new grpc_labview::BidiStreamingClientCall();
     std::unique_lock<std::mutex> lock(client->clientLock);
-    client->ActiveClientCalls.push_back(clientCall);
+    client->ActiveClientCalls[clientCall] = true;
     lock.unlock();
     *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
     clientCall->_client = client;
@@ -903,7 +909,11 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
         }
     }
     std::unique_lock<std::mutex> lock(call->_client->clientLock);
-    call->_client->ActiveClientCalls.remove(call.get());
+    auto client_call = call->_client->ActiveClientCalls.find(call.get());
+    if (client_call != call->_client->ActiveClientCalls.end())
+    {
+        call->_client->ActiveClientCalls.erase(client_call);
+    }
     lock.unlock();
     grpc_labview::gPointerManager.UnregisterPointer(callId);
     return result;
@@ -951,7 +961,11 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCallWithoutOccurrence(
         }
     }
     std::unique_lock<std::mutex> lock(call->_client->clientLock);
-    call->_client->ActiveClientCalls.remove(call.get());
+    auto client_call = call->_client->ActiveClientCalls.find(call.get());
+    if (client_call != call->_client->ActiveClientCalls.end())
+    {
+        call->_client->ActiveClientCalls.erase(client_call);
+    }
     lock.unlock();
     grpc_labview::gPointerManager.UnregisterPointer(callId);
     return result;
@@ -1028,7 +1042,11 @@ LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(
         }
     }
     std::unique_lock<std::mutex> lock(call->_client->clientLock);
-    call->_client->ActiveClientCalls.remove(call.get());
+    auto client_call = call->_client->ActiveClientCalls.find(call.get());
+    if (client_call != call->_client->ActiveClientCalls.end())
+    {
+        call->_client->ActiveClientCalls.erase(client_call);
+    }
     lock.unlock();
     return result;
 }
@@ -1079,7 +1097,11 @@ LIBRARY_EXPORT int32_t ClientCancelCall(
         }
     }
     std::unique_lock<std::mutex> lock(call->_client->clientLock);
-    call->_client->ActiveClientCalls.remove(call.get());
+    auto client_call = call->_client->ActiveClientCalls.find(call.get());
+    if (client_call != call->_client->ActiveClientCalls.end())
+    {
+        call->_client->ActiveClientCalls.erase(client_call);
+    }
     lock.unlock();
     return result;
 }
