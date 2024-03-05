@@ -35,6 +35,7 @@ namespace grpc_labview {
                 std::string key, value;
                 if (std::getline(iss, key, '=') && std::getline(iss, value)) {
                     // Append section name to key for uniqueness
+                    key.erase(std::remove_if(key.begin(), key.end(), ::isspace),key.end());
                     std::string fullKey = currentSection.empty() ? key : currentSection + "_" + key;
                     featureFlags[fullKey] = (value == "true");
                 }
