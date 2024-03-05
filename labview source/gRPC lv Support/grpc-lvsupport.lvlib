@@ -108,5 +108,6 @@
 		<Item Name="Set LVRT Module Path.vi" Type="VI" URL="../Shared/Set LVRT Module Path.vi"/>
 		<Item Name="Wait On Occurence.vi" Type="VI" URL="../Shared/Wait On Occurence.vi"/>
 		<Item Name="TranslateGrpcError.vi" Type="VI" URL="../Shared/TranslateGrpcError.vi"/>
+		<Item Name="Wait On Occurrence Wrapper.vi" Type="VI" URL="../Shared/Wait On Occurrence Wrapper.vi"/>
 	</Item>
 </Library>

@@ -10,9 +10,9 @@
 #include <lv_message.h>
 #include <grpcpp/impl/codegen/sync_stream.h>
 #include <future>
-#include <list>
+#include <unordered_map>
 
-namespace grpc_labview 
+namespace grpc_labview
 {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -25,11 +25,11 @@ namespace grpc_labview
     {
     public:
         LabVIEWgRPCClient();
-        void Connect(const char* address, const std::string& certificatePath);
+        void Connect(const char *address, const std::string &certificatePath);
 
     public:
         std::shared_ptr<grpc::Channel> Channel;
-        std::list<ClientCall*> ActiveClientCalls;
+        std::unordered_map<ClientCall *, bool> ActiveClientCalls;
         std::mutex clientLock;
     };
 
@@ -51,7 +51,7 @@ namespace grpc_labview
         virtual ~ClientCall();
         virtual void Finish();
         void Cancel();
-        
+
     public:
         std::shared_ptr<grpc_labview::LabVIEWgRPCClient> _client;
         std::string _methodName;
@@ -69,7 +69,7 @@ namespace grpc_labview
     class StreamWriter
     {
     public:
-        virtual bool Write(LVMessage* message) = 0;
+        virtual bool Write(LVMessage *message) = 0;
         virtual void WritesComplete() = 0;
     };
 
@@ -81,17 +81,18 @@ namespace grpc_labview
         std::future<bool> _readFuture;
 
     public:
-        virtual bool Read(LVMessage* message) = 0;
+        virtual bool Read(LVMessage *message) = 0;
     };
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     class ServerStreamingClientCall : public ClientCall, public StreamReader
-    {        
+    {
     public:
         ~ServerStreamingClientCall() override;
-        bool Read(LVMessage* message) override;
+        bool Read(LVMessage *message) override;
         void Finish() override;
+
     public:
         std::shared_ptr<grpc::ClientReaderInterface<grpc_labview::LVMessage>> _reader;
     };
@@ -99,16 +100,17 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     class ClientStreamingClientCall : public ClientCall, public StreamWriter
-    {        
+    {
     public:
         ClientStreamingClientCall() { _writesComplete = false; }
         ~ClientStreamingClientCall();
         void Finish() override;
-        bool Write(LVMessage* message) override;
+        bool Write(LVMessage *message) override;
         void WritesComplete() override;
 
     public:
         std::shared_ptr<grpc::ClientWriterInterface<grpc_labview::LVMessage>> _writer;
+
     private:
         bool _writesComplete;
     };
@@ -116,17 +118,18 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     class BidiStreamingClientCall : public ClientCall, public StreamReader, public StreamWriter
-    {       
+    {
     public:
         BidiStreamingClientCall() { _writesComplete = false; }
         ~BidiStreamingClientCall();
         void Finish() override;
         void WritesComplete() override;
-        bool Read(LVMessage* message) override;
-        bool Write(LVMessage* message) override;
+        bool Read(LVMessage *message) override;
+        bool Write(LVMessage *message) override;
 
     public:
         std::shared_ptr<grpc::ClientReaderWriterInterface<grpc_labview::LVMessage, grpc_labview::LVMessage>> _readerWriter;
+
     private:
         bool _writesComplete;
     };
