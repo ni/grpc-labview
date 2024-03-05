@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <algorithm>
 
 namespace grpc_labview {
     // Function to read feature configurations from an INI file
@@ -36,7 +37,9 @@ namespace grpc_labview {
                 if (std::getline(iss, key, '=') && std::getline(iss, value)) {
                     // Append section name to key for uniqueness
                     key.erase(std::remove_if(key.begin(), key.end(), ::isspace),key.end());
+                    value.erase(std::remove_if(value.begin(), value.end(), ::isspace),value.end());
                     std::string fullKey = currentSection.empty() ? key : currentSection + "_" + key;
+                    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
                     featureFlags[fullKey] = (value == "true");
                 }
             }

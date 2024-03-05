@@ -11,7 +11,7 @@ namespace grpc_labview {
         // Constructor to initialize with default values
         FeatureConfig() {
             featureFlags["gRPC"] = true; // Enable gRPC by default as an example, this will never be overridden by config file
-            featureFlags["EfficientMessageCopy"] = true;
+            featureFlags["data_EfficientMessageCopy"] = true;
             featureFlags["data_useOccurrence"] = true;
         }
 

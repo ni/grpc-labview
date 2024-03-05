@@ -320,7 +320,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall2(
     }
     clientCall->_context = clientContext;
 
-    if (featureConfig.isFeatureEnabled("EfficientMessageCopy") && responseCluster != nullptr)
+    if (featureConfig.isFeatureEnabled("data_EfficientMessageCopy") && responseCluster != nullptr)
     {
         clientCall->_useLVEfficientMessage = true;
     }
