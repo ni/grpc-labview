@@ -1,5 +1,7 @@
 # gRPC Support for LabVIEW
 
+[![Image](https://www.vipm.io/package/ni_lib_labview_grpc_library/badge.svg?metric=installs)](https://www.vipm.io/package/ni_lib_labview_grpc_library/) [![Image](https://www.vipm.io/package/ni_lib_labview_grpc_library/badge.svg?metric=stars)](https://www.vipm.io/package/ni_lib_labview_grpc_library/)
+
 This repo contains necessary C++ code and support VIs to implement a gRPC server and client in LabVIEW. You can either use the service as defined to implement a generic server via gRPC or use the implementation as a pattern to implement a gRPC service of your design.
 
 The project supports Windows, Linux, and Linux RT.
