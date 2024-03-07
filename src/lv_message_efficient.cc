@@ -91,9 +91,8 @@ namespace grpc_labview
                 }
             } while (ExpectTag(tag, protobuf_ptr));
 
-            auto arraySize = sizeof(void*) * _repeatedStringValuesIt->second.size();
-            auto _lvProvidedArrayHandle = *(void**)lv_ptr; 
-            *(void**)lv_ptr = DSNewHandle(arraySize);
+
+            NumericArrayResize(0x08, 1, (void*)lv_ptr, _repeatedStringValuesIt->second.size());
             auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
             (*arrayHandle)->cnt = _repeatedStringValuesIt->second.size();
 
