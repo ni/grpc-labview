@@ -92,10 +92,10 @@ namespace grpc_labview
             } while (ExpectTag(tag, protobuf_ptr));
 
 
-            NumericArrayResize(0x08, 1, (void*)lv_ptr, _repeatedStringValuesIt->second.size());
+            NumericArrayResize(0x08, 1, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), _repeatedStringValuesIt->second.size());
             auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
             (*arrayHandle)->cnt = _repeatedStringValuesIt->second.size();
-
+          
             // Copy the repeated string values into the LabVIEW array
             auto lvStringPtr = (*arrayHandle)->bytes<LStrHandle>();
             for (auto str:_repeatedStringValuesIt->second)
@@ -104,6 +104,8 @@ namespace grpc_labview
                 SetLVString(lvStringPtr, str);
                 lvStringPtr++;
             }
+
+            _repeatedStringValuesMap.clear();
         }
         else {
             auto str = std::string();
@@ -213,9 +215,7 @@ namespace grpc_labview
 
             // shrink the array to the correct size
             auto arraySize = numElements * clusterSize;
-            auto old_arrayHandle = *(void**)lv_ptr;
-            DSDisposeHandle(old_arrayHandle);
-            *(void**)lv_ptr = DSNewHandle(arraySize);
+            NumericArrayResize(0x08, 1, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), arraySize);
             auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
             (*arrayHandle)->cnt = numElements;
 

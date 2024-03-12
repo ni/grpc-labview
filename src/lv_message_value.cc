@@ -52,7 +52,7 @@ namespace grpc_labview
     size_t LVRepeatedNestedMessageMessageValue::ByteSizeLong()
     {
         size_t totalSize = 0;
-        totalSize += 1UL * _value.size();
+        totalSize += WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_MESSAGE) * _value.size();
         for (const auto& msg : _value)
         {
             totalSize += WireFormatLite::MessageSize(*msg);
