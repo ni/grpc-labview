@@ -68,16 +68,18 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     const char *LVMessageEfficient::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
-    {    
+    {  
         const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
 
         if (fieldInfo.isRepeated)
-        {
+        {            
+            std::string key = fieldInfo.fieldName +  std::to_string(_currentIndexForRepeatedMessageValue);
+         
             // Get the _repeatedMessageValues vector from the map
-            auto _repeatedStringValuesIt = _repeatedStringValuesMap.find(fieldInfo.fieldName);
+            auto _repeatedStringValuesIt = _repeatedStringValuesMap.find(key);
             if (_repeatedStringValuesIt == _repeatedStringValuesMap.end())
             {
-                _repeatedStringValuesIt = _repeatedStringValuesMap.emplace(fieldInfo.fieldName, google::protobuf::RepeatedField<std::string>()).first;
+                _repeatedStringValuesIt = _repeatedStringValuesMap.emplace(key, google::protobuf::RepeatedField<std::string>()).first;
             }
 
             protobuf_ptr -= 1;
@@ -91,12 +93,11 @@ namespace grpc_labview
                 }
             } while (ExpectTag(tag, protobuf_ptr));
 
-            auto arraySize = sizeof(void*) * _repeatedStringValuesIt->second.size();
-            auto _lvProvidedArrayHandle = *(void**)lv_ptr; 
-            *(void**)lv_ptr = DSNewHandle(arraySize);
+
+            NumericArrayResize(0x08, 1, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), _repeatedStringValuesIt->second.size());
             auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
             (*arrayHandle)->cnt = _repeatedStringValuesIt->second.size();
-
+          
             // Copy the repeated string values into the LabVIEW array
             auto lvStringPtr = (*arrayHandle)->bytes<LStrHandle>();
             for (auto str:_repeatedStringValuesIt->second)
@@ -178,6 +179,7 @@ namespace grpc_labview
                 auto _vectorPtr = _repeatedMessageValuesIt->second.get()->_buffer.data();
                 _vectorPtr = _vectorPtr + (elementIndex * clusterSize);
                 nestedMessage.SetLVClusterHandle(_vectorPtr);
+                nestedMessage._currentIndexForRepeatedMessageValue = elementIndex;
                 protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
 
                 elementIndex++;
@@ -214,9 +216,7 @@ namespace grpc_labview
 
             // shrink the array to the correct size
             auto arraySize = numElements * clusterSize;
-            auto old_arrayHandle = *(void**)lv_ptr;
-            DSDisposeHandle(old_arrayHandle);
-            *(void**)lv_ptr = DSNewHandle(arraySize);
+            NumericArrayResize(0x08, 1, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), arraySize);
             auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
             (*arrayHandle)->cnt = numElements;
 

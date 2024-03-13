@@ -38,6 +38,7 @@ namespace grpc_labview
         std::unordered_map<std::string, uint32_t> _repeatedField_continueIndex;
         std::unordered_map<std::string, std::shared_ptr<RepeatedMessageValue>> _repeatedMessageValuesMap;
         std::unordered_map<std::string, google::protobuf::RepeatedField<std::string>> _repeatedStringValuesMap;
+        uint64_t _currentIndexForRepeatedMessageValue = 0;
 
     protected:
         const char *ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
