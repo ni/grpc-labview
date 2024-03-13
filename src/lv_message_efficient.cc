@@ -68,16 +68,18 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     const char *LVMessageEfficient::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
-    {    
+    {  
         const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
 
         if (fieldInfo.isRepeated)
-        {
+        {            
+            std::string key = fieldInfo.fieldName +  std::to_string(_currentIndexForRepeatedMessageValue);
+         
             // Get the _repeatedMessageValues vector from the map
-            auto _repeatedStringValuesIt = _repeatedStringValuesMap.find(fieldInfo.fieldName);
+            auto _repeatedStringValuesIt = _repeatedStringValuesMap.find(key);
             if (_repeatedStringValuesIt == _repeatedStringValuesMap.end())
             {
-                _repeatedStringValuesIt = _repeatedStringValuesMap.emplace(fieldInfo.fieldName, google::protobuf::RepeatedField<std::string>()).first;
+                _repeatedStringValuesIt = _repeatedStringValuesMap.emplace(key, google::protobuf::RepeatedField<std::string>()).first;
             }
 
             protobuf_ptr -= 1;
@@ -104,8 +106,6 @@ namespace grpc_labview
                 SetLVString(lvStringPtr, str);
                 lvStringPtr++;
             }
-
-            _repeatedStringValuesMap.clear();
         }
         else {
             auto str = std::string();
@@ -179,6 +179,7 @@ namespace grpc_labview
                 auto _vectorPtr = _repeatedMessageValuesIt->second.get()->_buffer.data();
                 _vectorPtr = _vectorPtr + (elementIndex * clusterSize);
                 nestedMessage.SetLVClusterHandle(_vectorPtr);
+                nestedMessage._currentIndexForRepeatedMessageValue = elementIndex;
                 protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
 
                 elementIndex++;
