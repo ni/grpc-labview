@@ -10,6 +10,7 @@
 #include <mutex>
 #include <thread>
 #include <assert.h>
+#include <feature_toggles.h>
 
 namespace grpc_labview
 {
@@ -186,6 +187,13 @@ namespace grpc_labview
 }
 
 int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId);
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT void readIniFile(const char* filePath)
+{
+    grpc_labview::FeatureConfig::getInstance().readConfigFromFile(filePath);
+}
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
