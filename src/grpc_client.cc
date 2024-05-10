@@ -60,6 +60,7 @@ namespace grpc_labview
     void ClientCall::Cancel()
     {
         _context.get()->Cancel();
+        _cancelled = true;
     }
 
     //---------------------------------------------------------------------
@@ -201,6 +202,10 @@ void CheckActiveAndSignalOccurenceForClientCall(grpc_labview::ClientCall *client
     if (clientCall == nullptr)
     {
         return;
+    }
+    if (clientCall->_cancelled == true)
+    {
+        grpc_labview::SignalOccurrence(clientCall->_occurrence);
     }
     std::unique_lock<std::mutex> lock(clientCall->_client->clientLock);
     if (clientCall->_client->ActiveClientCalls.find(clientCall) != clientCall->_client->ActiveClientCalls.end())
