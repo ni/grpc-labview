@@ -20,7 +20,7 @@
 #ifdef _WIN32
     #define LIBRARY_EXPORT extern "C" __declspec(dllexport)
 #else
-    #define LIBRARY_EXPORT extern "C"
+    #define LIBRARY_EXPORT extern "C" __attribute__((visibility("default")))
 #endif
 
 namespace grpc_labview 
