@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       
     - name: Update Submodules
       shell: bash
@@ -74,7 +74,7 @@ jobs:
         liblabview_grpc_generator.so
     
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: liblabview-grpc-server-linux
         path: liblabview-grpc-server-linux.tar.gz
