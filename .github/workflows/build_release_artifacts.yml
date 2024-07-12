@@ -9,13 +9,13 @@ jobs:
     name: Download and Build artifacts
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         id: download_artifacts
         with:
           path: ${{ runner.temp }}\grpc-labview-artifacts
@@ -41,7 +41,7 @@ jobs:
         run: python ${{runner.workspace}}\grpc-labview\tests\run_tests.py
 
       - name: Get current time
-        uses: josStorer/get-current-time@v2
+        uses: josStorer/get-current-time@v2.1.2
         id: current-time
         with:
           format: YYYY-MM-DD_hh-mm-ss
@@ -52,13 +52,13 @@ jobs:
 
       - name: Check whether logs folder exists in New_ATS
         id: check_files
-        uses: andstor/file-existence-action@v2.0.0
+        uses: andstor/file-existence-action@v3.0.0
         with:
           files: "${{runner.workspace}}/grpc-labview/tests/New_ATS/logs/"
 
       - if: ${{always() && steps.check_files.outputs.files_exists == 'true' }}
         name: Download New_ATS Test Results if logs folder exists
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: New_ATS Test Results ${{ steps.current-time.outputs.formattedTime }}
           path: ${{runner.workspace}}/grpc-labview/tests/New_ATS/logs

@@ -17,9 +17,9 @@ jobs:
     runs-on: windows-2019
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: ilammy/msvc-dev-cmd@v1.4.1
-    - uses: ilammy/setup-nasm@v1
+    - uses: actions/checkout@v4
+    - uses: ilammy/msvc-dev-cmd@v1
+    - uses: ilammy/setup-nasm@v1.5.1
 
     - name: Update Submodules
       working-directory: ${{runner.workspace}}/grpc-labview      
@@ -72,7 +72,7 @@ jobs:
         labview_grpc_generator.dll
     
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: labview-grpc-server-windows-x64
         path: labview-grpc-server-windows-x64.tar.gz
