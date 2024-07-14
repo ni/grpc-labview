@@ -10,7 +10,7 @@ IF NOT exist %script_dir%\venv (
     echo Virtual Environment not found
     echo Creating Virtual Environment at \venv
     call python -m venv %script_dir%\venv
-    echo Installing grpcio-tools into Virtual Environment
+    echo Installing grpc and grpcio-tools into Virtual Environment
     call %script_dir%\venv\Scripts\python.exe -m pip install --upgrade pip
     call %script_dir%\venv\Scripts\python.exe -m pip install grpcio-tools pytest
     echo Successfully Installed Virtual Environment
