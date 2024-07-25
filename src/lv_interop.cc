@@ -49,6 +49,7 @@ namespace grpc_labview
  
     // Initialize the static members
     ProtoDescriptorString* ProtoDescriptorString::m_instance = nullptr;
+    int ProtoDescriptorString::m_refcount;
     std::string ProtoDescriptorString::descriptor_;
     std::mutex ProtoDescriptorString::m_mutex;
 
@@ -56,6 +57,7 @@ namespace grpc_labview
     ProtoDescriptorString* ProtoDescriptorString::getInstance() {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (m_instance == nullptr) {
+            m_refcount = 0;
             m_instance = new ProtoDescriptorString();
         }
         return m_instance;
@@ -70,8 +72,18 @@ namespace grpc_labview
     // Set the static descriptor
     void ProtoDescriptorString::setDescriptor(std::string str) {
         std::unique_lock<std::mutex> lock(m_mutex);
+        m_refcount += 1;
         descriptor_ = str;
     }
+
+    // Delete the instaance based on the refcount
+    void ProtoDescriptorString::deleteInstance() {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        if (!--m_refcount) {
+            m_instance = nullptr;
+        }
+    }
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
 

@@ -129,6 +129,7 @@ namespace grpc_labview
         static std::string descriptor_;
         static ProtoDescriptorString* m_instance;
         static std::mutex m_mutex;
+        static int m_refcount;
 
         // Default private constructor to prevent instantiation
         ProtoDescriptorString() = default;
@@ -141,9 +142,12 @@ namespace grpc_labview
         static ProtoDescriptorString* getInstance();
 
         // Set the static descriptor string
-        static void setDescriptor(std::string);
+        void setDescriptor(std::string);
 
         // Get the static descriptor string
         static std::string getDescriptor();
+
+        // Delete the instance based on the refcount
+        void deleteInstance();
     };
 }

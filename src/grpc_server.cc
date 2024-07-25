@@ -270,5 +270,6 @@ namespace grpc_labview
 
             _server = nullptr;
         }
+        grpc_labview::ProtoDescriptorString::getInstance()->deleteInstance();
     }    
 }
