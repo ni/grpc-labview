@@ -270,6 +270,5 @@ namespace grpc_labview
 
             _server = nullptr;
         }
-        LVProtoServerReflectionPlugin::GetInstance()->DeleteInstance();
     }    
 }

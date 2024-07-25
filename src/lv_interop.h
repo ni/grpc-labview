@@ -121,4 +121,29 @@ namespace grpc_labview
     int SignalOccurrence(MagicCookie occurrence);
     int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
     int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class ProtoDescriptorString {
+        // Static members
+        static std::string descriptor_;
+        static ProtoDescriptorString* m_instance;
+        static std::mutex m_mutex;
+
+        // Default private constructor to prevent instantiation
+        ProtoDescriptorString() = default;
+
+        // Delete copy constructor and assignment operator
+        ProtoDescriptorString(const ProtoDescriptorString&) = delete;
+        ProtoDescriptorString& operator=(const ProtoDescriptorString&) = delete;
+    public:
+        // Return the static class instance
+        static ProtoDescriptorString* getInstance();
+
+        // Set the static descriptor string
+        static void setDescriptor(std::string);
+
+        // Get the static descriptor string
+        static std::string getDescriptor();
+    };
 }

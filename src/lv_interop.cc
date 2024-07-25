@@ -44,6 +44,37 @@ namespace grpc_labview
 {
     grpc_labview::PointerManager<grpc_labview::gRPCid> gPointerManager;
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+ 
+    // Initialize the static members
+    ProtoDescriptorString* ProtoDescriptorString::m_instance = nullptr;
+    std::string ProtoDescriptorString::descriptor_;
+    std::mutex ProtoDescriptorString::m_mutex;
+
+    // Return the static class instance. Thread safe.
+    ProtoDescriptorString* ProtoDescriptorString::getInstance() {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        if (m_instance == nullptr) {
+            m_instance = new ProtoDescriptorString();
+        }
+        return m_instance;
+    }
+
+    // Get the static descriptor
+    std::string ProtoDescriptorString::getDescriptor() {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        return descriptor_;
+    }
+
+    // Set the static descriptor
+    void ProtoDescriptorString::setDescriptor(std::string str) {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        descriptor_ = str;
+    }
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+
 	//---------------------------------------------------------------------
 	// Allows for definition of the LVRT DLL path to be used for callback functions
 	// This function should be called prior to calling InitCallbacks()

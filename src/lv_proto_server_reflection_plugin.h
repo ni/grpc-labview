@@ -48,12 +48,8 @@ namespace grpc_labview
         bool has_sync_methods() const override;
         void AddService(std::string serviceName);
         void AddFileDescriptorProto(const std::string& serializedProto);
-        static LVProtoServerReflectionPlugin* GetInstance();
-        std::string protostring;
-        void DeleteInstance();
 
     private:
-        static LVProtoServerReflectionPlugin* m_instance;
         std::shared_ptr<grpc_labview::LVProtoServerReflectionService> reflection_service_;
     };
 
