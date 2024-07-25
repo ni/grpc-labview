@@ -39,7 +39,7 @@ namespace grpc_labview
 {
     class LVProtoServerReflectionPlugin : public ::grpc::ServerBuilderPlugin {
     public:
-        LVProtoServerReflectionPlugin(); // hide constructors TODO
+        LVProtoServerReflectionPlugin();
         ::std::string name() override;
         void InitServer(ServerInitializer* si) override;
         void Finish(ServerInitializer* si) override;
