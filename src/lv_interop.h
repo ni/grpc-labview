@@ -18,12 +18,12 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #ifdef _WIN32
-    #define LIBRARY_EXPORT extern "C" __declspec(dllexport)
+#define LIBRARY_EXPORT extern "C" __declspec(dllexport)
 #else
-    #define LIBRARY_EXPORT extern "C" __attribute__((visibility("default")))
+#define LIBRARY_EXPORT extern "C" __attribute__((visibility("default")))
 #endif
 
-namespace grpc_labview 
+namespace grpc_labview
 {
     class gRPCid;
     extern PointerManager<gRPCid> gPointerManager;
@@ -64,7 +64,7 @@ namespace grpc_labview
     };
 
     using LStrPtr = LStr*;
-    using LStrHandle =  LStr**;
+    using LStrHandle = LStr**;
 
     struct LV1DArray {
         int32_t cnt; /* number of bytes that follow */
@@ -95,59 +95,30 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    #ifdef _PS_4
-    #pragma pack (push, 1)
-    #endif
+#ifdef _PS_4
+#pragma pack (push, 1)
+#endif
     struct AnyCluster
-    {    
+    {
         LStrHandle TypeUrl;
         LV1DArrayHandle Bytes;
     };
-    #ifdef _PS_4
-    #pragma pack (pop)
-    #endif
+#ifdef _PS_4
+#pragma pack (pop)
+#endif
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void SetLVRTModulePath(std::string modulePath);
-	void InitCallbacks();
+    void InitCallbacks();
     void SetLVString(LStrHandle* lvString, std::string str);
     std::string GetLVString(LStrHandle lvString);
     int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size);
-    int PostUserEvent(LVUserEventRef ref, void *data);
+    int PostUserEvent(LVUserEventRef ref, void* data);
     unsigned char** DSNewHandle(size_t n);
     int DSSetHandleSize(void* h, size_t n);
     long DSDisposeHandle(void* h);
     int SignalOccurrence(MagicCookie occurrence);
     int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
     int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    class ProtoDescriptorString {
-        // Static members
-        static std::string descriptor_;
-        static ProtoDescriptorString* m_instance;
-        static std::mutex m_mutex;
-        static int m_refcount;
-
-        // Default private constructor to prevent instantiation
-        ProtoDescriptorString() = default;
-
-        // Delete copy constructor and assignment operator
-        ProtoDescriptorString(const ProtoDescriptorString&) = delete;
-        ProtoDescriptorString& operator=(const ProtoDescriptorString&) = delete;
-    public:
-        // Return the static class instance
-        static ProtoDescriptorString* getInstance();
-
-        // Set the static descriptor string
-        void setDescriptor(std::string);
-
-        // Get the static descriptor string
-        static std::string getDescriptor();
-
-        // Delete the instance based on the refcount
-        void deleteInstance();
-    };
 }

@@ -20,7 +20,7 @@ static int kCleanOnIdle = 2;
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 typedef int (*NumericArrayResize_T)(int32_t, int32_t, void* handle, size_t size);
-typedef int (*PostLVUserEvent_T)(grpc_labview::LVUserEventRef ref, void *data);
+typedef int (*PostLVUserEvent_T)(grpc_labview::LVUserEventRef ref, void* data);
 typedef int (*Occur_T)(grpc_labview::MagicCookie occurrence);
 typedef int32_t(*RTSetCleanupProc_T)(grpc_labview::CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id, int32_t mode);
 typedef unsigned char** (*DSNewHandlePtr_T)(size_t);
@@ -45,56 +45,13 @@ namespace grpc_labview
     grpc_labview::PointerManager<grpc_labview::gRPCid> gPointerManager;
 
     //---------------------------------------------------------------------
+    // Allows for definition of the LVRT DLL path to be used for callback functions
+    // This function should be called prior to calling InitCallbacks()
     //---------------------------------------------------------------------
- 
-    // Initialize the static members
-    ProtoDescriptorString* ProtoDescriptorString::m_instance = nullptr;
-    int ProtoDescriptorString::m_refcount;
-    std::string ProtoDescriptorString::descriptor_;
-    std::mutex ProtoDescriptorString::m_mutex;
-
-    // Return the static class instance. Thread safe.
-    ProtoDescriptorString* ProtoDescriptorString::getInstance() {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        if (m_instance == nullptr) {
-            m_refcount = 0;
-            m_instance = new ProtoDescriptorString();
-        }
-        return m_instance;
+    void SetLVRTModulePath(std::string modulePath)
+    {
+        ModulePath = modulePath;
     }
-
-    // Get the static descriptor
-    std::string ProtoDescriptorString::getDescriptor() {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        return descriptor_;
-    }
-
-    // Set the static descriptor
-    void ProtoDescriptorString::setDescriptor(std::string str) {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        m_refcount += 1;
-        descriptor_ = str;
-    }
-
-    // Delete the instaance based on the refcount
-    void ProtoDescriptorString::deleteInstance() {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        if (!--m_refcount) {
-            m_instance = nullptr;
-        }
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-
-	//---------------------------------------------------------------------
-	// Allows for definition of the LVRT DLL path to be used for callback functions
-	// This function should be called prior to calling InitCallbacks()
-    //---------------------------------------------------------------------
-	void SetLVRTModulePath(std::string modulePath)
-	{
-		ModulePath = modulePath;
-	}
 
 #ifdef _WIN32
 
@@ -110,24 +67,24 @@ namespace grpc_labview
             return;
         }
 
-		HMODULE lvModule;
+        HMODULE lvModule;
 
-		if(ModulePath != "")
-		{
-			lvModule = GetModuleHandle(ModulePath.c_str());
-		}
-		else
-		{
-			lvModule = GetModuleHandle("LabVIEW.exe");
-			if (lvModule == nullptr)
-			{
-				lvModule = GetModuleHandle("lvffrt.dll");
-			}
-			if (lvModule == nullptr)
-			{
-				lvModule = GetModuleHandle("lvrt.dll");
-			}
-		}
+        if (ModulePath != "")
+        {
+            lvModule = GetModuleHandle(ModulePath.c_str());
+        }
+        else
+        {
+            lvModule = GetModuleHandle("LabVIEW.exe");
+            if (lvModule == nullptr)
+            {
+                lvModule = GetModuleHandle("lvffrt.dll");
+            }
+            if (lvModule == nullptr)
+            {
+                lvModule = GetModuleHandle("lvrt.dll");
+            }
+        }
         NumericArrayResizeImp = (NumericArrayResize_T)GetProcAddress(lvModule, "NumericArrayResize");
         PostLVUserEvent = (PostLVUserEvent_T)GetProcAddress(lvModule, "PostLVUserEvent");
         Occur = (Occur_T)GetProcAddress(lvModule, "Occur");
@@ -174,15 +131,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size)
-    {    
+    {
         return NumericArrayResizeImp(typeCode, numDims, handle, size);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    int PostUserEvent(LVUserEventRef ref, void *data)
+    int PostUserEvent(LVUserEventRef ref, void* data)
     {
-        return PostLVUserEvent(ref, data);    
+        return PostLVUserEvent(ref, data);
     }
 
     //---------------------------------------------------------------------
@@ -210,7 +167,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void SetLVString(LStrHandle* lvString, std::string str)
     {
-        auto length = str.length();    
+        auto length = str.length();
         auto error = NumericArrayResize(0x01, 1, lvString, length);
         memcpy((**lvString)->str, str.c_str(), length);
         (**lvString)->cnt = (int)length;
@@ -219,7 +176,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     std::string GetLVString(LStrHandle lvString)
-    {    
+    {
         if (lvString == nullptr || *lvString == nullptr)
         {
             return std::string();

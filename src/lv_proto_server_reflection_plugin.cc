@@ -4,6 +4,7 @@
 #include <grpcpp/impl/server_initializer.h>
 #include <grpcpp/server_builder.h>
 #include <lv_interop.h>
+#include <grpc_server.h>
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 using grpc::ServerContext;
@@ -49,9 +50,9 @@ namespace grpc_labview
 
     std::unique_ptr< ::grpc::ServerBuilderPlugin> CreateLVProtoReflection() {
 
-        LVProtoServerReflectionPlugin* newinstance = new LVProtoServerReflectionPlugin();
-        newinstance->AddFileDescriptorProto(grpc_labview::ProtoDescriptorString::getDescriptor());
-        return std::unique_ptr< ::grpc::ServerBuilderPlugin>(newinstance);
+        LVProtoServerReflectionPlugin* reflectionPluginInstance = new LVProtoServerReflectionPlugin();
+        reflectionPluginInstance->AddFileDescriptorProto(grpc_labview::ProtoDescriptorString::getInstance()->getDescriptor());
+        return std::unique_ptr< ::grpc::ServerBuilderPlugin>(reflectionPluginInstance);
     }
 
     void InitLVProtoReflectionServerBuilderPlugin() {
