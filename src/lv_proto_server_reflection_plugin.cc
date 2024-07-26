@@ -4,6 +4,7 @@
 #include <grpcpp/impl/server_initializer.h>
 #include <grpcpp/server_builder.h>
 #include <lv_interop.h>
+#include <grpc_server.h>
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 using grpc::ServerContext;
@@ -13,8 +14,6 @@ using grpc::ServerBuilder;
 
 namespace grpc_labview
 {
-    LVProtoServerReflectionPlugin* LVProtoServerReflectionPlugin::m_instance = nullptr;
-
     LVProtoServerReflectionPlugin::LVProtoServerReflectionPlugin() : reflection_service_(new grpc_labview::LVProtoServerReflectionService()) {
     }
 
@@ -49,19 +48,11 @@ namespace grpc_labview
         reflection_service_.get()->AddFileDescriptorProto(serializedProto);
     }
 
-    LVProtoServerReflectionPlugin* LVProtoServerReflectionPlugin::GetInstance() {
-        if (m_instance == nullptr)        
-            m_instance = new LVProtoServerReflectionPlugin();
-        return m_instance;
-    }
-
-    void LVProtoServerReflectionPlugin::DeleteInstance() {
-        m_instance = nullptr;
-    }
-
     std::unique_ptr< ::grpc::ServerBuilderPlugin> CreateLVProtoReflection() {
-        return std::unique_ptr< ::grpc::ServerBuilderPlugin>(
-            LVProtoServerReflectionPlugin::GetInstance());
+
+        LVProtoServerReflectionPlugin* reflectionPluginInstance = new LVProtoServerReflectionPlugin();
+        reflectionPluginInstance->AddFileDescriptorProto(grpc_labview::ProtoDescriptorString::getInstance()->getDescriptor());
+        return std::unique_ptr< ::grpc::ServerBuilderPlugin>(reflectionPluginInstance);
     }
 
     void InitLVProtoReflectionServerBuilderPlugin() {
@@ -75,6 +66,6 @@ namespace grpc_labview
     LIBRARY_EXPORT void DeserializeReflectionInfo(grpc_labview::LStrHandle serializedFileDescriptor)
     {
         std::string serializedDescriptorStr = grpc_labview::GetLVString(serializedFileDescriptor);
-        LVProtoServerReflectionPlugin::GetInstance()->AddFileDescriptorProto(serializedDescriptorStr);
+        grpc_labview::ProtoDescriptorString::getInstance()->setDescriptor(serializedDescriptorStr);
     }
 }

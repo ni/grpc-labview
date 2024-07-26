@@ -39,6 +39,7 @@ namespace grpc_labview
 {
     class LVProtoServerReflectionPlugin : public ::grpc::ServerBuilderPlugin {
     public:
+        LVProtoServerReflectionPlugin();
         ::std::string name() override;
         void InitServer(ServerInitializer* si) override;
         void Finish(ServerInitializer* si) override;
@@ -47,12 +48,8 @@ namespace grpc_labview
         bool has_sync_methods() const override;
         void AddService(std::string serviceName);
         void AddFileDescriptorProto(const std::string& serializedProto);
-        static LVProtoServerReflectionPlugin* GetInstance();
-        void DeleteInstance();
 
     private:
-        LVProtoServerReflectionPlugin(); // hide constructors TODO
-        static LVProtoServerReflectionPlugin* m_instance;
         std::shared_ptr<grpc_labview::LVProtoServerReflectionService> reflection_service_;
     };
 

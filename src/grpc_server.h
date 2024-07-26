@@ -237,4 +237,35 @@ namespace grpc_labview
     void OccurServerEvent(LVUserEventRef event, gRPCid* data);
     void OccurServerEvent(LVUserEventRef event, gRPCid* data, std::string eventMethodName);
     std::string read_keycert(const std::string &filename);
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class ProtoDescriptorString {
+        // Static members
+        static ProtoDescriptorString* m_instance;
+        static std::mutex m_mutex;
+
+        // Non static members
+        std::string m_descriptor;
+        int m_refcount = 0; // Not a normal refcount. Its counts the number of time we set the descriptor string.
+
+        // Default private constructor to prevent instantiation
+        ProtoDescriptorString() = default;
+
+        // Delete copy constructor and assignment operator
+        ProtoDescriptorString(const ProtoDescriptorString&) = delete;
+        ProtoDescriptorString& operator=(const ProtoDescriptorString&) = delete;
+    public:
+        // Return the static class instance
+        static ProtoDescriptorString* getInstance();
+
+        // Set the descriptor string
+        void setDescriptor(std::string);
+
+        // Get the descriptor string
+        std::string getDescriptor();
+
+        // Delete the instance based on the refcount
+        void deleteInstance();
+    };
 }
