@@ -8,7 +8,7 @@ jobs:
     name: Update VIPB Verison on Release
     runs-on: self-hosted
     steps:  
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_REPO_TOKEN }}
 
@@ -22,7 +22,7 @@ jobs:
         continue-on-error: false
     
       - name : Commit VIPB library version bump
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: VIPB version bump
           branch: master
