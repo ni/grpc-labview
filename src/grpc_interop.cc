@@ -25,16 +25,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void OccurServerEvent(LVUserEventRef event, gRPCid* data, std::string eventMethodName)
     {
-        LStr* lvMethodName = (LStr*)malloc(sizeof(int32_t) + eventMethodName.length() + 1);
-        lvMethodName->cnt = eventMethodName.length();
-        memcpy(lvMethodName->str, eventMethodName.c_str(), eventMethodName.length());
-
         GeneralMethodEventData eventData;
         eventData.methodData = data;
-        eventData.methodName = &lvMethodName;
+        eventData.methodName = nullptr;
+
+        SetLVString(&eventData.methodName, eventMethodName);
+
         auto error = PostUserEvent(event, &eventData);
 
-        free(lvMethodName);
+        DSDisposeHandle(eventData.methodName);
     }
 
     //---------------------------------------------------------------------
