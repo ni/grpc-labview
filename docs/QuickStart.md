@@ -169,6 +169,11 @@ From the same project,
 
 ![Say Hello Again Client Code implementation](images/HelloAgain-Client-Code.png "Say Hello Again Client Code implementation")
 
+
+### [Optional] Configure feature toggles
+
+[Feature Toggle documentation](./FeatureToggles.md)
+
 ### Run!
 
 Just like we did before, from the `examples/helloworld` directory:

@@ -105,7 +105,9 @@
 	<Item Name="Shared" Type="Folder">
 		<Item Name="grpcId.ctl" Type="VI" URL="../Shared/grpcId.ctl"/>
 		<Item Name="Any.ctl" Type="VI" URL="../Shared/Any.ctl"/>
+		<Item Name="Set LVRT Module Path.vi" Type="VI" URL="../Shared/Set LVRT Module Path.vi"/>
 		<Item Name="Wait On Occurence.vi" Type="VI" URL="../Shared/Wait On Occurence.vi"/>
 		<Item Name="TranslateGrpcError.vi" Type="VI" URL="../Shared/TranslateGrpcError.vi"/>
+		<Item Name="Wait On Occurrence Wrapper.vi" Type="VI" URL="../Shared/Wait On Occurrence Wrapper.vi"/>
 	</Item>
 </Library>

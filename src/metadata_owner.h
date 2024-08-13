@@ -31,8 +31,8 @@ namespace grpc_labview
 
     private:
         std::mutex _mutex;
-        std::map<std::string, std::shared_ptr<MessageMetadata>> _registeredMessageMetadata;
-        std::map<std::string, std::shared_ptr<EnumMetadata>> _registeredEnumMetadata;
+        std::unordered_map<std::string, std::shared_ptr<MessageMetadata>> _registeredMessageMetadata;
+        std::unordered_map<std::string, std::shared_ptr<EnumMetadata>> _registeredEnumMetadata;
         void UpdateMetadataClusterLayout(std::shared_ptr<MessageMetadata>& metadata);
     };
 }

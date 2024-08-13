@@ -5,6 +5,7 @@
 #include <cstring>
 #include <memory>
 #include <grpcpp/grpcpp.h>
+#include <feature_toggles.h>
 
 #ifndef _WIN32
 #include <dlfcn.h>
@@ -22,6 +23,10 @@ typedef int (*NumericArrayResize_T)(int32_t, int32_t, void* handle, size_t size)
 typedef int (*PostLVUserEvent_T)(grpc_labview::LVUserEventRef ref, void *data);
 typedef int (*Occur_T)(grpc_labview::MagicCookie occurrence);
 typedef int32_t(*RTSetCleanupProc_T)(grpc_labview::CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id, int32_t mode);
+typedef unsigned char** (*DSNewHandlePtr_T)(size_t);
+typedef int (*DSSetHandleSize_T)(void* h, size_t);
+typedef long (*DSDisposeHandle_T)(void* h);
+
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -30,9 +35,23 @@ static PostLVUserEvent_T PostLVUserEvent = nullptr;
 static Occur_T Occur = nullptr;
 static RTSetCleanupProc_T RTSetCleanupProc = nullptr;
 
+static std::string ModulePath = "";
+static DSNewHandlePtr_T DSNewHandleImpl = nullptr;
+static DSSetHandleSize_T DSSetHandleSizeImpl = nullptr;
+static DSDisposeHandle_T DSDisposeHandleImpl = nullptr;
+
 namespace grpc_labview
 {
     grpc_labview::PointerManager<grpc_labview::gRPCid> gPointerManager;
+
+	//---------------------------------------------------------------------
+	// Allows for definition of the LVRT DLL path to be used for callback functions
+	// This function should be called prior to calling InitCallbacks()
+    //---------------------------------------------------------------------
+	void SetLVRTModulePath(std::string modulePath)
+	{
+		ModulePath = modulePath;
+	}
 
 #ifdef _WIN32
 
@@ -40,24 +59,39 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void InitCallbacks()
     {
+        // Instantiating the feature toggles singleton that will read the feature configuration file
+        // FeatureConfig::getInstance().readConfigFromFile("feature_config.ini");
+
         if (NumericArrayResizeImp != nullptr)
         {
             return;
         }
 
-        auto lvModule = GetModuleHandle("LabVIEW.exe");
-        if (lvModule == nullptr)
-        {
-            lvModule = GetModuleHandle("lvffrt.dll");
-        }
-        if (lvModule == nullptr)
-        {
-            lvModule = GetModuleHandle("lvrt.dll");
-        }
+		HMODULE lvModule;
+
+		if(ModulePath != "")
+		{
+			lvModule = GetModuleHandle(ModulePath.c_str());
+		}
+		else
+		{
+			lvModule = GetModuleHandle("LabVIEW.exe");
+			if (lvModule == nullptr)
+			{
+				lvModule = GetModuleHandle("lvffrt.dll");
+			}
+			if (lvModule == nullptr)
+			{
+				lvModule = GetModuleHandle("lvrt.dll");
+			}
+		}
         NumericArrayResizeImp = (NumericArrayResize_T)GetProcAddress(lvModule, "NumericArrayResize");
         PostLVUserEvent = (PostLVUserEvent_T)GetProcAddress(lvModule, "PostLVUserEvent");
         Occur = (Occur_T)GetProcAddress(lvModule, "Occur");
         RTSetCleanupProc = (RTSetCleanupProc_T)GetProcAddress(lvModule, "RTSetCleanupProc");
+        DSNewHandleImpl = (DSNewHandlePtr_T)GetProcAddress(lvModule, "DSNewHandle");
+        DSSetHandleSizeImpl = (DSSetHandleSize_T)GetProcAddress(lvModule, "DSSetHandleSize");
+        DSDisposeHandleImpl = (DSDisposeHandle_T)GetProcAddress(lvModule, "DSDisposeHandle");
     }
 
 #else
@@ -106,6 +140,27 @@ namespace grpc_labview
     int PostUserEvent(LVUserEventRef ref, void *data)
     {
         return PostLVUserEvent(ref, data);    
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    unsigned char** DSNewHandle(size_t n)
+    {
+        return DSNewHandleImpl(n);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    int DSSetHandleSize(void* h, size_t n)
+    {
+        return DSSetHandleSizeImpl(h, n);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    long DSDisposeHandle(void* h)
+    {
+        return DSDisposeHandleImpl(h);
     }
 
     //---------------------------------------------------------------------

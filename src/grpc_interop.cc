@@ -10,6 +10,7 @@
 #include <mutex>
 #include <thread>
 #include <assert.h>
+#include <feature_toggles.h>
 
 namespace grpc_labview
 {
@@ -186,6 +187,13 @@ namespace grpc_labview
 }
 
 int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId);
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT void readIniFile(const char* filePath)
+{
+    grpc_labview::FeatureConfig::getInstance().readConfigFromFile(filePath);
+}
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -455,4 +463,20 @@ LIBRARY_EXPORT int32_t IsCancelled(grpc_labview::gRPCid** id)
         return -1;
     }
     return data->_call->IsCancelled();
+}
+
+//---------------------------------------------------------------------
+// Allows for definition of the LVRT DLL path to be used for callback functions
+// This function should be called prior to any other gRPC functions in this library
+   //---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t SetLVRTModulePath(const char* modulePath)
+{
+    if (modulePath == nullptr)
+    {
+        return -1;
+    }
+	
+	grpc_labview::SetLVRTModulePath(modulePath);
+	
+	return 0;    
 }
