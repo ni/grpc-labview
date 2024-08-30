@@ -25,11 +25,6 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    static bool ichar_equals(char a, char b)
-    {
-        return std::tolower(static_cast<unsigned char>(a)) == std::tolower(static_cast<unsigned char>(b));
-    }
-
     static bool IsLoopbackAddress(const char* address)
     {
         std::string hostname(address);
@@ -50,8 +45,7 @@ namespace grpc_labview
             }
         }
 
-        std::string localhost("localhost");
-        bool isLoopback = hostname.size() == localhost.size() && std::equal(hostname.begin(), hostname.end(), localhost.begin(), ichar_equals);
+        bool isLoopback = hostname == "localhost" || hostname == "LOCALHOST";
         if (!isLoopback)
         {
             try
@@ -59,7 +53,7 @@ namespace grpc_labview
                 asio::ip::address ip_address = asio::ip::make_address(hostname);
                 isLoopback = ip_address.is_loopback();
             }
-            catch (std::exception)
+            catch (std::exception&)
             {
                 isLoopback = false;
             }
