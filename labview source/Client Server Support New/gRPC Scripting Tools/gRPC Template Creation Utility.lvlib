@@ -10,7 +10,6 @@
 	<Property Name="Enable Alarms Logging" Type="Bool">true</Property>
 	<Property Name="Enable Data Logging" Type="Bool">true</Property>
 	<Property Name="NI.Lib.Icon" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!*&amp;!!!*Q(C=\&gt;5R5C*"&amp;-&lt;R$WO$4@%%&amp;F&gt;Y6_!%6H'&amp;&gt;Q6394@A!#&lt;P#FS"+\T)7#+.C=H'@T&gt;P+&gt;(;:;P5UM!:?RS_HH\^9[:LE0LW5`KBY&gt;SW`_@WP`WN5#^WK(A=6C&gt;$(9:HB^0_E`($S`IH1`?PRR`G0`;`GP`.X_`P`7=W@7`@W_&gt;O.W=8[9?PW:(;CYC7N+!ZT&gt;3G'J)]S:-]S:-]S9-]S)-]S)-]S*X=S:X=S:X=S9X=S)X=S)X=S0N/,H+2CRR3-HES56)U+:"=$%8*)@%EHM34?0CIR*.Y%E`C34R=IM34?"*0YEE]$&amp;0C34S**`%E(EJV3@;&gt;(%`CI&lt;Q#4_!*0)%H]$#F!E]!##9,#A&gt;&amp;9#DI$%Y#4_!*0*QK]!3?Q".Y!A`&gt;#DS"*`!%HM$$E(Z8IGP;4I[(-H)]DM@R/"\(1WEZ(M@D?"S0YW%[/2\(YS#=#:XC%/1-=CZQ0DA?R]-`/2\(YXA=D_/BKT]B\X?G;&gt;J/DM@Q'"\$9XA-$S6E?!S0Y4%]BI?S-DS'R`!9(M0$6$)]BM@Q'""D5K;85=Q9;&amp;RE");(P\Z;L$_F[",LOV3,6\5I69N.N9B5CU0VU&amp;505`716$&gt;@&gt;6.6.UNV%V2@4I679634K!;X#\8DO+6N;'P;CD;HT7B4WI1W&lt;E0@_=,&gt;&lt;K@N&gt;KP.:K0V?KX6;K8Z@+\:&lt;+&lt;J&gt;+L*:+,R?(R]$6SR(V])B`@3$??N,?Y@2MP,W]8S`H'UP0[^7.T^'PXJ;_W$@EO`Q,N2&amp;XJ?FXPU"+@`55Q!!!!!</Property>
-	<Property Name="NI.Lib.SourceVersion" Type="Int">419463168</Property>
 	<Property Name="NI.Lib.Version" Type="Str">1.0.0.0</Property>
 	<Property Name="NI.LV.All.SourceOnly" Type="Bool">true</Property>
 	<Property Name="NI.SortType" Type="Int">3</Property>
@@ -415,6 +414,7 @@
 			<Item Name="Save VI at Path.vi" Type="VI" URL="../VI API/General VI API/Save VI at Path.vi"/>
 			<Item Name="SubVI Template.vit" Type="VI" URL="../VI API/General VI API/SubVI Template.vit"/>
 			<Item Name="Validate Path Length.vi" Type="VI" URL="../VI API/General VI API/Validate Path Length.vi"/>
+			<Item Name="Set Source Only.vi" Type="VI" URL="../VI API/General VI API/Set Source Only.vi"/>
 		</Item>
 	</Item>
 	<Item Name="Logging API" Type="Folder">
