@@ -22,6 +22,10 @@ endif()
 
 find_package(Threads REQUIRED)
 
+# Setup ASIO
+set(ASIO_ROOT "${CMAKE_SOURCE_DIR}/third_party/asio")
+set(ASIO_INCLUDE_DIRS "${ASIO_ROOT}/asio/include")
+
 #----------------------------------------------------------------------
 #----------------------------------------------------------------------
 message( ${CMAKE_SIZEOF_VOID_P} )
@@ -55,7 +59,7 @@ endif()
 #----------------------------------------------------------------------
 # Include generated *.pb.h files
 #----------------------------------------------------------------------
-include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src" "./third_party/grpc" "${CMAKE_CURRENT_BINARY_DIR}/gens")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}" "./src" "./third_party/grpc" "${CMAKE_CURRENT_BINARY_DIR}/gens" "${ASIO_INCLUDE_DIRS}")
 
 #----------------------------------------------------------------------
 # LabVIEW support for grpc and protobuf
