@@ -2,20 +2,74 @@
 
 Contributions to grpc-labview are welcome from all!
 
-grpc-labview is managed via [git](https://git-scm.com), with the canonical upstream
-repository hosted on [GitHub](https://github.com/ni/grpc-labview).
+grpc-labview is managed via [git](https://git-scm.com), with the canonical
+upstream repository hosted on [GitHub](https://github.com/ni/grpc-labview).
 
 grpc-labview follows a pull-request model for development.  If you wish to
 contribute, you will need to create a GitHub account, fork this project, push a
 branch with your changes to your project, and then submit a pull request.
 
-Please remember to sign off your commits (e.g., by using git commit -s if you are using the command line client). This amends your git commit message with a line of the form Signed-off-by: Name Lastname <name.lastmail@emailaddress.com>. Please include all authors of any given commit into the commit message with a Signed-off-by line. This indicates that you have read and signed the Developer Certificate of Origin (see below) and are able to legally submit your code to this repository.
+## How to Contribute
 
-See [GitHub's official documentation](https://help.github.com/articles/using-pull-requests/) for more details.
+### Getting Started
 
-# Getting Started
+- See the [Readme](./README.md) for documentation on how to build and use the
+  example.
 
-- See the [Readme](./README.md) for documentation on how to build and use the example.
+### Reporting Issues
+ 
+When creating an issue, please provide a detailed description to help us
+understand the problem. Here are some tips:
+ 
+1. **Title**: Use a clear, concise title that summarizes the issue.
+2. **Description**:
+   - **What Happened**: Describe the issue you encountered.
+   - **Expected Behavior**: Explain what you expected to happen.
+   - **Steps to Reproduce**: List the steps necessary to reproduce the issue.
+   - **Environment**: Include relevant details about your environment (e.g.,
+     operating system, version, etc.).
+   - **Screenshots**: If applicable, add screenshots to clarify the issue.
+ 
+### Submitting Pull Requests
+ 
+When submitting a PR, please follow these guidelines to ensure clarity and ease
+of review:
+ 
+1. **Title**: Start with a short, descriptive title that summarizes the change.
+2. **Description**:
+   - **Purpose**: Explain why you are making this change.
+   - **Changes Made**: Describe what changes you made and why.
+   - **Related Issues**: Reference any related issues using `#issue_number`.
+   - **Testing**: Outline how you tested your changes and any specific areas of
+     the code to focus on during review.
+   
+Please remember to sign off your commits (e.g., by using git commit -s if you
+are using the command line client). This amends your git commit message with a
+line of the form Signed-off-by: Name Lastname <name.lastmail@emailaddress.com>.
+Please include all authors of any given commit into the commit message with a
+Signed-off-by line. This indicates that you have read and signed the Developer
+Certificate of Origin (see below) and are able to legally submit your code to
+this repository.
+ 
+### General Tips
+ 
+- **Be Clear and Concise**: The more precise and clear your descriptions are,
+  the easier it will be for maintainers to understand and address your
+  contributions.
+- **Use Markdown**: Utilize Markdown for formatting your descriptions. It helps
+  make your issues and PRs more readable.
+- **Engage with the Community**: Don’t hesitate to ask questions or seek
+  clarification on issues or PRs. We’re here to help!
+- **Issues with merged Community PRs**: We will revert the PR changes, and it
+  will be the original author's responsibility to correct the error.
+
+See [GitHub's official
+documentation](https://help.github.com/articles/using-pull-requests/) for more
+details.
+
+### Contact us
+To ask about a possible enhancement, email us at yash.chauhan@emerson.com or
+karthik.nischal@emerson.com
 
 # Developer Certificate of Origin (DCO)
 
