@@ -27,7 +27,7 @@ understand the problem. Here are some tips:
    - **Expected Behavior**: Explain what you expected to happen.
    - **Steps to Reproduce**: List the steps necessary to reproduce the issue.
    - **Environment**: Include relevant details about your environment (e.g.,
-     operating system, version, etc.).
+     operating system, LabVIEW version, gRPC version, etc.).
    - **Screenshots**: If applicable, add screenshots to clarify the issue.
  
 ### Submitting Pull Requests
