@@ -131,7 +131,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size)
-    {    
+    {
         return NumericArrayResizeImp(typeCode, numDims, handle, size);
     }
 
@@ -139,7 +139,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     int PostUserEvent(LVUserEventRef ref, void *data)
     {
-        return PostLVUserEvent(ref, data);    
+        return PostLVUserEvent(ref, data);
     }
 
     //---------------------------------------------------------------------
@@ -167,7 +167,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void SetLVString(LStrHandle* lvString, std::string str)
     {
-        auto length = str.length();    
+        auto length = str.length();
         auto error = NumericArrayResize(0x01, 1, lvString, length);
         memcpy((**lvString)->str, str.c_str(), length);
         (**lvString)->cnt = (int)length;
@@ -176,7 +176,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     std::string GetLVString(LStrHandle lvString)
-    {    
+    {
         if (lvString == nullptr || *lvString == nullptr)
         {
             return std::string();
@@ -215,5 +215,21 @@ namespace grpc_labview
 #else
         return clusterOffset;
 #endif
+    }
+
+    int32_t GetTypeCodeForSize(int byteSize)
+    {
+        switch (byteSize)
+        {
+        case 1:
+            return 0x5; // u8
+        case 2:
+            return 0x6; // uW
+        case 4:
+            return 0x7; // uL
+        case 8:
+        default:
+            return 0x8; // uQ
+        }
     }
 }

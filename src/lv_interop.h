@@ -23,7 +23,7 @@
     #define LIBRARY_EXPORT extern "C" __attribute__((visibility("default")))
 #endif
 
-namespace grpc_labview 
+namespace grpc_labview
 {
     class gRPCid;
     extern PointerManager<gRPCid> gPointerManager;
@@ -49,6 +49,9 @@ namespace grpc_labview
     };
 
     int AlignClusterOffset(int clusterOffset, int alignmentRequirement);
+
+    // Provides type code for use with NumericArrayResize function for various sizes of data types.
+    int32_t GetTypeCodeForSize(int byteSize);
 
     //---------------------------------------------------------------------
     // LabVIEW definitions
@@ -99,7 +102,7 @@ namespace grpc_labview
     #pragma pack (push, 1)
     #endif
     struct AnyCluster
-    {    
+    {
         LStrHandle TypeUrl;
         LV1DArrayHandle Bytes;
     };
