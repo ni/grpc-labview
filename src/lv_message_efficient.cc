@@ -67,25 +67,17 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char *LVMessageEfficient::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
-    {  
+    const char* LVMessageEfficient::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx)
+    {
         const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
 
         if (fieldInfo.isRepeated)
-        {            
-            std::string key = fieldInfo.fieldName +  std::to_string(_currentIndexForRepeatedMessageValue);
-         
-            // Get the _repeatedMessageValues vector from the map
-            auto _repeatedStringValuesIt = _repeatedStringValuesMap.find(key);
-            if (_repeatedStringValuesIt == _repeatedStringValuesMap.end())
-            {
-                _repeatedStringValuesIt = _repeatedStringValuesMap.emplace(key, google::protobuf::RepeatedField<std::string>()).first;
-            }
-
+        {
+            auto repeatedString = google::protobuf::RepeatedField<std::string>();
             protobuf_ptr -= 1;
             do {
                 protobuf_ptr += 1;
-                auto str = _repeatedStringValuesIt->second.Add();
+                auto str = repeatedString.Add();
                 protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
                 if (!ctx->DataAvailable(protobuf_ptr))
                 {
@@ -94,20 +86,21 @@ namespace grpc_labview
             } while (ExpectTag(tag, protobuf_ptr));
 
 
-            NumericArrayResize(0x08, 1, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), _repeatedStringValuesIt->second.size());
+            NumericArrayResize(GetTypeCodeForSize(sizeof(char*)), 1, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), repeatedString.size());
             auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
-            (*arrayHandle)->cnt = _repeatedStringValuesIt->second.size();
-          
+            (*arrayHandle)->cnt = repeatedString.size();
+
             // Copy the repeated string values into the LabVIEW array
             auto lvStringPtr = (*arrayHandle)->bytes<LStrHandle>();
-            for (auto str:_repeatedStringValuesIt->second)
+            for (auto str : repeatedString)
             {
                 *lvStringPtr = nullptr;
                 SetLVString(lvStringPtr, str);
                 lvStringPtr++;
             }
         }
-        else {
+        else
+        {
             auto str = std::string();
             protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
             SetLVString((LStrHandle*)lv_ptr, str);
@@ -117,51 +110,47 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char *LVMessageEfficient::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    const char* LVMessageEfficient::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
     {
-        return ParseString(tag, fieldInfo, index, ptr, ctx);    
+        return ParseString(tag, fieldInfo, index, ptr, ctx);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char *LVMessageEfficient::ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
-    {    
+    const char* LVMessageEfficient::ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx)
+    {
         auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
-        
+
         LVMessageEfficient nestedMessage(metadata);
 
-        if (fieldInfo.isRepeated) {
+        if (fieldInfo.isRepeated)
+        {
             // if the array is not big enough, resize it to 2x the size
             auto numElements = 128;
             auto elementIndex = 0;
             auto clusterSize = metadata->clusterSize;
-            auto alignment = metadata->alignmentRequirement;
             auto arraySize = numElements * clusterSize;
             char _fillData = '\0';
 
             // Get the _repeatedMessageValues vector from the map
-            auto _repeatedMessageValuesIt = _repeatedMessageValuesMap.find(metadata->messageName);
+            auto _repeatedMessageValuesIt = _repeatedMessageValuesMap.find(fieldInfo.fieldName);
             if (_repeatedMessageValuesIt == _repeatedMessageValuesMap.end())
             {
                 auto m_val = std::make_shared<RepeatedMessageValue>(fieldInfo, google::protobuf::RepeatedField<char>());
-                _repeatedMessageValuesIt = _repeatedMessageValuesMap.emplace(metadata->messageName, m_val).first;
-            }
-
-            // There are situations where the protobuf message is not complete, and we need to continue from the last index.
-            // This function returns to _internalParse, and then gets back to this function.
-            // If we are continuing from a previous parse, then we need to continue from the last index
-            auto _continueFromIndex = _repeatedField_continueIndex.find(metadata->messageName);
-            if (_continueFromIndex != _repeatedField_continueIndex.end()) {
-                elementIndex = _continueFromIndex->second;
-                _repeatedField_continueIndex.erase(_continueFromIndex);
-                // find next largest power of 2, as we assume that we previously resized it to a power of 2
-                auto _size = (int)ceil(log2(elementIndex));
-                numElements = ((1 << _size) > 128) ? (1 << _size) : 128;
-            }
-            else {
-                // occurs on the first time this function is called
+                _repeatedMessageValuesIt = _repeatedMessageValuesMap.emplace(fieldInfo.fieldName, m_val).first;
                 _repeatedMessageValuesIt->second.get()->_buffer.Resize(arraySize, _fillData);
             }
+            else
+            {
+                // Zero out data from the previous use of the buffer.
+                auto bytesUsed = _repeatedMessageValuesIt->second.get()->_numElements * clusterSize;
+                auto bufferPtr = _repeatedMessageValuesIt->second.get()->_buffer.data();
+                memset(reinterpret_cast<void*>(const_cast<char*>(bufferPtr)), _fillData, bytesUsed);
+
+                // Recalculate number of cluster elements that can fit in the buffer based on its current capacity.
+                numElements = _repeatedMessageValuesIt->second.get()->_buffer.Capacity() / clusterSize;
+            }
+            _repeatedMessageValuesIt->second.get()->_validData = true;
 
             protobuf_ptr -= 1;
             do
@@ -169,30 +158,30 @@ namespace grpc_labview
                 protobuf_ptr += 1;
 
                 // Resize the vector if we need more memory
-                if (elementIndex >= numElements - 1) {
+                if (elementIndex >= numElements - 1)
+                {
                     numElements *= 2;
                     arraySize = numElements * clusterSize;
-                    auto s = _repeatedMessageValuesIt->second.get()->_buffer.size();
                     _repeatedMessageValuesIt->second.get()->_buffer.Resize(arraySize, _fillData);
                 }
 
                 auto _vectorPtr = _repeatedMessageValuesIt->second.get()->_buffer.data();
                 _vectorPtr = _vectorPtr + (elementIndex * clusterSize);
                 nestedMessage.SetLVClusterHandle(_vectorPtr);
-                nestedMessage._currentIndexForRepeatedMessageValue = elementIndex;
                 protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
 
                 elementIndex++;
 
-                if (!ctx->DataAvailable(protobuf_ptr)) {
+                if (!ctx->DataAvailable(protobuf_ptr))
+                {
                     break;
                 }
             } while (ExpectTag(tag, protobuf_ptr));
-            
+
             _repeatedMessageValuesIt->second.get()->_numElements = elementIndex;
-            _repeatedField_continueIndex.emplace(metadata->messageName, elementIndex);
         }
-        else {
+        else
+        {
             const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
             nestedMessage.SetLVClusterHandle(lv_ptr);
             protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
@@ -204,9 +193,14 @@ namespace grpc_labview
     {
         for (auto nestedMessage : _repeatedMessageValuesMap)
         {
+            if (!nestedMessage.second.get()->_validData)
+            {
+                continue;
+            }
+
             auto fieldInfo = nestedMessage.second.get()->_fieldInfo;
             auto buffer = nestedMessage.second.get()->_buffer;
-            auto numElements = nestedMessage.second.get()->_numElements;
+            auto numClusters = nestedMessage.second.get()->_numElements;
 
             auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
             const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
@@ -214,17 +208,23 @@ namespace grpc_labview
             auto alignment = metadata->alignmentRequirement;
 
 
-            // shrink the array to the correct size
-            auto arraySize = numElements * clusterSize;
-            NumericArrayResize(0x08, 1, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), arraySize);
+            // Allocate an array with the correct size and alignment for the cluster.
+            auto byteSize = numClusters * clusterSize;
+            auto alignedElementSize = byteSize / alignment;
+            if (byteSize % alignment != 0)
+            {
+                alignedElementSize++;
+            }
+            auto numDimensions = 1;
+            NumericArrayResize(GetTypeCodeForSize(alignment), numDimensions, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), alignedElementSize);
             auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
-            (*arrayHandle)->cnt = numElements;
+            (*arrayHandle)->cnt = numClusters;
 
             auto _vectorDataPtr = buffer.data();
             auto _lvArrayDataPtr = (*arrayHandle)->bytes(0, alignment);
-            memcpy(_lvArrayDataPtr, _vectorDataPtr, arraySize);
+            memcpy(_lvArrayDataPtr, _vectorDataPtr, byteSize);
+            nestedMessage.second.get()->_validData = false;
         }
     }
-
 }
 
