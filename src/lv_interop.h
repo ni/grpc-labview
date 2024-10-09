@@ -23,7 +23,7 @@
     #define LIBRARY_EXPORT extern "C" __attribute__((visibility("default")))
 #endif
 
-namespace grpc_labview 
+namespace grpc_labview
 {
     class gRPCid;
     extern PointerManager<gRPCid> gPointerManager;
@@ -50,6 +50,9 @@ namespace grpc_labview
 
     int AlignClusterOffset(int clusterOffset, int alignmentRequirement);
 
+    // Provides type code for use with NumericArrayResize function for various sizes of data types.
+    int32_t GetTypeCodeForSize(int byteSize);
+
     //---------------------------------------------------------------------
     // LabVIEW definitions
     //---------------------------------------------------------------------
@@ -64,7 +67,7 @@ namespace grpc_labview
     };
 
     using LStrPtr = LStr*;
-    using LStrHandle =  LStr**;
+    using LStrHandle = LStr**;
 
     struct LV1DArray {
         int32_t cnt; /* number of bytes that follow */
@@ -99,7 +102,7 @@ namespace grpc_labview
     #pragma pack (push, 1)
     #endif
     struct AnyCluster
-    {    
+    {
         LStrHandle TypeUrl;
         LV1DArrayHandle Bytes;
     };
@@ -110,11 +113,11 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void SetLVRTModulePath(std::string modulePath);
-	void InitCallbacks();
+    void InitCallbacks();
     void SetLVString(LStrHandle* lvString, std::string str);
     std::string GetLVString(LStrHandle lvString);
     int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size);
-    int PostUserEvent(LVUserEventRef ref, void *data);
+    int PostUserEvent(LVUserEventRef ref, void* data);
     unsigned char** DSNewHandle(size_t n);
     int DSSetHandleSize(void* h, size_t n);
     long DSDisposeHandle(void* h);

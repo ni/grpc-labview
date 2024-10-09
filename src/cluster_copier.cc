@@ -76,15 +76,15 @@ namespace grpc_labview {
                 case LVMessageMetadataType::SInt32Value:
                     CopySInt32ToCluster(fieldMetadata, start, value);
                     break;
-                case LVMessageMetadataType:: SInt64Value:
+                case LVMessageMetadataType::SInt64Value:
                     CopySInt64ToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::Fixed32Value:
                     CopyFixed32ToCluster(fieldMetadata, start, value);
                     break;
                 case LVMessageMetadataType::Fixed64Value:
-                     CopyFixed64ToCluster(fieldMetadata, start, value);
-                     break;
+                    CopyFixed64ToCluster(fieldMetadata, start, value);
+                    break;
                 case LVMessageMetadataType::SFixed32Value:
                     CopySFixed32ToCluster(fieldMetadata, start, value);
                     break;
@@ -95,13 +95,13 @@ namespace grpc_labview {
             }
         }
 
-        // second pass to fill the oneof selected_index. We can do this in one pass when we push the selected_field to the end of the oneof cluster!        
+        // second pass to fill the oneof selected_index. We can do this in one pass when we push the selected_field to the end of the oneof cluster!
         // TODO: Skip the entire loop if the message has no oneof. It's a bool in the metadata.
         for (auto val : message._metadata->_mappedElements)
         {
-            auto fieldMetadata = val.second;            
-            if (fieldMetadata->isInOneof&& fieldMetadata->protobufIndex < 0)
-            {   
+            auto fieldMetadata = val.second;
+            if (fieldMetadata->isInOneof && fieldMetadata->protobufIndex < 0)
+            {
                 // This field is the selected_index field of a oneof
                 if (oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName) != oneof_containerToSelectedIndexMap.end())
                 {
@@ -119,7 +119,7 @@ namespace grpc_labview {
         message._values.clear();
         std::map<std::string, int> oneof_containerToSelectedIndexMap; // Needed to serialize only the field related to the selected_index
         for (auto val : message._metadata->_mappedElements)
-        {            
+        {
             auto fieldMetadata = val.second;
             if (fieldMetadata->isInOneof)
             {
@@ -140,7 +140,7 @@ namespace grpc_labview {
                 if (fieldMetadata->protobufIndex >= 0)
                 {
                     auto it = oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName);
-                    assert (it != oneof_containerToSelectedIndexMap.end());
+                    assert(it != oneof_containerToSelectedIndexMap.end());
                     auto selected_index = it->second;
                     if (selected_index != fieldMetadata->protobufIndex)
                     {
@@ -287,7 +287,7 @@ namespace grpc_labview {
             auto repeatedString = static_cast<const LVRepeatedMessageValue<std::string>&>(*value);
             if (repeatedString._value.size() != 0)
             {
-                NumericArrayResize(0x08, 1, start, repeatedString._value.size());
+                NumericArrayResize(GetTypeCodeForSize(sizeof(char*)), 1, start, repeatedString._value.size());
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedString._value.size();
                 int x = 0;
@@ -330,14 +330,21 @@ namespace grpc_labview {
             {
                 auto nestedMetadata = repeatedNested->_value.front()->_metadata;
                 auto clusterSize = nestedMetadata->clusterSize;
+                auto byteSize = repeatedNested->_value.size() * clusterSize;
+                auto alignment = nestedMetadata->alignmentRequirement;
+                auto alignedElementSize = byteSize / alignment;
+                if (byteSize % alignment != 0)
+                {
+                    alignedElementSize++;
+                }
 
-                NumericArrayResize(0x08, 1, start, repeatedNested->_value.size() * clusterSize);
+                NumericArrayResize(GetTypeCodeForSize(alignment), 1, start, alignedElementSize);
                 auto array = *(LV1DArrayHandle*)start;
                 (*array)->cnt = repeatedNested->_value.size();
                 int x = 0;
                 for (auto str : repeatedNested->_value)
                 {
-                    auto lvCluster = (LVCluster**)(*array)->bytes(x * clusterSize, nestedMetadata->alignmentRequirement);
+                    auto lvCluster = (LVCluster**)(*array)->bytes(x * clusterSize, alignment);
                     *lvCluster = nullptr;
                     CopyToCluster(*str, (int8_t*)lvCluster);
                     x += 1;
@@ -419,7 +426,7 @@ namespace grpc_labview {
                 auto byteCount = count * sizeof(int32_t);
                 memcpy((*array)->bytes<int32_t>(), mappedArray, byteCount);
             }
-            
+
             free(mappedArray);
         }
         else
@@ -810,7 +817,7 @@ namespace grpc_labview {
                 repeatedValue->_value.Reserve(count);
                 auto dest = repeatedValue->_value.AddNAlreadyReserved(count);
                 memcpy(dest, mappedArray, count * sizeof(int32_t));
-                
+
                 free(mappedArray);
             }
         }
