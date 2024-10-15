@@ -82,6 +82,6 @@ namespace grpc_labview
         virtual const char *ParseBytes(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
         virtual const char *ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
         bool ExpectTag(google::protobuf::uint32 tag, const char* ptr);
-		int CalculateTagWireSize(google::protobuf::uint32 tag);
+        int CalculateTagWireSize(google::protobuf::uint32 tag);
     };
 }
