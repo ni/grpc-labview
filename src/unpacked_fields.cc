@@ -161,7 +161,7 @@ namespace grpc_labview
             case LVMessageMetadataType::MessageValue:
                 return -1;
             case LVMessageMetadataType::BoolValue:
-                *(uint8_t*)buffer = field->varint();
+                CopyVarintBitValueField<uint8_t>(isRepeated, 0x05, 8, field, buffer);
                 break;
             case LVMessageMetadataType::EnumValue:
             case LVMessageMetadataType::Int32Value:
