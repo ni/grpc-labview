@@ -404,16 +404,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-	int LVMessage::CalculateTagWireSize(google::protobuf::uint32 tag)
-	{
-        // The current gRPC libraries only support a maximum number of field numbers that
-        // can be encoded with a two byte tag.
-        if (tag < 128)
-        {
-            return 1;
-        }
-        return 2;
-	}
+    int LVMessage::CalculateTagWireSize(google::protobuf::uint32 tag)
+    {
+        return (tag < (1 << 7)) ? 1
+            : (tag < (1 << 14)) ? 2
+            : (tag < (1 << 21)) ? 3
+            : (tag < (1 << 28)) ? 4
+            : 5;
+    }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------

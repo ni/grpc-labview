@@ -222,7 +222,7 @@ namespace grpc_labview
         switch (byteSize)
         {
         case 1:
-            return 0x5; // u8
+            return 0x5; // uB
         case 2:
             return 0x6; // uW
         case 4:
