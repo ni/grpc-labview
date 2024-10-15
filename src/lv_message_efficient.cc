@@ -202,8 +202,7 @@ namespace grpc_labview
             {
                 alignedElementSize++;
             }
-            auto numDimensions = 1;
-            NumericArrayResize(GetTypeCodeForSize(alignment), numDimensions, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), alignedElementSize);
+            NumericArrayResize(GetTypeCodeForSize(alignment), 1, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), alignedElementSize);
             auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
             (*arrayHandle)->cnt = numClusters;
 
