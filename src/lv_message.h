@@ -10,7 +10,7 @@
 
 using namespace google::protobuf::internal;
 
-namespace grpc_labview 
+namespace grpc_labview
 {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -37,7 +37,7 @@ namespace grpc_labview
         int GetCachedSize(void) const final;
         size_t ByteSizeLong() const final;
         virtual void PostInteralParseAction() {};
-        
+
         void MergeFrom(const google::protobuf::Message &from) final;
         void MergeFrom(const LVMessage &from);
         void CopyFrom(const google::protobuf::Message &from) final;
@@ -82,5 +82,6 @@ namespace grpc_labview
         virtual const char *ParseBytes(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
         virtual const char *ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
         bool ExpectTag(google::protobuf::uint32 tag, const char* ptr);
+		int CalculateTagWireSize(google::protobuf::uint32 tag);
     };
 }

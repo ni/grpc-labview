@@ -356,10 +356,12 @@ namespace grpc_labview
             {
                 v = std::static_pointer_cast<LVRepeatedMessageValue<std::string>>((*it).second);
             }
-            protobuf_ptr -= 1;
+
+            auto tagSize = CalculateTagWireSize(tag);
+            protobuf_ptr -= tagSize;
             do
             {
-                protobuf_ptr += 1;
+                protobuf_ptr += tagSize;
                 auto str = v->_value.Add();
                 protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
                 if (!ctx->DataAvailable(protobuf_ptr))
@@ -399,6 +401,19 @@ namespace grpc_labview
             return std::memcmp(ptr, buf, 2) == 0;
         }
     }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+	int LVMessage::CalculateTagWireSize(google::protobuf::uint32 tag)
+	{
+        // The current gRPC libraries only support a maximum number of field numbers that
+        // can be encoded with a two byte tag.
+        if (tag < 128)
+        {
+            return 1;
+        }
+        return 2;
+	}
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -527,21 +542,23 @@ namespace grpc_labview
         auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
         if (fieldInfo.isRepeated)
         {
-            protobuf_ptr -= 1;
+            std::shared_ptr<LVRepeatedNestedMessageMessageValue> v;
+            auto it = _values.find(index);
+            if (it == _values.end())
+            {
+                v = std::make_shared<LVRepeatedNestedMessageMessageValue>(index);
+                _values.emplace(index, v);
+            }
+            else
+            {
+                v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
+            }
+
+            auto tagSize = CalculateTagWireSize(tag);
+            protobuf_ptr -= tagSize;
             do
             {
-                std::shared_ptr<LVRepeatedNestedMessageMessageValue> v;
-                auto it = _values.find(index);
-                if (it == _values.end())
-                {
-                    v = std::make_shared<LVRepeatedNestedMessageMessageValue>(index);
-                    _values.emplace(index, v);
-                }
-                else
-                {
-                    v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
-                }
-                protobuf_ptr += 1;
+                protobuf_ptr += tagSize;
                 auto nestedMessage = std::make_shared<LVMessage>(metadata);
                 protobuf_ptr = ctx->ParseMessage(nestedMessage.get(), protobuf_ptr);
                 v->_value.push_back(nestedMessage);

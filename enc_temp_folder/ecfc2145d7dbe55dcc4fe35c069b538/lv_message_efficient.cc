@@ -213,23 +213,23 @@ namespace grpc_labview
         }
 
         for (auto repeatedStringValue : _repeatedStringValuesMap)
-        {
-            auto& fieldInfo = repeatedStringValue.second.get()->_fieldInfo;
-            auto& repeatedString = repeatedStringValue.second.get()->_repeatedString;
-            const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
+		{
+			auto& fieldInfo = repeatedStringValue.second.get()->_fieldInfo;
+			auto& repeatedString = repeatedStringValue.second.get()->_repeatedString;
+			const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
 
-            NumericArrayResize(GetTypeCodeForSize(sizeof(char*)), 1, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), repeatedString.size());
-            auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
-            (*arrayHandle)->cnt = repeatedString.size();
+			NumericArrayResize(GetTypeCodeForSize(sizeof(char*)), 1, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), repeatedString.size());
+			auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
+			(*arrayHandle)->cnt = repeatedString.size();
 
-            // Copy the repeated string values into the LabVIEW array
-            auto lvStringPtr = (*arrayHandle)->bytes<LStrHandle>();
-            for (auto& str : repeatedString)
-            {
-                *lvStringPtr = nullptr;
-                SetLVString(lvStringPtr, str);
-                lvStringPtr++;
-            }
+			// Copy the repeated string values into the LabVIEW array
+			auto lvStringPtr = (*arrayHandle)->bytes<LStrHandle>();
+			for (auto str : repeatedString)
+			{
+				*lvStringPtr = nullptr;
+				SetLVString(lvStringPtr, str);
+				lvStringPtr++;
+			}
         }
     }
 }

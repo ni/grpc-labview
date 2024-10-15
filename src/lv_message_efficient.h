@@ -29,14 +29,22 @@ namespace grpc_labview
             const MessageElementMetadata& _fieldInfo;
             google::protobuf::RepeatedField<char> _buffer;
             uint64_t _numElements = 0;
-            bool _validData = false;
 
             RepeatedMessageValue(const MessageElementMetadata& fieldInfo, google::protobuf::RepeatedField<char> buffer) :
                 _fieldInfo(fieldInfo), _buffer(buffer) {}
         };
 
+        struct RepeatedStringValue {
+            const MessageElementMetadata& _fieldInfo;
+            google::protobuf::RepeatedField<std::string> _repeatedString;
+
+            RepeatedStringValue(const MessageElementMetadata& fieldInfo) :
+                _fieldInfo(fieldInfo), _repeatedString(google::protobuf::RepeatedField<std::string>()) {}
+        };
+
     public:
         std::unordered_map<std::string, std::shared_ptr<RepeatedMessageValue>> _repeatedMessageValuesMap;
+        std::unordered_map<std::string, std::shared_ptr<RepeatedStringValue>> _repeatedStringValuesMap;
 
     protected:
         const char* ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
