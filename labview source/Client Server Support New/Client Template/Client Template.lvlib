@@ -1,7 +1,6 @@
 ﻿<?xml version='1.0' encoding='UTF-8'?>
 <Library LVVersion="19008000">
 	<Property Name="NI.Lib.Icon" Type="Bin">'1#!!!!!!!)!"1!&amp;!!!-!%!!!@````]!!!!"!!%!!!)B!!!*Q(C=\&gt;4.=3)R%-8RNSY@^EI',F,I&amp;%C"&amp;$I&amp;LHMEB8@E3AKEU#G1!CGQ@YEW`KCS=&gt;8OVPL!D$7'*[HV9U9VUDR_3I][XTJWHRZ@[R`8]?']'Q80TR_?_S`"\HLN);`\8_;`8$_=PXMX`T*_FLWO`[&lt;`4X`@:`UX$NW0_`&amp;`DV]X._E`X\-`.&amp;Z%N++:FL417/J=Z%6?Z%6?Z%6O=J/&lt;X/1G.XG3*XG3*XG3*XG1"XG1"XG1"`E]S55O=J&amp;$+B9P&amp;CK+&amp;A7+Q6"58!J0Y3E]B9?P+DS&amp;J`!5HM,$%"7?QF.Y#E`B9:I+4_%J0)7H]&amp;"K3GK?Z(A+$_6F0-:D0-:D0#QJYT%!MZAJ&lt;)L!E/EU(YT(?)S(DT)?YT%?YT%?OG5]RG-]RG-]4*FXR6-T4H)]F&amp;(C34S**`%E(EIL]33?R*.Y%A`,+@%EHA32,*A5B["E5D)A_:*Y%A``F(A34_**0)G(LPG%=N[:I2EH/:\!%XA#4_!*0*21Y!E]A3@Q""\++P!%HM!4?!)03SHQ"*\!%U##26F?1&lt;&amp;A9D!I#!)0@X/XR(R+HJ+9J^3&lt;6\UJV:N.P9H5GU0^U.505`W1V$&gt;@@606.UN^%^1`4IV79^3,K#?0A4JR0&gt;)/N$VN3^P1VL16&lt;5F&lt;D+F`??$J&gt;.,R?.4B=."_P^&gt;WO^6GM^&amp;[P&gt;:KN&gt;*SO&gt;2CM&lt;C_"JYYLS_%\`"?_B;'"\WOSTX[$?IV&amp;`U!!!!!</Property>
-	<Property Name="NI.Lib.SourceVersion" Type="Int">419463168</Property>
 	<Property Name="NI.Lib.Version" Type="Str">1.0.0.0</Property>
 	<Property Name="NI.LV.All.SourceOnly" Type="Bool">true</Property>
 	<Property Name="NI.SortType" Type="Int">3</Property>
@@ -13,7 +12,9 @@
 			<Item Name="Get package_template_enum for Value.vi" Type="VI" URL="../RPC Messages/Get package_template_enum for Value.vi"/>
 			<Item Name="Get Value for package_template_enum.vi" Type="VI" URL="../RPC Messages/Get Value for package_template_enum.vi"/>
 		</Item>
-		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../RPC Messages/Register gRPC Messages.vi"/>
+		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../RPC Messages/Register gRPC Messages.vi">
+			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
+		</Item>
 	</Item>
 	<Item Name="RPC Service" Type="Folder">
 		<Item Name="Unary UnaryTemplate.vi" Type="VI" URL="../RPC Service/Unary UnaryTemplate.vi"/>
@@ -30,5 +31,4 @@
 		<Item Name="Create Client.vi" Type="VI" URL="../Client API/Create Client.vi"/>
 		<Item Name="Destroy Client.vi" Type="VI" URL="../Client API/Destroy Client.vi"/>
 	</Item>
-	<Item Name="gRPC Client Test.vi" Type="VI" URL="../gRPC Client Test.vi"/>
 </Library>
