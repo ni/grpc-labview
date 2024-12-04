@@ -11,7 +11,7 @@
 
 using namespace google::protobuf::internal;
 
-namespace grpc_labview 
+namespace grpc_labview
 {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -33,31 +33,37 @@ namespace grpc_labview
             RepeatedMessageValue(const MessageElementMetadata& fieldInfo, google::protobuf::RepeatedField<char> buffer) :
                 _fieldInfo(fieldInfo), _buffer(buffer) {}
         };
-    
+
+        struct RepeatedStringValue {
+            const MessageElementMetadata& _fieldInfo;
+            google::protobuf::RepeatedField<std::string> _repeatedString;
+
+            RepeatedStringValue(const MessageElementMetadata& fieldInfo) :
+                _fieldInfo(fieldInfo), _repeatedString(google::protobuf::RepeatedField<std::string>()) {}
+        };
+
     public:
-        std::unordered_map<std::string, uint32_t> _repeatedField_continueIndex;
         std::unordered_map<std::string, std::shared_ptr<RepeatedMessageValue>> _repeatedMessageValuesMap;
-        std::unordered_map<std::string, google::protobuf::RepeatedField<std::string>> _repeatedStringValuesMap;
-        uint64_t _currentIndexForRepeatedMessageValue = 0;
+        std::unordered_map<std::string, std::shared_ptr<RepeatedStringValue>> _repeatedStringValuesMap;
 
     protected:
-        const char *ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        const char *ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        const char *ParseUInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        const char *ParseEnum(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        const char *ParseInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        const char *ParseUInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        const char *ParseFloat(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        const char *ParseDouble(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
+        const char* ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        const char* ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        const char* ParseUInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        const char* ParseEnum(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        const char* ParseInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        const char* ParseUInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        const char* ParseFloat(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        const char* ParseDouble(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
         const char* ParseSInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
         const char* ParseSInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
         const char* ParseFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
         const char* ParseFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
         const char* ParseSFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
         const char* ParseSFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char *ParseString(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        const char *ParseBytes(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        const char *ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
+        const char* ParseString(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        const char* ParseBytes(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        const char* ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
     };
 
     template <typename MessageType, const char* (*ReadFunc)(const char*, MessageType*), const char* (*PackedFunc)(void*, const char*, google::protobuf::internal::ParseContext*)>
@@ -73,8 +79,8 @@ namespace grpc_labview
 
         // Parse and copy message in a single pass.
         template<typename RepeatedMessageValuePointer>
-        const char* ParseAndCopyRepeatedMessage(const char *ptr, ParseContext *ctx, RepeatedMessageValuePointer v) {
-            
+        const char* ParseAndCopyRepeatedMessage(const char* ptr, ParseContext* ctx, RepeatedMessageValuePointer v) {
+
             uint64_t numElements;
             ptr = PackedMessageType(ptr, ctx, reinterpret_cast<google::protobuf::RepeatedField<MessageType>*>(&(v->_value)));
             numElements = v->_value.size();
@@ -86,13 +92,14 @@ namespace grpc_labview
             // copy into LVCluster
             if (numElements != 0)
             {
-                NumericArrayResize(0x08, 1, reinterpret_cast<void*>(const_cast<char*>(_lv_ptr)), numElements);
+                auto messageTypeSize = sizeof(MessageType);
+                NumericArrayResize(GetTypeCodeForSize(messageTypeSize), 1, reinterpret_cast<void*>(const_cast<char*>(_lv_ptr)), numElements);
                 auto array = *(LV1DArrayHandle*)_lv_ptr;
                 (*array)->cnt = numElements;
-                auto byteCount = numElements * sizeof(MessageType);
+                auto byteCount = numElements * messageTypeSize;
                 std::memcpy((*array)->bytes<MessageType>(), v->_value.data(), byteCount);
             }
-            
+
             return ptr;
         }
 
@@ -101,8 +108,8 @@ namespace grpc_labview
             return PackedFunc(value, ptr, ctx);
         }
 
-        const char* ParseAndCopyMessage(const char *ptr) {
-            ptr = ReadMessageType(ptr, reinterpret_cast<MessageType*>(const_cast<char *>(_lv_ptr)));
+        const char* ParseAndCopyMessage(const char* ptr) {
+            ptr = ReadMessageType(ptr, reinterpret_cast<MessageType*>(const_cast<char*>(_lv_ptr)));
             return ptr;
         }
 

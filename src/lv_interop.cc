@@ -20,7 +20,7 @@ static int kCleanOnIdle = 2;
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 typedef int (*NumericArrayResize_T)(int32_t, int32_t, void* handle, size_t size);
-typedef int (*PostLVUserEvent_T)(grpc_labview::LVUserEventRef ref, void *data);
+typedef int (*PostLVUserEvent_T)(grpc_labview::LVUserEventRef ref, void* data);
 typedef int (*Occur_T)(grpc_labview::MagicCookie occurrence);
 typedef int32_t(*RTSetCleanupProc_T)(grpc_labview::CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id, int32_t mode);
 typedef unsigned char** (*DSNewHandlePtr_T)(size_t);
@@ -44,14 +44,14 @@ namespace grpc_labview
 {
     grpc_labview::PointerManager<grpc_labview::gRPCid> gPointerManager;
 
-	//---------------------------------------------------------------------
-	// Allows for definition of the LVRT DLL path to be used for callback functions
-	// This function should be called prior to calling InitCallbacks()
     //---------------------------------------------------------------------
-	void SetLVRTModulePath(std::string modulePath)
-	{
-		ModulePath = modulePath;
-	}
+    // Allows for definition of the LVRT DLL path to be used for callback functions
+    // This function should be called prior to calling InitCallbacks()
+    //---------------------------------------------------------------------
+    void SetLVRTModulePath(std::string modulePath)
+    {
+        ModulePath = modulePath;
+    }
 
 #ifdef _WIN32
 
@@ -67,24 +67,24 @@ namespace grpc_labview
             return;
         }
 
-		HMODULE lvModule;
+        HMODULE lvModule;
 
-		if(ModulePath != "")
-		{
-			lvModule = GetModuleHandle(ModulePath.c_str());
-		}
-		else
-		{
-			lvModule = GetModuleHandle("LabVIEW.exe");
-			if (lvModule == nullptr)
-			{
-				lvModule = GetModuleHandle("lvffrt.dll");
-			}
-			if (lvModule == nullptr)
-			{
-				lvModule = GetModuleHandle("lvrt.dll");
-			}
-		}
+        if (ModulePath != "")
+        {
+            lvModule = GetModuleHandle(ModulePath.c_str());
+        }
+        else
+        {
+            lvModule = GetModuleHandle("LabVIEW.exe");
+            if (lvModule == nullptr)
+            {
+                lvModule = GetModuleHandle("lvffrt.dll");
+            }
+            if (lvModule == nullptr)
+            {
+                lvModule = GetModuleHandle("lvrt.dll");
+            }
+        }
         NumericArrayResizeImp = (NumericArrayResize_T)GetProcAddress(lvModule, "NumericArrayResize");
         PostLVUserEvent = (PostLVUserEvent_T)GetProcAddress(lvModule, "PostLVUserEvent");
         Occur = (Occur_T)GetProcAddress(lvModule, "Occur");
@@ -126,15 +126,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size)
-    {    
+    {
         return NumericArrayResizeImp(typeCode, numDims, handle, size);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    int PostUserEvent(LVUserEventRef ref, void *data)
+    int PostUserEvent(LVUserEventRef ref, void* data)
     {
-        return PostLVUserEvent(ref, data);    
+        return PostLVUserEvent(ref, data);
     }
 
     //---------------------------------------------------------------------
@@ -162,7 +162,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void SetLVString(LStrHandle* lvString, std::string str)
     {
-        auto length = str.length();    
+        auto length = str.length();
         auto error = NumericArrayResize(0x01, 1, lvString, length);
         memcpy((**lvString)->str, str.c_str(), length);
         (**lvString)->cnt = (int)length;
@@ -171,7 +171,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     std::string GetLVString(LStrHandle lvString)
-    {    
+    {
         if (lvString == nullptr || *lvString == nullptr)
         {
             return std::string();
@@ -210,5 +210,21 @@ namespace grpc_labview
 #else
         return clusterOffset;
 #endif
+    }
+  
+    int32_t GetTypeCodeForSize(int byteSize)
+    {
+        switch (byteSize)
+        {
+        case 1:
+            return 0x5; // uB
+        case 2:
+            return 0x6; // uW
+        case 4:
+            return 0x7; // uL
+        case 8:
+        default:
+            return 0x8; // uQ
+        }
     }
 }
