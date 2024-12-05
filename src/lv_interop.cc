@@ -109,14 +109,9 @@ namespace grpc_labview
         PostLVUserEvent = (PostLVUserEvent_T)dlsym(RTLD_DEFAULT, "PostLVUserEvent");
         Occur = (Occur_T)dlsym(RTLD_DEFAULT, "Occur");
         RTSetCleanupProc = (RTSetCleanupProc_T)dlsym(RTLD_DEFAULT, "RTSetCleanupProc");
-
-        if (NumericArrayResizeImp == nullptr ||
-            PostLVUserEvent == nullptr ||
-            Occur == nullptr ||
-            RTSetCleanupProc == nullptr)
-        {
-            exit(grpc::StatusCode::INTERNAL);
-        }
+        DSNewHandleImpl = (DSNewHandlePtr_T)dlsym(RTLD_DEFAULT, "DSNewHandle");
+        DSSetHandleSizeImpl = (DSSetHandleSize_T)dlsym(RTLD_DEFAULT, "DSSetHandleSize");
+        DSDisposeHandleImpl = (DSDisposeHandle_T)dlsym(RTLD_DEFAULT, "DSDisposeHandle");
     }
 
 #endif
@@ -216,7 +211,7 @@ namespace grpc_labview
         return clusterOffset;
 #endif
     }
-
+  
     int32_t GetTypeCodeForSize(int byteSize)
     {
         switch (byteSize)
