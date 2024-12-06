@@ -271,6 +271,7 @@
 			<Item Name="Update Enum Setter.vi" Type="VI" URL="../Top Level API/Update Enum Setter.vi"/>
 			<Item Name="Update Message Getter.vi" Type="VI" URL="../Top Level API/Update Message Getter.vi"/>
 			<Item Name="Update Message Setter.vi" Type="VI" URL="../Top Level API/Update Message Setter.vi"/>
+			<Item Name="Update Messages Access Scope.vi" Type="VI" URL="../Top Level API/Update Messages Access Scope.vi"/>
 			<Item Name="Update Messages MetaData.vi" Type="VI" URL="../Top Level API/Update Messages MetaData.vi"/>
 		</Item>
 		<Item Name="RPC Methods" Type="Folder">
@@ -308,6 +309,7 @@
 			<Item Name="Copy Template Files.vi" Type="VI" URL="../Top Level API/Copy Template Files.vi"/>
 			<Item Name="Create Server Class from Template.vi" Type="VI" URL="../Top Level API/Create Server Class from Template.vi"/>
 			<Item Name="Create Server Library from Template.vi" Type="VI" URL="../Top Level API/Create Server Library from Template.vi"/>
+			<Item Name="Update Service Class Instances.vi" Type="VI" URL="../Top Level API/Update Service Class Instances.vi"/>
 			<Item Name="Update Template Files.vi" Type="VI" URL="../Top Level API/Update Template Files.vi"/>
 		</Item>
 	</Item>
@@ -415,6 +417,7 @@
 				<Item Name="Generate Location Coordinates.vi" Type="VI" URL="../VI API/General VI API/Coordinates/Generate Location Coordinates.vi"/>
 			</Item>
 			<Item Name="Cleanup VI BD.vi" Type="VI" URL="../VI API/General VI API/Cleanup VI BD.vi"/>
+			<Item Name="Cleanup VI FP.vi" Type="VI" URL="../VI API/General VI API/Cleanup VI FP.vi"/>
 			<Item Name="Save VI at Path.vi" Type="VI" URL="../VI API/General VI API/Save VI at Path.vi"/>
 			<Item Name="Set Source Only.vi" Type="VI" URL="../VI API/General VI API/Set Source Only.vi"/>
 			<Item Name="SubVI Template.vit" Type="VI" URL="../VI API/General VI API/SubVI Template.vit"/>
