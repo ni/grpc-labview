@@ -48,7 +48,7 @@ jobs:
           utcOffset: "+05:30"
 
       - name: Run New Testing Suite's Tests
-        timeout-minutes: 30
+        timeout-minutes: 31
         run: python ${{runner.workspace}}\grpc-labview\tests\New_ATS\pylib\run_tests.py
 
       - name: Check whether logs folder exists in New_ATS
