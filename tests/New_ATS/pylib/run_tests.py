@@ -160,6 +160,13 @@ def run_test(test_config):
 # Desc: Run the tests in the testlist.json file
 def main():
     global FAILED
+
+    # Quit LabVIEW if it is running
+    try:
+        run_command(['taskkill', '/f', '/im', 'labview.exe'])
+    except Exception:
+        pass
+
     # read the list of tests from testlist.json
     test_list_json_path = pathlib.Path(__file__).parent.absolute() / 'testlist.json'
     with open(test_list_json_path) as f:
@@ -197,7 +204,7 @@ def main():
                 test_config['python_server_folder'] = test_config['test_folder'] / 'Python_server'
                 run_test(test_config)
             if FAILED:
-                raise Exception(f"{FAILED} test cases have failed. Please review the above results")            
+                raise Exception(f"{FAILED} test cases have failed. Please review the above results")
 
 if __name__ == '__main__':
     main()
