@@ -6,12 +6,12 @@
 
 2. The configuration of the testing suite is saved in the [testlist.json](pylib/testlist.json) file. We can modify it to run specific tests with specific labview version and bitness according to our needs.
 
-3. For each test, inside the test folder, we have a protofile, a `Python_client` folder that contains the python clients, optionally a `Python_server` folder that contains the python server, an `Impl` folder that stores pre-implemented `Start Sync.vi` and `Run Service.vi` for that particular protofile and a `testcases` folder that contain the testcases for each rpc in json format.
+3. For each test, inside the test folder, we have a protofile, a `Python_client` folder that contains the python clients, optionally a `Python_server` folder that contains the python server, an `Impl` folder that stores pre-implemented `Start Sync.vi` for that particular protofile and a `testcases` folder that contain the testcases for each rpc in json format.
 
 4. When executing the testing suite, the following steps are performed for each test:
    - Delete the pre-existing `Generated Server` folder that contains the gRPC Server.
    - Regenerate the gRPC server using the protofile.
-   - Copy the `Start Sync.vi` and `Run Service.vi` from the `Impl` folder into the new `Generated Server` folder.
+   - Copy the `Start Sync.vi` from the `Impl` folder into the new `Generated Server` folder.
    - Regenerate the server (without deleting the previously generated server) if we are not doing clean generation.
    - Run the pre-written python clients in the `Python_client` folder which uses pytest to run all the testcases for each rpc. The testcases are defined in the form of json files in the `testcases` folder.
    - Prints the verbose output of each testcase onto the terminal.
@@ -87,11 +87,11 @@ Follow the below steps to add more tests in the testing suite.
 
 4. Use LabVIEW-gRPC code generator to generate server. Only select the protofile and the labview project in the code generator and leave all other fields empty.
 
-5. Write the rpc definition in `Start Sync.vi` of the generated server and replace the dummy class with the service class in `Run Service.vi`.
+5. Write the rpc definition in `Start Sync.vi` of the generated server.
 
 6. Create a new folder with the name `Impl` inside the test folder. Folder structure should look like `Tests/<test_name>/Impl`.
 
-7. Copy both `Start Sync.vi` and `Run Service.vi` from the generated server into the newly created `Impl` folder.
+7. Copy `Start Sync.vi` from the generated server into the newly created `Impl` folder.
 
 8. Now create another new folder with the name `testcases` inside the test folder. Folder structure should look like `Tests/<test_name>/testcases`
 
