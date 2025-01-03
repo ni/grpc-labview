@@ -37,4 +37,10 @@
 	<Item Name="Monitor for Stop.vi" Type="VI" URL="../Monitor for Stop.vi">
 		<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 	</Item>
+	<Item Name="Initialize Panel.vi" Type="VI" URL="../Initialize Panel.vi">
+		<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
+	</Item>
+	<Item Name="Cleanup Panel.vi" Type="VI" URL="../Cleanup Panel.vi">
+		<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
+	</Item>
 </Library>
