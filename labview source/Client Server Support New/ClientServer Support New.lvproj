@@ -27,6 +27,9 @@
 		<Item Name="Client Template" Type="Folder">
 			<Item Name="Client Template.lvlib" Type="Library" URL="../Client Template/Client Template.lvlib"/>
 		</Item>
+		<Item Name="Oneof Template" Type="Folder">
+			<Item Name="OneOfTemplate.lvclass" Type="LVClass" URL="../Oneof Template/OneOfTemplate.lvclass"/>
+		</Item>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="vi.lib" Type="Folder">
 				<Item Name="Application Directory.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/file.llb/Application Directory.vi"/>
@@ -128,13 +131,48 @@
 				<Item Name="Dflt Data Dir.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/file.llb/Dflt Data Dir.vi"/>
 				<Item Name="Pathes.ctl" Type="VI" URL="/&lt;vilib&gt;/LabVIEW Icon API/lv_icon/Controls/Pathes.ctl"/>
 				<Item Name="Get GObject Label.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/traverseref.llb/Get GObject Label.vi"/>
-				<Item Name="Remove Duplicates From 1D Array.vim" Type="VI" URL="/&lt;vilib&gt;/Array/Remove Duplicates From 1D Array.vim"/>
 				<Item Name="Trim Whitespace One-Sided.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/Trim Whitespace One-Sided.vi"/>
 				<Item Name="niceiplib.lvlib" Type="Library" URL="/&lt;vilib&gt;/UDC/niceiplib.lvlib"/>
 				<Item Name="NI_LVConfig.lvlib" Type="Library" URL="/&lt;vilib&gt;/Utility/config.llb/NI_LVConfig.lvlib"/>
 				<Item Name="8.6CompatibleGlobalVar.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/config.llb/8.6CompatibleGlobalVar.vi"/>
+				<Item Name="Is Path and Not Empty.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/file.llb/Is Path and Not Empty.vi"/>
+				<Item Name="Remove Duplicates From 1D Array.vim" Type="VI" URL="/&lt;vilib&gt;/Array/Remove Duplicates From 1D Array.vim"/>
 			</Item>
-			<Item Name="OneOfTemplate.lvclass" Type="LVClass" URL="../Oneof Template/OneOfTemplate.lvclass"/>
+			<Item Name="Arrange VIWin - Window Margins.ctl" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Window Margins.ctl"/>
+			<Item Name="Arrange VIWin - Min Window Dimensions.ctl" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Min Window Dimensions.ctl"/>
+			<Item Name="Arrange VIWin - Window Gaps.ctl" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Window Gaps.ctl"/>
+			<Item Name="Arrange VIWin - Rectangle Dimensions.ctl" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Rectangle Dimensions.ctl"/>
+			<Item Name="Arrange VIWin - Compute Window Bounds.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Compute Window Bounds.vi"/>
+			<Item Name="Arrange VIWin - Get Window Margins.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Get Window Margins.vi"/>
+			<Item Name="Arrange VIWin - Establish Window Bounds.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Establish Window Bounds.vi"/>
+			<Item Name="Arrange VIWin - FP Objects Arrangement Info.ctl" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - FP Objects Arrangement Info.ctl"/>
+			<Item Name="Arrange VIWin - Resize FP.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Resize FP.vi"/>
+			<Item Name="Arrange VIWin - Arrange Other FP Objects.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Arrange Other FP Objects.vi"/>
+			<Item Name="Arrange VIWin - Get FP Controls Max Bottom.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Get FP Controls Max Bottom.vi"/>
+			<Item Name="Arrange VIWin - Align 1 Row of FP Controls.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Align 1 Row of FP Controls.vi"/>
+			<Item Name="Arrange VIWin - Compute Bound on Grid.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Compute Bound on Grid.vi"/>
+			<Item Name="Arrange VIWin - FP Control Info.ctl" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - FP Control Info.ctl"/>
+			<Item Name="Arrange VIWin - Get FP Controls Rows.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Get FP Controls Rows.vi"/>
+			<Item Name="Arrange VIWin - Arrange FP Controls Rows.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Arrange FP Controls Rows.vi"/>
+			<Item Name="Arrange VIWin - Space FP Controls.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Space FP Controls.vi"/>
+			<Item Name="Arrange VIWin - Compute Top Row Vertical Delta.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Compute Top Row Vertical Delta.vi"/>
+			<Item Name="Arrange VIWin - Arrange FP Controls Columns.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Arrange FP Controls Columns.vi"/>
+			<Item Name="Arrange VIWin - Order FP Conn Pane Controls.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Order FP Conn Pane Controls.vi"/>
+			<Item Name="Arrange VIWin - Filter FP Conn Pane Controls.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Filter FP Conn Pane Controls.vi"/>
+			<Item Name="Arrange VIWin - Arrange FP Controls.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Arrange FP Controls.vi"/>
+			<Item Name="LV Config Read Numeric (I32).vi" Type="VI" URL="/&lt;resource&gt;/dialog/lvconfig.llb/LV Config Read Numeric (I32).vi"/>
+			<Item Name="LV Config Read Color.vi" Type="VI" URL="/&lt;resource&gt;/dialog/lvconfig.llb/LV Config Read Color.vi"/>
+			<Item Name="LV Config Read Pathlist.vi" Type="VI" URL="/&lt;resource&gt;/dialog/lvconfig.llb/LV Config Read Pathlist.vi"/>
+			<Item Name="LV Config Read String.vi" Type="VI" URL="/&lt;resource&gt;/dialog/lvconfig.llb/LV Config Read String.vi"/>
+			<Item Name="LV Config Read Boolean.vi" Type="VI" URL="/&lt;resource&gt;/dialog/lvconfig.llb/LV Config Read Boolean.vi"/>
+			<Item Name="LV Config Read.vi" Type="VI" URL="/&lt;resource&gt;/dialog/lvconfig.llb/LV Config Read.vi"/>
+			<Item Name="Arrange VIWin - Get FP Objects Arrangement Info.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Get FP Objects Arrangement Info.vi"/>
+			<Item Name="Arrange VIWin - Window Type.ctl" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Window Type.ctl"/>
+			<Item Name="Arrange VIWin - Get Window Gaps.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Get Window Gaps.vi"/>
+			<Item Name="Arrange VIWin - Get Min Window Dimensions.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Get Min Window Dimensions.vi"/>
+			<Item Name="Arrange VIWin - Get Display Workspace Bounds.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Get Display Workspace Bounds.vi"/>
+			<Item Name="Arrange VIWin - Get Window INI tokens.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Get Window INI tokens.vi"/>
+			<Item Name="Arrange VIWin - Arrange FP.vi" Type="VI" URL="/&lt;resource&gt;/dialog/QuickDrop/plugins/_Arrange VIWin SubVIs/Arrange VIWin - Arrange FP.vi"/>
 		</Item>
 		<Item Name="Build Specifications" Type="Build"/>
 	</Item>

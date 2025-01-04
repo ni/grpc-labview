@@ -64,16 +64,7 @@ def run_test(test_config):
     print("Generating server code for " + test_config['test_name'])
     clean_server_generation(test_config)
 
-    # 3. Copy the 'Run Service.vi' from the Impl folder to the Generated_server folder
-    run_service_impl_path = test_config['impl'] / 'Run Service.vi'
-    run_service_gen_path = test_config['generated_server'] / 'Run Service.vi'
-    if pathlib.Path(test_config['generated_server']).exists():
-        print (f"Copying 'Run Service.vi' to {run_service_gen_path}")
-        shutil.copyfile(run_service_impl_path, run_service_gen_path)
-    else:
-        print (f"{test_config['generated_server']} not generated")
-
-    # 4. Copy the 'Start Sync.vi' from the Impl folder to the "Generated_server/RPC Service/serviceName/Server API" folder
+    # 3. Copy the 'Start Sync.vi' from the Impl folder to the "Generated_server/RPC Service/serviceName/Server API" folder
     serviceName = utility.get_service(test_config['test_folder'] / f"{test_config['test_name']}.proto")
     start_sync_impl_path = test_config['impl'] / 'Start Sync.vi'
     start_sync_gen_path = test_config['generated_server'] / 'RPC Service' / f'{serviceName}' / 'Server API' / 'Start Sync.vi'
@@ -83,12 +74,12 @@ def run_test(test_config):
     else:
         print (f"{test_config['generated_server']} not generated")
 
-    # 5. Generate server again if clean_gen is false
+    # 4. Generate server again if clean_gen is false
     if not test_config['clean_gen']:
         print("Generating server again")
         call_code_generator(test_config)
 
-    # 6. Quit LabVIEW if it is running
+    # 5. Quit LabVIEW if it is running
     try:
         run_command(['taskkill', '/f', '/im', 'labview.exe'])
     except Exception:
@@ -96,7 +87,7 @@ def run_test(test_config):
 
     # 6. Start Run Service.vi from command prompt by launching labview.exe form lv_folder with the following arguments:
     # this must be non-blocking
-    # subprocess.Popen([str(labview_path), str(test_config['generated_server'] / 'Run Service.vi')])     # shoud be non-blocking
+    # subprocess.Popen([str(labview_path), str(test_config['generated_server'] / 'Run Service.vi')])     # should be non-blocking
     # TODO Need to add support for passing multiple protofiles
     runservice_wrapper_vi_path = test_config['test_suite_folder'] / 'RunService_CLIWrapper.vi'
     CLI_command = ' '.join([
@@ -197,7 +188,7 @@ def main():
                 test_config['python_server_folder'] = test_config['test_folder'] / 'Python_server'
                 run_test(test_config)
             if FAILED:
-                raise Exception(f"{FAILED} test cases have failed. Please review the above results")            
+                raise Exception(f"{FAILED} test cases have failed. Please review the above results")
 
 if __name__ == '__main__':
     main()
