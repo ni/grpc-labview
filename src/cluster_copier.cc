@@ -16,28 +16,14 @@ namespace grpc_labview {
     // cluster: Pointer to the cluster created by LabVIEW
     void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
     {
-        std::map<std::string, int> oneof_containerToSelectedIndexMap;
-        for (auto val : message._metadata->_mappedElements)
+        for (auto indexAndValue : message._values)
         {
-            auto fieldMetadata = val.second;
-            auto start = cluster + fieldMetadata->clusterOffset;
-            std::shared_ptr<LVMessageValue> value;
-            for (auto v : message._values)
+            auto& value = indexAndValue.second;
+            auto it = message._metadata->_mappedElements.find(value->_protobufId);
+            if (it != message._metadata->_mappedElements.end())
             {
-                if (v.second->_protobufId == fieldMetadata->protobufIndex)
-                {
-                    value = v.second;
-                    break;
-                }
-            }
-            if (value != nullptr)
-            {
-                if (fieldMetadata->isInOneof)
-                {
-                    // set the map of the selected index for the "oneofContainer" to this protobuf Index
-                    assert(oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName) == oneof_containerToSelectedIndexMap.end());
-                    oneof_containerToSelectedIndexMap.insert(std::pair<std::string, int>(fieldMetadata->oneofContainerName, fieldMetadata->protobufIndex));
-                }
+                auto& fieldMetadata = it->second;
+                auto start = cluster + fieldMetadata->clusterOffset;;
                 switch (fieldMetadata->type)
                 {
                 case LVMessageMetadataType::StringValue:
@@ -95,18 +81,22 @@ namespace grpc_labview {
             }
         }
 
-        // second pass to fill the oneof selected_index. We can do this in one pass when we push the selected_field to the end of the oneof cluster!
-        // TODO: Skip the entire loop if the message has no oneof. It's a bool in the metadata.
-        for (auto val : message._metadata->_mappedElements)
+        // Second pass to fill the oneof selected_index. We can do this in one pass when we push the selected_field to the end of the oneof cluster!
+        if (message._oneofContainerToSelectedIndexMap.size() > 0)
         {
-            auto fieldMetadata = val.second;
-            if (fieldMetadata->isInOneof && fieldMetadata->protobufIndex < 0)
+            // Must iterate over _elements and not _mappedElements since all oneof selected_index fields use -1 for the field number
+            // and there can be multiple oneof fields in a message.
+            for (auto& fieldMetadata : message._metadata->_elements)
             {
-                // This field is the selected_index field of a oneof
-                if (oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName) != oneof_containerToSelectedIndexMap.end())
+                if (fieldMetadata->isInOneof && fieldMetadata->protobufIndex < 0)
                 {
-                    auto start = cluster + fieldMetadata->clusterOffset;
-                    *(int*)start = oneof_containerToSelectedIndexMap[fieldMetadata->oneofContainerName];
+                    // This field is the selected_index field of a oneof
+                    auto it = message._oneofContainerToSelectedIndexMap.find(fieldMetadata->oneofContainerName);
+                    if (it != message._oneofContainerToSelectedIndexMap.end())
+                    {
+                        auto selectedIndexPtr = reinterpret_cast<int*>(cluster + fieldMetadata->clusterOffset);
+                        *selectedIndexPtr = it->second;
+                    }
                 }
             }
         }
@@ -116,8 +106,18 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyFromCluster(LVMessage& message, int8_t* cluster)
     {
-        message._values.clear();
-        std::map<std::string, int> oneof_containerToSelectedIndexMap; // Needed to serialize only the field related to the selected_index
+        message.Clear();
+        for (auto& fieldMetadata : message._metadata->_elements)
+        {
+            if (fieldMetadata->isInOneof && fieldMetadata->protobufIndex < 0)
+            {
+                // set the map of the selected index for the "oneofContainer" to this protobuf Index
+                assert(message._oneofContainerToSelectedIndexMap.find(fieldMetadata->oneofContainerName) == message._oneofContainerToSelectedIndexMap.end());
+                auto selected_index = *(int*)(cluster + fieldMetadata->clusterOffset);
+                message._oneofContainerToSelectedIndexMap.insert(std::pair<std::string, int>(fieldMetadata->oneofContainerName, selected_index));
+            }
+        }
+
         for (auto val : message._metadata->_mappedElements)
         {
             auto fieldMetadata = val.second;
@@ -125,22 +125,14 @@ namespace grpc_labview {
             {
                 if (fieldMetadata->protobufIndex < 0)
                 {
-                    // set the map of the selected index for the "oneofContainer" to this protobuf Index
-                    assert(oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName) == oneof_containerToSelectedIndexMap.end());
-                    auto selected_index = *(int*)(cluster + fieldMetadata->clusterOffset);
-                    oneof_containerToSelectedIndexMap.insert(std::pair<std::string, int>(fieldMetadata->oneofContainerName, selected_index));
+                    // Do not serialize the selected_index field of a oneof. This is used for internal book keeping
+                    // and is not really a part of the message data that should go across the wire.
+                    continue;
                 }
-            }
-        }
-        for (auto val : message._metadata->_mappedElements)
-        {
-            auto fieldMetadata = val.second;
-            if (fieldMetadata->isInOneof)
-            {
-                if (fieldMetadata->protobufIndex >= 0)
+                else
                 {
-                    auto it = oneof_containerToSelectedIndexMap.find(fieldMetadata->oneofContainerName);
-                    assert(it != oneof_containerToSelectedIndexMap.end());
+                    auto it = message._oneofContainerToSelectedIndexMap.find(fieldMetadata->oneofContainerName);
+                    assert(it != message._oneofContainerToSelectedIndexMap.end());
                     auto selected_index = it->second;
                     if (selected_index != fieldMetadata->protobufIndex)
                     {

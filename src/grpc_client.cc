@@ -375,10 +375,8 @@ LIBRARY_EXPORT int32_t ClientUnaryCall2(
 
     if (clientCall->_useLVEfficientMessage)
     {
-        clientCall->_request = std::make_shared<grpc_labview::LVMessageEfficient>(requestMetadata);
-        clientCall->_response = std::make_shared<grpc_labview::LVMessageEfficient>(responseMetadata);
-        clientCall->_request->SetLVClusterHandle(reinterpret_cast<const char*>(requestCluster));
-        clientCall->_response->SetLVClusterHandle(reinterpret_cast<const char*>(responseCluster));
+        clientCall->_request = std::make_shared<grpc_labview::LVMessageEfficient>(requestMetadata, requestCluster);
+        clientCall->_response = std::make_shared<grpc_labview::LVMessageEfficient>(responseMetadata, responseCluster);
     }
     else
     {
