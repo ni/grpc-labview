@@ -83,6 +83,7 @@ namespace grpc_labview
     void LVMessage::Clear()
     {
         _values.clear();
+        _oneofContainerToSelectedIndexMap.clear();
     }
 
     //---------------------------------------------------------------------
@@ -105,8 +106,16 @@ namespace grpc_labview
                 auto fieldIt = _metadata->_mappedElements.find(index);
                 if (fieldIt != _metadata->_mappedElements.end())
                 {
-                    auto fieldInfo = (*fieldIt).second;
+                    auto& fieldInfo = (*fieldIt).second;
                     LVMessageMetadataType dataType = fieldInfo->type;
+
+                    if (fieldInfo->isInOneof)
+                    {
+                        // set the map of the selected index for the "oneofContainer" to this protobuf Index
+                        assert(_oneofContainerToSelectedIndexMap.find(fieldInfo->oneofContainerName) == _oneofContainerToSelectedIndexMap.end());
+                        _oneofContainerToSelectedIndexMap.insert(std::pair<std::string, int>(fieldInfo->oneofContainerName, fieldInfo->protobufIndex));
+                    }
+
                     switch (dataType)
                     {
                     case LVMessageMetadataType::Int32Value:
