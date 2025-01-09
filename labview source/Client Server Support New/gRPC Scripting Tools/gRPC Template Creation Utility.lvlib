@@ -219,7 +219,7 @@
 			<Item Name="Create Client from Template.vi" Type="VI" URL="../Top Level API/Create Client from Template.vi"/>
 			<Item Name="Create RPC Client Method.vi" Type="VI" URL="../Top Level API/Create RPC Client Method.vi"/>
 			<Item Name="Delete RPC Client Method Template Files.vi" Type="VI" URL="../Top Level API/Delete RPC Client Method Template Files.vi"/>
-			<Item Name="Generate RPC Client Methods.vi" Type="VI" URL="../Top Level API/Generate RPC Client Methods.vi"/>
+			<Item Name="Generate Client RPC Methods.vi" Type="VI" URL="../Top Level API/Generate Client RPC Methods.vi"/>
 			<Item Name="Script RPC Client VI.vi" Type="VI" URL="../Top Level API/Script RPC Client VI.vi"/>
 			<Item Name="Set VI Icon Text Layer.vi" Type="VI" URL="../Top Level API/Set VI Icon Text Layer.vi"/>
 			<Item Name="StringSplitIntoThree.vi" Type="VI" URL="../Top Level API/StringSplitIntoThree.vi"/>
@@ -234,7 +234,6 @@
 		</Item>
 		<Item Name="RPC Messages" Type="Folder">
 			<Item Name="Check Message Data Clusters.vi" Type="VI" URL="../Top Level API/Check Message Data Clusters.vi"/>
-			<Item Name="Create Data Clusters for Types.vi" Type="VI" URL="../Top Level API/Create Data Clusters for Types.vi"/>
 			<Item Name="Create Enum Accessor.vi" Type="VI" URL="../Top Level API/Create Enum Accessor.vi"/>
 			<Item Name="Create Enum Data Clusters (simple).vi" Type="VI" URL="../Top Level API/Create Enum Data Clusters (simple).vi"/>
 			<Item Name="Create Enum Data Clusters.vi" Type="VI" URL="../Top Level API/Create Enum Data Clusters.vi"/>
@@ -254,12 +253,14 @@
 			<Item Name="Create Message Getter.vi" Type="VI" URL="../Top Level API/Create Message Getter.vi"/>
 			<Item Name="Create Message Setter (from Accessor).vi" Type="VI" URL="../Top Level API/Create Message Setter (from Accessor).vi"/>
 			<Item Name="Create Message Setter.vi" Type="VI" URL="../Top Level API/Create Message Setter.vi"/>
+			<Item Name="Create Message Types and Converters.vi" Type="VI" URL="../Top Level API/Create Message Types and Converters.vi"/>
 			<Item Name="Create Message VI (from Accessor).vi" Type="VI" URL="../Top Level API/Create Message VI (from Accessor).vi"/>
 			<Item Name="Create Message VI (from Template).vi" Type="VI" URL="../Top Level API/Create Message VI (from Template).vi"/>
 			<Item Name="Create Messages For Registration.vi" Type="VI" URL="../Top Level API/Create Messages For Registration.vi"/>
 			<Item Name="Create Type Data Clusters.vi" Type="VI" URL="../Top Level API/Create Type Data Clusters.vi"/>
 			<Item Name="Delete Message Template Files.vi" Type="VI" URL="../Top Level API/Delete Message Template Files.vi"/>
-			<Item Name="Generate RPC Messages.vi" Type="VI" URL="../Top Level API/Generate RPC Messages.vi"/>
+			<Item Name="Generate Client RPC Messages.vi" Type="VI" URL="../Top Level API/Generate Client RPC Messages.vi"/>
+			<Item Name="Generate Server RPC Messages.vi" Type="VI" URL="../Top Level API/Generate Server RPC Messages.vi"/>
 			<Item Name="Get LV Object Controls for Proto Field Type.vi" Type="VI" URL="../Top Level API/Get LV Object Controls for Proto Field Type.vi"/>
 			<Item Name="Get LV Object Indicators for Proto Field Type.vi" Type="VI" URL="../Top Level API/Get LV Object Indicators for Proto Field Type.vi"/>
 			<Item Name="Get Message Placement Cluster.vi" Type="VI" URL="../Top Level API/Get Message Placement Cluster.vi"/>
@@ -279,7 +280,7 @@
 			<Item Name="Create LV RPC Method Name.vi" Type="VI" URL="../Top Level API/Create LV RPC Method Name.vi"/>
 			<Item Name="Create RPC Method.vi" Type="VI" URL="../Top Level API/Create RPC Method.vi"/>
 			<Item Name="Delete Method Template Files.vi" Type="VI" URL="../Top Level API/Delete Method Template Files.vi"/>
-			<Item Name="Generate RPC Methods.vi" Type="VI" URL="../Top Level API/Generate RPC Methods.vi"/>
+			<Item Name="Generate Server RPC Methods.vi" Type="VI" URL="../Top Level API/Generate Server RPC Methods.vi"/>
 			<Item Name="Get RPC Method Name.vi" Type="VI" URL="../Top Level API/Get RPC Method Name.vi"/>
 			<Item Name="Get RPC Methods Binds.vi" Type="VI" URL="../Top Level API/Get RPC Methods Binds.vi"/>
 			<Item Name="Get RPC Methods Paths.vi" Type="VI" URL="../Top Level API/Get RPC Methods Paths.vi"/>
