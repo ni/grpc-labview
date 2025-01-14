@@ -18,11 +18,12 @@ namespace grpc_labview
     class LVMessageEfficient : public LVMessage
     {
     public:
-        LVMessageEfficient(std::shared_ptr<MessageMetadata> metadata) : LVMessage(metadata) {}
+        LVMessageEfficient(std::shared_ptr<MessageMetadata> metadata, int8_t* cluster) : LVMessage(metadata), _LVClusterHandle(cluster) {}
         ~LVMessageEfficient() {}
 
         Message* New(google::protobuf::Arena* arena) const override;
         void PostInteralParseAction() override;
+        int8_t* GetLVClusterHandle() { return _LVClusterHandle; };
 
     protected:
         struct RepeatedMessageValue {
@@ -47,34 +48,36 @@ namespace grpc_labview
         std::unordered_map<std::string, std::shared_ptr<RepeatedStringValue>> _repeatedStringValuesMap;
 
     protected:
-        const char* ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseUInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseEnum(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseUInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseFloat(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseDouble(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseSInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseSInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseSFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseSFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseString(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseBytes(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        int8_t* _LVClusterHandle;
+
+        const char* ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseUInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseEnum(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseUInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseFloat(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseDouble(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseSInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseSInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseSFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseSFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseString(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseBytes(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
+        const char* ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
     };
 
     template <typename MessageType, const char* (*ReadFunc)(const char*, MessageType*), const char* (*PackedFunc)(void*, const char*, google::protobuf::internal::ParseContext*)>
     class SinglePassMessageParser {
     private:
-        LVMessage& _message;
-        const char* _lv_ptr;
+        LVMessageEfficient& _message;
+        int8_t* _lv_ptr;
     public:
         // Constructor and other necessary member functions
-        SinglePassMessageParser(LVMessage& message, const MessageElementMetadata& fieldInfo) : _message(message) {
-            _lv_ptr = reinterpret_cast<const char*>(_message.GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
+        SinglePassMessageParser(LVMessageEfficient& message, const MessageElementMetadata& fieldInfo) : _message(message) {
+            _lv_ptr = _message.GetLVClusterHandle() + fieldInfo.clusterOffset;
         }
 
         // Parse and copy message in a single pass.
@@ -93,7 +96,7 @@ namespace grpc_labview
             if (numElements != 0)
             {
                 auto messageTypeSize = sizeof(MessageType);
-                NumericArrayResize(GetTypeCodeForSize(messageTypeSize), 1, reinterpret_cast<void*>(const_cast<char*>(_lv_ptr)), numElements);
+                NumericArrayResize(GetTypeCodeForSize(messageTypeSize), 1, _lv_ptr, numElements);
                 auto array = *(LV1DArrayHandle*)_lv_ptr;
                 (*array)->cnt = numElements;
                 auto byteCount = numElements * messageTypeSize;
@@ -109,7 +112,7 @@ namespace grpc_labview
         }
 
         const char* ParseAndCopyMessage(const char* ptr) {
-            ptr = ReadMessageType(ptr, reinterpret_cast<MessageType*>(const_cast<char*>(_lv_ptr)));
+            ptr = ReadMessageType(ptr, reinterpret_cast<MessageType*>(_lv_ptr));
             return ptr;
         }
 

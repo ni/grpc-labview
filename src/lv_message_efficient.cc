@@ -57,7 +57,6 @@ namespace grpc_labview
     DEFINE_PARSE_FUNCTION(uint64_t, UInt64, UINT64, UInt64)
     DEFINE_PARSE_FUNCTION(float, Float, FLOAT, Float)
     DEFINE_PARSE_FUNCTION(double, Double, DOUBLE, Double)
-    DEFINE_PARSE_FUNCTION_SPECIAL(int32_t, Enum, ENUM, Enum)
     DEFINE_PARSE_FUNCTION_SPECIAL(int32_t, SInt32, SINT32, SInt32)
     DEFINE_PARSE_FUNCTION_SPECIAL(int64_t, SInt64, SINT64, SInt64)
     DEFINE_PARSE_FUNCTION_SPECIAL(uint32_t, Fixed32, FIXED32, Fixed32)
@@ -67,10 +66,46 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    const char* LVMessageEfficient::ParseEnum(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    {
+        std::shared_ptr<EnumMetadata> enumMetadata = fieldInfo._owner->FindEnumMetadata(fieldInfo.embeddedMessageName);
+        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
+
+        if (fieldInfo.isRepeated)
+        {
+            auto repeatedEnum = std::make_shared<LVRepeatedEnumMessageValue>(index);
+            ptr = PackedEnumParser(&(repeatedEnum->_value), ptr, ctx);
+
+            int count = repeatedEnum->_value.size();
+            for (size_t i = 0; i < count; i++)
+            {
+                auto enumValueFromProtobuf = repeatedEnum->_value[i];
+                repeatedEnum->_value[i] = enumMetadata->GetLVEnumValueFromProtoValue(enumValueFromProtobuf);
+            }
+
+            if (count != 0)
+            {
+                auto messageTypeSize = sizeof(int32_t);
+                NumericArrayResize(GetTypeCodeForSize(messageTypeSize), 1, reinterpret_cast<void*>(lv_ptr), count);
+                auto array = *(LV1DArrayHandle*)lv_ptr;
+                (*array)->cnt = count;
+                auto byteCount = count * sizeof(int32_t);
+                memcpy((*array)->bytes<int32_t>(), repeatedEnum->_value.data(), byteCount);
+            }
+        }
+        else
+        {
+            int32_t enumValueFromProtobuf;
+            ptr = ReadENUM(ptr, &enumValueFromProtobuf);
+            *(int32_t*)lv_ptr = enumMetadata->GetLVEnumValueFromProtoValue(enumValueFromProtobuf);
+        }
+        return ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     const char* LVMessageEfficient::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx)
     {
-        const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
-
         if (fieldInfo.isRepeated)
         {
             auto repeatedStringValuesIt = _repeatedStringValuesMap.find(fieldInfo.fieldName);
@@ -97,6 +132,7 @@ namespace grpc_labview
         {
             auto str = std::string();
             protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
+            auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
             SetLVString((LStrHandle*)lv_ptr, str);
         }
         return protobuf_ptr;
@@ -146,7 +182,6 @@ namespace grpc_labview
             do
             {
                 protobuf_ptr += tagSize;
-                LVMessageEfficient nestedMessage(metadata);
 
                 // Resize the vector if we need more memory
                 if (elementIndex >= numElements - 1)
@@ -156,9 +191,9 @@ namespace grpc_labview
                     repeatedMessageValuesIt->second.get()->_buffer.Resize(arraySize, _fillData);
                 }
 
-                auto vectorPtr = repeatedMessageValuesIt->second.get()->_buffer.data();
-                vectorPtr = vectorPtr + (elementIndex * clusterSize);
-                nestedMessage.SetLVClusterHandle(vectorPtr);
+                auto nestedMessageCluster = reinterpret_cast<int8_t*>(const_cast<char*>(repeatedMessageValuesIt->second.get()->_buffer.data()));
+                nestedMessageCluster = nestedMessageCluster + (elementIndex * clusterSize);
+                LVMessageEfficient nestedMessage(metadata, nestedMessageCluster);
                 protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
 
                 elementIndex++;
@@ -173,16 +208,19 @@ namespace grpc_labview
         }
         else
         {
-            LVMessageEfficient nestedMessage(metadata);
-            const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
-            nestedMessage.SetLVClusterHandle(lv_ptr);
+            auto nestedClusterPtr = _LVClusterHandle + fieldInfo.clusterOffset;
+            LVMessageEfficient nestedMessage(metadata, nestedClusterPtr);
             protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
         }
         return protobuf_ptr;
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void LVMessageEfficient::PostInteralParseAction()
     {
+        CopyOneofIndicesToCluster(_LVClusterHandle);
+
         for (auto nestedMessage : _repeatedMessageValuesMap)
         {
             auto& fieldInfo = nestedMessage.second.get()->_fieldInfo;
@@ -190,7 +228,7 @@ namespace grpc_labview
             auto numClusters = nestedMessage.second.get()->_numElements;
 
             auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
-            const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
+            auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
             auto clusterSize = metadata->clusterSize;
             auto alignment = metadata->alignmentRequirement;
 
@@ -202,22 +240,22 @@ namespace grpc_labview
             {
                 alignedElementSize++;
             }
-            NumericArrayResize(GetTypeCodeForSize(alignment), 1, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), alignedElementSize);
+            NumericArrayResize(GetTypeCodeForSize(alignment), 1, reinterpret_cast<void*>(lv_ptr), alignedElementSize);
             auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
             (*arrayHandle)->cnt = numClusters;
 
-            auto _vectorDataPtr = buffer.data();
-            auto _lvArrayDataPtr = (*arrayHandle)->bytes(0, alignment);
-            memcpy(_lvArrayDataPtr, _vectorDataPtr, byteSize);
+            auto vectorDataPtr = buffer.data();
+            auto lvArrayDataPtr = (*arrayHandle)->bytes(0, alignment);
+            memcpy(lvArrayDataPtr, vectorDataPtr, byteSize);
         }
 
         for (auto repeatedStringValue : _repeatedStringValuesMap)
         {
             auto& fieldInfo = repeatedStringValue.second.get()->_fieldInfo;
             auto& repeatedString = repeatedStringValue.second.get()->_repeatedString;
-            const char* lv_ptr = (this->GetLVClusterHandleSharedPtr()) + fieldInfo.clusterOffset;
+            auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
 
-            NumericArrayResize(GetTypeCodeForSize(sizeof(char*)), 1, reinterpret_cast<void*>(const_cast<char*>(lv_ptr)), repeatedString.size());
+            NumericArrayResize(GetTypeCodeForSize(sizeof(char*)), 1, reinterpret_cast<void*>(lv_ptr), repeatedString.size());
             auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
             (*arrayHandle)->cnt = repeatedString.size();
 

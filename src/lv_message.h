@@ -42,27 +42,20 @@ namespace grpc_labview
         void MergeFrom(const LVMessage &from);
         void CopyFrom(const google::protobuf::Message &from) final;
         void CopyFrom(const LVMessage &from);
+        void CopyOneofIndicesToCluster(int8_t* cluster) const;
         void InternalSwap(LVMessage *other);
         google::protobuf::Metadata GetMetadata() const final;
 
         bool ParseFromByteBuffer(const grpc::ByteBuffer& buffer);
         std::unique_ptr<grpc::ByteBuffer> SerializeToByteBuffer();
 
-        void SetLVClusterHandle(const char* lvClusterHandle) {
-            _LVClusterHandle = lvClusterHandle;
-        };
-
-        const char* GetLVClusterHandleSharedPtr() {
-            return _LVClusterHandle;
-        };
-
         std::map<int, std::shared_ptr<LVMessageValue>> _values;
         std::shared_ptr<MessageMetadata> _metadata;
+        std::map<std::string, int> _oneofContainerToSelectedIndexMap;
 
     protected:
         mutable google::protobuf::internal::CachedSize _cached_size_;
         google::protobuf::UnknownFieldSet _unknownFields;
-        const char* _LVClusterHandle;
 
         virtual const char *ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
         virtual const char *ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
