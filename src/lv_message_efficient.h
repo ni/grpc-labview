@@ -18,7 +18,7 @@ namespace grpc_labview
     class LVMessageEfficient : public LVMessage
     {
     public:
-        LVMessageEfficient(std::shared_ptr<MessageMetadata> metadata, int8_t* cluster) : LVMessage(metadata) { _LVClusterHandle = cluster; }
+        LVMessageEfficient(std::shared_ptr<MessageMetadata> metadata, int8_t* cluster) : LVMessage(metadata), _LVClusterHandle(cluster) {}
         ~LVMessageEfficient() {}
 
         Message* New(google::protobuf::Arena* arena) const override;
@@ -96,7 +96,7 @@ namespace grpc_labview
             if (numElements != 0)
             {
                 auto messageTypeSize = sizeof(MessageType);
-                NumericArrayResize(GetTypeCodeForSize(messageTypeSize), 1, reinterpret_cast<void*>(_lv_ptr), numElements);
+                NumericArrayResize(GetTypeCodeForSize(messageTypeSize), 1, _lv_ptr, numElements);
                 auto array = *(LV1DArrayHandle*)_lv_ptr;
                 (*array)->cnt = numElements;
                 auto byteCount = numElements * messageTypeSize;

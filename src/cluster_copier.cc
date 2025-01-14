@@ -16,7 +16,7 @@ namespace grpc_labview {
     // cluster: Pointer to the cluster created by LabVIEW
     void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
     {
-        for (auto indexAndValue : message._values)
+        for (auto& indexAndValue : message._values)
         {
             auto& value = indexAndValue.second;
             auto it = message._metadata->_mappedElements.find(value->_protobufId);
@@ -82,24 +82,7 @@ namespace grpc_labview {
         }
 
         // Second pass to fill the oneof selected_index. We can do this in one pass when we push the selected_field to the end of the oneof cluster!
-        if (message._oneofContainerToSelectedIndexMap.size() > 0)
-        {
-            // Must iterate over _elements and not _mappedElements since all oneof selected_index fields use -1 for the field number
-            // and there can be multiple oneof fields in a message.
-            for (auto& fieldMetadata : message._metadata->_elements)
-            {
-                if (fieldMetadata->isInOneof && fieldMetadata->protobufIndex < 0)
-                {
-                    // This field is the selected_index field of a oneof
-                    auto it = message._oneofContainerToSelectedIndexMap.find(fieldMetadata->oneofContainerName);
-                    if (it != message._oneofContainerToSelectedIndexMap.end())
-                    {
-                        auto selectedIndexPtr = reinterpret_cast<int*>(cluster + fieldMetadata->clusterOffset);
-                        *selectedIndexPtr = it->second;
-                    }
-                }
-            }
-        }
+        message.CopyOneofIndicesToCluster(cluster);
     }
 
     //---------------------------------------------------------------------
@@ -114,7 +97,7 @@ namespace grpc_labview {
                 // set the map of the selected index for the "oneofContainer" to this protobuf Index
                 assert(message._oneofContainerToSelectedIndexMap.find(fieldMetadata->oneofContainerName) == message._oneofContainerToSelectedIndexMap.end());
                 auto selected_index = *(int*)(cluster + fieldMetadata->clusterOffset);
-                message._oneofContainerToSelectedIndexMap.insert(std::pair<std::string, int>(fieldMetadata->oneofContainerName, selected_index));
+                message._oneofContainerToSelectedIndexMap.insert({ fieldMetadata->oneofContainerName, selected_index });
             }
         }
 

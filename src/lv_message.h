@@ -42,6 +42,7 @@ namespace grpc_labview
         void MergeFrom(const LVMessage &from);
         void CopyFrom(const google::protobuf::Message &from) final;
         void CopyFrom(const LVMessage &from);
+        void CopyOneofIndicesToCluster(int8_t* cluster) const;
         void InternalSwap(LVMessage *other);
         google::protobuf::Metadata GetMetadata() const final;
 

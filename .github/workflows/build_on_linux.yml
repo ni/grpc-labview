@@ -14,14 +14,14 @@ jobs:
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v4
-      
+
     - name: Update Submodules
       shell: bash
-      working-directory: ${{runner.workspace}}/grpc-labview      
+      working-directory: ${{runner.workspace}}/grpc-labview
       run: git submodule update --init --recursive
 
     - name: Create Build Environment
@@ -34,8 +34,8 @@ jobs:
       # access regardless of the host operating system
       shell: bash
       working-directory: ${{runner.workspace}}/cmake/build
-      # Note the current convention is to use the -S and -B options here to specify source 
-      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # Note the current convention is to use the -S and -B options here to specify source
+      # and build directories, but this is only available with CMake 3.13 and higher.
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
@@ -72,7 +72,7 @@ jobs:
         tar -czvf liblabview-grpc-server-linux.tar.gz -C ${{runner.workspace}}/cmake/build
         liblabview_grpc_server.so
         liblabview_grpc_generator.so
-    
+
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
       with:
