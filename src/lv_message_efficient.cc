@@ -79,8 +79,8 @@ namespace grpc_labview
             int count = repeatedEnum->_value.size();
             for (size_t i = 0; i < count; i++)
             {
-                auto enumValueFromPrtobuf = repeatedEnum->_value[i];
-                repeatedEnum->_value[i] = enumMetadata->GetLVEnumValueFromProtoValue(enumValueFromPrtobuf);
+                auto enumValueFromProtobuf = repeatedEnum->_value[i];
+                repeatedEnum->_value[i] = enumMetadata->GetLVEnumValueFromProtoValue(enumValueFromProtobuf);
             }
 
             if (count != 0)
@@ -95,9 +95,9 @@ namespace grpc_labview
         }
         else
         {
-            int32_t enumValueFromPrtobuf;
-            ptr = ReadENUM(ptr, &enumValueFromPrtobuf);
-            *(int32_t*)lv_ptr = enumMetadata->GetLVEnumValueFromProtoValue(enumValueFromPrtobuf);
+            int32_t enumValueFromProtobuf;
+            ptr = ReadENUM(ptr, &enumValueFromProtobuf);
+            *(int32_t*)lv_ptr = enumMetadata->GetLVEnumValueFromProtoValue(enumValueFromProtobuf);
         }
         return ptr;
     }
@@ -219,24 +219,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void LVMessageEfficient::PostInteralParseAction()
     {
-        if (_oneofContainerToSelectedIndexMap.size() > 0)
-        {
-            // Must iterate over _elements and not _mappedElements since all oneof selected_index fields use -1 for the field number
-            // and there can be multiple oneof fields in a message.
-            for (auto& fieldMetadata : _metadata->_elements)
-            {
-                if (fieldMetadata->isInOneof && fieldMetadata->protobufIndex < 0)
-                {
-                    // This field is the selected_index field of a oneof. This field only exists in the cluster
-                    // and is not a field in the message.
-                    if (_oneofContainerToSelectedIndexMap.find(fieldMetadata->oneofContainerName) != _oneofContainerToSelectedIndexMap.end())
-                    {
-                        auto selectedIndexPtr = _LVClusterHandle + fieldMetadata->clusterOffset;
-                        *(int*)selectedIndexPtr = _oneofContainerToSelectedIndexMap[fieldMetadata->oneofContainerName];
-                    }
-                }
-            }
-        }
+        CopyOneofIndicesToCluster(_LVClusterHandle);
 
         for (auto nestedMessage : _repeatedMessageValuesMap)
         {
