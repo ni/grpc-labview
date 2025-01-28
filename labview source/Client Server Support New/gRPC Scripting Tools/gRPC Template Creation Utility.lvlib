@@ -121,19 +121,18 @@
 			<Item Name="Get Constant.vi" Type="VI" URL="../Oneof API/OneOf Constants/Get Constant.vi"/>
 			<Item Name="OneOfConstantsEnum.ctl" Type="VI" URL="../Oneof API/OneOf Constants/OneOfConstantsEnum.ctl"/>
 		</Item>
+		<Item Name="Add Oneof Index To Metadata.vi" Type="VI" URL="../Oneof API/Add Oneof Index To Metadata.vi"/>
 		<Item Name="Add Oneof Indices To Metadata.vi" Type="VI" URL="../Oneof API/Add Oneof Indices To Metadata.vi"/>
 		<Item Name="Copy PDC To VI.vi" Type="VI" URL="../Oneof API/Copy PDC To VI.vi"/>
 		<Item Name="Create LVClass for Oneof.vi" Type="VI" URL="../Oneof API/Create LVClass for Oneof.vi"/>
 		<Item Name="Create OneOf Accessors.vi" Type="VI" URL="../Oneof API/Create OneOf Accessors.vi"/>
 		<Item Name="Create Oneof Case Structure.vi" Type="VI" URL="../Oneof API/Create Oneof Case Structure.vi"/>
-		<Item Name="Create Oneof Class Converter.vi" Type="VI" URL="../Oneof API/Create Oneof Class Converter.vi"/>
 		<Item Name="Create OneOf Field Accessors.vi" Type="VI" URL="../Oneof API/Create OneOf Field Accessors.vi"/>
 		<Item Name="Create Oneof Message Converter Skeletons.vi" Type="VI" URL="../Oneof API/Create Oneof Message Converter Skeletons.vi"/>
+		<Item Name="Create Oneof Message Converters (Flat to Rich).vi" Type="VI" URL="../Oneof API/Create Oneof Message Converters (Flat to Rich).vi"/>
 		<Item Name="Create Oneof Message Converters (Rich to Flat).vi" Type="VI" URL="../Oneof API/Create Oneof Message Converters (Rich to Flat).vi"/>
-		<Item Name="Create Oneof Message Converters.vi" Type="VI" URL="../Oneof API/Create Oneof Message Converters.vi"/>
 		<Item Name="Create Oneof Protobuf To Field Name.vi" Type="VI" URL="../Oneof API/Create Oneof Protobuf To Field Name.vi"/>
 		<Item Name="Create Selected Index Numeric In Cluster.vi" Type="VI" URL="../Oneof API/Create Selected Index Numeric In Cluster.vi"/>
-		<Item Name="Create VI From Template For Oneof Class.vi" Type="VI" URL="../Oneof API/Create VI From Template For Oneof Class.vi"/>
 		<Item Name="Delete Oneof Template Files.vi" Type="VI" URL="../Oneof API/Delete Oneof Template Files.vi"/>
 		<Item Name="Drop Oneof Constant into Case Structure Default.vi" Type="VI" URL="../Oneof API/Drop Oneof Constant into Case Structure Default.vi"/>
 		<Item Name="Drop Protobuf To Field Converter SubVI.vi" Type="VI" URL="../Oneof API/Drop Protobuf To Field Converter SubVI.vi"/>
@@ -142,12 +141,15 @@
 		<Item Name="Get Rich to Flat Info.vi" Type="VI" URL="../Oneof API/Get Rich to Flat Info.vi"/>
 		<Item Name="Get Selected Index Terminal from Unbundler (by oneof name).vi" Type="VI" URL="../Oneof API/Get Selected Index Terminal from Unbundler (by oneof name).vi"/>
 		<Item Name="Get Typedef Name.vi" Type="VI" URL="../Oneof API/Get Typedef Name.vi"/>
-		<Item Name="Script Rich to Flat Conversion.vi" Type="VI" URL="../Oneof API/Script Rich to Flat Conversion.vi"/>
+		<Item Name="Script Field Conversion.vi" Type="VI" URL="../Oneof API/Script Field Conversion.vi"/>
+		<Item Name="Script Flat to Rich Message Conversion.vi" Type="VI" URL="../Oneof API/Script Flat to Rich Message Conversion.vi"/>
+		<Item Name="Script Flat to Rich Oneof Conversion.vi" Type="VI" URL="../Oneof API/Script Flat to Rich Oneof Conversion.vi"/>
+		<Item Name="Script Rich to Flat Message Conversion.vi" Type="VI" URL="../Oneof API/Script Rich to Flat Message Conversion.vi"/>
+		<Item Name="Script Rich to Flat Oneof Conversion.vi" Type="VI" URL="../Oneof API/Script Rich to Flat Oneof Conversion.vi"/>
 		<Item Name="ScriptOneofClassConverter.vi" Type="VI" URL="../Oneof API/ScriptOneofClassConverter.vi"/>
 		<Item Name="Set LVClass Const Label.vi" Type="VI" URL="../Oneof API/Set LVClass Const Label.vi"/>
 		<Item Name="Set LVClass Control Label.vi" Type="VI" URL="../Oneof API/Set LVClass Control Label.vi"/>
 		<Item Name="Update OneOf Field Accessor.vi" Type="VI" URL="../Oneof API/Update OneOf Field Accessor.vi"/>
-		<Item Name="Wire Between Unbundle And Bundle For Message Converter With Oneof.vi" Type="VI" URL="../Oneof API/Wire Between Unbundle And Bundle For Message Converter With Oneof.vi"/>
 		<Item Name="Wire Selected_Index To Case Selector.vi" Type="VI" URL="../Oneof API/Wire Selected_Index To Case Selector.vi"/>
 	</Item>
 	<Item Name="Project API" Type="Folder">
@@ -233,7 +235,6 @@
 			<Item Name="Populate gRPC Events.vi" Type="VI" URL="../Top Level API/Populate gRPC Events.vi"/>
 		</Item>
 		<Item Name="RPC Messages" Type="Folder">
-			<Item Name="Check Message Data Clusters.vi" Type="VI" URL="../Top Level API/Check Message Data Clusters.vi"/>
 			<Item Name="Create Enum Accessor.vi" Type="VI" URL="../Top Level API/Create Enum Accessor.vi"/>
 			<Item Name="Create Enum Data Clusters (simple).vi" Type="VI" URL="../Top Level API/Create Enum Data Clusters (simple).vi"/>
 			<Item Name="Create Enum Data Clusters.vi" Type="VI" URL="../Top Level API/Create Enum Data Clusters.vi"/>
@@ -265,8 +266,11 @@
 			<Item Name="Get LV Object Indicators for Proto Field Type.vi" Type="VI" URL="../Top Level API/Get LV Object Indicators for Proto Field Type.vi"/>
 			<Item Name="Get Message Placement Cluster.vi" Type="VI" URL="../Top Level API/Get Message Placement Cluster.vi"/>
 			<Item Name="Get Or Create Typedef.vi" Type="VI" URL="../Top Level API/Get Or Create Typedef.vi"/>
+			<Item Name="Is Element Conversion Required.vi" Type="VI" URL="../Top Level API/Is Element Conversion Required.vi"/>
+			<Item Name="Is Element Well Known Type.vi" Type="VI" URL="../Top Level API/Is Element Well Known Type.vi"/>
 			<Item Name="Set Enum Control Strings.vi" Type="VI" URL="../Top Level API/Set Enum Control Strings.vi"/>
 			<Item Name="Set Message Field Representation.vi" Type="VI" URL="../Top Level API/Set Message Field Representation.vi"/>
+			<Item Name="Update Control for Element.vi" Type="VI" URL="../Top Level API/Update Control for Element.vi"/>
 			<Item Name="Update Enum Getter.vi" Type="VI" URL="../Top Level API/Update Enum Getter.vi"/>
 			<Item Name="Update Enum Mapper.vi" Type="VI" URL="../Top Level API/Update Enum Mapper.vi"/>
 			<Item Name="Update Enum Setter.vi" Type="VI" URL="../Top Level API/Update Enum Setter.vi"/>

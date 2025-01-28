@@ -1,7 +1,8 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <grpc_server.h>
-#include "lv_message_efficient.h"
+#include <lv_message_efficient.h>
+#include <well_known_types.h>
 #include <sstream>
 
 //---------------------------------------------------------------------
@@ -149,8 +150,13 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     const char* LVMessageEfficient::ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx)
     {
-        auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
+        switch (fieldInfo.wellKnownType)
+        {
+        case wellknown::Types::Double2DArray:
+            return ParseDouble2DArrayMessage(tag, fieldInfo, index, protobuf_ptr, ctx);
+        }
 
+        auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
         if (fieldInfo.isRepeated)
         {
             // if the array is not big enough, resize it to 2x the size
@@ -212,6 +218,19 @@ namespace grpc_labview
             LVMessageEfficient nestedMessage(metadata, nestedClusterPtr);
             protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);
         }
+        return protobuf_ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char* LVMessageEfficient::ParseDouble2DArrayMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx)
+    {
+        auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
+        auto nestedMessage = std::make_shared<LVMessage>(metadata);
+        protobuf_ptr = ctx->ParseMessage(nestedMessage.get(), protobuf_ptr);
+        auto nestedClusterPtr = _LVClusterHandle + fieldInfo.clusterOffset;
+        auto nestedMessageValue = std::make_shared<LVNestedMessageMessageValue>(index, nestedMessage);
+        wellknown::Double2DArray::CopyToCluster(fieldInfo, nestedClusterPtr, nestedMessageValue);
         return protobuf_ptr;
     }
 

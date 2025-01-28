@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <cluster_copier.h>
+#include <well_known_types.h>
 #include <lv_message.h>
 
 namespace grpc_labview {
@@ -11,7 +12,7 @@ namespace grpc_labview {
     // This method takes the address of the cluster as a parameter and writes to it using the offsets present
     // in the metadata. Each field of the cluster gets written that way, by fetching the offset from the metadata.
     // [Inputs]
-    // LVMessage: Rrepresentation of the proto 'message' in LabVIEW
+    // LVMessage: Representation of the proto 'message' in LabVIEW
     //  ->  message._values: contains the deserialized values for this message
     // cluster: Pointer to the cluster created by LabVIEW
     void ClusterDataCopier::CopyToCluster(const LVMessage& message, int8_t* cluster)
@@ -186,12 +187,7 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     bool ClusterDataCopier::AnyBuilderAddValue(LVMessage& message, LVMessageMetadataType valueType, bool isRepeated, int protobufIndex, int8_t* value)
     {
-        auto metadata = std::make_shared<MessageElementMetadata>(nullptr);
-        metadata->clusterOffset = 0;
-        metadata->embeddedMessageName = std::string();
-        metadata->isRepeated = isRepeated;
-        metadata->protobufIndex = protobufIndex;
-        metadata->type = valueType;
+        auto metadata = std::make_shared<MessageElementMetadata>(valueType, isRepeated, protobufIndex);
 
         switch (valueType)
         {
@@ -298,6 +294,13 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyMessageToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
+        switch (metadata->wellKnownType)
+        {
+        case wellknown::Types::Double2DArray:
+            wellknown::Double2DArray::CopyToCluster(*(metadata.get()), start, value);
+            return;
+        }
+
         if (metadata->isRepeated)
         {
             auto repeatedNested = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>(value);
@@ -909,8 +912,14 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyMessageFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
-        auto nestedMetadata = metadata->_owner->FindMetadata(metadata->embeddedMessageName);
+        switch (metadata->wellKnownType)
+        {
+        case wellknown::Types::Double2DArray:
+            wellknown::Double2DArray::CopyFromCluster(metadata, start, message);
+            return;
+        }
 
+        auto nestedMetadata = metadata->_owner->FindMetadata(metadata->embeddedMessageName);
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;

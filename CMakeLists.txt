@@ -88,7 +88,9 @@ add_library(labview_grpc_server SHARED
   src/lv_proto_server_reflection_plugin.cc
   src/lv_proto_server_reflection_service.cc
   src/message_element_metadata_owner.cc
+  src/message_metadata.cc
   src/unpacked_fields.cc
+  src/well_known_types.cc
 )
 target_link_libraries(labview_grpc_server
    ${_REFLECTION}

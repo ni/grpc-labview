@@ -38,66 +38,6 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    std::shared_ptr<MessageMetadata> CreateMessageMetadata(IMessageElementMetadataOwner* metadataOwner, LVMessageMetadata* lvMetadata)
-    {
-        std::shared_ptr<MessageMetadata> metadata(new MessageMetadata());
-
-        auto name = GetLVString(lvMetadata->messageName);
-        metadata->messageName = name;
-        metadata->typeUrl = name;
-        int clusterOffset = 0;
-        if (lvMetadata->elements != nullptr)
-        {
-            // byteAlignment for LVMesageElementMetadata would be the size of its largest element which is a LStrHandle
-            auto lvElement = (LVMesageElementMetadata*)(*lvMetadata->elements)->bytes(0, sizeof(LStrHandle));
-            for (int x = 0; x < (*lvMetadata->elements)->cnt; ++x, ++lvElement)
-            {
-                auto element = std::make_shared<MessageElementMetadata>(metadataOwner);
-                element->embeddedMessageName = GetLVString(lvElement->embeddedMessageName);
-                element->protobufIndex = lvElement->protobufIndex;
-                element->type = (LVMessageMetadataType)lvElement->valueType;
-                element->isRepeated = lvElement->isRepeated;
-                metadata->_elements.push_back(element);
-                metadata->_mappedElements.emplace(element->protobufIndex, element);
-
-            }
-        }
-        return metadata;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    std::shared_ptr<MessageMetadata> CreateMessageMetadata2(IMessageElementMetadataOwner* metadataOwner, LVMessageMetadata2* lvMetadata)
-    {
-        std::shared_ptr<MessageMetadata> metadata(new MessageMetadata());
-
-        auto name = GetLVString(lvMetadata->messageName);
-        metadata->messageName = name;
-        metadata->typeUrl = GetLVString(lvMetadata->typeUrl);
-        int clusterOffset = 0;
-        if (lvMetadata->elements != nullptr)
-        {
-            // byteAlignment for LVMesageElementMetadata would be the size of its largest element which is a LStrHandle
-            auto lvElement = (LVMesageElementMetadata*)(*lvMetadata->elements)->bytes(0, sizeof(LStrHandle));
-            for (int x = 0; x < (*lvMetadata->elements)->cnt; ++x, ++lvElement)
-            {
-                auto element = std::make_shared<MessageElementMetadata>(metadataOwner);
-                element->fieldName = GetLVString(lvElement->fieldName);
-                element->embeddedMessageName = GetLVString(lvElement->embeddedMessageName);
-                element->protobufIndex = lvElement->protobufIndex;
-                element->type = (LVMessageMetadataType)lvElement->valueType;
-                element->isRepeated = lvElement->isRepeated;
-                metadata->_elements.push_back(element);
-                metadata->_mappedElements.emplace(element->protobufIndex, element);
-                element->isInOneof = lvElement->isInOneof;
-                element->oneofContainerName = GetLVString(lvElement->oneofContainerName);
-            }
-        }
-        return metadata;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
 
     std::vector<std::string> SplitString(std::string s, std::string delimiter)
     {
@@ -209,7 +149,7 @@ LIBRARY_EXPORT int32_t LVCreateServer(grpc_labview::gRPCid** id)
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t LVStartServer(char* address, char* serverCertificatePath, char* serverKeyPath, grpc_labview::gRPCid** id)
-{   
+{
     auto server = (*id)->CastTo<grpc_labview::LabVIEWgRPCServer>();
     if (server == nullptr)
     {
@@ -221,7 +161,7 @@ LIBRARY_EXPORT int32_t LVStartServer(char* address, char* serverCertificatePath,
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t LVGetServerListeningPort(grpc_labview::gRPCid** id, int* listeningPort)
-{   
+{
     auto server = (*id)->CastTo<grpc_labview::LabVIEWgRPCServer>();
     if (server == nullptr)
     {
@@ -255,13 +195,13 @@ int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId)
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t RegisterMessageMetadata(grpc_labview::gRPCid** id, grpc_labview::LVMessageMetadata* lvMetadata)
-{    
+{
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
     if (server == nullptr)
     {
         return -1;
     }
-    auto metadata = CreateMessageMetadata(server.get(), lvMetadata);
+    auto metadata = std::make_shared<grpc_labview::MessageMetadata>(server.get(), lvMetadata);
     server->RegisterMetadata(metadata);
     return 0;
 }
@@ -269,13 +209,13 @@ LIBRARY_EXPORT int32_t RegisterMessageMetadata(grpc_labview::gRPCid** id, grpc_l
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t RegisterMessageMetadata2(grpc_labview::gRPCid** id, grpc_labview::LVMessageMetadata2* lvMetadata)
-{    
+{
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
     if (server == nullptr)
     {
         return -1;
     }
-    auto metadata = CreateMessageMetadata2(server.get(), lvMetadata);
+    auto metadata = std::make_shared<grpc_labview::MessageMetadata>(server.get(), lvMetadata);
     server->RegisterMetadata(metadata);
     return 0;
 }
@@ -305,7 +245,7 @@ LIBRARY_EXPORT uint32_t GetLVEnumValueFromProtoValue(grpc_labview::gRPCid** id, 
     }
     auto metadata = (server.get())->FindEnumMetadata(std::string(enumName));
     *(uint32_t*)lvEnumValue = metadata.get()->GetLVEnumValueFromProtoValue(protoValue);
-    
+
     return 0;
 }
 
@@ -327,7 +267,7 @@ LIBRARY_EXPORT int32_t GetProtoValueFromLVEnumValue(grpc_labview::gRPCid** id, c
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t CompleteMetadataRegistration(grpc_labview::gRPCid** id)
-{        
+{
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();
     if (server == nullptr)
     {
@@ -340,7 +280,7 @@ LIBRARY_EXPORT int32_t CompleteMetadataRegistration(grpc_labview::gRPCid** id)
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t RegisterServerEvent(grpc_labview::gRPCid** id, const char* name, grpc_labview::LVUserEventRef* item, const char* requestMessageName, const char* responseMessageName)
-{    
+{
     auto server = (*id)->CastTo<grpc_labview::LabVIEWgRPCServer>();
     if (server == nullptr)
     {
@@ -354,7 +294,7 @@ LIBRARY_EXPORT int32_t RegisterServerEvent(grpc_labview::gRPCid** id, const char
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t RegisterGenericMethodServerEvent(grpc_labview::gRPCid** id, grpc_labview::LVUserEventRef* item)
-{    
+{
     auto server = (*id)->CastTo<grpc_labview::LabVIEWgRPCServer>();
     if (server == nullptr)
     {
@@ -442,7 +382,7 @@ LIBRARY_EXPORT int32_t CloseServerEvent(grpc_labview::gRPCid** id)
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t SetCallStatus(grpc_labview::gRPCid** id, int grpcErrorCode, const char* errorMessage)
-{    
+{
     auto data = (*id)->CastTo<grpc_labview::GenericMethodData>();
     if (data == nullptr)
     {
@@ -474,8 +414,8 @@ LIBRARY_EXPORT int32_t SetLVRTModulePath(const char* modulePath)
     {
         return -1;
     }
-	
-	grpc_labview::SetLVRTModulePath(modulePath);
-	
-	return 0;    
+
+    grpc_labview::SetLVRTModulePath(modulePath);
+
+    return 0;
 }

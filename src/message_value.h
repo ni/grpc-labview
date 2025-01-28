@@ -2,7 +2,11 @@
 //---------------------------------------------------------------------
 #pragma once
 
-namespace grpc_labview 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+#include <grpc_server.h>
+
+namespace grpc_labview
 {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -37,7 +41,7 @@ namespace grpc_labview
         LVMessageValue(int protobufId);
 
     public:
-        int _protobufId;    
+        int _protobufId;
 
     public:
         virtual void* RawValue() = 0;
@@ -56,13 +60,13 @@ namespace grpc_labview
             LVMessageValue(protobufId)
         {
         }
-        
+
         google::protobuf::RepeatedField<T> _value;
 
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
         google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
-    
+
     protected:
         int _cachedSize;
     };
@@ -142,7 +146,7 @@ namespace grpc_labview
         LVEnumMessageValue(int protobufId, int _value);
 
     public:
-        int _value;    
+        int _value;
 
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
