@@ -97,27 +97,15 @@ namespace grpc_labview
     using LV1DArrayHandle = LV1DArray**;
 
     struct LV2DArray {
-        int32_t firstDimensionSize; /* number of T elements for the first dimension */
-        int32_t secondDimensionSize; /* number of T elements for the second dimension */
+        int32_t dimensionSizes[2]; /* number of T elements for each dimension */
         int8_t rawBytes[1]; /* (firstDimensionSize * secondDimensionSize * sizeof(T)) bytes */
 
+        // The start of 2D array data is always aligned and does not require padding.
         template<typename T>
         T* bytes()
         {
             static_assert(!std::is_class<T>::value, "T must not be a struct/class type.");
-            return (T*)(bytes(0, sizeof(T)));
-        }
-
-        template<typename T>
-        T* bytes(int byteOffset)
-        {
-            static_assert(!std::is_class<T>::value, "T must not be a struct/class type.");
-            return (T*)(bytes(byteOffset, sizeof(T)));
-        }
-
-        void* bytes(int byteOffset, int byteAlignment)
-        {
-            return (void*)(rawBytes + AlignClusterOffset(4, byteAlignment) - 4 + byteOffset);
+            return (T*)(rawBytes);
         }
     };
 

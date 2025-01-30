@@ -55,7 +55,7 @@ namespace grpc_labview
     #ifdef _PS_4
     #pragma pack (push, 1)
     #endif
-    struct LVMesageElementMetadata
+    struct LVMessageElementMetadata
     {
         LStrHandle fieldName;
         LStrHandle embeddedMessageName;
@@ -75,7 +75,7 @@ namespace grpc_labview
     {
     public:
         MessageElementMetadata(LVMessageMetadataType valueType, bool isRepeated, int protobufIndex);
-        MessageElementMetadata(IMessageElementMetadataOwner* owner, LVMesageElementMetadata* elementMetadata, int metadataVersion = 2);
+        MessageElementMetadata(IMessageElementMetadataOwner* owner, LVMessageElementMetadata* elementMetadata, int metadataVersion = 2);
 
     public:
         IMessageElementMetadataOwner* _owner;
@@ -134,7 +134,7 @@ namespace grpc_labview
         MessageMetadata(IMessageElementMetadataOwner* metadataOwner, LVMessageMetadata2* lvMetadata);
 
     private:
-        void InitializeElements(IMessageElementMetadataOwner* metadataOwner, LVMesageElementMetadata* lvElement, int elementCount, int metadataVersion);
+        void InitializeElements(IMessageElementMetadataOwner* metadataOwner, LVMessageElementMetadata* lvElement, int elementCount, int metadataVersion);
 
     public:
         std::string messageName;

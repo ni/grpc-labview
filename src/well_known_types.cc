@@ -72,8 +72,8 @@ namespace grpc_labview
                 return;
             }
 
-            int rows = (*array)->firstDimensionSize;
-            int columns = (*array)->secondDimensionSize;
+            int rows = (*array)->dimensionSizes[0];
+            int columns = (*array)->dimensionSizes[1];
             if (rows == 0 || columns == 0)
             {
                 return;
@@ -139,8 +139,8 @@ namespace grpc_labview
             {
                 NumericArrayResize(GetTypeCodeForSize(sizeof(double)), 2, start, elementCount);
                 auto array = *(LV2DArrayHandle*)start;
-                (*array)->firstDimensionSize = rows;
-                (*array)->secondDimensionSize = columns;
+                (*array)->dimensionSizes[0] = rows;
+                (*array)->dimensionSizes[1] = columns;
                 auto byteCount = elementCount * sizeof(double);
                 memcpy((*array)->bytes<double>(), dataValue->_value.data(), byteCount);
             }

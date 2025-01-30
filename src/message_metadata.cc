@@ -26,7 +26,7 @@ namespace grpc_labview
     };
 
     //---------------------------------------------------------------------
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     MessageElementMetadata::MessageElementMetadata(LVMessageMetadataType valueType, bool isRepeated, int protobufIndex)
     {
         _owner = nullptr;
@@ -40,7 +40,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-	MessageElementMetadata::MessageElementMetadata(IMessageElementMetadataOwner* owner, LVMesageElementMetadata* lvElement, int metadataVersion)
+    MessageElementMetadata::MessageElementMetadata(IMessageElementMetadataOwner* owner, LVMessageElementMetadata* lvElement, int metadataVersion)
     {
         _owner = owner;
         clusterOffset = 0;
@@ -84,8 +84,8 @@ namespace grpc_labview
 
         if (lvMetadata->elements != nullptr)
         {
-            // byteAlignment for LVMesageElementMetadata would be the size of its largest element which is a LStrHandle
-            auto lvElement = (LVMesageElementMetadata*)(*lvMetadata->elements)->bytes(0, sizeof(LStrHandle));
+            // byteAlignment for LVMessageElementMetadata would be the size of its largest element which is a LStrHandle
+            auto lvElement = (LVMessageElementMetadata*)(*lvMetadata->elements)->bytes(0, sizeof(LStrHandle));
             auto metadataVersion = 1;
             InitializeElements(metadataOwner, lvElement, (*lvMetadata->elements)->cnt, metadataVersion);
         }
@@ -103,8 +103,8 @@ namespace grpc_labview
 
         if (lvMetadata->elements != nullptr)
         {
-            // byteAlignment for LVMesageElementMetadata would be the size of its largest element which is a LStrHandle
-            auto lvElement = (LVMesageElementMetadata*)(*lvMetadata->elements)->bytes(0, sizeof(LStrHandle));
+            // byteAlignment for LVMessageElementMetadata would be the size of its largest element which is a LStrHandle
+            auto lvElement = (LVMessageElementMetadata*)(*lvMetadata->elements)->bytes(0, sizeof(LStrHandle));
             auto metadataVersion = 2;
             InitializeElements(metadataOwner, lvElement, (*lvMetadata->elements)->cnt, metadataVersion);
         }
@@ -112,7 +112,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void MessageMetadata::InitializeElements(IMessageElementMetadataOwner* metadataOwner, LVMesageElementMetadata* lvElement, int elementCount, int metadataVersion)
+    void MessageMetadata::InitializeElements(IMessageElementMetadataOwner* metadataOwner, LVMessageElementMetadata* lvElement, int elementCount, int metadataVersion)
     {
         for (int i = 0; i < elementCount; i++, lvElement++)
         {
