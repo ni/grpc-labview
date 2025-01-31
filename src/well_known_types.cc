@@ -36,7 +36,7 @@ namespace grpc_labview
 
         //---------------------------------------------------------------------
         //---------------------------------------------------------------------
-        std::shared_ptr<MessageMetadata> MetadataOwner::FindMetadata(const std::string & name)
+        std::shared_ptr<MessageMetadata> MetadataOwner::FindMetadata(const std::string& name)
         {
             return _owner->FindLocalMetadata(name);
         }
@@ -59,7 +59,7 @@ namespace grpc_labview
 
         //---------------------------------------------------------------------
         //---------------------------------------------------------------------
-        void Double2DArray::CopyFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t * start, LVMessage & message)
+        void Double2DArray::CopyFromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
         {
             // LV doesn't support arrays of arrays. CopyMessageFromCluster should be used instead to copy/serialize based
             // proto/cluster data type rather than native LV array data type.
@@ -104,7 +104,7 @@ namespace grpc_labview
 
         //---------------------------------------------------------------------
         //---------------------------------------------------------------------
-        void Double2DArray::CopyToCluster(const MessageElementMetadata & metadata, int8_t * start, const std::shared_ptr<LVMessageValue>&value)
+        void Double2DArray::CopyToCluster(const MessageElementMetadata& metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
         {
             // LV doesn't support arrays of arrays. CopyMessageFromCluster should be used instead to copy/serialize based
             // proto/cluster data type rather than native LV array data type.
@@ -152,7 +152,7 @@ namespace grpc_labview
 
         //---------------------------------------------------------------------
         //---------------------------------------------------------------------
-        std::shared_ptr<MessageMetadata> Double2DArray::GetMetadata(IMessageElementMetadataOwner * metadataOwner)
+        std::shared_ptr<MessageMetadata> Double2DArray::GetMetadata(IMessageElementMetadataOwner* metadataOwner)
         {
             auto messageMetadata = std::make_shared<MessageMetadata>();
             messageMetadata->messageName = GetMessageName();

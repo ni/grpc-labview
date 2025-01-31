@@ -251,7 +251,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyStringToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyStringToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -279,7 +279,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyBytesToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyBytesToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         CopyStringToCluster(metadata, start, value);
     }
@@ -292,7 +292,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyMessageToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyMessageToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         switch (metadata->wellKnownType)
         {
@@ -337,7 +337,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyInt32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyInt32ToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -359,7 +359,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyUInt32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyUInt32ToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -379,7 +379,7 @@ namespace grpc_labview {
         }
     }
 
-    void ClusterDataCopier::CopyEnumToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyEnumToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
 
@@ -416,7 +416,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyInt64ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyInt64ToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -438,7 +438,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyUInt64ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyUInt64ToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -460,7 +460,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyBoolToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyBoolToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -482,7 +482,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyDoubleToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyDoubleToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -505,7 +505,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyFloatToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyFloatToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -527,7 +527,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopySInt32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopySInt32ToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -549,7 +549,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopySInt64ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopySInt64ToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -571,7 +571,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyFixed32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyFixed32ToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -593,7 +593,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopySFixed32ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopySFixed32ToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -615,7 +615,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyFixed64ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopyFixed64ToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -637,7 +637,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopySFixed64ToCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+    void ClusterDataCopier::CopySFixed64ToCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
     {
         if (metadata->isRepeated)
         {
@@ -659,7 +659,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyStringFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyStringFromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -687,14 +687,14 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyBytesFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyBytesFromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         CopyStringFromCluster(metadata, start, message);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyBoolFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyBoolFromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -719,7 +719,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyInt32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyInt32FromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -744,7 +744,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyUInt32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyUInt32FromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -767,7 +767,7 @@ namespace grpc_labview {
         }
     }
 
-    void ClusterDataCopier::CopyEnumFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyEnumFromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
 
@@ -810,7 +810,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyInt64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyInt64FromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -835,7 +835,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyUInt64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyUInt64FromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -860,7 +860,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyDoubleFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyDoubleFromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -885,7 +885,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyFloatFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyFloatFromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -910,7 +910,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyMessageFromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyMessageFromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         switch (metadata->wellKnownType)
         {
@@ -952,7 +952,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopySInt32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopySInt32FromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -977,7 +977,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopySInt64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopySInt64FromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -1002,7 +1002,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyFixed32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyFixed32FromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -1027,7 +1027,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopyFixed64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopyFixed64FromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -1052,7 +1052,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopySFixed32FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopySFixed32FromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
@@ -1077,7 +1077,7 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ClusterDataCopier::CopySFixed64FromCluster(const std::shared_ptr<MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
+    void ClusterDataCopier::CopySFixed64FromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         if (metadata->isRepeated)
         {
