@@ -42,7 +42,7 @@ namespace grpc_labview
         private:
             static MetadataOwner* _instance;
             static std::mutex _mutex;
-            MessageElementMetadataOwner* _owner;
+            std::unique_ptr<MessageElementMetadataOwner> _owner;
 
             MetadataOwner();
         };

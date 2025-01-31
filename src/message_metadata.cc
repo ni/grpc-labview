@@ -9,7 +9,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     // Functions for calculating whether an element is considered a well known type.
     //---------------------------------------------------------------------
-    static wellknown::Types IsWellKnownDouble2DArray(const MessageElementMetadata& metadata)
+    static wellknown::Types CalculateDouble2DArrayWellKnownTypeEnum(const MessageElementMetadata& metadata)
     {
         if (!metadata.isRepeated)
         {
@@ -22,7 +22,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     std::map<const std::string, wellknown::Types(*)(const MessageElementMetadata&)> MessageElementMetadata::_wellKnownTypeFunctionMap =
     {
-        { wellknown::Double2DArray::GetMessageName(), IsWellKnownDouble2DArray}
+        { wellknown::Double2DArray::GetMessageName(), CalculateDouble2DArrayWellKnownTypeEnum}
     };
 
     //---------------------------------------------------------------------
@@ -85,7 +85,7 @@ namespace grpc_labview
         if (lvMetadata->elements != nullptr)
         {
             // byteAlignment for LVMessageElementMetadata would be the size of its largest element which is a LStrHandle
-            auto lvElement = (LVMessageElementMetadata*)(*lvMetadata->elements)->bytes(0, sizeof(LStrHandle));
+            auto lvElement = (LVMessageElementMetadata*)(*lvMetadata->elements)->bytes(0, alignof(LVMessageElementMetadata));
             auto metadataVersion = 1;
             InitializeElements(metadataOwner, lvElement, (*lvMetadata->elements)->cnt, metadataVersion);
         }
@@ -104,7 +104,7 @@ namespace grpc_labview
         if (lvMetadata->elements != nullptr)
         {
             // byteAlignment for LVMessageElementMetadata would be the size of its largest element which is a LStrHandle
-            auto lvElement = (LVMessageElementMetadata*)(*lvMetadata->elements)->bytes(0, sizeof(LStrHandle));
+            auto lvElement = (LVMessageElementMetadata*)(*lvMetadata->elements)->bytes(0, alignof(LVMessageElementMetadata));
             auto metadataVersion = 2;
             InitializeElements(metadataOwner, lvElement, (*lvMetadata->elements)->cnt, metadataVersion);
         }

@@ -105,6 +105,7 @@ namespace grpc_labview
         T* bytes()
         {
             static_assert(!std::is_class<T>::value, "T must not be a struct/class type.");
+            static_assert(sizeof(T) <= 8, "Need to revisit logic if we ever have element size larger than 8 bytes.");
             return (T*)(rawBytes);
         }
     };

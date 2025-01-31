@@ -20,8 +20,8 @@ namespace grpc_labview
             if (_instance == nullptr)
             {
                 _instance = new MetadataOwner();
-                auto owner = _instance->_owner;
-                owner->RegisterMetadata(Double2DArray::GetMetadata(owner));
+                auto& owner = _instance->_owner;
+                owner->RegisterMetadata(Double2DArray::GetMetadata(owner.get()));
                 owner->FinalizeMetadata();
             }
             return *_instance;
@@ -31,7 +31,7 @@ namespace grpc_labview
         //---------------------------------------------------------------------
         MetadataOwner::MetadataOwner()
         {
-            _owner = new MessageElementMetadataOwner();
+            _owner = std::make_unique<MessageElementMetadataOwner>();
         }
 
         //---------------------------------------------------------------------
@@ -141,8 +141,12 @@ namespace grpc_labview
                 auto array = *(LV2DArrayHandle*)start;
                 (*array)->dimensionSizes[0] = rows;
                 (*array)->dimensionSizes[1] = columns;
-                auto byteCount = elementCount * sizeof(double);
-                memcpy((*array)->bytes<double>(), dataValue->_value.data(), byteCount);
+                // Protect against a malformed message where the amount of data sent doesn't match the dimension sizes.
+                // LV will automatically pad/handle writing less data than was allocated to the array so we just need
+                // to make sure we don't write more data than was allocated to the array.
+                auto lvByteCount = elementCount * sizeof(double);
+                auto protobufByteCount = dataValue->_value.size() * sizeof(double);
+                memcpy((*array)->bytes<double>(), dataValue->_value.data(), std::min(lvByteCount, protobufByteCount));
             }
         }
 
