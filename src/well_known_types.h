@@ -56,7 +56,7 @@ namespace grpc_labview
             static const std::string& GetMessageName();
             static const std::string& GetMessageUrl();
 
-            static void CopyToCluster(const grpc_labview::MessageElementMetadata& metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value);
+            static void CopyToCluster(const grpc_labview::MessageElementMetadata& metadata, int8_t* start, std::shared_ptr<const LVMessageValue>& value);
             static void CopyFromCluster(std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message);
             static std::shared_ptr<MessageMetadata> GetMetadata(IMessageElementMetadataOwner* metadataOwner);
 

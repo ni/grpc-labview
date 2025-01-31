@@ -104,7 +104,7 @@ namespace grpc_labview
 
         //---------------------------------------------------------------------
         //---------------------------------------------------------------------
-        void Double2DArray::CopyToCluster(const MessageElementMetadata& metadata, int8_t* start, const std::shared_ptr<LVMessageValue>& value)
+        void Double2DArray::CopyToCluster(const MessageElementMetadata& metadata, int8_t* start, std::shared_ptr<const LVMessageValue>& value)
         {
             // LV doesn't support arrays of arrays. CopyMessageFromCluster should be used instead to copy/serialize based
             // proto/cluster data type rather than native LV array data type.
