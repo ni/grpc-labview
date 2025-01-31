@@ -230,8 +230,7 @@ namespace grpc_labview
         protobuf_ptr = ctx->ParseMessage(nestedMessage.get(), protobuf_ptr);
         auto nestedClusterPtr = _LVClusterHandle + fieldInfo.clusterOffset;
         auto nestedMessageValue = std::make_shared<LVNestedMessageMessageValue>(index, nestedMessage);
-        auto constNestedMessageValue = std::static_pointer_cast<const LVMessageValue>(nestedMessageValue);
-        wellknown::Double2DArray::CopyToCluster(fieldInfo, nestedClusterPtr, constNestedMessageValue);
+        wellknown::Double2DArray::CopyToCluster(fieldInfo, nestedClusterPtr, nestedMessageValue);
         return protobuf_ptr;
     }
 
