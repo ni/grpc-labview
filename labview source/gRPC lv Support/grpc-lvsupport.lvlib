@@ -67,12 +67,13 @@
 			<Item Name="Get Embedded Message Name.vi" Type="VI" URL="../Server API/Cluster to gRPC message/Get Embedded Message Name.vi">
 				<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 			</Item>
-			<Item Name="LabVIEW DataType to Message Element DataType.vi" Type="VI" URL="../Server API/Cluster to gRPC message/LabVIEW DataType to Message Element DataType.vi">
+			<Item Name="LabVIEW Data Value to Message Element DataType.vi" Type="VI" URL="../Server API/Cluster to gRPC message/LabVIEW Data Value to Message Element DataType.vi">
 				<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 			</Item>
 			<Item Name="Element to Enum Metadata.vi" Type="VI" URL="../Server API/Cluster to gRPC message/Element to Enum Metadata.vi">
 				<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 			</Item>
+			<Item Name="Element to Message Element Metadata.vi" Type="VI" URL="../Server API/Cluster to gRPC message/Element to Message Element Metadata.vi"/>
 		</Item>
 		<Item Name="Message Requests" Type="Folder">
 			<Item Name="Complete Call.vi" Type="VI" URL="../Server API/Message Requests/Complete Call.vi"/>
@@ -103,11 +104,15 @@
 		</Item>
 	</Item>
 	<Item Name="Shared" Type="Folder">
-		<Item Name="grpcId.ctl" Type="VI" URL="../Shared/grpcId.ctl"/>
 		<Item Name="Any.ctl" Type="VI" URL="../Shared/Any.ctl"/>
+		<Item Name="grpcId.ctl" Type="VI" URL="../Shared/grpcId.ctl"/>
+		<Item Name="Well Known Types.ctl" Type="VI" URL="../Shared/Well Known Types.ctl"/>
+		<Item Name="Is Message Well Known Type.vi" Type="VI" URL="../Shared/Is Message Well Known Type.vi"/>
 		<Item Name="Set LVRT Module Path.vi" Type="VI" URL="../Shared/Set LVRT Module Path.vi"/>
-		<Item Name="Wait On Occurence.vi" Type="VI" URL="../Shared/Wait On Occurence.vi"/>
+		<Item Name="To Message Name.vi" Type="VI" URL="../Shared/To Message Name.vi"/>
+		<Item Name="To Well Known Type.vi" Type="VI" URL="../Shared/To Well Known Type.vi"/>
 		<Item Name="TranslateGrpcError.vi" Type="VI" URL="../Shared/TranslateGrpcError.vi"/>
+		<Item Name="Wait On Occurence.vi" Type="VI" URL="../Shared/Wait On Occurence.vi"/>
 		<Item Name="Wait On Occurrence Wrapper.vi" Type="VI" URL="../Shared/Wait On Occurrence Wrapper.vi"/>
 	</Item>
 </Library>

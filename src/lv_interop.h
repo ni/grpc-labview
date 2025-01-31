@@ -70,8 +70,8 @@ namespace grpc_labview
     using LStrHandle = LStr**;
 
     struct LV1DArray {
-        int32_t cnt; /* number of bytes that follow */
-        int8_t rawBytes[1]; /* cnt bytes */
+        int32_t cnt; /* number of T elements that follow */
+        int8_t rawBytes[1]; /* (cnt * sizeof(T)) bytes */
 
         template<typename T>
         T* bytes()
@@ -95,6 +95,23 @@ namespace grpc_labview
 
     using LV1DArrayPtr = LV1DArray*;
     using LV1DArrayHandle = LV1DArray**;
+
+    struct LV2DArray {
+        int32_t dimensionSizes[2]; /* number of T elements for each dimension */
+        int8_t rawBytes[1]; /* (firstDimensionSize * secondDimensionSize * sizeof(T)) bytes */
+
+        // The start of 2D array data is always aligned and does not require padding.
+        template<typename T>
+        T* bytes()
+        {
+            static_assert(!std::is_class<T>::value, "T must not be a struct/class type.");
+            static_assert(sizeof(T) <= 8, "Need to revisit logic if we ever have element size larger than 8 bytes.");
+            return (T*)(rawBytes);
+        }
+    };
+
+    using LV2DArrayPtr = LV2DArray*;
+    using LV2DArrayHandle = LV2DArray**;
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------

@@ -11,7 +11,7 @@ env:
 jobs:
   build-nilrt:
     name: NILRT Cross Compile with GCC 6.3.0
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout Repo
@@ -30,13 +30,13 @@ jobs:
         sudo chmod a+x ./oecore-x86_64-core2-64-toolchain-6.0.sh
         sudo ./oecore-x86_64-core2-64-toolchain-6.0.sh -y -d ${GITHUB_WORKSPACE}/nilrt-toolchain/
         echo "${GITHUB_WORKSPACE}/nilrt-toolchain/sysroots/x86_64-nilrtsdk-linux/usr/bin/x86_64-nilrt-linux" >> ${GITHUB_PATH}
-    
+
     - name: Update Submodules
       id: submodules
       run: |
         git submodule update --init --recursive
         echo "::set-output name=grpc-commit::$(git rev-parse --short @:./third_party/grpc)"
-    
+
     - name: Cache Host OS gRPC Support
       uses: actions/cache@v4
       id: hostgrpccache
@@ -63,7 +63,7 @@ jobs:
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Bad exit status")
         endif()
-    
+
     - name: Build Host OS gRPC Support
       if: steps.hostgrpccache.outputs.cache-hit != 'true'
       shell: cmake -P {0}
@@ -81,7 +81,7 @@ jobs:
           message("::error::${error_message}")
           message(FATAL_ERROR "Build failed")
         endif()
-    
+
     - name: Install Host OS gRPC Support
       run: sudo cmake --install ${GITHUB_WORKSPACE}/third_party/grpc/build
 
@@ -101,7 +101,7 @@ jobs:
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Bad exit status")
         endif()
-        
+
     - name: Cross Compile
       shell: cmake -P {0}
       run: |
@@ -123,17 +123,17 @@ jobs:
       name: Print CMakeTests logs
       run: |
         folder="${{runner.workspace}}/grpc-labview/tests/CMakeTests/logs/"
-            
+
         # Check if the folder exists
         if [ ! -d "$folder" ]; then
           echo "CMakeTests log folder (grpc-labview/tests/CmakeTests/logs) does not exist."
           echo "Exiting the script."
           exit
         fi
-            
+
         # Change to the folder
         cd "$folder" || exit
-            
+
         # Iterate through files and print their contents
         for file in *; do
             if [ -f "$file" ]; then
@@ -141,11 +141,11 @@ jobs:
                 echo
             fi
         done
-        
+
     - name: Tar Build Artifacts
       run: >-
         tar -czvf liblabview-grpc-server-rt.tar.gz -C ${GITHUB_WORKSPACE}/build liblabview_grpc_server.so
-    
+
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
       with:

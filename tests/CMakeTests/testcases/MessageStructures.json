@@ -2,7 +2,7 @@
   {
     "name": "LVMessageMetadata",
     "fields": [
-      "LStrHandle messageName", 
+      "LStrHandle messageName",
       "LV1DArrayHandle elements"
     ]
   },
@@ -16,7 +16,7 @@
     ]
   },
   {
-    "name": "LVMesageElementMetadata",
+    "name": "LVMessageElementMetadata",
     "fields": [
       "LStrHandle fieldName",
       "LStrHandle embeddedMessageName",

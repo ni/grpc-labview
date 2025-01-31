@@ -53,14 +53,34 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    int AlignClusterOffset(int clusterOffset, LVMessageMetadataType type, bool repeated)
+    static int WellKnownTypeElementSize(wellknown::Types type, bool repeated)
     {
-        if (clusterOffset == 0)
+        if (repeated)
         {
-            return 0;
+            return sizeof(void*);
         }
-        auto multiple = ClusterElementSize(type, repeated);
-        return AlignClusterOffset(clusterOffset, multiple);
+        switch (type)
+        {
+        case wellknown::Types::Double2DArray:
+            return sizeof(void*);
+        }
+        return 0;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    static int WellKnownTypeAlignment(wellknown::Types type, bool repeated)
+    {
+        if (repeated)
+        {
+            return sizeof(void*);
+        }
+        switch (type)
+        {
+        case wellknown::Types::Double2DArray:
+            return sizeof(void*);
+        }
+        return 0;
     }
 
     //---------------------------------------------------------------------
@@ -68,7 +88,7 @@ namespace grpc_labview {
     void MessageElementMetadataOwner::RegisterMetadata(std::shared_ptr<MessageMetadata> requestMetadata)
     {
         std::lock_guard<std::mutex> lock(_mutex);
-        
+
         _registeredMessageMetadata.insert({requestMetadata->messageName, requestMetadata});
     }
 
@@ -84,6 +104,18 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     std::shared_ptr<MessageMetadata> MessageElementMetadataOwner::FindMetadata(const std::string& name)
+    {
+        auto metadata = FindLocalMetadata(name);
+        if (metadata)
+        {
+            return metadata;
+        }
+        return wellknown::MetadataOwner::GetInstance().FindMetadata(name);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    std::shared_ptr<MessageMetadata> MessageElementMetadataOwner::FindLocalMetadata(const std::string& name)
     {
         auto it = _registeredMessageMetadata.find(name);
         if (it != _registeredMessageMetadata.end())
@@ -113,43 +145,46 @@ namespace grpc_labview {
         {
             return;
         }
+
         int clusterOffset = 0;
         int maxAlignmentRequirement = 0;
-        for (auto element: metadata->_elements)
+        for (auto& element : metadata->_elements)
         {
+            int alignmentRequirement = 0;
+            int elementSize = 0;
             if (element->type == LVMessageMetadataType::MessageValue)
             {
-                auto nestedMetadata = FindMetadata(element->embeddedMessageName);
-                UpdateMetadataClusterLayout(nestedMetadata);
-                int alignmentRequirement = 0;
-                int elementSize = 0;
-                if (element->isRepeated)
+                if (element->wellKnownType != wellknown::Types::None)
                 {
-                    alignmentRequirement = elementSize = ClusterElementSize(element->type, element->isRepeated);
+                    alignmentRequirement = WellKnownTypeAlignment(element->wellKnownType, element->isRepeated);
+                    elementSize = WellKnownTypeElementSize(element->wellKnownType, element->isRepeated);
                 }
                 else
                 {
-                    alignmentRequirement = nestedMetadata->alignmentRequirement;
-                    elementSize = nestedMetadata->clusterSize;
-                }
-                clusterOffset = AlignClusterOffset(clusterOffset, alignmentRequirement);
-                element->clusterOffset = clusterOffset;
-                clusterOffset += elementSize;
-                if (maxAlignmentRequirement < alignmentRequirement)
-                {
-                    maxAlignmentRequirement = alignmentRequirement;
+                    auto nestedMetadata = FindMetadata(element->embeddedMessageName);
+                    UpdateMetadataClusterLayout(nestedMetadata);
+                    if (element->isRepeated)
+                    {
+                        alignmentRequirement = elementSize = ClusterElementSize(element->type, element->isRepeated);
+                    }
+                    else
+                    {
+                        alignmentRequirement = nestedMetadata->alignmentRequirement;
+                        elementSize = nestedMetadata->clusterSize;
+                    }
                 }
             }
             else
             {
-                clusterOffset = AlignClusterOffset(clusterOffset, element->type, element->isRepeated);
-                element->clusterOffset = clusterOffset;
-                int elementSize = ClusterElementSize(element->type, element->isRepeated);
-                clusterOffset += elementSize;
-                if (maxAlignmentRequirement < elementSize)
-                {
-                    maxAlignmentRequirement = elementSize;
-                }
+                alignmentRequirement = elementSize = ClusterElementSize(element->type, element->isRepeated);
+            }
+
+            clusterOffset = AlignClusterOffset(clusterOffset, alignmentRequirement);
+            element->clusterOffset = clusterOffset;
+            clusterOffset += elementSize;
+            if (maxAlignmentRequirement < alignmentRequirement)
+            {
+                maxAlignmentRequirement = alignmentRequirement;
             }
         }
         metadata->alignmentRequirement = maxAlignmentRequirement;
@@ -160,7 +195,7 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     void MessageElementMetadataOwner::FinalizeMetadata()
     {
-        for (auto metadata: _registeredMessageMetadata)
+        for (auto& metadata : _registeredMessageMetadata)
         {
             UpdateMetadataClusterLayout(metadata.second);
         }

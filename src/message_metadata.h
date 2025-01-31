@@ -10,16 +10,17 @@
 #include <map>
 #include <unordered_map>
 #include <grpcpp/impl/codegen/proto_utils.h>
+#include <well_known_types.h>
 
-namespace grpc_labview 
+namespace grpc_labview
 {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     class IMessageElementMetadataOwner;
 
     //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
     // Enum equivalent to this on the LabVIEW side: Message Element Type.ctl
+    //---------------------------------------------------------------------
     enum class LVMessageMetadataType
     {
         Int32Value = 0,
@@ -43,29 +44,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class MessageElementMetadata
-    {
-    public:
-        MessageElementMetadata(IMessageElementMetadataOwner* owner) :
-            _owner(owner)
-        {            
-        }
-
-    public:
-        IMessageElementMetadataOwner* _owner;
-        std::string fieldName;
-        std::string embeddedMessageName;
-        int protobufIndex;
-        int clusterOffset;
-        LVMessageMetadataType type;    
-        bool isRepeated;
-        bool isInOneof;
-        std::string oneofContainerName;
-    };
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    // The struct below is the equivalanet to grpc-lvsupport-release.lvlib:Message Element Metadata.ctl.
+    // The struct below is the equivalent to grpc-lvsupport-release.lvlib:Message Element Metadata.ctl.
     // If there is any change to this cluster, make sure the corresponding .ctl is updated as well,
     // or be prepared to debug any crashes that may occur.
     //
@@ -76,7 +55,7 @@ namespace grpc_labview
     #ifdef _PS_4
     #pragma pack (push, 1)
     #endif
-    struct LVMesageElementMetadata
+    struct LVMessageElementMetadata
     {
         LStrHandle fieldName;
         LStrHandle embeddedMessageName;
@@ -92,27 +71,32 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    using LVMessageMetadataMap = std::unordered_map<google::protobuf::uint32, std::shared_ptr<MessageElementMetadata>>;
-    using LVMessageMetadataList = std::vector<std::shared_ptr<MessageElementMetadata>>;
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    struct MessageMetadata
+    class MessageElementMetadata
     {
     public:
-        MessageMetadata() :
-            clusterSize(0)
-        {            
-        }
+        MessageElementMetadata(LVMessageMetadataType valueType, bool isRepeated, int protobufIndex);
+        MessageElementMetadata(IMessageElementMetadataOwner* owner, LVMessageElementMetadata* elementMetadata, int metadataVersion = 2);
 
     public:
-        std::string messageName;
-        std::string typeUrl;
-        int clusterSize;
-        int alignmentRequirement;
-        LVMessageMetadataList _elements;
-        LVMessageMetadataMap _mappedElements;
+        IMessageElementMetadataOwner* _owner;
+        std::string fieldName;
+        std::string embeddedMessageName;
+        int protobufIndex;
+        int clusterOffset;
+        LVMessageMetadataType type;
+        bool isRepeated;
+        bool isInOneof;
+        std::string oneofContainerName;
+        wellknown::Types wellKnownType;
+
+    private:
+        static std::map<const std::string, wellknown::Types(*)(const MessageElementMetadata&)> _wellKnownTypeFunctionMap;
     };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    using LVMessageMetadataMap = std::unordered_map<google::protobuf::uint32, std::shared_ptr<MessageElementMetadata>>;
+    using LVMessageMetadataList = std::vector<std::shared_ptr<MessageElementMetadata>>;
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -124,7 +108,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    // The struct below is the equivalanet to grpc-lvsupport-release.lvlib:Message Metadata.ctl.
+    // The struct below is the equivalent to grpc-lvsupport-release.lvlib:Message Metadata.ctl.
     // If there is any change to this cluster, make sure the corresponding .ctl is updated as well,
     // or be prepared to debug any crashes that may occur.
     //
@@ -138,5 +122,26 @@ namespace grpc_labview
         LStrHandle messageName;
         LStrHandle typeUrl;
         LV1DArrayHandle elements;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    struct MessageMetadata
+    {
+    public:
+        MessageMetadata() : clusterSize(0) {}
+        MessageMetadata(IMessageElementMetadataOwner* metadataOwner, LVMessageMetadata* lvMetadata);
+        MessageMetadata(IMessageElementMetadataOwner* metadataOwner, LVMessageMetadata2* lvMetadata);
+
+    private:
+        void InitializeElements(IMessageElementMetadataOwner* metadataOwner, LVMessageElementMetadata* lvElement, int elementCount, int metadataVersion);
+
+    public:
+        std::string messageName;
+        std::string typeUrl;
+        int clusterSize;
+        int alignmentRequirement;
+        LVMessageMetadataList _elements;
+        LVMessageMetadataMap _mappedElements;
     };
 }
