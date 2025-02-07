@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <cluster_copier.h>
-#include <well_known_types.h>
+#include <well_known_messages.h>
 #include <lv_message.h>
 
 namespace grpc_labview {
@@ -297,7 +297,10 @@ namespace grpc_labview {
         switch (metadata->wellKnownType)
         {
         case wellknown::Types::Double2DArray:
-            wellknown::Double2DArray::CopyToCluster(*(metadata.get()), start, value);
+            wellknown::Double2DArray::GetInstance().CopyFromMessageToCluster(*(metadata.get()), value, start);
+            return;
+        case wellknown::Types::String2DArray:
+            wellknown::String2DArray::GetInstance().CopyFromMessageToCluster(*(metadata.get()), value, start);
             return;
         }
 
@@ -915,7 +918,10 @@ namespace grpc_labview {
         switch (metadata->wellKnownType)
         {
         case wellknown::Types::Double2DArray:
-            wellknown::Double2DArray::CopyFromCluster(metadata, start, message);
+            wellknown::Double2DArray::GetInstance().CopyFromClusterToMessage(metadata, start, message);
+            return;
+        case wellknown::Types::String2DArray:
+            wellknown::String2DArray::GetInstance().CopyFromClusterToMessage(metadata, start, message);
             return;
         }
 
