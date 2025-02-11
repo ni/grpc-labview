@@ -83,6 +83,7 @@ namespace grpc_labview
     void LVMessage::Clear()
     {
         _values.clear();
+        _oneofContainerToSelectedIndexMap.clear();
     }
 
     //---------------------------------------------------------------------
@@ -105,8 +106,16 @@ namespace grpc_labview
                 auto fieldIt = _metadata->_mappedElements.find(index);
                 if (fieldIt != _metadata->_mappedElements.end())
                 {
-                    auto fieldInfo = (*fieldIt).second;
+                    auto& fieldInfo = (*fieldIt).second;
                     LVMessageMetadataType dataType = fieldInfo->type;
+
+                    if (fieldInfo->isInOneof)
+                    {
+                        // set the map of the selected index for the "oneofContainer" to this protobuf Index
+                        assert(_oneofContainerToSelectedIndexMap.find(fieldInfo->oneofContainerName) == _oneofContainerToSelectedIndexMap.end());
+                        _oneofContainerToSelectedIndexMap.insert({ fieldInfo->oneofContainerName, fieldInfo->protobufIndex });
+                    }
+
                     switch (dataType)
                     {
                     case LVMessageMetadataType::Int32Value:
@@ -345,21 +354,23 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            std::shared_ptr<LVRepeatedStringMessageValue> v;
+            std::shared_ptr<LVRepeatedMessageValue<std::string>> v;
             auto it = _values.find(index);
             if (it == _values.end())
             {
-                v = std::make_shared<LVRepeatedStringMessageValue>(index);
+                v = std::make_shared<LVRepeatedMessageValue<std::string>>(index);
                 _values.emplace(index, v);
             }
             else
             {
-                v = std::static_pointer_cast<LVRepeatedStringMessageValue>((*it).second);
+                v = std::static_pointer_cast<LVRepeatedMessageValue<std::string>>((*it).second);
             }
-            protobuf_ptr -= 1;
+
+            auto tagSize = CalculateTagWireSize(tag);
+            protobuf_ptr -= tagSize;
             do
             {
-                protobuf_ptr += 1;
+                protobuf_ptr += tagSize;
                 auto str = v->_value.Add();
                 protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
                 if (!ctx->DataAvailable(protobuf_ptr))
@@ -398,6 +409,17 @@ namespace grpc_labview
             char buf[2] = {static_cast<char>(tag | 0x80), static_cast<char>(tag >> 7)};
             return std::memcmp(ptr, buf, 2) == 0;
         }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    int LVMessage::CalculateTagWireSize(google::protobuf::uint32 tag)
+    {
+        return (tag < (1 << 7)) ? 1
+            : (tag < (1 << 14)) ? 2
+            : (tag < (1 << 21)) ? 3
+            : (tag < (1 << 28)) ? 4
+            : 5;
     }
 
     //---------------------------------------------------------------------
@@ -527,21 +549,23 @@ namespace grpc_labview
         auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
         if (fieldInfo.isRepeated)
         {
-            protobuf_ptr -= 1;
+            std::shared_ptr<LVRepeatedNestedMessageMessageValue> v;
+            auto it = _values.find(index);
+            if (it == _values.end())
+            {
+                v = std::make_shared<LVRepeatedNestedMessageMessageValue>(index);
+                _values.emplace(index, v);
+            }
+            else
+            {
+                v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
+            }
+
+            auto tagSize = CalculateTagWireSize(tag);
+            protobuf_ptr -= tagSize;
             do
             {
-                std::shared_ptr<LVRepeatedNestedMessageMessageValue> v;
-                auto it = _values.find(index);
-                if (it == _values.end())
-                {
-                    v = std::make_shared<LVRepeatedNestedMessageMessageValue>(index);
-                    _values.emplace(index, v);
-                }
-                else
-                {
-                    v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
-                }
-                protobuf_ptr += 1;
+                protobuf_ptr += tagSize;
                 auto nestedMessage = std::make_shared<LVMessage>(metadata);
                 protobuf_ptr = ctx->ParseMessage(nestedMessage.get(), protobuf_ptr);
                 v->_value.push_back(nestedMessage);
@@ -648,6 +672,31 @@ namespace grpc_labview
     void LVMessage::CopyFrom(const LVMessage &from)
     {
         assert(false); // not expected to be called
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void LVMessage::CopyOneofIndicesToCluster(int8_t* cluster) const
+    {
+        if (_oneofContainerToSelectedIndexMap.size() > 0)
+        {
+            // Must iterate over _elements and not _mappedElements since all oneof selected_index fields use -1 for the field number
+            // and there can be multiple oneof fields in a message.
+            for (auto& fieldMetadata : _metadata->_elements)
+            {
+                if (fieldMetadata->isInOneof && fieldMetadata->protobufIndex < 0)
+                {
+                    // This field is the selected_index field of a oneof. This field only exists in the cluster
+                    // and is not a field in the message.
+                    auto it = _oneofContainerToSelectedIndexMap.find(fieldMetadata->oneofContainerName);
+                    if (it != _oneofContainerToSelectedIndexMap.end())
+                    {
+                        auto selectedIndexPtr = reinterpret_cast<int*>(cluster + fieldMetadata->clusterOffset);
+                        *selectedIndexPtr = it->second;
+                    }
+                }
+            }
+        }
     }
 
     //---------------------------------------------------------------------
