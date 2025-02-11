@@ -9,7 +9,7 @@ env:
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -17,6 +17,10 @@ jobs:
       with:
         arch: x86
     - uses: ilammy/setup-nasm@v1.5.1
+
+    - name: Install Visual Studio 2022 Build Tools
+      run: |
+        choco install visualstudio2022-workload-vctools --yes || throw "Installation failed"
 
     - name: Update Submodules
       working-directory: ${{runner.workspace}}/grpc-labview      
@@ -27,7 +31,7 @@ jobs:
 
     - name: Configure CMake
       working-directory: ${{runner.workspace}}\grpc-labview\build
-      run: cmake -G "Visual Studio 16 2019" -A Win32 ..
+      run: cmake -G "Visual Studio 17 2022" -A Win32 ..
       
     - name: Build
       working-directory: ${{runner.workspace}}\grpc-labview\build
