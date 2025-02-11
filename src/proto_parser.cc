@@ -18,7 +18,7 @@ namespace grpc_labview
     #pragma pack (push, 1)
     #endif
     struct MessageFieldCluster
-    {
+    {    
         LStrHandle fieldName;
         LStrHandle embeddedMessage;
         int32_t protobufIndex;
@@ -45,18 +45,18 @@ namespace grpc_labview
     class ErrorCollector : public MultiFileErrorCollector
     {
     public:
-        void AddError(const std::string& filename, int line, int column, const std::string& message) override;
+        void AddError(const std::string & filename, int line, int column, const std::string & message) override;
         std::string GetLVErrorMessage();
 
     private:
-        std::list<string> _errors;
+        std::list<std::string> _errors;
     };
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void ErrorCollector::AddError(const std::string& filename, int line, int column, const std::string& message)
+    void ErrorCollector::AddError(const std::string & filename, int line, int column, const std::string & message)
     {
-        std::string errorMessage = filename + ": " + std::to_string(line) + " - " + message;
+        std::string errorMessage = filename + ": " + std::to_string(line) + " - " + message; 
         _errors.emplace_back(errorMessage);
     }
 
@@ -65,7 +65,7 @@ namespace grpc_labview
     std::string ErrorCollector::GetLVErrorMessage()
     {
         std::stringstream result;
-        for (auto& s : _errors)
+        for (auto& s: _errors)
         {
             result << s << std::endl;
         }
@@ -98,7 +98,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     LVProtoParser::LVProtoParser()
         : m_Importer(&m_SourceTree, &m_ErrorCollector)
-    {
+    {    
         s_Parser = this;
     }
 
@@ -118,14 +118,14 @@ namespace grpc_labview
         std::string searchPath = search;
         std::replace(searchPath.begin(), searchPath.end(), '\\', '/');
         m_SourceTree.MapPath("", searchPath);
-        for (auto path : m_searchPaths)
+        for (auto path: m_searchPaths)
         {
             m_SourceTree.MapPath("", path);
         }
-
+        
         std::string path = filePath;
         std::replace(path.begin(), path.end(), '\\', '/');
-
+        
         m_FileDescriptor = m_Importer.Import(path);
     }
 
@@ -140,7 +140,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void AddFieldError(FieldDescriptor* field, string message)
+    void AddFieldError(FieldDescriptor* field, std::string message)
     {
         grpc_labview::LVProtoParser::s_Parser->m_ErrorCollector.AddError("", 0, 0, message);
     }
@@ -150,9 +150,9 @@ namespace grpc_labview
     void AddNestedMessages(const google::protobuf::Descriptor& descriptor, std::set<const google::protobuf::Descriptor*>& messages)
     {
         auto count = descriptor.nested_type_count();
-        for (int x = 0; x < count; ++x)
+        for (int x=0; x<count; ++x)
         {
-            auto current = descriptor.nested_type(x);
+            auto current = descriptor.nested_type(x);        
             AddNestedMessages(*current, messages);
             messages.emplace(current);
         }
@@ -163,15 +163,15 @@ namespace grpc_labview
     void AddDependentMessages(const google::protobuf::FileDescriptor& descriptor, std::set<const google::protobuf::Descriptor*>& messages)
     {
         auto imported = descriptor.dependency_count();
-        for (int x = 0; x < imported; ++x)
+        for (int x=0; x<imported; ++x)
         {
             AddDependentMessages(*descriptor.dependency(x), messages);
         }
 
         auto count = descriptor.message_type_count();
-        for (int x = 0; x < count; ++x)
+        for (int x=0; x<count; ++x)
         {
-            auto current = descriptor.message_type(x);
+            auto current = descriptor.message_type(x);        
             AddNestedMessages(*current, messages);
             messages.emplace(current);
         }
@@ -186,7 +186,7 @@ LIBRARY_EXPORT int LVGetgRPCAPIVersion(int* version)
     grpc_labview::InitCallbacks();
 
     *version = 2;
-    return 0;
+    return 0;    
 }
 
 //---------------------------------------------------------------------
@@ -209,7 +209,7 @@ LIBRARY_EXPORT int LVAddParserSearchPath(grpc_labview::LVProtoParser* parser, co
         return -1;
     }
     parser->AddSearchPath(searchPath);
-    return 0;
+    return 0;    
 }
 
 //---------------------------------------------------------------------
@@ -221,7 +221,7 @@ LIBRARY_EXPORT int LVImportProto2(grpc_labview::LVProtoParser* parser, const cha
         return -1;
     }
     parser->Import(filePath, searchPath);
-    return 0;
+    return 0;    
 }
 
 //---------------------------------------------------------------------
@@ -232,7 +232,7 @@ LIBRARY_EXPORT int LVImportProto(const char* filePath, const char* searchPath, g
 
     *parser = new grpc_labview::LVProtoParser();
     (*parser)->Import(filePath, searchPath);
-    return 0;
+    return 0;    
 }
 
 //---------------------------------------------------------------------
@@ -262,19 +262,18 @@ LIBRARY_EXPORT int LVGetServices(grpc_labview::LVProtoParser* parser, grpc_labvi
     }
 
     auto count = parser->m_FileDescriptor->service_count();
-    auto elementSize = sizeof(ServiceDescriptor*);
-    if (NumericArrayResize(grpc_labview::GetTypeCodeForSize(elementSize), 1, services, count * elementSize) != 0)
+    if (NumericArrayResize(0x08, 1, services, count * sizeof(ServiceDescriptor*)) != 0)
     {
         parser->m_ErrorCollector.AddError("", 0, 0, "Failed to resize array");
         return -3;
     }
     (**services)->cnt = count;
     const ServiceDescriptor** serviceElements = (**services)->bytes<const ServiceDescriptor*>();
-    for (int x = 0; x < count; ++x)
+    for (int x=0; x<count; ++x)
     {
         serviceElements[x] = parser->m_FileDescriptor->service(x);
     }
-    return 0;
+    return 0;    
 }
 
 //---------------------------------------------------------------------
@@ -294,20 +293,19 @@ LIBRARY_EXPORT int LVGetMessages(grpc_labview::LVProtoParser* parser, grpc_labvi
     grpc_labview::AddDependentMessages(*parser->m_FileDescriptor, allMessages);
 
     auto count = allMessages.size();
-    auto elementSize = sizeof(Descriptor*);
-    if (grpc_labview::NumericArrayResize(grpc_labview::GetTypeCodeForSize(elementSize), 1, messages, count * elementSize) != 0)
+    if (grpc_labview::NumericArrayResize(0x08, 1, messages, count * sizeof(Descriptor*)) != 0)
     {
         return -3;
     }
     (**messages)->cnt = count;
     const Descriptor** messageElements = (**messages)->bytes<const Descriptor*>();
-    int x = 0;
-    for (auto& it : allMessages)
+    int x=0;
+    for (auto& it: allMessages)
     {
         messageElements[x] = it;
         x += 1;
     }
-    return 0;
+    return 0;    
 }
 
 //---------------------------------------------------------------------
@@ -369,11 +367,10 @@ LIBRARY_EXPORT int LVGetEnums(grpc_labview::LVProtoParser* parser, grpc_labview:
 
     std::set<const google::protobuf::EnumDescriptor*> allEnums;
     AddTopLevelEnums(*(parser->m_FileDescriptor), allEnums);
-    AddNestedEnums(messages, allEnums);
+    AddNestedEnums(messages, allEnums);    
 
     auto count = allEnums.size();
-    auto elementSize = sizeof(EnumDescriptor*);
-    if (grpc_labview::NumericArrayResize(grpc_labview::GetTypeCodeForSize(elementSize), 1, enums, count * elementSize) != 0)
+    if (grpc_labview::NumericArrayResize(0x08, 1, enums, count * sizeof(EnumDescriptor*)) != 0)
     {
         return -3;
     }
@@ -409,14 +406,14 @@ LIBRARY_EXPORT int LVGetServiceMethods(ServiceDescriptor* service, grpc_labview:
         return -1;
     }
     auto count = service->method_count();
-    auto elementSize = sizeof(ServiceDescriptor*);
-    if (grpc_labview::NumericArrayResize(grpc_labview::GetTypeCodeForSize(elementSize), 1, methods, count * elementSize) != 0)
+    auto size = sizeof(ServiceDescriptor*);
+    if (grpc_labview::NumericArrayResize(0x08, 1, methods, count * size) != 0)
     {
         return -3;
     }
     (**methods)->cnt = count;
     auto methodElements = (**methods)->bytes<const MethodDescriptor*>();
-    for (int x = 0; x < count; ++x)
+    for (int x=0; x<count; ++x)
     {
         methodElements[x] = service->method(x);
     }
@@ -555,7 +552,7 @@ LIBRARY_EXPORT int LVEnumTypeUrl(EnumDescriptor* descriptor, grpc_labview::LStrH
     return 0;
 }
 
-LIBRARY_EXPORT void SerializeReflectionInfo(grpc_labview::LVProtoParser* parser, grpc_labview::LStrHandle* outbuffer)
+LIBRARY_EXPORT void SerializeReflectionInfo(grpc_labview::LVProtoParser *parser, grpc_labview::LStrHandle *outbuffer)
 {
     FileDescriptorProto fProto;
     parser->m_FileDescriptor->CopyTo(&fProto);
@@ -573,14 +570,13 @@ LIBRARY_EXPORT int LVGetFields(Descriptor* descriptor, grpc_labview::LV1DArrayHa
         return -1;
     }
     auto count = descriptor->field_count();
-    auto elementSize = sizeof(FieldDescriptor*);
-    if (NumericArrayResize(grpc_labview::GetTypeCodeForSize(elementSize), 1, fields, count * elementSize) != 0)
+    if (NumericArrayResize(0x08, 1, fields, count * sizeof(FieldDescriptor*)) != 0)
     {
         return -3;
     }
     (**fields)->cnt = count;
     auto fieldElements = (**fields)->bytes<const FieldDescriptor*>();
-    for (int x = 0; x < count; ++x)
+    for (int x=0; x<count; ++x)
     {
         fieldElements[x] = descriptor->field(x);
     }
@@ -687,7 +683,7 @@ LIBRARY_EXPORT int GetEnumInfo(EnumDescriptor* enumDescriptor, grpc_labview::Enu
     SetLVString(&info->typeUrl, enumDescriptor->full_name());
     SetLVString(&info->enumValues, GetEnumNames(enumDescriptor));
     info->isAliasAllowed = (enumDescriptor->options().has_allow_alias() && enumDescriptor->options().allow_alias());
-
+    
     return 0;
 }
 
@@ -701,6 +697,6 @@ std::string GetEnumNames(google::protobuf::EnumDescriptor* enumDescriptor)
         std::string enumVal = enumDescriptor->value(i)->name() + "=" + std::to_string(enumDescriptor->value(i)->number());
         enumNames += enumVal + ((i < enumValueCount - 1) ? ";" : "");
     }
-
+    
     return enumNames;
 }

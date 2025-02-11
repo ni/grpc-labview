@@ -62,7 +62,6 @@ namespace grpc_labview
         grpc::Status _status;
         std::future<int> _runFuture;
         bool _useLVEfficientMessage;
-        bool _cancelled = false;
     };
 
     //---------------------------------------------------------------------
