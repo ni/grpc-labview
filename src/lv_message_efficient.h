@@ -13,6 +13,74 @@ using namespace google::protobuf::internal;
 
 namespace grpc_labview
 {
+
+    inline const char* ReadBOOL(const char* ptr, bool* value) {
+        *value = static_cast<bool>(ReadVarint64(&ptr));
+        return ptr;
+    }
+
+    inline const char* ReadINT32(const char* ptr, int32_t* value) {
+        return VarintParse(ptr, reinterpret_cast<uint32_t*>(value));
+    }
+
+    inline const char* ReadUINT32(const char* ptr, uint32_t* value) {
+        return VarintParse(ptr, value);
+    }
+
+    template <typename E>
+    inline const char* ReadENUM(const char* ptr, E* value) {
+        *value = static_cast<E>(ReadVarint32(&ptr));
+        return ptr;
+    }
+
+    inline const char* ReadINT64(const char* ptr, int64_t* value) {
+        return VarintParse(ptr, reinterpret_cast<uint64_t*>(value));
+    }
+
+    inline const char* ReadUINT64(const char* ptr, uint64_t* value) {
+        return VarintParse(ptr, value);
+    }
+
+    template <typename F>
+    inline const char* ReadUnaligned(const char* ptr, F* value) {
+        *value = UnalignedLoad<F>(ptr);
+        return ptr + sizeof(F);
+    }
+
+    inline const char* ReadFLOAT(const char* ptr, float* value) {
+        return ReadUnaligned(ptr, value);
+    }
+
+    inline const char* ReadDOUBLE(const char* ptr, double* value) {
+        return ReadUnaligned(ptr, value);
+    }
+
+    inline const char* ReadSINT32(const char* ptr, int32_t* value) {
+        *value = ReadVarintZigZag32(&ptr);
+        return ptr;
+    }
+
+    inline const char* ReadSINT64(const char* ptr, int64_t* value) {
+        *value = ReadVarintZigZag64(&ptr);
+        return ptr;
+    }
+
+    inline const char* ReadFIXED32(const char* ptr, uint32_t* value) {
+        return ReadUnaligned(ptr, value);
+    }
+
+    inline const char* ReadFIXED64(const char* ptr, uint64_t* value) {
+        return ReadUnaligned(ptr, value);
+    }
+
+    inline const char* ReadSFIXED32(const char* ptr, int32_t* value) {
+        return ReadUnaligned(ptr, value);
+    }
+
+    inline const char* ReadSFIXED64(const char* ptr, int64_t* value) {
+        return ReadUnaligned(ptr, value);
+    }
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     class LVMessageEfficient : public LVMessage
@@ -24,74 +92,7 @@ namespace grpc_labview
         Message* New(google::protobuf::Arena* arena) const;
         void PostInteralParseAction() override;
         int8_t* GetLVClusterHandle() { return _LVClusterHandle; };
-
-        inline const char* ReadBOOL(const char* ptr, bool* value) {
-            *value = static_cast<bool>(ReadVarint64(&ptr));
-            return ptr;
-        }
-
-        inline const char* ReadINT32(const char* ptr, int32_t* value) {
-            return VarintParse(ptr, reinterpret_cast<uint32_t*>(value));
-        }
-
-        inline const char* ReadUINT32(const char* ptr, uint32_t* value) {
-            return VarintParse(ptr, value);
-        }
-
-        template <typename E>
-        inline const char* ReadENUM(const char* ptr, E* value) {
-            *value = static_cast<E>(ReadVarint32(&ptr));
-            return ptr;
-        }
-
-        inline const char* ReadINT64(const char* ptr, int64_t* value) {
-            return VarintParse(ptr, reinterpret_cast<uint64_t*>(value));
-        }
-
-        inline const char* ReadUINT64(const char* ptr, uint64_t* value) {
-            return VarintParse(ptr, value);
-        }
-
-        template <typename F>
-        inline const char* ReadUnaligned(const char* ptr, F* value) {
-            *value = UnalignedLoad<F>(ptr);
-            return ptr + sizeof(F);
-        }
-
-        inline const char* ReadFLOAT(const char* ptr, float* value) {
-            return ReadUnaligned(ptr, value);
-        }
-
-        inline const char* ReadDOUBLE(const char* ptr, double* value) {
-            return ReadUnaligned(ptr, value);
-        }
-
-        inline const char* ReadSINT32(const char* ptr, int32_t* value) {
-            *value = ReadVarintZigZag32(&ptr);
-            return ptr;
-        }
-
-        inline const char* ReadSINT64(const char* ptr, int64_t* value) {
-            *value = ReadVarintZigZag64(&ptr);
-            return ptr;
-        }
-
-        inline const char* ReadFIXED32(const char* ptr, uint32_t* value) {
-            return ReadUnaligned(ptr, value);
-        }
-
-        inline const char* ReadFIXED64(const char* ptr, uint64_t* value) {
-            return ReadUnaligned(ptr, value);
-        }
-
-        inline const char* ReadSFIXED32(const char* ptr, int32_t* value) {
-            return ReadUnaligned(ptr, value);
-        }
-
-        inline const char* ReadSFIXED64(const char* ptr, int64_t* value) {
-            return ReadUnaligned(ptr, value);
-        }
-
+        
     protected:
         struct RepeatedMessageValue {
             const MessageElementMetadata& _fieldInfo;
