@@ -18,7 +18,7 @@ namespace grpc_labview
         assert(false); // not expected to be called
         return nullptr;
     }
-
+    
 #define DEFINE_PARSE_FUNCTION(Type, TypeName, ReadType, ParserType) \
     const char *LVMessageEfficient::Parse##TypeName(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx) \
     { \

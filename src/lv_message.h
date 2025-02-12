@@ -22,29 +22,29 @@ namespace grpc_labview
 
         google::protobuf::UnknownFieldSet& UnknownFields();
 
-        Message* New(google::protobuf::Arena* arena) const override;
+        Message* New(google::protobuf::Arena* arena) const;
         void SharedCtor();
         void SharedDtor();
         void ArenaDtor(void* object);
         void RegisterArenaDtor(google::protobuf::Arena*);
 
         void Clear()  final;
-        bool IsInitialized() const final;
+        bool IsInitialized() const;
 
-        const char* _InternalParse(const char* ptr, google::protobuf::internal::ParseContext* ctx)  override final;
+        const char* _InternalParse(const char* ptr, google::protobuf::internal::ParseContext* ctx);
         google::protobuf::uint8* _InternalSerialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override final;
-        void SetCachedSize(int size) const final;
-        int GetCachedSize(void) const final;
+        void SetCachedSize(int size) const;
+        int GetCachedSize(void) const;
         size_t ByteSizeLong() const final;
         virtual void PostInteralParseAction() {};
 
-        void MergeFrom(const google::protobuf::Message &from) final;
+        void MergeFrom(const google::protobuf::Message &from);
         void MergeFrom(const LVMessage &from);
-        void CopyFrom(const google::protobuf::Message &from) final;
+        void CopyFrom(const google::protobuf::Message &from);
         void CopyFrom(const LVMessage &from);
         void CopyOneofIndicesToCluster(int8_t* cluster) const;
         void InternalSwap(LVMessage *other);
-        google::protobuf::Metadata GetMetadata() const final;
+        google::protobuf::Metadata GetMetadata() const;
 
         bool ParseFromByteBuffer(const grpc::ByteBuffer& buffer);
         std::unique_ptr<grpc::ByteBuffer> SerializeToByteBuffer();
@@ -52,7 +52,7 @@ namespace grpc_labview
         std::map<int, std::shared_ptr<LVMessageValue>> _values;
         std::shared_ptr<MessageMetadata> _metadata;
         std::map<std::string, int> _oneofContainerToSelectedIndexMap;
-
+        const google::protobuf::internal::ClassData* GetClassData() const override final;
     protected:
         mutable google::protobuf::internal::CachedSize _cached_size_;
         google::protobuf::UnknownFieldSet _unknownFields;
