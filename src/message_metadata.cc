@@ -2,27 +2,38 @@
 //---------------------------------------------------------------------
 #include "message_metadata.h"
 #include "lv_interop.h"
-#include "well_known_types.h"
+#include "well_known_messages.h"
 
 namespace grpc_labview
 {
     //---------------------------------------------------------------------
     // Functions for calculating whether an element is considered a well known type.
     //---------------------------------------------------------------------
-    static wellknown::Types CalculateDouble2DArrayWellKnownTypeEnum(const MessageElementMetadata& metadata)
+    static wellknown::Types Calculate2DArrayWellKnownTypeEnum(const MessageElementMetadata& metadata, wellknown::Types type)
     {
         if (!metadata.isRepeated)
         {
-            return wellknown::Types::Double2DArray;
+            return type;
         }
         return wellknown::Types::None;
+    }
+
+    static wellknown::Types CalculateDouble2DArrayWellKnownTypeEnum(const MessageElementMetadata& metadata)
+    {
+        return Calculate2DArrayWellKnownTypeEnum(metadata, wellknown::Types::Double2DArray);
+    }
+
+    static wellknown::Types CalculateString2DArrayWellKnownTypeEnum(const MessageElementMetadata& metadata)
+    {
+        return Calculate2DArrayWellKnownTypeEnum(metadata, wellknown::Types::String2DArray);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     std::map<const std::string, wellknown::Types(*)(const MessageElementMetadata&)> MessageElementMetadata::_wellKnownTypeFunctionMap =
     {
-        { wellknown::Double2DArray::GetMessageName(), CalculateDouble2DArrayWellKnownTypeEnum}
+        { wellknown::Double2DArray::GetInstance().GetMessageName(), CalculateDouble2DArrayWellKnownTypeEnum},
+        { wellknown::String2DArray::GetInstance().GetMessageName(), CalculateString2DArrayWellKnownTypeEnum}
     };
 
     //---------------------------------------------------------------------
