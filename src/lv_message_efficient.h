@@ -7,9 +7,10 @@
 #include <message_value.h>
 #include <message_metadata.h>
 #include <google/protobuf/message.h>
+#include "lv_message.h"
 #include <type_traits>
-#include <lv_message.h>
 #include <well_known_messages.h>
+#include <type_traits>
 
 using namespace google::protobuf::internal;
 
