@@ -2,7 +2,7 @@
 //---------------------------------------------------------------------
 #include <grpc_server.h>
 #include <lv_message_efficient.h>
-#include <well_known_types.h>
+#include <well_known_messages.h>
 #include <sstream>
 
 //---------------------------------------------------------------------
@@ -153,7 +153,9 @@ namespace grpc_labview
         switch (fieldInfo.wellKnownType)
         {
         case wellknown::Types::Double2DArray:
-            return ParseDouble2DArrayMessage(tag, fieldInfo, index, protobuf_ptr, ctx);
+            return ParseDouble2DArrayMessage(fieldInfo, index, protobuf_ptr, ctx);
+        case wellknown::Types::String2DArray:
+            return ParseString2DArrayMessage(fieldInfo, index, protobuf_ptr, ctx);
         }
 
         auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
@@ -225,15 +227,29 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char* LVMessageEfficient::ParseDouble2DArrayMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx)
+    const char* LVMessageEfficient::Parse2DArrayMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx, wellknown::I2DArray& array)
     {
         auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
         auto nestedMessage = std::make_shared<LVMessage>(metadata);
         protobuf_ptr = ctx->ParseMessage(nestedMessage.get(), protobuf_ptr);
         auto nestedClusterPtr = _LVClusterHandle + fieldInfo.clusterOffset;
         auto nestedMessageValue = std::make_shared<LVNestedMessageMessageValue>(index, nestedMessage);
-        wellknown::Double2DArray::CopyToCluster(fieldInfo, nestedClusterPtr, nestedMessageValue);
+        array.CopyFromMessageToCluster(fieldInfo, nestedMessageValue, nestedClusterPtr);
         return protobuf_ptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char* LVMessageEfficient::ParseDouble2DArrayMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx)
+    {
+        return Parse2DArrayMessage(fieldInfo, index, protobuf_ptr, ctx, wellknown::Double2DArray::GetInstance());
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    const char* LVMessageEfficient::ParseString2DArrayMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx)
+    {
+        return Parse2DArrayMessage(fieldInfo, index, protobuf_ptr, ctx, wellknown::String2DArray::GetInstance());
     }
 
     //---------------------------------------------------------------------
