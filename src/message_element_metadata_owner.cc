@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <future>
+#include <well_known_messages.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -62,6 +63,7 @@ namespace grpc_labview {
         switch (type)
         {
         case wellknown::Types::Double2DArray:
+        case wellknown::Types::String2DArray:
             return sizeof(void*);
         }
         return 0;
@@ -78,6 +80,7 @@ namespace grpc_labview {
         switch (type)
         {
         case wellknown::Types::Double2DArray:
+        case wellknown::Types::String2DArray:
             return sizeof(void*);
         }
         return 0;

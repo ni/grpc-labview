@@ -7,8 +7,9 @@
 #include <message_value.h>
 #include <message_metadata.h>
 #include <google/protobuf/message.h>
-#include "lv_message.h"
 #include <type_traits>
+#include <lv_message.h>
+#include <well_known_messages.h>
 
 using namespace google::protobuf::internal;
 
@@ -136,7 +137,11 @@ namespace grpc_labview
         const char* ParseString(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
         const char* ParseBytes(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
         const char* ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseDouble2DArrayMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        const char* ParseDouble2DArrayMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        const char* ParseString2DArrayMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+
+    private:
+        const char* Parse2DArrayMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx, wellknown::I2DArray& array);
     };
 
     template <typename MessageType, const char* (*ReadFunc)(const char*, MessageType*), const char* (*PackedFunc)(void*, const char*, google::protobuf::internal::ParseContext*)>
