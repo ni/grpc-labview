@@ -22,26 +22,26 @@ namespace grpc_labview
         LVMessageEfficient(std::shared_ptr<MessageMetadata> metadata, int8_t* cluster) : LVMessage(metadata), _LVClusterHandle(cluster) {}
         ~LVMessageEfficient() {}
 
-        Message* New(google::protobuf::Arena* arena) const override;
+        Message* New(google::protobuf::Arena* arena) const;
         void PostInteralParseAction() override;
         int8_t* GetLVClusterHandle() { return _LVClusterHandle; };
 
     protected:
         struct RepeatedMessageValue {
             const MessageElementMetadata& _fieldInfo;
-            google::protobuf::RepeatedField<char> _buffer;
+            google::protobuf::RepeatedPtrField<google::protobuf::Message> _buffer;
             uint64_t _numElements = 0;
 
-            RepeatedMessageValue(const MessageElementMetadata& fieldInfo, google::protobuf::RepeatedField<char> buffer) :
+            RepeatedMessageValue(const MessageElementMetadata& fieldInfo, google::protobuf::RepeatedPtrField<google::protobuf::Message> buffer) :
                 _fieldInfo(fieldInfo), _buffer(buffer) {}
         };
 
         struct RepeatedStringValue {
             const MessageElementMetadata& _fieldInfo;
-            google::protobuf::RepeatedField<std::string> _repeatedString;
+            google::protobuf::RepeatedPtrField<std::string> _repeatedString;
 
             RepeatedStringValue(const MessageElementMetadata& fieldInfo) :
-                _fieldInfo(fieldInfo), _repeatedString(google::protobuf::RepeatedField<std::string>()) {}
+                _fieldInfo(fieldInfo), _repeatedString(google::protobuf::RepeatedPtrField<std::string>()) {}
         };
 
     public:

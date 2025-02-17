@@ -713,4 +713,9 @@ namespace grpc_labview
         assert(false); // not expected to be called
         return google::protobuf::Metadata();
     }
+
+    const google::protobuf::internal::ClassData* LVMessage::GetClassData() const
+    {
+        return nullptr;
+    }
 }

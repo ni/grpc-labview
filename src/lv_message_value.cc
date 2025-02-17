@@ -37,7 +37,7 @@ namespace grpc_labview
     google::protobuf::uint8* LVNestedMessageMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {
         target = stream->EnsureSpace(target);
-        return WireFormatLite::InternalWriteMessage(_protobufId, *_value, target, stream);
+        return WireFormatLite::InternalWriteMessage(_protobufId, *_value, _value->GetCachedSize(), target, stream);
     }
 
     //---------------------------------------------------------------------
@@ -67,7 +67,7 @@ namespace grpc_labview
         for (unsigned int i = 0, n = static_cast<unsigned int>(_value.size()); i < n; i++)
         {
             target = stream->EnsureSpace(target);
-            target = WireFormatLite::InternalWriteMessage(_protobufId, *_value[i], target, stream);
+            target = WireFormatLite::InternalWriteMessage(_protobufId, *_value[i], _value[i]->GetCachedSize(), target, stream);
         }
         return target;
     }
