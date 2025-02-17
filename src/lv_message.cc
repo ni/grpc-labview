@@ -354,16 +354,16 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            std::shared_ptr<LVRepeatedStringMessageValue> v;
+            std::shared_ptr<LVRepeatedMessageValue<std::string>> v;
             auto it = _values.find(index);
             if (it == _values.end())
             {
-                v = std::make_shared<LVRepeatedStringMessageValue>(index);
+                v = std::make_shared<LVRepeatedMessageValue<std::string>>(index);
                 _values.emplace(index, v);
             }
             else
             {
-                v = std::static_pointer_cast<LVRepeatedStringMessageValue>((*it).second);
+                v = std::static_pointer_cast<LVRepeatedMessageValue<std::string>>((*it).second);
             }
 
             auto tagSize = CalculateTagWireSize(tag);

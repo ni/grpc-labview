@@ -172,9 +172,9 @@ namespace grpc_labview
             auto repeatedMessageValuesIt = _repeatedMessageValuesMap.find(fieldInfo.fieldName);
             if (repeatedMessageValuesIt == _repeatedMessageValuesMap.end())
             {
-                auto m_val = std::make_shared<RepeatedMessageValue>(fieldInfo, google::protobuf::RepeatedPtrField<std::string>());
+                auto m_val = std::make_shared<RepeatedMessageValue>(fieldInfo, google::protobuf::RepeatedField<char>());
                 repeatedMessageValuesIt = _repeatedMessageValuesMap.emplace(fieldInfo.fieldName, m_val).first;
-                repeatedMessageValuesIt->second.get()->_buffer.Reserve(numElements);
+                repeatedMessageValuesIt->second.get()->_buffer.Resize(arraySize, _fillData);
             }
             else
             {
@@ -196,12 +196,10 @@ namespace grpc_labview
                 {
                     numElements *= 2;
                     arraySize = numElements * clusterSize;
-                    repeatedMessageValuesIt->second.get()->_buffer.Reserve(numElements);
+                    repeatedMessageValuesIt->second.get()->_buffer.Resize(arraySize, _fillData);
                 }
 
-                auto& messageString = *repeatedMessageValuesIt->second->_buffer.Mutable(elementIndex);
-                auto nestedMessageCluster = reinterpret_cast<int8_t*>(messageString.data());
-
+                auto nestedMessageCluster = reinterpret_cast<int8_t*>(const_cast<char*>(repeatedMessageValuesIt->second.get()->_buffer.data()));
                 nestedMessageCluster = nestedMessageCluster + (elementIndex * clusterSize);
                 LVMessageEfficient nestedMessage(metadata, nestedMessageCluster);
                 protobuf_ptr = ctx->ParseMessage(&nestedMessage, protobuf_ptr);

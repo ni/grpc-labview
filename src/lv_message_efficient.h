@@ -8,9 +8,6 @@
 #include <message_metadata.h>
 #include <google/protobuf/message.h>
 #include "lv_message.h"
-#include <type_traits>
-#include <well_known_messages.h>
-#include <type_traits>
 
 using namespace google::protobuf::internal;
 
@@ -99,19 +96,19 @@ namespace grpc_labview
     protected:
         struct RepeatedMessageValue {
             const MessageElementMetadata& _fieldInfo;
-            google::protobuf::RepeatedPtrField<std::string> _buffer;
+            google::protobuf::RepeatedField<char> _buffer;
             uint64_t _numElements = 0;
 
-            RepeatedMessageValue(const MessageElementMetadata& fieldInfo, google::protobuf::RepeatedPtrField<std::string> buffer) :
+            RepeatedMessageValue(const MessageElementMetadata& fieldInfo, google::protobuf::RepeatedField<char> buffer) :
                 _fieldInfo(fieldInfo), _buffer(buffer) {}
         };
 
         struct RepeatedStringValue {
             const MessageElementMetadata& _fieldInfo;
-            google::protobuf::RepeatedPtrField<std::string> _repeatedString;
+            google::protobuf::RepeatedField<std::string> _repeatedString;
 
             RepeatedStringValue(const MessageElementMetadata& fieldInfo) :
-                _fieldInfo(fieldInfo), _repeatedString(google::protobuf::RepeatedPtrField<std::string>()) {}
+                _fieldInfo(fieldInfo), _repeatedString(google::protobuf::RepeatedField<std::string>()) {}
         };
 
     public:
@@ -161,7 +158,7 @@ namespace grpc_labview
         const char* ParseAndCopyRepeatedMessage(const char* ptr, ParseContext* ctx, RepeatedMessageValuePointer v) {
 
             uint64_t numElements;
-            ptr = PackedMessageType(ptr, ctx, reinterpret_cast<google::protobuf::RepeatedPtrField<MessageType>*>(&(v->_value)));
+            ptr = PackedMessageType(ptr, ctx, reinterpret_cast<google::protobuf::RepeatedField<MessageType>*>(&(v->_value)));
             numElements = v->_value.size();
             // get the LVClusterHandle
 
@@ -182,7 +179,7 @@ namespace grpc_labview
             return ptr;
         }
 
-        const char* PackedMessageType(const char* ptr, ParseContext* ctx, google::protobuf::RepeatedPtrField<MessageType>* value)
+        const char* PackedMessageType(const char* ptr, ParseContext* ctx, google::protobuf::RepeatedField<MessageType>* value)
         {
             return PackedFunc(value, ptr, ctx);
         }

@@ -89,20 +89,6 @@ namespace grpc_labview
         google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
     };
 
-    class LVRepeatedStringMessageValue : public LVMessageValue
-    {
-    public:
-        LVRepeatedStringMessageValue(int protobufId);
-
-    public:
-        google::protobuf::RepeatedPtrField<std::string> _value;
-
-    public:
-        void* RawValue() override { return &_value; };
-        size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
-    };
-
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     class LVNestedMessageMessageValue : public LVMessageValue
