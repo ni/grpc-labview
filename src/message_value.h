@@ -56,16 +56,21 @@ namespace grpc_labview
     class LVRepeatedMessageValue : public LVMessageValue
     {
     public:
-        LVRepeatedMessageValue(int protobufId) :
-            LVMessageValue(protobufId)
-        {
-        }
+        LVRepeatedMessageValue(int protobufId) : LVMessageValue(protobufId) {}
 
-        google::protobuf::RepeatedField<T> _value;
+        // Use std::conditional to choose the correct field type
+        using FieldType = typename std::conditional<
+            std::is_scalar<T>::value, // Condition: Is T a scalar?
+            google::protobuf::RepeatedField<T>, // If true: Use RepeatedField<T>
+            google::protobuf::RepeatedPtrField<T> // If false: Use RepeatedPtrField<T>
+        >::type;
 
-        void* RawValue() override { return &_value; };
+        FieldType _value;
+
+        void* RawValue() override { return &_value; }
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        google::protobuf::uint8* Serialize(google::protobuf::uint8* target,
+            google::protobuf::io::EpsCopyOutputStream* stream) const override;
 
     protected:
         int _cachedSize;
