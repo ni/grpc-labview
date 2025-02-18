@@ -133,7 +133,7 @@ namespace grpc_labview
             for (int i = 0; i < totalElements; i++)
             {
                 auto str = GetLVString(*lvStr);
-                dataValue->_value.AddAlreadyReserved(std::move(str));
+                dataValue->_value.Add(std::move(str));
                 lvStr += 1;
             }
         }

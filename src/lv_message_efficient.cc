@@ -172,7 +172,7 @@ namespace grpc_labview
             auto repeatedMessageValuesIt = _repeatedMessageValuesMap.find(fieldInfo.fieldName);
             if (repeatedMessageValuesIt == _repeatedMessageValuesMap.end())
             {
-                auto m_val = std::make_shared<RepeatedMessageValue>(fieldInfo, google::protobuf::RepeatedField<char>());
+                auto m_val = std::make_shared<RepeatedMessageValue>(fieldInfo, google::protobuf::RepeatedPtrField<google::protobuf::Message>());
                 repeatedMessageValuesIt = _repeatedMessageValuesMap.emplace(fieldInfo.fieldName, m_val).first;
                 repeatedMessageValuesIt->second.get()->_buffer.Reserve(numElements);
             }
