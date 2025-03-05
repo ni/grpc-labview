@@ -7,6 +7,7 @@
 #include <message_value.h>
 #include <message_metadata.h>
 #include <google/protobuf/message.h>
+#include <google/protobuf/dynamic_message.h>
 
 using namespace google::protobuf::internal;
 
