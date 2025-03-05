@@ -3,6 +3,7 @@
 #include <grpc_server.h>
 #include <lv_message.h>
 #include <sstream>
+#include <google/protobuf/compiler/command_line_interface.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -716,6 +717,54 @@ namespace grpc_labview
 
     const google::protobuf::internal::ClassData* LVMessage::GetClassData() const
     {
-        return nullptr;
+        auto serializedProtoStr = ProtoDescriptorString::getInstance()->getDescriptor();
+        grpc::protobuf::FileDescriptorProto proto;
+        proto.ParseFromString(serializedProtoStr);
+        grpc::protobuf::DescriptorPool other_pool;
+		auto file = other_pool.BuildFile(proto);
+        auto a = other_pool.FindFileByName("helloworld.proto");
+        const google::protobuf::DescriptorPool* descriptor_pool = &other_pool;
+        const google::protobuf::Descriptor* message_desc = other_pool.FindMessageTypeByName(this->_metadata->typeUrl);
+        auto namee = message_desc->full_name();
+        google::protobuf::DynamicMessageFactory dynamic_factory;
+        auto  prototype = dynamic_factory.GetPrototype(message_desc);
+
+            google::protobuf::internal::ClassData class_data(
+                prototype,  // Ensure this is a valid MessageLite pointer
+                nullptr,  // tc_table (nullptr for dynamic messages)
+
+                nullptr,
+
+                //[](google::protobuf::MessageLite& to, const google::protobuf::MessageLite& from) {
+                //    google::protobuf::Message* to_msg =
+                //        dynamic_cast<google::protobuf::Message*>(&to);  // Remove 'const'
+
+                //    const google::protobuf::Message* from_msg =
+                //        dynamic_cast<const google::protobuf::Message*>(&from);
+
+                //    if (to_msg && from_msg) {
+                //        to_msg->MergeFrom(*from_msg);  // Now it compiles
+                //    }
+                //    else {
+                //        std::cerr << "MergeFrom failed: Message is not a full protobuf::Message." << std::endl;
+                //    }
+                //},
+                nullptr,
+                nullptr,
+
+                {},
+                //nullptr,
+
+                /*{},  */// Empty initializer list for unknown required fields
+
+                0,   // Cached size offset (not applicable for dynamic messages)
+                false // Indicates this is a full message
+            );
+
+
+
+
+
+        return &class_data;
     }
 }
