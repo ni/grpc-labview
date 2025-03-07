@@ -29,19 +29,19 @@ namespace grpc_labview
     protected:
         struct RepeatedMessageValue {
             const MessageElementMetadata& _fieldInfo;
-            google::protobuf::RepeatedField<char> _buffer;
+            google::protobuf::RepeatedPtrField<google::protobuf::Message> _buffer;
             uint64_t _numElements = 0;
 
-            RepeatedMessageValue(const MessageElementMetadata& fieldInfo, google::protobuf::RepeatedField<char> buffer) :
+            RepeatedMessageValue(const MessageElementMetadata& fieldInfo, google::protobuf::RepeatedPtrField<google::protobuf::Message> buffer) :
                 _fieldInfo(fieldInfo), _buffer(buffer) {}
         };
 
         struct RepeatedStringValue {
             const MessageElementMetadata& _fieldInfo;
-            google::protobuf::RepeatedField<std::string> _repeatedString;
+            google::protobuf::RepeatedPtrField<std::string> _repeatedString;
 
             RepeatedStringValue(const MessageElementMetadata& fieldInfo) :
-                _fieldInfo(fieldInfo), _repeatedString(google::protobuf::RepeatedField<std::string>()) {}
+                _fieldInfo(fieldInfo), _repeatedString(google::protobuf::RepeatedPtrField<std::string>()) {}
         };
 
     public:

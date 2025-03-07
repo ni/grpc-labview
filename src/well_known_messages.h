@@ -126,7 +126,18 @@ namespace grpc_labview
                 arrayMessage->_values.emplace(_rowsIndex, rowsValue);
                 auto columnsValue = std::make_shared<LVVariableMessageValue<int>>(_columnsIndex, columns);
                 arrayMessage->_values.emplace(_columnsIndex, columnsValue);
-                auto dataValue = std::make_shared<LVRepeatedMessageValue<TRepeatedType>>(_dataIndex);
+                //auto dataValue = std::make_shared<LVRepeatedMessageValue<TRepeatedType>>(_dataIndex);
+
+                std::shared_ptr<LVMessageValue> dataValue;
+                if constexpr (std::is_same<TRepeatedType, std::string>::value)
+                {
+                    dataValue = std::make_shared<LVRepeatedStringMessageValue>(_dataIndex);
+                }
+                else
+                {
+                    dataValue = std::make_shared<LVRepeatedMessageValue<TRepeatedType>>(_dataIndex);
+                }
+
                 arrayMessage->_values.emplace(_dataIndex, dataValue);
 
                 CopyArrayFromClusterToMessage(rows * columns, array, dataValue);

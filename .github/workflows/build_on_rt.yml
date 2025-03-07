@@ -26,9 +26,9 @@ jobs:
     # improvements to hosting and exports of the NILRT toolchain are made.
     - name: Install NI Linux RT CC Toolchain
       run: |
-        wget -nv https://download.ni.com/support/softlib/labview/labview_rt/2018/Linux%20Toolchains/linux/oecore-x86_64-core2-64-toolchain-6.0.sh
-        sudo chmod a+x ./oecore-x86_64-core2-64-toolchain-6.0.sh
-        sudo ./oecore-x86_64-core2-64-toolchain-6.0.sh -y -d ${GITHUB_WORKSPACE}/nilrt-toolchain/
+        wget -nv https://download.ni.com/support/softlib/labview/labview_rt/2023Q4/LinuxToolchains/linux/oecore-x86_64-core2-64-toolchain-10.0.sh
+        sudo chmod a+x ./oecore-x86_64-core2-64-toolchain-10.0.sh
+        sudo ./oecore-x86_64-core2-64-toolchain-10.0.sh -y -d ${GITHUB_WORKSPACE}/nilrt-toolchain/
         echo "${GITHUB_WORKSPACE}/nilrt-toolchain/sysroots/x86_64-nilrtsdk-linux/usr/bin/x86_64-nilrt-linux" >> ${GITHUB_PATH}
 
     - name: Update Submodules
