@@ -10,7 +10,7 @@ set(_GRPC_DEVICE_NILRT_LEGACY_TOOLCHAIN TRUE)
 #----------------------------------------------------------------------
 find_program(COMPILER_PATH x86_64-nilrt-linux-gcc)
 get_filename_component(toolchain_path ${COMPILER_PATH}/../../../../.. REALPATH DIRECTORY)
-set(include_path core2-64-nilrt-linux/usr/include/c++/6.3.0)
+set(include_path core2-64-nilrt-linux/usr/include/c++/10.0)
 
 #----------------------------------------------------------------------
 # Compilers

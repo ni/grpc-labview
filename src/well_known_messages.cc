@@ -113,7 +113,7 @@ namespace grpc_labview
             // Protect against a malformed message where the amount of data sent doesn't match the dimension sizes.
             // LV will automatically pad/handle writing less data than was allocated to the array so we just need
             // to make sure we don't write more data than was allocated to the array.
-            auto dataValue = std::static_pointer_cast<const LVRepeatedMessageValue<std::string>>(dataFieldValue);
+            auto dataValue = std::static_pointer_cast<const LVRepeatedStringMessageValue>(dataFieldValue);
             auto stringElements = dataValue->_value.size();
             auto stringsToCopy = std::min(elementCount, stringElements);
             auto lvString = (*array)->bytes<LStrHandle>();
@@ -128,12 +128,12 @@ namespace grpc_labview
         void String2DArray::CopyArrayFromClusterToMessage(int totalElements, LV2DArrayHandle array, const std::shared_ptr<LVMessageValue>& dataFieldValue)
         {
             auto lvStr = (*array)->bytes<LStrHandle>();
-            auto dataValue = std::static_pointer_cast<LVRepeatedMessageValue<std::string>>(dataFieldValue);
+            auto dataValue = std::static_pointer_cast<LVRepeatedStringMessageValue>(dataFieldValue);
             dataValue->_value.Reserve(totalElements);
             for (int i = 0; i < totalElements; i++)
             {
                 auto str = GetLVString(*lvStr);
-                dataValue->_value.AddAlreadyReserved(std::move(str));
+                dataValue->_value.Add(std::move(str));
                 lvStr += 1;
             }
         }
