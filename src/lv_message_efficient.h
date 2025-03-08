@@ -91,7 +91,7 @@ namespace grpc_labview
         const char* ParseAndCopyRepeatedMessage(const char* ptr, ParseContext* ctx, RepeatedMessageValuePointer v) {
 
             uint64_t numElements;
-            ptr = PackedMessageType(ptr, ctx, reinterpret_cast<google::protobuf::RepeatedField<MessageType>*>(&(v->_value)));
+            ptr = PackedMessageType(ptr, ctx, reinterpret_cast<google::protobuf::RepeatedPtrField<MessageType>*>(&(v->_value)));
             numElements = v->_value.size();
             // get the LVClusterHandle
 
@@ -112,7 +112,7 @@ namespace grpc_labview
             return ptr;
         }
 
-        const char* PackedMessageType(const char* ptr, ParseContext* ctx, google::protobuf::RepeatedField<MessageType>* value)
+        const char* PackedMessageType(const char* ptr, ParseContext* ctx, google::protobuf::RepeatedPtrField<MessageType>* value)
         {
             return PackedFunc(value, ptr, ctx);
         }
