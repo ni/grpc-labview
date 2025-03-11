@@ -667,17 +667,15 @@ namespace grpc_labview {
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;
-            auto arraySize = (*array)->cnt;
-            if (array && *array && (arraySize != 0))
+            if (array && *array && ((*array)->cnt != 0))
             {
                 auto repeatedStringValue = std::make_shared<LVRepeatedMessageValue<std::string>>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedStringValue);
                 auto lvStr = (*array)->bytes<LStrHandle>();
-                repeatedStringValue->_value.Reserve(arraySize);
-                for (int x = 0; x < arraySize; ++x)
+                for (int x = 0; x < (*array)->cnt; ++x)
                 {
                     auto str = GetLVString(*lvStr);
-                    repeatedStringValue->_value.AddAlreadyReserved(std::move(str));
+                    repeatedStringValue->_value.Add(str);
                     lvStr += 1;
                 }
             }
