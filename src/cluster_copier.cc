@@ -676,7 +676,7 @@ namespace grpc_labview {
                 for (int x = 0; x < arraySize; ++x)
                 {
                     auto str = GetLVString(*lvStr);
-                    repeatedStringValue->_value.Add(str);
+                    repeatedStringValue->_value.AddAlreadyReserved(std::move(str));
                     lvStr += 1;
                 }
             }
