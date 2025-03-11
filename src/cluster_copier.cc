@@ -673,6 +673,7 @@ namespace grpc_labview {
                 auto repeatedStringValue = std::make_shared<LVRepeatedMessageValue<std::string>>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedStringValue);
                 auto lvStr = (*array)->bytes<LStrHandle>();
+                repeatedStringValue->_value.Reserve(arraySize);
                 for (int x = 0; x < arraySize; ++x)
                 {
                     auto str = GetLVString(*lvStr);
