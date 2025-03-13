@@ -667,8 +667,8 @@ namespace grpc_labview {
         if (metadata->isRepeated)
         {
             auto array = *(LV1DArrayHandle*)start;
-            auto arraySize = (*array)->cnt;
-            if (array && *array && (arraySize != 0))
+            auto arraySize = (array && *array) ? (*array)->cnt : 0;
+            if (arraySize != 0)
             {
                 auto repeatedStringValue = std::make_shared<LVRepeatedMessageValue<std::string>>(metadata->protobufIndex);
                 message._values.emplace(metadata->protobufIndex, repeatedStringValue);
