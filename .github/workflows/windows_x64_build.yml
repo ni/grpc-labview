@@ -32,12 +32,8 @@ jobs:
 
     - name: Configure CMake
       working-directory: ${{runner.workspace}}\grpc-labview\build
-      run: cmake -G "Visual Studio 16 2019" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
-
-    - name: Configure CMake
-      working-directory: ${{runner.workspace}}\grpc-labview\build
-      run: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -S . -B build
-
+      run: cmake -G "Visual Studio 16 2019" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -S ${{runner.workspace}}\grpc-labview -B ${{runner.workspace}}\grpc-labview\build
+      
     - name: Build
       working-directory: ${{runner.workspace}}\grpc-labview\build
       # Execute the build.  You can specify a specific target with "--target <NAME>"
