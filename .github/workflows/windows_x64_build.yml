@@ -32,7 +32,7 @@ jobs:
 
     - name: Configure CMake
       working-directory: ${{runner.workspace}}\grpc-labview\build
-      run: cmake -G "Visual Studio 16 2019" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -S ${{runner.workspace}}\grpc-labview -B ${{runner.workspace}}\grpc-labview\build
+      run: cmake -G "Visual Studio 16 2019" -DCMAKE_POLICY_VERSION_MINIMUM=3.5.1 ..
       
     - name: Build
       working-directory: ${{runner.workspace}}\grpc-labview\build
