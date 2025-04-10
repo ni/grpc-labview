@@ -185,11 +185,9 @@ namespace grpc_labview {
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool ClusterDataCopier::AnyBuilderAddValue(LVMessage& message, LVMessageMetadataType valueType, bool isRepeated, int protobufIndex, int8_t* value)
+    bool ClusterDataCopier::AnyBuilderAddValue(LVMessage& message, std::shared_ptr<MessageElementMetadata> metadata, int8_t* value)
     {
-        auto metadata = std::make_shared<MessageElementMetadata>(valueType, isRepeated, protobufIndex);
-
-        switch (valueType)
+        switch (metadata->type)
         {
         case LVMessageMetadataType::StringValue:
             CopyStringFromCluster(metadata, value, message);
@@ -774,7 +772,16 @@ namespace grpc_labview {
 
     void ClusterDataCopier::CopyEnumFromCluster(const std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
-        std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
+        std::shared_ptr<EnumMetadata> enumMetadata;
+        if (metadata && metadata->_owner)
+        {
+            enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
+        }
+
+        if (!enumMetadata)
+        {
+            throw InvalidEnumValueException("Enum metadata not found");
+        }
 
         if (metadata->isRepeated)
         {

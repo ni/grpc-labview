@@ -24,7 +24,7 @@ namespace grpc_labview
     public:
         static void CopyToCluster(const LVMessage& message, int8_t* cluster);
         static void CopyFromCluster(LVMessage& message, int8_t* cluster);
-        static bool AnyBuilderAddValue(LVMessage& message, LVMessageMetadataType valueType, bool isRepeated, int protobufIndex, int8_t* value);
+        static bool AnyBuilderAddValue(LVMessage& message, std::shared_ptr<MessageElementMetadata> metadata, int8_t* value);
 
     private:
         static void CopyStringToCluster(const std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<const LVMessageValue>& value);
