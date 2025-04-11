@@ -60,6 +60,9 @@ namespace grpc_labview
     typedef MagicCookie LVRefNum;
     typedef MagicCookie LVUserEventRef;
     typedef int32_t(*CleanupProcPtr)(gRPCid* id);
+    typedef uint8_t LVBoolean;
+    static const LVBoolean LVTrue = 1;
+    static const LVBoolean LVFalse = 0;
 
     struct LStr {
         int32_t cnt; /* number of bytes that follow */
@@ -127,6 +130,22 @@ namespace grpc_labview
     #pragma pack (pop)
     #endif
 
+    // Defines cleanup modes which are used with RTSetCleanupProc
+    enum class CleanupProcMode
+    {
+        // Value passed to the RTSetCleanupProc to remove a cleanup proc for the VI.
+        CleanOnRemove = 0,
+        // Value passed to the RTSetCleanupProc to register a cleanup proc that is called when
+        // the LV application context exits.
+        CleanOnExit = 1,
+        // Value passed to the RTSetCleanUpProc to register a cleanup proc for a VI that is called
+        // when the VI state changes to Idle.
+        CleanOnIdle = 2,
+        // Value passed to the RTSetCleanUpProc to register a cleanup proc for a VI that is called
+        // when the VI state changes to Idle after a reset.
+        CleanAfterReset = 3
+    };
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void SetLVRTModulePath(std::string modulePath);
@@ -139,6 +158,6 @@ namespace grpc_labview
     int DSSetHandleSize(void* h, size_t n);
     long DSDisposeHandle(void* h);
     int SignalOccurrence(MagicCookie occurrence);
-    int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
+    int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id, CleanupProcMode cleanupCondition = CleanupProcMode::CleanOnIdle);
     int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
 }
