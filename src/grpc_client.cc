@@ -215,31 +215,26 @@ void CheckActiveAndSignalOccurenceForClientCall(grpc_labview::ClientCall *client
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t CreateClient(const char *address, const char *certificatePath, grpc_labview::gRPCid **clientId)
+LIBRARY_EXPORT int32_t CreateClient2(const char* address, const char* certificatePath, grpc_labview::LVBoolean autoCleanup, grpc_labview::gRPCid** clientId)
 {
     grpc_labview::InitCallbacks();
 
     auto client = new grpc_labview::LabVIEWgRPCClient();
     client->Connect(address, certificatePath);
     *clientId = grpc_labview::gPointerManager.RegisterPointer(client);
-    grpc_labview::RegisterCleanupProc(ClientCleanUpProc, client);
+    auto cleanupMode = autoCleanup ? grpc_labview::CleanupProcMode::CleanOnIdle : grpc_labview::CleanupProcMode::CleanAfterReset;
+    grpc_labview::RegisterCleanupProc(ClientCleanUpProc, client, cleanupMode);
     return 0;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-int32_t CloseClient(grpc_labview::LabVIEWgRPCClient* client)
+LIBRARY_EXPORT int32_t CreateClient(const char* address, const char* certificatePath, grpc_labview::gRPCid** clientId)
 {
-    if (!client)
-    {
-        return -1;
-    }
-
-    grpc_labview::DeregisterCleanupProc(ClientCleanUpProc, client);
-    return 0;
+    return CreateClient2(address, certificatePath, grpc_labview::LVTrue, clientId);
 }
 
-// Signal a lv occurence for an active client call from async c++ thread
+// Signal a lv occurrence for an active client call from async c++ thread
 void CheckActiveAndSignalOccurenceForClientCall(grpc_labview::ClientCall* clientCall)
 {
     if (clientCall == nullptr)
@@ -265,18 +260,6 @@ LIBRARY_EXPORT int32_t CloseClient(grpc_labview::gRPCid* clientId)
         return -1;
     }
 
-    CloseClient(client.get());
-    grpc_labview::gPointerManager.UnregisterPointer(clientId);
-    return 0;
-}
-
-int32_t ClientCleanUpProc(grpc_labview::gRPCid* clientId)
-{
-    auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
-    if (!client)
-    {
-        return -1;
-    }
     std::unique_lock<std::mutex> lock(client->clientLock);
     for (auto activeClientCall = client->ActiveClientCalls.begin(); activeClientCall != client->ActiveClientCalls.end(); activeClientCall++)
     {
@@ -284,7 +267,15 @@ int32_t ClientCleanUpProc(grpc_labview::gRPCid* clientId)
     }
     client->ActiveClientCalls.clear();
     lock.unlock();
-    return CloseClient(client.get());
+
+    grpc_labview::DeregisterCleanupProc(ClientCleanUpProc, clientId);
+    grpc_labview::gPointerManager.UnregisterPointer(clientId);
+    return 0;
+}
+
+int32_t ClientCleanUpProc(grpc_labview::gRPCid* clientId)
+{
+    return CloseClient(clientId);
 }
 
 //---------------------------------------------------------------------
