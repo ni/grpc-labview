@@ -3,6 +3,7 @@
 #include <cluster_copier.h>
 #include <lv_interop.h>
 #include <google/protobuf/any.pb.h>
+#include <message_metadata.h>
 #include <serialization_session.h>
 #include <lv_message.h>
 
@@ -151,7 +152,7 @@ LIBRARY_EXPORT int32_t AnyBuilderBegin(grpc_labview::gRPCid** builderId)
     auto rootMessage = new grpc_labview::LVMessage(metadata);
     grpc_labview::gPointerManager.RegisterPointer(rootMessage);
     *builderId = rootMessage;
-    return 0; 
+    return 0;
 }
 
 //---------------------------------------------------------------------
@@ -159,9 +160,45 @@ LIBRARY_EXPORT int32_t AnyBuilderBegin(grpc_labview::gRPCid** builderId)
 LIBRARY_EXPORT int32_t AnyBuilderAddValue(grpc_labview::gRPCid* anyId, grpc_labview::LVMessageMetadataType valueType, int isRepeated, int protobufIndex, int8_t* value)
 {
     auto message = anyId->CastTo<grpc_labview::LVMessage>();
+    auto messageMetadata = std::make_shared<grpc_labview::MessageElementMetadata>(valueType, isRepeated, protobufIndex);
     try
     {
-        grpc_labview::ClusterDataCopier::AnyBuilderAddValue(*message, valueType, isRepeated, protobufIndex, value);
+        grpc_labview::ClusterDataCopier::AnyBuilderAddValue(*message, messageMetadata, value);
+    }
+    catch (grpc_labview::InvalidEnumValueException& e)
+    {
+        return e.code;
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t AnyBuilderAddValueFromMetadata(grpc_labview::gRPCid* anyId, grpc_labview::gRPCid* metadataOwnerId, const char* messsageName, int protobufIndex, int8_t* value)
+{
+    auto message = anyId->CastTo<grpc_labview::LVMessage>();
+    auto metadataOwner = metadataOwnerId->CastTo<grpc_labview::IMessageElementMetadataOwner>();
+    if (message == nullptr || metadataOwner == nullptr)
+    {
+        return -2;
+    }
+
+    auto metadata = metadataOwner->FindMetadata(messsageName);
+    if (metadata == nullptr)
+    {
+        return -2;
+    }
+
+    auto fieldMetadataItr = metadata->_mappedElements.find(protobufIndex);
+    if (fieldMetadataItr == metadata->_mappedElements.end())
+    {
+        return -2;
+    }
+
+    auto fieldMetadata = fieldMetadataItr->second;
+    try
+    {
+        grpc_labview::ClusterDataCopier::AnyBuilderAddValue(*message, fieldMetadata, value);
     }
     catch (grpc_labview::InvalidEnumValueException& e)
     {
