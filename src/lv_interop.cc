@@ -11,12 +11,6 @@
 #include <dlfcn.h>
 #endif
 
-// Value passed to the RTSetCleanupProc to remove the clean up proc for the VI.
-static int kCleanOnRemove = 0;
-// Value passed to the RTSetCleanUpProc to register a cleanup proc for a VI which
-// gets called when the VI state changes to Idle.
-static int kCleanOnIdle = 2;
-
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 typedef int (*NumericArrayResize_T)(int32_t, int32_t, void* handle, size_t size);
@@ -186,16 +180,16 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, gRPCid* id)
+    int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, gRPCid* id, CleanupProcMode cleanupCondition)
     {
-        return RTSetCleanupProc(cleanUpProc, id, kCleanOnIdle);
+        return RTSetCleanupProc(cleanUpProc, id, (int32_t)cleanupCondition);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, gRPCid* id)
     {
-        return RTSetCleanupProc(cleanUpProc, id, kCleanOnRemove);
+        return RTSetCleanupProc(cleanUpProc, id, (int32_t)CleanupProcMode::CleanOnRemove);
     }
 
     int AlignClusterOffset(int clusterOffset, int alignmentRequirement)
@@ -211,7 +205,7 @@ namespace grpc_labview
         return clusterOffset;
 #endif
     }
-  
+
     int32_t GetTypeCodeForSize(int byteSize)
     {
         switch (byteSize)
