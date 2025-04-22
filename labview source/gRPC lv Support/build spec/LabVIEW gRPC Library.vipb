@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-28 23:37:57" Modified_Date="2025-01-31 14:10:31" Creator="navin" Comments="" ID="4f52d5f7135fd920bd847792fd7cdfd6">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-28 23:37:57" Modified_Date="2025-04-14 16:07:28" Creator="navin" Comments="" ID="37923328567acc13cd52f17f48c2c72a">
   <Library_General_Settings>
     <Package_File_Name>NI_lib_LabVIEW_gRPC_Library</Package_File_Name>
-    <Library_Version>1.3.0.1</Library_Version>
+    <Library_Version>1.4.0.1</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>..\..\Builds</Library_Output_Folder>
@@ -252,7 +252,7 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Server API</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>43A6CCF2113C5A85CC31D2023FE21C38</GUID>
+      <GUID>5957BDEDDDA553AED0714F89A9448341</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -371,7 +371,7 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Client API\Client Cancel Call.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>326E05B30F2CBC9FB8857E9E1292D0E5</GUID>
+      <GUID>393E1A92294F2F8AA1B0DFF9B48E661E</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -490,7 +490,7 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Server API\UnpackFromBuffer.vim</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>0A2D2300790D51C90BE46AFFE4F8E126</GUID>
+      <GUID>DF83F0CFB5B3A3FADDA7ECCD9402140E</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>2</Parent_Palette_Index>
@@ -721,7 +721,7 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Server API\Message Requests\Write Call Response.vim</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>A0921295AB2AA9B10FF446B6A3ED8A05</GUID>
+      <GUID>6F26F1E4F850A902DEBE92666DA6B748</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>2</Parent_Palette_Index>
@@ -840,7 +840,7 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Server API\Server\Stop Server.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>8CBF6D67F9E886F04225EAB39BDFFF4D</GUID>
+      <GUID>65DC18DAC43267B8BD5F821D34CC88E3</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>
