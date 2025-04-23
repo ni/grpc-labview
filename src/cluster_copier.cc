@@ -222,7 +222,9 @@ namespace grpc_labview {
             CopyUInt64FromCluster(metadata, value, message);
             break;
         case LVMessageMetadataType::EnumValue:
-            CopyEnumFromCluster(metadata, value, message);
+            // Treat enum as an int32 for now.
+            // CopyEnumFromCluster() requires enum metadata and the AnyBuilder API doesn't allow users to provide that.
+            CopyInt32FromCluster(metadata, value, message);
             break;
         case LVMessageMetadataType::SInt32Value:
             CopySInt32FromCluster(metadata, value, message);
@@ -774,7 +776,16 @@ namespace grpc_labview {
 
     void ClusterDataCopier::CopyEnumFromCluster(const std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
-        std::shared_ptr<EnumMetadata> enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
+        std::shared_ptr<EnumMetadata> enumMetadata;
+        if (metadata && metadata->_owner)
+        {
+            enumMetadata = metadata->_owner->FindEnumMetadata(metadata->embeddedMessageName);
+        }
+
+        if (!enumMetadata)
+        {
+            throw InvalidEnumValueException("Enum metadata not found");
+        }
 
         if (metadata->isRepeated)
         {
