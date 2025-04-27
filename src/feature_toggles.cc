@@ -46,6 +46,8 @@ namespace grpc_labview {
         }
 
         configFile.close();
+        if (featureFlags.find("data_EfficientMessageCopy") != featureFlags.end())
+            featureFlags["data_EfficientMessageCopy"] = false;
     }
 
     // Function to check if a feature is enabled
