@@ -46,7 +46,7 @@ namespace grpc_labview {
         }
 
         configFile.close();
-        //TODO: remove this post fixing LVMessageEfficient to let enable feature
+        //TODO: remove this post fixing LVMessageEfficient to let enable feature. See issue: #433
         if (featureFlags.find("data_EfficientMessageCopy") != featureFlags.end())
             featureFlags["data_EfficientMessageCopy"] = false;
     }
