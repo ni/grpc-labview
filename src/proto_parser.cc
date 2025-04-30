@@ -49,7 +49,7 @@ namespace grpc_labview
         std::string GetLVErrorMessage();
 
     private:
-        std::list<string> _errors;
+        std::list<std::string> _errors;
     };
 
     //---------------------------------------------------------------------
@@ -140,7 +140,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void AddFieldError(FieldDescriptor* field, string message)
+    void AddFieldError(FieldDescriptor* field, std::string message)
     {
         grpc_labview::LVProtoParser::s_Parser->m_ErrorCollector.AddError("", 0, 0, message);
     }

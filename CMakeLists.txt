@@ -1,18 +1,25 @@
 #----------------------------------------------------------------------
 #----------------------------------------------------------------------
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.15)
 
 cmake_policy(SET CMP0091 NEW)
 
 project(labview-grpc C CXX)
+set(ABSL_ENABLE_INSTALL ON)
 
 if(NOT MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
   # Set default visibility to hidden, only export LIBRARY_EXPORT symbols from the shared library
   add_compile_options(-fvisibility=hidden)
 else()
   add_definitions(-D_WIN32_WINNT=0x600)
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Use static runtime" FORCE)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY_DEFAULT "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Default MSVC runtime library to use static runtime")
+  set(gRPC_MSVC_STATIC_RUNTIME ON CACHE BOOL "Use static runtime for gRPC" FORCE)
+  set(protobuf_MSVC_STATIC_RUNTIME ON CACHE BOOL "Use static runtime for protobuf" FORCE)
+  set(ABSL_MSVC_STATIC_RUNTIME ON CACHE BOOL "Use static runtime for Abseil")
+  set(CARES_MSVC_STATIC_RUNTIME ON CACHE BOOL "Use static runtime for c-ares")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4267 /wd4244")
   add_compile_options("$<$<NOT:$<CONFIG:Debug>>:/Zi>")
   add_link_options("$<$<NOT:$<CONFIG:Debug>>:/DEBUG>")
