@@ -13,7 +13,7 @@ namespace grpc_labview
     class UnpackedFields : public gRPCid
     {
     public:
-        UnpackedFields(LVMessage* message);    
+        UnpackedFields(LVMessage* message);
         int32_t GetField(int protobufIndex, LVMessageMetadataType valueType, int isRepeated, int8_t* buffer);
 
     private:
@@ -124,7 +124,7 @@ namespace grpc_labview
                 arr[i] = val;
             }
 
-            // Memcopy the unsigned integer array (arr) into the labview array (destArray). 
+            // Memcopy the unsigned integer array (arr) into the labview array (destArray).
             grpc_labview::NumericArrayResize(typeCode, 1, destArray, count);
             (**destArray)->cnt = count;
             memcpy((**destArray)->bytes<T>(), arr, count * sizeof(T));
@@ -206,8 +206,8 @@ namespace grpc_labview
                     SetLVString((LStrHandle*)buffer, field->length_delimited());
                 }
                 break;
-        }    
-        return 0; 
+        }
+        return 0;
     }
 }
 
@@ -244,16 +244,22 @@ LIBRARY_EXPORT int32_t GetUnpackedField(grpc_labview::gRPCid* id, int protobufIn
     {
         return -1;
     }
+
     auto unpackedFields = id->CastTo<grpc_labview::UnpackedFields>();
+    if (!unpackedFields)
+    {
+        return -1;
+    }
+
     unpackedFields->GetField(protobufIndex, valueType, isRepeated, buffer);
-    return 0; 
+    return 0;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t GetUnpackedMessageField(grpc_labview::gRPCid* id, int protobufIndex, int8_t* buffer)
-{    
-    return -1; 
+{
+    return -1;
 }
 
 //---------------------------------------------------------------------
@@ -261,5 +267,5 @@ LIBRARY_EXPORT int32_t GetUnpackedMessageField(grpc_labview::gRPCid* id, int pro
 LIBRARY_EXPORT int32_t FreeUnpackedFields(grpc_labview::gRPCid* id)
 {
     grpc_labview::gPointerManager.UnregisterPointer(id);
-    return 0; 
+    return 0;
 }
