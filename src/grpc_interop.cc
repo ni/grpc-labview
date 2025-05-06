@@ -345,6 +345,12 @@ LIBRARY_EXPORT int32_t SetResponseData(grpc_labview::gRPCid** id, int8_t* lvRequ
     {
         return -1;
     }
+
+    if (data->_call->IsCancelled())
+    {
+        return -(1000 + grpc::StatusCode::CANCELLED);
+    }
+
     try
     {
         grpc_labview::ClusterDataCopier::CopyFromCluster(*data->_response, lvRequest);
@@ -353,10 +359,7 @@ LIBRARY_EXPORT int32_t SetResponseData(grpc_labview::gRPCid** id, int8_t* lvRequ
     {
         return e.code;
     }
-    if (data->_call->IsCancelled())
-    {
-        return -(1000 + grpc::StatusCode::CANCELLED);
-    }
+
     if (!data->_call->IsActive() || !data->_call->Write())
     {
         return -2;
@@ -373,6 +376,12 @@ LIBRARY_EXPORT int32_t CloseServerEvent(grpc_labview::gRPCid** id)
     {
         return -1;
     }
+
+    if (data->_call->IsCancelled())
+    {
+        return -(1000 + grpc::StatusCode::CANCELLED);
+    }
+
     data->NotifyComplete();
     data->_call->Finish();
     grpc_labview::gPointerManager.UnregisterPointer(*id);
