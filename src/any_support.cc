@@ -139,6 +139,7 @@ LIBRARY_EXPORT int32_t TryUnpackFromAny(grpc_labview::gRPCid* id, grpc_labview::
     {
         return -2;
     }
+
     if (grpc_labview::GetLVString(anyCluster->TypeUrl) != messageType)
     {
         return -1;
@@ -157,6 +158,11 @@ LIBRARY_EXPORT int32_t IsAnyOfType(grpc_labview::gRPCid* id, grpc_labview::AnyCl
     }
 
     auto metadata = metadataOwner->FindMetadata(messageType);
+    if (metadata == nullptr)
+    {
+        return -2;
+    }
+
     if (grpc_labview::GetLVString(anyCluster->TypeUrl) != metadata->typeUrl)
     {
         return -1;
