@@ -31,6 +31,11 @@ LIBRARY_EXPORT int32_t FreeSerializationSession(grpc_labview::gRPCid* sessionId)
 LIBRARY_EXPORT int32_t PackToBuffer(grpc_labview::gRPCid* id, const char* messageType, int8_t* cluster, grpc_labview::LV1DArrayHandle* lvBuffer)
 {
     auto metadataOwner = id->CastTo<grpc_labview::IMessageElementMetadataOwner>();
+    if (!metadataOwner)
+    {
+        return -1;
+    }
+
     auto metadata = metadataOwner->FindMetadata(messageType);
     if (metadata == nullptr)
     {
@@ -63,6 +68,11 @@ LIBRARY_EXPORT int32_t PackToBuffer(grpc_labview::gRPCid* id, const char* messag
 LIBRARY_EXPORT int32_t PackToAny(grpc_labview::gRPCid* id, const char* messageType, int8_t* cluster, grpc_labview::AnyCluster* anyCluster)
 {
     auto metadataOwner = id->CastTo<grpc_labview::IMessageElementMetadataOwner>();
+    if (!metadataOwner)
+    {
+        return -1;
+    }
+
     auto metadata = metadataOwner->FindMetadata(messageType);
     if (metadata == nullptr)
     {
@@ -78,12 +88,17 @@ LIBRARY_EXPORT int32_t PackToAny(grpc_labview::gRPCid* id, const char* messageTy
 LIBRARY_EXPORT int32_t UnpackFromBuffer(grpc_labview::gRPCid* id, grpc_labview::LV1DArrayHandle lvBuffer, const char* messageType, int8_t* cluster)
 {
     auto metadataOwner = id->CastTo<grpc_labview::IMessageElementMetadataOwner>();
-    auto metadata = metadataOwner->FindMetadata(messageType);
+    if (!metadataOwner)
+    {
+        return -1;
+    }
 
+    auto metadata = metadataOwner->FindMetadata(messageType);
     if (metadata == nullptr)
     {
         return -2;
-    }  
+    }
+
     grpc_labview::LVMessage message(metadata);
     char* elements = (*lvBuffer)->bytes<char>();
     std::string buffer(elements, (*lvBuffer)->cnt);
@@ -112,14 +127,19 @@ LIBRARY_EXPORT int32_t UnpackFromAny(grpc_labview::gRPCid* id, grpc_labview::Any
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t TryUnpackFromAny(grpc_labview::gRPCid* id, grpc_labview::AnyCluster* anyCluster, const char* messageType, int8_t* cluster)
-{    
+{
     auto metadataOwner = id->CastTo<grpc_labview::IMessageElementMetadataOwner>();
-    auto metadata = metadataOwner->FindMetadata(messageType);
+    if (!metadataOwner)
+    {
+        return -1;
+    }
 
+    auto metadata = metadataOwner->FindMetadata(messageType);
     if (metadata == nullptr)
     {
         return -2;
     }
+
     if (grpc_labview::GetLVString(anyCluster->TypeUrl) != messageType)
     {
         return -1;
@@ -130,9 +150,18 @@ LIBRARY_EXPORT int32_t TryUnpackFromAny(grpc_labview::gRPCid* id, grpc_labview::
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t IsAnyOfType(grpc_labview::gRPCid* id, grpc_labview::AnyCluster* anyCluster, const char* messageType)
-{    
+{
     auto metadataOwner = id->CastTo<grpc_labview::IMessageElementMetadataOwner>();
+    if (!metadataOwner)
+    {
+        return -1;
+    }
+
     auto metadata = metadataOwner->FindMetadata(messageType);
+    if (metadata == nullptr)
+    {
+        return -2;
+    }
 
     if (grpc_labview::GetLVString(anyCluster->TypeUrl) != metadata->typeUrl)
     {
@@ -144,14 +173,14 @@ LIBRARY_EXPORT int32_t IsAnyOfType(grpc_labview::gRPCid* id, grpc_labview::AnyCl
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t AnyBuilderBegin(grpc_labview::gRPCid** builderId)
-{   
+{
     grpc_labview::InitCallbacks();
 
     auto metadata = std::make_shared<grpc_labview::MessageMetadata>();
     auto rootMessage = new grpc_labview::LVMessage(metadata);
     grpc_labview::gPointerManager.RegisterPointer(rootMessage);
     *builderId = rootMessage;
-    return 0; 
+    return 0;
 }
 
 //---------------------------------------------------------------------
@@ -159,6 +188,11 @@ LIBRARY_EXPORT int32_t AnyBuilderBegin(grpc_labview::gRPCid** builderId)
 LIBRARY_EXPORT int32_t AnyBuilderAddValue(grpc_labview::gRPCid* anyId, grpc_labview::LVMessageMetadataType valueType, int isRepeated, int protobufIndex, int8_t* value)
 {
     auto message = anyId->CastTo<grpc_labview::LVMessage>();
+    if (!message)
+    {
+        return -1;
+    }
+
     try
     {
         grpc_labview::ClusterDataCopier::AnyBuilderAddValue(*message, valueType, isRepeated, protobufIndex, value);
@@ -173,48 +207,66 @@ LIBRARY_EXPORT int32_t AnyBuilderAddValue(grpc_labview::gRPCid* anyId, grpc_labv
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t AnyBuilderBeginNestedMessage(grpc_labview::gRPCid* builderId, int protobufIndex, grpc_labview::gRPCid** nestedId)
-{   
+{
     auto message = builderId->CastTo<grpc_labview::LVMessage>();
-    auto metadata = std::make_shared<grpc_labview::MessageMetadata>();
+    if (!message)
+    {
+        return -1;
+    }
 
+    auto metadata = std::make_shared<grpc_labview::MessageMetadata>();
     auto nested = std::make_shared<grpc_labview::LVMessage>(metadata);
     auto value = std::make_shared<grpc_labview::LVNestedMessageMessageValue>(protobufIndex, nested);
     message->_values.emplace(protobufIndex, value);
     *nestedId = nested.get();
-    return 0; 
+    return 0;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t AnyBuilderBeginRepeatedNestedMessage(grpc_labview::gRPCid* builderId, int protobufIndex, grpc_labview::gRPCid** nestedId)
-{   
+{
     auto message = builderId->CastTo<grpc_labview::LVMessage>();
-    auto metadata = std::make_shared<grpc_labview::MessageMetadata>();
+    if (!message)
+    {
+        return -1;
+    }
 
+    auto metadata = std::make_shared<grpc_labview::MessageMetadata>();
     auto value = std::make_shared<grpc_labview::LVRepeatedNestedMessageMessageValue>(protobufIndex);
     message->_values.emplace(protobufIndex, value);
     *nestedId = value.get();
-    return 0; 
+    return 0;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t AnyBuilderBeginRepeatedNestedMessageElement(grpc_labview::gRPCid* builderId, grpc_labview::gRPCid** nestedId)
-{   
+{
     auto message = builderId->CastTo<grpc_labview::LVRepeatedNestedMessageMessageValue>();
+    if (!message)
+    {
+        return -1;
+    }
+
     auto metadata = std::make_shared<grpc_labview::MessageMetadata>();
 
     auto nested = std::make_shared<grpc_labview::LVMessage>(metadata);
     message->_value.emplace_back(nested);
     *nestedId = nested.get();
-    return 0; 
+    return 0;
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t AnyBuilderBuildToBuffer(grpc_labview::gRPCid* builderId, const char* typeUrl, grpc_labview::LV1DArrayHandle* lvBuffer)
-{   
+{
     auto message = builderId->CastTo<grpc_labview::LVMessage>();
+    if (!message)
+    {
+        return -1;
+    }
+
     grpc_labview::gPointerManager.UnregisterPointer(builderId);
     std::string buffer;
     if (message->SerializeToString(&buffer))
@@ -231,8 +283,13 @@ LIBRARY_EXPORT int32_t AnyBuilderBuildToBuffer(grpc_labview::gRPCid* builderId, 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t AnyBuilderBuild(grpc_labview::gRPCid* builderId, const char* typeUrl, grpc_labview::AnyCluster* anyCluster)
-{   
+{
     auto message = builderId->CastTo<grpc_labview::LVMessage>();
+    if (!message)
+    {
+        return -1;
+    }
+
     grpc_labview::SetLVString(&anyCluster->TypeUrl, message->_metadata->typeUrl);
     return AnyBuilderBuildToBuffer(builderId, typeUrl, &anyCluster->Bytes);
 }
