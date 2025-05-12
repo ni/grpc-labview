@@ -138,7 +138,7 @@ LIBRARY_EXPORT void readIniFile(const char* filePath)
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t getFeatureEnabled(const char* featureName, uint8_t* featureEnabled)
 {
-    featureEnabled = grpc_labview::FeatureConfig::getInstance().isFeatureEnabled(featureName);
+    *featureEnabled = grpc_labview::FeatureConfig::getInstance().isFeatureEnabled(featureName);
 	return 0;
 }
 
