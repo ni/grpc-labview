@@ -113,9 +113,9 @@
 		<Item Name="Set LVRT Module Path.vi" Type="VI" URL="../Shared/Set LVRT Module Path.vi"/>
 		<Item Name="To Message Name.vi" Type="VI" URL="../Shared/To Message Name.vi"/>
 		<Item Name="To Well Known Type.vi" Type="VI" URL="../Shared/To Well Known Type.vi"/>
+		<Item Name="Get Feature Toggle Enabled.vi" Type="VI" URL="../Shared/Get Feature Toggle Enabled.vi"/>
 		<Item Name="TranslateGrpcError.vi" Type="VI" URL="../Shared/TranslateGrpcError.vi"/>
 		<Item Name="Wait On Occurence.vi" Type="VI" URL="../Shared/Wait On Occurence.vi"/>
 		<Item Name="Wait On Occurrence Wrapper.vi" Type="VI" URL="../Shared/Wait On Occurrence Wrapper.vi"/>
 	</Item>
-	<Item Name="Get Feature Toggle Enabled.vi" Type="VI" URL="../Shared/Get Feature Toggle Enabled.vi"/>
 </Library>
