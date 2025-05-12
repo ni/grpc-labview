@@ -49,9 +49,9 @@ namespace grpc_labview
             virtual ~I2DArray() = default;
 
         protected:
-            static const int _rowsIndex = 1;
-            static const int _columnsIndex = 2;
-            static const int _dataIndex = 3;
+            static constexpr int _rowsIndex = 1;
+            static constexpr int _columnsIndex = 2;
+            static constexpr int _dataIndex = 3;
         };
 
         //---------------------------------------------------------------------
