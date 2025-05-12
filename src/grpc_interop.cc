@@ -136,6 +136,13 @@ LIBRARY_EXPORT void readIniFile(const char* filePath)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+LIBRARY_EXPORT void getFeatureEnabled(const char* featureName, uint8_t* featureEnabled)
+{
+    featureEnabled = grpc_labview::FeatureConfig::getInstance().isFeatureEnabled(featureName);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t LVCreateServer(grpc_labview::gRPCid** id)
 {
     grpc_labview::InitCallbacks();
