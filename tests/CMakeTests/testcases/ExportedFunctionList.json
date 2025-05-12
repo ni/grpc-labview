@@ -848,7 +848,7 @@
       "return_type": "int32_t",
       "parameter_list": [
         "const char*",
-		"uint8_t*"
+        "uint8_t*"
       ]
     }
   ]
