@@ -841,6 +841,15 @@
       "parameter_list": [
         "const char*"
       ]
+    },
+	{
+      "id": 87,
+      "function_name": "getFeatureEnabled",
+      "return_type": "int32_t",
+      "parameter_list": [
+        "const char*",
+		"uint8_t*"
+      ]
     }
   ]
 }
