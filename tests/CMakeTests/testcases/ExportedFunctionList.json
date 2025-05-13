@@ -836,7 +836,7 @@
     },
     {
       "id": 86,
-      "function_name": "readIniFile",
+      "function_name": "ReadIniFile",
       "return_type": "void",
       "parameter_list": [
         "const char*"
@@ -844,7 +844,7 @@
     },
 	{
       "id": 87,
-      "function_name": "getFeatureEnabled",
+      "function_name": "IsFeatureEnabled",
       "return_type": "int32_t",
       "parameter_list": [
         "const char*",
