@@ -4,11 +4,21 @@
 #include <sstream>
 #include <map>
 #include <algorithm>
+#include <path_support.h>
+
 
 namespace grpc_labview {
     // Function to read feature configurations from an INI file
-    void FeatureConfig::readConfigFromFile(const std::string& filePath) {
-        std::ifstream configFile(filePath);
+    void FeatureConfig::ReadConfigFromFile(const std::string& filePath) {
+        std::string configFilePath = filePath;
+        
+        if (configFilePath.empty()) {
+            // If no filepath passed into this function, use the default
+            // configuration file path.
+            configFilePath = GetDefaultConfigPath();
+        }
+
+        std::ifstream configFile(configFilePath);
         if (!configFile.is_open()) {
             return;
         }
@@ -52,8 +62,16 @@ namespace grpc_labview {
     }
 
     // Function to check if a feature is enabled
-    bool FeatureConfig::isFeatureEnabled(const std::string& featureName) const {
+    bool FeatureConfig::IsFeatureEnabled(const std::string& featureName) const {
         auto it = featureFlags.find(featureName);
         return (it != featureFlags.end()) ? it->second : false;
+    }
+
+    std::string FeatureConfig::GetDefaultConfigPath() {
+#ifdef _WIN32
+        return GetFolderContainingDLL() + "\\" + defaultConfigFileName;
+#else
+        return GetFolderContainingDLL() + "/" + defaultConfigFileName;
+#endif
     }
 }
