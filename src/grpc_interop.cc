@@ -131,14 +131,14 @@ int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId);
 //---------------------------------------------------------------------
 LIBRARY_EXPORT void ReadIniFile(const char* filePath)
 {
-    grpc_labview::FeatureConfig::getInstance().readConfigFromFile(filePath);
+    grpc_labview::FeatureConfig::getInstance().ReadConfigFromFile(filePath);
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t IsFeatureEnabled(const char* featureName, uint8_t* featureEnabled)
 {
-    *featureEnabled = grpc_labview::FeatureConfig::getInstance().isFeatureEnabled(featureName);
+    *featureEnabled = grpc_labview::FeatureConfig::getInstance().IsFeatureEnabled(featureName);
     return 0;
 }
 
