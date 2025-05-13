@@ -109,6 +109,7 @@
 		<Item Name="Private" Type="Folder">
 			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 			<Item Name="Is Feature Enabled.vi" Type="VI" URL="../Shared/Is Feature Enabled.vi"/>
+			<Item Name="Wait On Occurence.vi" Type="VI" URL="../Shared/Wait On Occurence.vi"/>
 		</Item>
 		<Item Name="Any.ctl" Type="VI" URL="../Shared/Any.ctl"/>
 		<Item Name="grpcId.ctl" Type="VI" URL="../Shared/grpcId.ctl"/>
@@ -118,7 +119,5 @@
 		<Item Name="To Message Name.vi" Type="VI" URL="../Shared/To Message Name.vi"/>
 		<Item Name="To Well Known Type.vi" Type="VI" URL="../Shared/To Well Known Type.vi"/>
 		<Item Name="TranslateGrpcError.vi" Type="VI" URL="../Shared/TranslateGrpcError.vi"/>
-		<Item Name="Wait On Occurence.vi" Type="VI" URL="../Shared/Wait On Occurence.vi"/>
-		<Item Name="Wait On Occurrence Wrapper.vi" Type="VI" URL="../Shared/Wait On Occurrence Wrapper.vi"/>
 	</Item>
 </Library>
