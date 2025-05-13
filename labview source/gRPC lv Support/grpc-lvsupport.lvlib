@@ -106,18 +106,22 @@
 		</Item>
 	</Item>
 	<Item Name="Shared" Type="Folder">
-		<Item Name="Private" Type="Folder">
-			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
-			<Item Name="Is Feature Enabled.vi" Type="VI" URL="../Shared/Is Feature Enabled.vi"/>
-			<Item Name="Wait On Occurrence.vi" Type="VI" URL="../Shared/Wait On Occurrence.vi"/>
-		</Item>
+		<Property Name="NI.SortType" Type="Int">0</Property>
 		<Item Name="Any.ctl" Type="VI" URL="../Shared/Any.ctl"/>
 		<Item Name="grpcId.ctl" Type="VI" URL="../Shared/grpcId.ctl"/>
-		<Item Name="Well Known Types.ctl" Type="VI" URL="../Shared/Well Known Types.ctl"/>
+		<Item Name="Is Feature Enabled.vi" Type="VI" URL="../Shared/Is Feature Enabled.vi">
+			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
+		</Item>
 		<Item Name="Is Message Well Known Type.vi" Type="VI" URL="../Shared/Is Message Well Known Type.vi"/>
 		<Item Name="Set LVRT Module Path.vi" Type="VI" URL="../Shared/Set LVRT Module Path.vi"/>
 		<Item Name="To Message Name.vi" Type="VI" URL="../Shared/To Message Name.vi"/>
 		<Item Name="To Well Known Type.vi" Type="VI" URL="../Shared/To Well Known Type.vi"/>
-		<Item Name="TranslateGrpcError.vi" Type="VI" URL="../Shared/TranslateGrpcError.vi"/>
+		<Item Name="TranslateGrpcError.vi" Type="VI" URL="../Shared/TranslateGrpcError.vi">
+			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
+		</Item>
+		<Item Name="Wait On Occurrence.vi" Type="VI" URL="../Shared/Wait On Occurrence.vi">
+			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
+		</Item>
+		<Item Name="Well Known Types.ctl" Type="VI" URL="../Shared/Well Known Types.ctl"/>
 	</Item>
 </Library>
