@@ -109,7 +109,7 @@
 		<Item Name="Private" Type="Folder">
 			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 			<Item Name="Is Feature Enabled.vi" Type="VI" URL="../Shared/Is Feature Enabled.vi"/>
-			<Item Name="Wait On Occurence.vi" Type="VI" URL="../Shared/Wait On Occurence.vi"/>
+			<Item Name="Wait On Occurrence.vi" Type="VI" URL="../Shared/Wait On Occurrence.vi"/>
 		</Item>
 		<Item Name="Any.ctl" Type="VI" URL="../Shared/Any.ctl"/>
 		<Item Name="grpcId.ctl" Type="VI" URL="../Shared/grpcId.ctl"/>
