@@ -4,7 +4,8 @@
 #include <sstream>
 #include <map>
 #include <algorithm>
-#include <path_support.h>
+
+#include "path_support.h"
 
 
 namespace grpc_labview {
