@@ -27,11 +27,8 @@ namespace grpc_labview {
     public:
         // Singleton instance
         static FeatureConfig& getInstance() {
-            if (_instance == nullptr)
-            {
-                _instance = new FeatureConfig();
-            }
-            return *_instance;
+            static FeatureConfig instance;
+            return instance;
         }
 
         // Function to read feature configurations from an INI file
