@@ -26,8 +26,15 @@ namespace grpc_labview
             GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
             reinterpret_cast<LPCSTR>(&GetFolderContainingDLL), &hModule))
         {
-            char path[MAX_PATH];
-            if (GetModuleFileNameA(hModule, path, MAX_PATH)) {
+            // Fetch the path of the DLL, increasing the buffer size in case the path is a long path
+            std::string path(MAX_PATH, '\0');
+            DWORD result = GetModuleFileNameA(hModule, path.data(), path.size());
+            while (result >= path.size() && GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+                path.resize(path.size() * 2);
+                result = GetModuleFileNameA(hModule, path.data(), path.size());
+            }
+            path.resize(result); // remove padding at end
+            if (result) {
                 fullPath = std::filesystem::path(path).parent_path();
             }
         }
