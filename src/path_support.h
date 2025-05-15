@@ -7,5 +7,5 @@
 
 namespace grpc_labview
 {
-	std::filesystem::path GetFolderContainingDLL();
+    std::filesystem::path GetFolderContainingDLL();
 }
