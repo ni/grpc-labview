@@ -129,13 +129,6 @@ int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId);
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT void ReloadFeaturesFromFile(const char* filePath)
-{
-    grpc_labview::FeatureConfig::getInstance().ReloadFeaturesFromFile(filePath);
-}
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t IsFeatureEnabled(const char* featureName, uint8_t* featureEnabled)
 {
     *featureEnabled = grpc_labview::FeatureConfig::getInstance().IsFeatureEnabled(featureName);

@@ -1,5 +1,5 @@
 {
-  "size": 88,
+  "size": 87,
   "signatures": [
     {
       "id": 0,
@@ -834,16 +834,8 @@
         "int8_t*"
       ]
     },
-    {
-      "id": 86,
-      "function_name": "ReloadFeaturesFromFile",
-      "return_type": "void",
-      "parameter_list": [
-        "const char*"
-      ]
-    },
 	{
-      "id": 87,
+      "id": 86,
       "function_name": "IsFeatureEnabled",
       "return_type": "int32_t",
       "parameter_list": [
