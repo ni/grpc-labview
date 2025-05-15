@@ -1,5 +1,3 @@
-#include <string>
-#include <algorithm>
 #include <filesystem>
 
 #include "path_support.h"
@@ -17,9 +15,9 @@
 namespace grpc_labview
 {
     //---------------------------------------------------------------------
-    // Returns a string of the path containing this shared library
+    // Returns the directory path containing the currently loaded shared library
     //---------------------------------------------------------------------
-    std::string GetFolderContainingDLL() {
+    std::filesystem::path GetFolderContainingDLL() {
         std::filesystem::path fullPath;
 
 #ifdef _WIN32
@@ -44,6 +42,6 @@ namespace grpc_labview
         }
 #endif
 
-        return fullPath.string();
+        return fullPath;
     }
 }

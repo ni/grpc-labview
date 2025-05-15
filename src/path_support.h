@@ -3,8 +3,9 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
 
 namespace grpc_labview
 {
-	std::string GetFolderContainingDLL();
+	std::filesystem::path GetFolderContainingDLL();
 }
