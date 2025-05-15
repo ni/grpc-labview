@@ -26,7 +26,6 @@ namespace grpc_labview {
         // During ReloadFeaturesFromFile(), this configuration is always applied first prior to reading the
         // features configuration file
         void ApplyDefaultFeatures() {
-            featureFlags["gRPC"] = true; // Enable gRPC by default as an example, this will never be overridden by config file
             featureFlags["featureFileFound"] = false;  // Used to indicate if the feature file was found/used during initialization
             featureFlags["data_EfficientMessageCopy"] = false;
             featureFlags["data_useOccurrence"] = true;
