@@ -129,9 +129,9 @@ int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId);
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT void ReadIniFile(const char* filePath)
+LIBRARY_EXPORT void ReloadFeaturesFromFile(const char* filePath)
 {
-    grpc_labview::FeatureConfig::getInstance().ReadConfigFromFile(filePath);
+    grpc_labview::FeatureConfig::getInstance().ReloadFeaturesFromFile(filePath);
 }
 
 //---------------------------------------------------------------------

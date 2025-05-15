@@ -836,7 +836,7 @@
     },
     {
       "id": 86,
-      "function_name": "ReadIniFile",
+      "function_name": "ReloadFeaturesFromFile",
       "return_type": "void",
       "parameter_list": [
         "const char*"
