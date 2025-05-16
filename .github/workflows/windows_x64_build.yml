@@ -21,10 +21,6 @@ jobs:
     - uses: ilammy/msvc-dev-cmd@v1
     - uses: ilammy/setup-nasm@v1.5.1
 
-    - name: Install Visual Studio 2022 Build Tools
-      run: |
-        choco install visualstudio2022-workload-vctools --yes || throw "Installation failed"
-
     - name: Update Submodules
       working-directory: ${{runner.workspace}}/grpc-labview      
       run: git submodule update --init --recursive
