@@ -834,12 +834,13 @@
         "int8_t*"
       ]
     },
-    {
+	{
       "id": 86,
-      "function_name": "readIniFile",
-      "return_type": "void",
+      "function_name": "IsFeatureEnabled",
+      "return_type": "int32_t",
       "parameter_list": [
-        "const char*"
+        "const char*",
+        "uint8_t*"
       ]
     }
   ]

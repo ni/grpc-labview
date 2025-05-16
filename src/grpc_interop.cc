@@ -129,9 +129,10 @@ int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId);
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT void readIniFile(const char* filePath)
+LIBRARY_EXPORT int32_t IsFeatureEnabled(const char* featureName, uint8_t* featureEnabled)
 {
-    grpc_labview::FeatureConfig::getInstance().readConfigFromFile(filePath);
+    *featureEnabled = grpc_labview::FeatureConfig::getInstance().IsFeatureEnabled(featureName);
+    return 0;
 }
 
 //---------------------------------------------------------------------
