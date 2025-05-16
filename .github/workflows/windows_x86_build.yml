@@ -18,20 +18,6 @@ jobs:
         arch: x86
     - uses: ilammy/setup-nasm@v1.5.1
 
-    - name: Install Visual Studio 2022 Build Tools
-      shell: pwsh
-      run: |
-        choco install visualstudio2022-workload-vctools --yes
-        if ($LASTEXITCODE -eq 3010) {
-            # Trap and ignore error 3010
-            Write-Host "Installation successful, reboot required.  Ignoring and proceeding..."
-            exit 0
-        } elseif ($LASTEXITCODE -ne 0) {
-            # If another error happened (that wasn't 3010), then pass that error up
-            Write-Error "Installation failed with exit code $LASTEXITCODE"
-            exit $LASTEXITCODE
-        }
-
     - name: Update Submodules
       working-directory: ${{runner.workspace}}/grpc-labview      
       run: git submodule update --init --recursive
