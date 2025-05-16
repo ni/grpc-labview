@@ -20,7 +20,12 @@ jobs:
 
     - name: Install Visual Studio 2022 Build Tools
       run: |
-        choco install visualstudio2022-workload-vctools --yes || throw "Installation failed"
+        choco install visualstudio2022-workload-vctools --yes
+        if ($LASTEXITCODE -eq 3010) {
+            Write-Host "Installation successful, reboot required.  Ignoring and proceeding..."
+        } elseif ($LASTEXITCODE -ne 0) {
+            Write-Error "Installation failed with exit code $LASTEXITCODE"
+        }
 
     - name: Update Submodules
       working-directory: ${{runner.workspace}}/grpc-labview      
