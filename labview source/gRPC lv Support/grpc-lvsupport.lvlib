@@ -108,6 +108,8 @@
 	<Item Name="Shared" Type="Folder">
 		<Property Name="NI.SortType" Type="Int">0</Property>
 		<Item Name="Any.ctl" Type="VI" URL="../Shared/Any.ctl"/>
+		<Item Name="Get LV Enum Value from Proto Value.vi" Type="VI" URL="../Shared/Get LV Enum Value from Proto Value.vi"/>
+		<Item Name="Get Proto Enum Value from LV Value.vi" Type="VI" URL="../Shared/Get Proto Enum Value from LV Value.vi"/>
 		<Item Name="grpcId.ctl" Type="VI" URL="../Shared/grpcId.ctl"/>
 		<Item Name="Is Feature Enabled.vi" Type="VI" URL="../Shared/Is Feature Enabled.vi">
 			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
