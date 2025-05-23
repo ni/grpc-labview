@@ -89,6 +89,7 @@
 			<Item Name="Create Server.vi" Type="VI" URL="../Server API/Server/Create Server.vi"/>
 			<Item Name="Get Server DLL Path.vi" Type="VI" URL="../Server API/Server/Get Server DLL Path.vi"/>
 			<Item Name="Register Message Metadata.vi" Type="VI" URL="../Server API/Server/Register Message Metadata.vi"/>
+			<Item Name="Register Reflection Descriptors.vi" Type="VI" URL="../Server API/Server/Register Reflection Descriptors.vi"/>
 			<Item Name="Set Call Status.vi" Type="VI" URL="../Server API/Set Call Status.vi"/>
 			<Item Name="Start Server.vi" Type="VI" URL="../Server API/Server/Start Server.vi"/>
 			<Item Name="Stop Server.vi" Type="VI" URL="../Server API/Server/Stop Server.vi"/>
@@ -108,6 +109,8 @@
 	<Item Name="Shared" Type="Folder">
 		<Property Name="NI.SortType" Type="Int">0</Property>
 		<Item Name="Any.ctl" Type="VI" URL="../Shared/Any.ctl"/>
+		<Item Name="Get LV Enum Value from Proto Value.vi" Type="VI" URL="../Shared/Get LV Enum Value from Proto Value.vi"/>
+		<Item Name="Get Proto Enum Value from LV Value.vi" Type="VI" URL="../Shared/Get Proto Enum Value from LV Value.vi"/>
 		<Item Name="grpcId.ctl" Type="VI" URL="../Shared/grpcId.ctl"/>
 		<Item Name="Is Feature Enabled.vi" Type="VI" URL="../Shared/Is Feature Enabled.vi">
 			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>

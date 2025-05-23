@@ -18,9 +18,7 @@
 			<Item Name="Get Value for package_template_enum.vi" Type="VI" URL="../RPC Messages/Get Value for package_template_enum.vi"/>
 			<Item Name="MessageConverterProxy.vim" Type="VI" URL="../RPC Messages/MessageConverterProxy.vim"/>
 		</Item>
-		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../RPC Messages/Register gRPC Messages.vi">
-			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
-		</Item>
+		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../RPC Messages/Register gRPC Messages.vi"/>
 	</Item>
 	<Item Name="Generated Descriptors" Type="Folder">
 		<Item Name="Generated Descriptors.vi" Type="VI" URL="../Generated Descriptors/Generated Descriptors.vi">
@@ -28,12 +26,8 @@
 		</Item>
 	</Item>
 	<Item Name="Run Service.vi" Type="VI" URL="../Run Service.vi"/>
-	<Item Name="Register Descriptors.vi" Type="VI" URL="../RPC Messages/Register Descriptors.vi">
-		<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
-	</Item>
-	<Item Name="Get Service Class Instances.vi" Type="VI" URL="../Get Service Class Instances.vi">
-		<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
-	</Item>
+	<Item Name="Register Descriptors.vi" Type="VI" URL="../RPC Messages/Register Descriptors.vi"/>
+	<Item Name="Get Service Class Instances.vi" Type="VI" URL="../Get Service Class Instances.vi"/>
 	<Item Name="Monitor for Stop.vi" Type="VI" URL="../Monitor for Stop.vi">
 		<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 	</Item>
