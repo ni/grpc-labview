@@ -10,6 +10,8 @@ The project supports Windows, Linux, and Linux RT.
 
 LabVIEW source is saved with __LabVIEW 2019__.
 
+When using with NI Linux RT, __system image version 2022 Q4__ or greater is required.
+
 ## Note: This project is not yet complete
 * Not all .proto data types are supported
 * The VI generated has not been fully implemented when updating the generated code with the .proto - VIs need to be implemented by hand to match the .proto file in certain cases
