@@ -10,7 +10,7 @@ env:
 
 jobs:
   build-nilrt:
-    name: NILRT Cross Compile with GCC 6.3.0
+    name: NILRT Cross Compile with GCC
     runs-on: ubuntu-22.04
 
     steps:
@@ -24,11 +24,12 @@ jobs:
 
     # The URL used to download this toolchain may change in the future as
     # improvements to hosting and exports of the NILRT toolchain are made.
+    # NOTE: Be sure to update the include directories in `nilrt-x86_64.cmake` when updating this toolchain
     - name: Install NI Linux RT CC Toolchain
       run: |
-        wget -nv https://download.ni.com/support/softlib/labview/labview_rt/2023Q4/LinuxToolchains/linux/oecore-x86_64-core2-64-toolchain-10.0.sh
-        sudo chmod a+x ./oecore-x86_64-core2-64-toolchain-10.0.sh
-        sudo ./oecore-x86_64-core2-64-toolchain-10.0.sh -y -d ${GITHUB_WORKSPACE}/nilrt-toolchain/
+        wget -nv https://download.ni.com/support/softlib/labview/labview_rt/2023Q1/LinuxToolchains/linux/oecore-x86_64-core2-64-toolchain-9.2.sh
+        sudo chmod a+x ./oecore-x86_64-core2-64-toolchain-9.2.sh
+        sudo ./oecore-x86_64-core2-64-toolchain-9.2.sh -y -d ${GITHUB_WORKSPACE}/nilrt-toolchain/
         echo "${GITHUB_WORKSPACE}/nilrt-toolchain/sysroots/x86_64-nilrtsdk-linux/usr/bin/x86_64-nilrt-linux" >> ${GITHUB_PATH}
 
     - name: Update Submodules
