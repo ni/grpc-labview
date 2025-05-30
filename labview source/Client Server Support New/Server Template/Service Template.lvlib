@@ -11,9 +11,7 @@
 		<Item Name="Generated Descriptors.vi" Type="VI" URL="../Generated Descriptors/Generated Descriptors.vi">
 			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 		</Item>
-		<Item Name="Register Descriptors.vi" Type="VI" URL="../RPC Messages/Register Descriptors.vi">
-			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
-		</Item>
+		<Item Name="Register Descriptors.vi" Type="VI" URL="../RPC Messages/Register Descriptors.vi"/>
 	</Item>
 	<Item Name="RPC Messages" Type="Folder">
 		<Item Name="package_templatemessage" Type="Folder">
@@ -26,9 +24,7 @@
 			<Item Name="Set package_template_enum.vi" Type="VI" URL="../RPC Messages/Set package_template_enum.vi"/>
 			<Item Name="Set package_templatemessage.vi" Type="VI" URL="../RPC Messages/Set package_templatemessage.vi"/>
 		</Item>
-		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../RPC Messages/Register gRPC Messages.vi">
-			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
-		</Item>
+		<Item Name="Register gRPC Messages.vi" Type="VI" URL="../RPC Messages/Register gRPC Messages.vi"/>
 	</Item>
 	<Item Name="Server Support" Type="Folder">
 		<Item Name="Cleanup Panel.vi" Type="VI" URL="../Cleanup Panel.vi">
