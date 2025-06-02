@@ -85,9 +85,9 @@ def run_test(test_config):
     except Exception:
         pass
 
-    # 6. Start Run Service.vi from command prompt by launching labview.exe form lv_folder with the following arguments:
+    # 6. Start Run Server.vi from command prompt by launching labview.exe form lv_folder with the following arguments:
     # this must be non-blocking
-    # subprocess.Popen([str(labview_path), str(test_config['generated_server'] / 'Run Service.vi')])     # should be non-blocking
+    # subprocess.Popen([str(labview_path), str(test_config['generated_server'] / 'Run Server.vi')])     # should be non-blocking
     # TODO Need to add support for passing multiple protofiles
     runservice_wrapper_vi_path = test_config['test_suite_folder'] / 'RunService_CLIWrapper.vi'
     CLI_command = ' '.join([
