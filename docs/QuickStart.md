@@ -145,7 +145,7 @@ This is where the human-written parts of the application is present.
 
 ![Say Hello Again Server Code implementation](images/HelloAgain-Server-Code.png "Say Hello Again Server Code implementation")
 
-4. Open `Run Service.vi` from helloworld.lvproj
+4. Open `Run Server.vi` from helloworld.lvproj
 
 Note that before regeneration this was named `Run greeter_server.vi`.
 
@@ -157,7 +157,7 @@ Note that before regeneration this was named `Run greeter_server.vi`.
 
 ![Delete old and wire new lvclass reference](images/delete-old-wire-new-lvclass.png "Delete old and wire new lvclass reference")
 
-Althougth old reference looks the same it needs to replaced. If not replaced the VIs will immediately exit after execution without error in `Run Service.vi`.
+Althougth old reference looks the same it needs to replaced. If not replaced the VIs will immediately exit after execution without error in `Run Server.vi`.
 
 ### Update the client
 
