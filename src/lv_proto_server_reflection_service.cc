@@ -80,21 +80,21 @@ namespace grpc_labview
 
 
     void LVProtoServerReflectionService::AddFileDescriptorProto(const std::string& serializedProtoStr) {
+        // Parse the serialized proto string into a FileDescriptorProto, then query how many
+        // services are present in that proto file.  Add those services to the services_ list        
         FileDescriptorProto proto;
-        proto.ParseFromString(serializedProtoStr);
-        other_pool_services_info_ptr->other_pool_file_descriptor = other_pool.BuildFile(proto);       
-        AddOtherPoolServices();
-    }
-
-    void LVProtoServerReflectionService::AddOtherPoolServices()
-    {
-        if (other_pool_services_info_ptr->other_pool_file_descriptor != nullptr)
+        if (!proto.ParseFromString(serializedProtoStr)) {
+            return;
+        }
+        const auto* proto_file_descriptor = other_pool.BuildFile(proto);
+        
+        if (proto_file_descriptor != nullptr)
         {
-            int numServices = other_pool_services_info_ptr->other_pool_file_descriptor->service_count();
+            int numServices = proto_file_descriptor->service_count();
             for (int i = 0; i < numServices; ++i)
             {
-                const google::protobuf::ServiceDescriptor* serviceDescriptor = other_pool_services_info_ptr->other_pool_file_descriptor->service(i);
-                other_pool_services_info_ptr->other_pool_services_.push_back(serviceDescriptor->full_name());
+                const google::protobuf::ServiceDescriptor* serviceDescriptor = proto_file_descriptor->service(i);
+                services_->push_back(serviceDescriptor->full_name());
             }
         }
     }

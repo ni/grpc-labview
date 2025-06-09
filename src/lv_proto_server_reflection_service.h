@@ -45,8 +45,7 @@ namespace grpc_labview
         void SetServiceList(const std::vector<std::string>* snames);
         void AddService(const std::string serviceName);
         void AddFileDescriptorProto(const std::string& serializedProtoStr);
-        void AddOtherPoolServices();
-
+        
     private:
         Status ListService(ServerContext* context, grpc::reflection::v1alpha::ListServiceResponse* response);
         Status GetFileByName(ServerContext* context, const std::string& file_name, grpc::reflection::v1alpha::ServerReflectionResponse* response);
@@ -67,11 +66,21 @@ namespace grpc_labview
 
         void FillErrorResponse(const Status& status,
             grpc::reflection::v1alpha::ErrorResponse* error_response);
-
+        
+        // descriptor_pool_ contains descriptors for built-in gRPC-managed services 
+        // such as grpc.health.v1.Health and grpc.reflection.v1alpha.ServerReflection
         const grpc::protobuf::DescriptorPool* descriptor_pool_;
+
+        // other_pool contains descriptors for any LabVIEW gRPC services
+        // This pool is populated by calling the DeserializeReflectionInfo function
         grpc::protobuf::DescriptorPool other_pool;
+
+        // services_ contains a list of services which are described in other_pool
+        // This is kept separately as there is no method to list services from a
+        //   DescriptorPool; they must be tracked separately
         std::vector<std::string>* services_;
 
+        // NOT NEEDED???  just a temp storage location        
         struct OtherPoolServiceInfo
         {
             const grpc::protobuf::FileDescriptor* other_pool_file_descriptor;

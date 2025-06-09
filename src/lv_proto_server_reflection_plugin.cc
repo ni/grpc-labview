@@ -49,9 +49,14 @@ namespace grpc_labview
     }
 
     std::unique_ptr< ::grpc::ServerBuilderPlugin> CreateLVProtoReflection() {
-
         LVProtoServerReflectionPlugin* reflectionPluginInstance = new LVProtoServerReflectionPlugin();
-        reflectionPluginInstance->AddFileDescriptorProto(grpc_labview::ProtoDescriptorString::getInstance()->getDescriptor());
+        
+        std::vector<std::string> protoDescriptorStrings = grpc_labview::ProtoDescriptorStrings::getInstance()->getAllDescriptors();
+
+        for (const std::string& protoDescriptor : protoDescriptorStrings) {
+            reflectionPluginInstance->AddFileDescriptorProto(protoDescriptor);
+        }
+
         return std::unique_ptr< ::grpc::ServerBuilderPlugin>(reflectionPluginInstance);
     }
 
@@ -66,6 +71,6 @@ namespace grpc_labview
     LIBRARY_EXPORT void DeserializeReflectionInfo(grpc_labview::LStrHandle serializedFileDescriptor)
     {
         std::string serializedDescriptorStr = grpc_labview::GetLVString(serializedFileDescriptor);
-        grpc_labview::ProtoDescriptorString::getInstance()->setDescriptor(serializedDescriptorStr);
+        grpc_labview::ProtoDescriptorStrings::getInstance()->addDescriptor(serializedDescriptorStr);
     }
 }

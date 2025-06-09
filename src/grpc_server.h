@@ -240,30 +240,30 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class ProtoDescriptorString {
+    class ProtoDescriptorStrings {
         // Static members
-        static ProtoDescriptorString* m_instance;
+        static ProtoDescriptorStrings* m_instance;
         static std::mutex m_mutex;
 
         // Non static members
-        std::string m_descriptor;
+        std::vector<std::string> m_descriptors;
         int m_refcount = 0; // Not a normal refcount. Its counts the number of time we set the descriptor string.
 
         // Default private constructor to prevent instantiation
-        ProtoDescriptorString() = default;
+        ProtoDescriptorStrings() = default;
 
         // Delete copy constructor and assignment operator
-        ProtoDescriptorString(const ProtoDescriptorString&) = delete;
-        ProtoDescriptorString& operator=(const ProtoDescriptorString&) = delete;
+        ProtoDescriptorStrings(const ProtoDescriptorStrings&) = delete;
+        ProtoDescriptorStrings& operator=(const ProtoDescriptorStrings&) = delete;
     public:
         // Return the static class instance
-        static ProtoDescriptorString* getInstance();
+        static ProtoDescriptorStrings* getInstance();
 
         // Set the descriptor string
-        void setDescriptor(std::string);
+        void addDescriptor(std::string);
 
         // Get the descriptor string
-        std::string getDescriptor();
+        std::vector<std::string> getAllDescriptors();
 
         // Delete the instance based on the refcount
         void deleteInstance();

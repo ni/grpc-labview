@@ -190,7 +190,7 @@ namespace grpc_labview
 
         grpc::EnableDefaultHealthCheckService(true);
         InitLVProtoReflectionServerBuilderPlugin();
-        // grpc::reflection::InitProtoReflectionServerBuilderPlugin();
+        
         ServerBuilder builder;
 
         std::shared_ptr<grpc::ServerCredentials> creds;
@@ -270,40 +270,40 @@ namespace grpc_labview
 
             _server = nullptr;
         }
-        grpc_labview::ProtoDescriptorString::getInstance()->deleteInstance();
+        grpc_labview::ProtoDescriptorStrings::getInstance()->deleteInstance();
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
 
     // Initialize the static members
-    ProtoDescriptorString* ProtoDescriptorString::m_instance = nullptr;
-    std::mutex ProtoDescriptorString::m_mutex;
+    ProtoDescriptorStrings* ProtoDescriptorStrings::m_instance = nullptr;
+    std::mutex ProtoDescriptorStrings::m_mutex;
 
     // Return the static class instance. Thread safe.
-    ProtoDescriptorString* ProtoDescriptorString::getInstance() {
+    ProtoDescriptorStrings* ProtoDescriptorStrings::getInstance() {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (m_instance == nullptr) {
-            m_instance = new ProtoDescriptorString();
+            m_instance = new ProtoDescriptorStrings();
         }
         return m_instance;
     }
 
     // Get the descriptor string
-    std::string ProtoDescriptorString::getDescriptor() {
+    std::vector<std::string> ProtoDescriptorStrings::getAllDescriptors() {
         std::unique_lock<std::mutex> lock(m_mutex);
-        return m_descriptor;
+        return m_descriptors;
     }
 
     // Set the descriptor string
-    void ProtoDescriptorString::setDescriptor(std::string str) {
+    void ProtoDescriptorStrings::addDescriptor(std::string str) {
         std::unique_lock<std::mutex> lock(m_mutex);
         m_refcount++;
-        m_descriptor = str;
+        m_descriptors.push_back(str);
     }
 
-    // Delete the instaance based on the refcount
-    void ProtoDescriptorString::deleteInstance() {
+    // Delete the instance based on the refcount
+    void ProtoDescriptorStrings::deleteInstance() {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (!--m_refcount) {
             delete m_instance;
