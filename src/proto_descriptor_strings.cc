@@ -28,16 +28,13 @@ namespace grpc_labview
     // Set the descriptor string
     void ProtoDescriptorStrings::addDescriptor(std::string str) {
         std::unique_lock<std::mutex> lock(m_mutex);
-        m_refcount++;
         m_descriptors.push_back(str);
     }
 
     // Delete the instance based on the refcount
     void ProtoDescriptorStrings::deleteInstance() {
         std::unique_lock<std::mutex> lock(m_mutex);
-        if (!--m_refcount) {
-            delete m_instance;
-            m_instance = nullptr;
-        }
+        delete m_instance;
+        m_instance = nullptr;
     }
 }

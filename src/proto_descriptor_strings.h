@@ -20,7 +20,6 @@ namespace grpc_labview
 
         // Non static members
         std::vector<std::string> m_descriptors;
-        int m_refcount = 0; // Not a normal refcount. Its counts the number of time we set the descriptor string.
 
         // Default private constructor to prevent instantiation
         ProtoDescriptorStrings() = default;
