@@ -17,7 +17,6 @@ namespace grpc_labview
 {
     LVProtoServerReflectionService::LVProtoServerReflectionService() :
         descriptor_pool_(grpc::protobuf::DescriptorPool::generated_pool()), services_(new std::vector<std::string>()) {
-             other_pool_services_info_ptr = std::make_unique<OtherPoolServiceInfo>();
     }
 
     // Add the full names of registered services
@@ -110,11 +109,7 @@ namespace grpc_labview
             grpc::reflection::v1alpha::ServiceResponse* service_response = response->add_service();
             service_response->set_name(value);
         }
-        for (const auto value : other_pool_services_info_ptr->other_pool_services_) {
-            grpc::reflection::v1alpha::ServiceResponse* service_response = response->add_service();
-            service_response->set_name(value);
-        }
-
+        
         return Status::OK;
     }
 

@@ -79,14 +79,5 @@ namespace grpc_labview
         // This is kept separately as there is no method to list services from a
         //   DescriptorPool; they must be tracked separately
         std::vector<std::string>* services_;
-
-        // NOT NEEDED???  just a temp storage location        
-        struct OtherPoolServiceInfo
-        {
-            const grpc::protobuf::FileDescriptor* other_pool_file_descriptor;
-            std::vector<std::string> other_pool_services_;
-        };
-
-        std::unique_ptr<OtherPoolServiceInfo> other_pool_services_info_ptr;
     };
 }
