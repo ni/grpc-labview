@@ -9,7 +9,6 @@
 #include <future>
 #include <grpcpp/impl/server_initializer.h>
 #include "lv_proto_server_reflection_plugin.h"
-#include "proto_descriptor_strings.h"
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -95,6 +94,13 @@ namespace grpc_labview
     int LabVIEWgRPCServer::ListeningPort()
     {
         return _listeningPort;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void LabVIEWgRPCServer::RegisterReflectionProtoString(std::string protoDescriptorString)
+    {
+        _protoDescriptorStrings.push_back(protoDescriptorString);
     }
 
     //---------------------------------------------------------------------
@@ -190,9 +196,17 @@ namespace grpc_labview
         }
 
         grpc::EnableDefaultHealthCheckService(true);
-        InitLVProtoReflectionServerBuilderPlugin();
-        
         ServerBuilder builder;
+        
+        // Create an instance of a reflection plugin object and add the
+        // registered proto file descriptor strings into it
+        LVProtoServerReflectionPlugin reflectionService;
+        for (const std::string& protoFile : _protoDescriptorStrings) {
+            reflectionService.AddFileDescriptorProto(protoFile);
+        }
+        
+        // Register the reflection service into the server
+        builder.RegisterService(reflectionService.GetService());
 
         std::shared_ptr<grpc::ServerCredentials> creds;
         if (serverCertificatePath.length() > 1)
@@ -271,6 +285,5 @@ namespace grpc_labview
 
             _server = nullptr;
         }
-        grpc_labview::ProtoDescriptorStrings::getInstance()->deleteInstance();
     }
 }

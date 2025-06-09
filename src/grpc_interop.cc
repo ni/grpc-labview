@@ -195,6 +195,32 @@ int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId)
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t RegisterReflectionProtoString(grpc_labview::gRPCid** id, grpc_labview::LStrHandle serializedFileDescriptor)
+{
+    std::string serializedDescriptorStr = grpc_labview::GetLVString(serializedFileDescriptor); 
+    
+    auto server = (*id)->CastTo<grpc_labview::LabVIEWgRPCServer>();
+    if (server == nullptr)
+    {
+        return -1;
+    }
+    
+    //TODO: Pass back any error that may have happened while parsing
+    server->RegisterReflectionProtoString(serializedDescriptorStr);
+    return 0;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT void DeserializeReflectionInfo(grpc_labview::LStrHandle serializedFileDescriptor)
+{
+    std::string serializedDescriptorStr = grpc_labview::GetLVString(serializedFileDescriptor);
+    //TODO -- need to handle backwards compatibility!
+    //grpc_labview::ProtoDescriptorStrings::getInstance()->addDescriptor(serializedDescriptorStr);
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t RegisterMessageMetadata(grpc_labview::gRPCid** id, grpc_labview::LVMessageMetadata* lvMetadata)
 {
     auto server = (*id)->CastTo<grpc_labview::MessageElementMetadataOwner>();

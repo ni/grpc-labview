@@ -42,7 +42,6 @@ namespace grpc_labview
             grpc::reflection::v1alpha::ServerReflectionRequest>* stream)
             override;
 
-        void SetServiceList(const std::vector<std::string>* snames);
         void AddService(const std::string serviceName);
         void AddFileDescriptorProto(const std::string& serializedProtoStr);
         

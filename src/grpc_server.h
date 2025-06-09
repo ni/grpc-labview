@@ -99,6 +99,7 @@ namespace grpc_labview
         bool FindEventData(std::string name, LVEventData& data);
         bool HasGenericMethodEvent();
         bool HasRegisteredServerMethod(std::string methodName);
+        void RegisterReflectionProtoString(std::string protoDescriptorString);
 
     private:
         std::mutex _mutex;
@@ -110,6 +111,7 @@ namespace grpc_labview
         std::unique_ptr<std::thread> _runThread;
         bool _shutdown;
         int _listeningPort;
+        std::vector<std::string> _protoDescriptorStrings;
 
     private:
         void RunServer(std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);

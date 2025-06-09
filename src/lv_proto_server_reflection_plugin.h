@@ -35,25 +35,18 @@
 using grpc::ServerContext;
 using grpc::ServerInitializer;
 
-namespace grpc_labview 
+namespace grpc_labview
 {
-    class LVProtoServerReflectionPlugin : public ::grpc::ServerBuilderPlugin {
+    class LVProtoServerReflectionPlugin {
     public:
         LVProtoServerReflectionPlugin();
-        ::std::string name() override;
-        void InitServer(ServerInitializer* si) override;
-        void Finish(ServerInitializer* si) override;
-        void ChangeArguments(const ::std::string& name, void* value) override;
-        bool has_async_methods() const override;
-        bool has_sync_methods() const override;
-        void AddService(std::string serviceName);
+
         void AddFileDescriptorProto(const std::string& serializedProto);
+        void AddService(const std::string& serviceName);
+
+        grpc::Service* GetService();
 
     private:
         std::shared_ptr<grpc_labview::LVProtoServerReflectionService> reflection_service_;
     };
-
-    std::unique_ptr<::grpc::ServerBuilderPlugin> CreateLVProtoReflection();
-    void InitLVProtoReflectionServerBuilderPlugin();
-
 }

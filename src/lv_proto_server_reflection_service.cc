@@ -19,12 +19,6 @@ namespace grpc_labview
         grpc_descriptor_pool_(grpc::protobuf::DescriptorPool::generated_pool()), services_(new std::vector<std::string>()) {
     }
 
-    // Add the full names of registered services
-    void LVProtoServerReflectionService::SetServiceList(const std::vector<std::string>* snames) {
-        for (int i = 0; i < snames->size(); ++i)
-            services_->push_back(snames->at(i));
-    }
-
     void LVProtoServerReflectionService::AddService(const std::string serviceName) {
         services_->push_back(serviceName);
     }
