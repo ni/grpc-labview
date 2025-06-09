@@ -54,17 +54,16 @@ namespace grpc_labview
                 status = GetFileContainingExtension(
                     context, &request.file_containing_extension(), &response);
                 break;
-                case ServerReflectionRequest::MessageRequestCase::
-                kAllExtensionNumbersOfType:
-                    status = GetAllExtensionNumbers(
-                        context, request.all_extension_numbers_of_type(),
-                        response.mutable_all_extension_numbers_response());
-                    break;
-                case ServerReflectionRequest::MessageRequestCase::kListServices:
-                    status = ListService(context, response.mutable_list_services_response());
-                    break;
-                default:
-                    status = Status(grpc::StatusCode::UNIMPLEMENTED, "");
+            case ServerReflectionRequest::MessageRequestCase::kAllExtensionNumbersOfType:
+                status = GetAllExtensionNumbers(
+                    context, request.all_extension_numbers_of_type(),
+                    response.mutable_all_extension_numbers_response());
+                break;
+            case ServerReflectionRequest::MessageRequestCase::kListServices:
+                status = ListService(context, response.mutable_list_services_response());
+                break;
+            default:
+                status = Status(grpc::StatusCode::UNIMPLEMENTED, "");
             }
 
             if (!status.ok()) {
