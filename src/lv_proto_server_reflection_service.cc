@@ -16,7 +16,7 @@ using grpc::protobuf::FileDescriptorProto;
 namespace grpc_labview
 {
     LVProtoServerReflectionService::LVProtoServerReflectionService() :
-        descriptor_pool_(grpc::protobuf::DescriptorPool::generated_pool()), services_(new std::vector<std::string>()) {
+        grpc_descriptor_pool_(grpc::protobuf::DescriptorPool::generated_pool()), services_(new std::vector<std::string>()) {
     }
 
     // Add the full names of registered services
@@ -85,7 +85,7 @@ namespace grpc_labview
         if (!proto.ParseFromString(serializedProtoStr)) {
             return;
         }
-        const auto* proto_file_descriptor = other_pool.BuildFile(proto);
+        const auto* proto_file_descriptor = lv_descriptor_pool_.BuildFile(proto);
         
         if (proto_file_descriptor != nullptr)
         {
@@ -116,15 +116,15 @@ namespace grpc_labview
     Status LVProtoServerReflectionService::GetFileByName(ServerContext* context, const std::string& file_name,
         grpc::reflection::v1alpha::ServerReflectionResponse* response) {
 
-        if (descriptor_pool_ == nullptr) {
+        if (grpc_descriptor_pool_ == nullptr) {
             return Status::CANCELLED;
         }
 
         const grpc::protobuf::FileDescriptor* file_desc =
-            descriptor_pool_->FindFileByName(file_name);
+            grpc_descriptor_pool_->FindFileByName(file_name);
         if (file_desc == nullptr) {
             // check in other pools
-            file_desc = other_pool.FindFileByName(file_name);
+            file_desc = lv_descriptor_pool_.FindFileByName(file_name);
         }
 
         if (file_desc == nullptr) // we couldn't find it anywhere
@@ -139,15 +139,15 @@ namespace grpc_labview
         ServerContext* context, const std::string& symbol,
         grpc::reflection::v1alpha::ServerReflectionResponse* response) {
 
-        if (descriptor_pool_ == nullptr) {
+        if (grpc_descriptor_pool_ == nullptr) {
             return Status::CANCELLED;
         }
 
         const grpc::protobuf::FileDescriptor* file_desc =
-            descriptor_pool_->FindFileContainingSymbol(symbol);
+            grpc_descriptor_pool_->FindFileContainingSymbol(symbol);
 
         if (file_desc == nullptr) {
-            file_desc = other_pool.FindFileContainingSymbol(symbol);
+            file_desc = lv_descriptor_pool_.FindFileContainingSymbol(symbol);
         }
 
         if (file_desc == nullptr) {
@@ -163,22 +163,22 @@ namespace grpc_labview
         ServerContext* context,
         const grpc::reflection::v1alpha::ExtensionRequest* request,
         grpc::reflection::v1alpha::ServerReflectionResponse* response) {
-        if (descriptor_pool_ == nullptr) {
+        if (grpc_descriptor_pool_ == nullptr) {
             return Status::CANCELLED;
         }
 
         const grpc::protobuf::Descriptor* desc =
-            descriptor_pool_->FindMessageTypeByName(request->containing_type());
+            grpc_descriptor_pool_->FindMessageTypeByName(request->containing_type());
         if (desc == nullptr) {
-            desc = other_pool.FindMessageTypeByName(request->containing_type());
+            desc = lv_descriptor_pool_.FindMessageTypeByName(request->containing_type());
         }
         if (desc == nullptr) {
             return Status(grpc::StatusCode::NOT_FOUND, "Type not found.");
         }
 
-        const grpc::protobuf::FieldDescriptor* field_desc = descriptor_pool_->FindExtensionByNumber(desc, request->extension_number());
+        const grpc::protobuf::FieldDescriptor* field_desc = grpc_descriptor_pool_->FindExtensionByNumber(desc, request->extension_number());
         if (field_desc == nullptr) {
-            field_desc = other_pool.FindExtensionByNumber(desc, request->extension_number());
+            field_desc = lv_descriptor_pool_.FindExtensionByNumber(desc, request->extension_number());
         }
         if (field_desc == nullptr) {
             return Status(grpc::StatusCode::NOT_FOUND, "Extension not found.");
@@ -191,22 +191,22 @@ namespace grpc_labview
     Status LVProtoServerReflectionService::GetAllExtensionNumbers(
         ServerContext* context, const std::string& type,
         grpc::reflection::v1alpha::ExtensionNumberResponse* response) {
-        if (descriptor_pool_ == nullptr) {
+        if (grpc_descriptor_pool_ == nullptr) {
             return Status::CANCELLED;
         }
 
         const grpc::protobuf::Descriptor* desc =
-            descriptor_pool_->FindMessageTypeByName(type);
+            grpc_descriptor_pool_->FindMessageTypeByName(type);
         if (desc == nullptr) 
-            desc = other_pool.FindMessageTypeByName(type);
+            desc = lv_descriptor_pool_.FindMessageTypeByName(type);
 
         if (desc == nullptr)
             return Status(grpc::StatusCode::NOT_FOUND, "Type not found.");        
 
         std::vector<const grpc::protobuf::FieldDescriptor*> extensions;
-        descriptor_pool_->FindAllExtensions(desc, &extensions);
+        grpc_descriptor_pool_->FindAllExtensions(desc, &extensions);
         if (extensions.empty())
-            other_pool.FindAllExtensions(desc, &extensions);
+            lv_descriptor_pool_.FindAllExtensions(desc, &extensions);
         for (const auto& value : extensions) {
             response->add_extension_number(value->number());
         }

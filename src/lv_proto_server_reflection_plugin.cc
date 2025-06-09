@@ -5,6 +5,7 @@
 #include <grpcpp/server_builder.h>
 #include <lv_interop.h>
 #include <grpc_server.h>
+#include "proto_descriptor_strings.h"
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 using grpc::ServerContext;

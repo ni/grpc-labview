@@ -67,15 +67,15 @@ namespace grpc_labview
         void FillErrorResponse(const Status& status,
             grpc::reflection::v1alpha::ErrorResponse* error_response);
         
-        // descriptor_pool_ contains descriptors for built-in gRPC-managed services 
+        // grpc_descriptor_pool_ contains descriptors for built-in gRPC-managed services 
         // such as grpc.health.v1.Health and grpc.reflection.v1alpha.ServerReflection
-        const grpc::protobuf::DescriptorPool* descriptor_pool_;
+        const grpc::protobuf::DescriptorPool* grpc_descriptor_pool_;
 
-        // other_pool contains descriptors for any LabVIEW gRPC services
+        // lv_descriptor_pool_ contains descriptors for any LabVIEW gRPC services
         // This pool is populated by calling the DeserializeReflectionInfo function
-        grpc::protobuf::DescriptorPool other_pool;
+        grpc::protobuf::DescriptorPool lv_descriptor_pool_;
 
-        // services_ contains a list of services which are described in other_pool
+        // services_ contains a list of services which are described in lv_descriptor_pool_
         // This is kept separately as there is no method to list services from a
         //   DescriptorPool; they must be tracked separately
         std::vector<std::string>* services_;
