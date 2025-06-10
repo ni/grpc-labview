@@ -17,6 +17,11 @@ namespace grpc_labview
 {
     LVProtoServerReflectionService::LVProtoServerReflectionService() :
         grpc_descriptor_pool_(grpc::protobuf::DescriptorPool::generated_pool()), services_(new std::vector<std::string>()) {
+       
+        // Add the reflection server manually to the reflection service.  The actual methods for
+        // this service are given by `grpc::protobuf::DescriptorPool::generated_pool()` used during
+        // construction, but the actual service name needs to be added.
+        AddService("grpc.reflection.v1alpha.ServerReflection");
     }
 
     void LVProtoServerReflectionService::AddService(const std::string serviceName) {
