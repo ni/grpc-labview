@@ -28,6 +28,7 @@
 #include <event_data.h>
 #include <metadata_owner.h>
 #include <semaphore.h>
+#include "lv_proto_server_reflection_service.h"
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -112,6 +113,7 @@ namespace grpc_labview
         bool _shutdown;
         int _listeningPort;
         std::vector<std::string> _protoDescriptorStrings;
+        std::unique_ptr<LVProtoServerReflectionService> _reflectionService;
 
     private:
         void RunServer(std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);

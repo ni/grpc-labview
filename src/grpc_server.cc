@@ -8,7 +8,7 @@
 #include <iostream>
 #include <future>
 #include <grpcpp/impl/server_initializer.h>
-#include "lv_proto_server_reflection_plugin.h"
+#include "lv_proto_server_reflection_service.h"
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -200,13 +200,14 @@ namespace grpc_labview
         
         // Create an instance of a reflection plugin object and add the
         // registered proto file descriptor strings into it
-        LVProtoServerReflectionPlugin reflectionService;
+        _reflectionService = std::unique_ptr<LVProtoServerReflectionService>(new LVProtoServerReflectionService());
+
         for (const std::string& protoFile : _protoDescriptorStrings) {
-            reflectionService.AddFileDescriptorProto(protoFile);
+            _reflectionService->AddFileDescriptorProto(protoFile);
         }
         
         // Register the reflection service into the server
-        builder.RegisterService(reflectionService.GetService());
+        builder.RegisterService(_reflectionService.get());
 
         std::shared_ptr<grpc::ServerCredentials> creds;
         if (serverCertificatePath.length() > 1)
