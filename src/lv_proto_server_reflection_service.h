@@ -42,7 +42,7 @@ namespace grpc_labview
             grpc::reflection::v1alpha::ServerReflectionRequest>* stream)
             override;
 
-        void AddFileDescriptorProtoString(const std::string& serializedProtoStr);
+        bool AddFileDescriptorProtoString(const std::string& serializedProtoStr);
         
     private:
         void AddService(const std::string serviceName);

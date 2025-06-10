@@ -43,29 +43,34 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     // Adds a serialized proto descriptor string to the pool of known gRPC published methods which are
-    // published via gRPC reflection.  
+    // published via gRPC reflection.  Returns true if the descriptor string was parsed and stored
+    // successfully.
     // 
     // When calling AddFileDescriptorProtoString, any gRPC services found in the descriptor string
     // are automatically added to the list of registered services.
     //---------------------------------------------------------------------
-    void LVProtoServerReflectionService::AddFileDescriptorProtoString(const std::string& serializedProtoStr) {
+    bool LVProtoServerReflectionService::AddFileDescriptorProtoString(const std::string& serializedProtoStr) {
         // Parse the serialized proto string into a FileDescriptorProto, then query how many
         // services are present in that proto file.  Add those services to the services_ list
         FileDescriptorProto proto;
         if (!proto.ParseFromString(serializedProtoStr)) {
-            return;
+            return false;
         }
         const auto* proto_file_descriptor = lv_descriptor_pool_.BuildFile(proto);
+        if (proto_file_descriptor == nullptr) {
+            return false;
+        }
 
-        if (proto_file_descriptor != nullptr)
+        int numServices = proto_file_descriptor->service_count();
+        for (int i = 0; i < numServices; ++i)
         {
-            int numServices = proto_file_descriptor->service_count();
-            for (int i = 0; i < numServices; ++i)
-            {
-                const google::protobuf::ServiceDescriptor* serviceDescriptor = proto_file_descriptor->service(i);
+            const google::protobuf::ServiceDescriptor* serviceDescriptor = proto_file_descriptor->service(i);
+            if (serviceDescriptor != nullptr) {
                 services_->push_back(serviceDescriptor->full_name());
             }
         }
+
+        return true;  // Successfully parsed and registered services
     }
 
     //---------------------------------------------------------------------

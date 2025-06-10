@@ -233,7 +233,10 @@ LIBRARY_EXPORT int32_t RegisterReflectionProtoString(grpc_labview::gRPCid** id, 
         return -1;
     }
     
-    server->RegisterReflectionProtoString(serializedDescriptorStr);
+    if (!server->RegisterReflectionProtoString(serializedDescriptorStr)) {
+        return -(1000 + grpc::StatusCode::INVALID_ARGUMENT);
+    }
+
     return 0;
 }
 

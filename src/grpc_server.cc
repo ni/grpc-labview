@@ -24,7 +24,8 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     LabVIEWgRPCServer::LabVIEWgRPCServer() :
         _shutdown(false),
-        _genericMethodEvent(0)
+        _genericMethodEvent(0),
+        _reflectionService(std::make_unique<LVProtoServerReflectionService>())
     {
     }
 
@@ -100,10 +101,12 @@ namespace grpc_labview
     // Registers a serialized proto descriptor string to be published with the gRPC reflection
     // service once the gRPC server is running.  All descriptor strings should be registered
     // prior to calling `Run`.
+    // 
+    // Returns true if the descriptor string was successfully parsed
     //---------------------------------------------------------------------
-    void LabVIEWgRPCServer::RegisterReflectionProtoString(std::string protoDescriptorString)
+    bool LabVIEWgRPCServer::RegisterReflectionProtoString(std::string protoDescriptorString)
     {
-        _protoDescriptorStrings.push_back(protoDescriptorString);
+        return _reflectionService->AddFileDescriptorProtoString(protoDescriptorString);
     }
 
     //---------------------------------------------------------------------
@@ -200,14 +203,6 @@ namespace grpc_labview
 
         grpc::EnableDefaultHealthCheckService(true);
         ServerBuilder builder;
-        
-        // Create an instance of a reflection service object and add the
-        // registered proto file descriptor strings into it
-        _reflectionService = std::unique_ptr<LVProtoServerReflectionService>(new LVProtoServerReflectionService());
-
-        for (const std::string& protoFile : _protoDescriptorStrings) {
-            _reflectionService->AddFileDescriptorProtoString(protoFile);
-        }
         
         // Register the reflection service into the server
         builder.RegisterService(_reflectionService.get());
