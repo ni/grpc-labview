@@ -233,7 +233,6 @@ LIBRARY_EXPORT int32_t RegisterReflectionProtoString(grpc_labview::gRPCid** id, 
         return -1;
     }
     
-    //TODO: Pass back any error that may have happened while parsing
     server->RegisterReflectionProtoString(serializedDescriptorStr);
     return 0;
 }
