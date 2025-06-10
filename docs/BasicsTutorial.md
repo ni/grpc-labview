@@ -122,7 +122,7 @@ Note that as we’ve already provided a version of the generated code in the exa
 * server code for the route_guide.proto
   * `RPC Messages`, which contain the messages defined in the route_guide.proto
   * `RPC Service`, which contains the classes that defines the interfaces for implementation of the RouteGuide service
-  * `Run Service.vi`, which contains the code to add the service to the gRPC server and run them.
+  * `Run Server.vi`, which contains the code to add the service to the gRPC server and run them.
 * client code for the route_guide.proto
   * `RPC Messages`, which contains the messages defined in the route_guide.proto
   * `RPC Service`, which contains the methods the represent the RPC client API calls
@@ -192,7 +192,7 @@ This method’s semantics are a combination of those of the request-streaming me
 
 ## Starting the server
 
-Once you have implemented all the RouteGuide methods, the next step is to start up a gRPC server so that clients can actually use your service. The generated code contains a method called `Run Service.vi` which contains the pre-defined code sequence required to run the service on the server. This vi contains below code blocks and the only edit that user wants to do is on the Step 3, to make sure the Instantiate Service method is called with correct `Service Object`.
+Once you have implemented all the RouteGuide methods, the next step is to start up a gRPC server so that clients can actually use your service. The generated code contains a method called `Run Server.vi` which contains the pre-defined code sequence required to run the service on the server. This vi contains below code blocks and the only edit that user wants to do is on the Step 3, to make sure the Instantiate Service method is called with correct `Service Object`.
 
 1. Create a Server
 2. Register the `RPC Messages`
@@ -253,7 +253,7 @@ Calling the bidirectionally-streaming `RouteChat` has (as is the case on the ser
 
 Run the server:
 
-Run the `Run Service.vi`
+Run the `Run Server.vi`
 
 To run the client, run any of the client methods. From the [example code](../examples/route_guide/), run any of the Test VIs:
 * Unary RouteGuide Test.vi
