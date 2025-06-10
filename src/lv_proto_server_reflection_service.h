@@ -17,7 +17,9 @@ using grpc::ServerContext;
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 using grpc::Status;
+using grpc::ServerContext;
 using grpc::ServerInitializer;
+using grpc::protobuf::DescriptorPool;
 using grpc::reflection::v1alpha::ServerReflectionRequest;
 using grpc::reflection::v1alpha::ServerReflectionResponse;
 
@@ -79,6 +81,6 @@ namespace grpc_labview
         // grpc_descriptor_pool_ or lv_descriptor_pool_
         // This is kept separately as there is no method to list services from a
         // DescriptorPool; they must be tracked separately
-        std::vector<std::string>* services_;
+        std::vector<std::string> services_;
     };
 }

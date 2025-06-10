@@ -20,7 +20,7 @@ namespace grpc_labview
     // gRPC messages into the descriptor pool.  
     //---------------------------------------------------------------------
     LVProtoServerReflectionService::LVProtoServerReflectionService() :
-        grpc_descriptor_pool_(grpc::protobuf::DescriptorPool::generated_pool()), services_(new std::vector<std::string>()) {
+        grpc_descriptor_pool_(grpc::protobuf::DescriptorPool::generated_pool()) {
        
         // Add the reflection service name manually to the published service list.  The actual methods 
         // for the reflection service are given are registered by `grpc::protobuf::DescriptorPool::generated_pool()` 
@@ -38,7 +38,7 @@ namespace grpc_labview
     // as provided by the `grpc_descriptor_pool`, populated using the `generated_pool()` in the constructor.
     //---------------------------------------------------------------------
     void LVProtoServerReflectionService::AddService(const std::string serviceName) {
-        services_->push_back(serviceName);
+        services_.push_back(serviceName);
     }
 
     //---------------------------------------------------------------------
@@ -66,7 +66,7 @@ namespace grpc_labview
         {
             const google::protobuf::ServiceDescriptor* serviceDescriptor = proto_file_descriptor->service(i);
             if (serviceDescriptor != nullptr) {
-                services_->push_back(serviceDescriptor->full_name());
+                AddService(serviceDescriptor->full_name());
             }
         }
 
@@ -127,10 +127,7 @@ namespace grpc_labview
     Status LVProtoServerReflectionService::ListService(ServerContext* context,
         grpc::reflection::v1alpha::ListServiceResponse* response) {
 
-        if (services_ == nullptr) {
-            return Status(grpc::StatusCode::NOT_FOUND, "Services not found.");
-        }
-        for (const auto& value : *services_) {
+        for (const auto& value : services_) {
             grpc::reflection::v1alpha::ServiceResponse* service_response = response->add_service();
             service_response->set_name(value);
         }
