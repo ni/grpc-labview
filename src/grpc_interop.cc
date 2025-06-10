@@ -127,6 +127,12 @@ namespace grpc_labview
 
 int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId);
 
+// This array keeps a list of all created server instances and is used only for backwards-compatibility
+// for the DeserializeReflectionInfo method, which does not take a gRPCid as an input.  As this method
+// was used directly by the server template, this workaround allows for using the updated reflection
+// service with older generated servers.
+std::vector<grpc_labview::gRPCid*> server_instances;
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t IsFeatureEnabled(const char* featureName, uint8_t* featureEnabled)
@@ -144,6 +150,10 @@ LIBRARY_EXPORT int32_t LVCreateServer(grpc_labview::gRPCid** id)
     grpc_labview::gPointerManager.RegisterPointer(server);
     *id = server;
     grpc_labview::RegisterCleanupProc(ServerCleanupProc, server);
+
+    // Store the instance on the server_instances array for the DeserializeReflectionInfo function
+    server_instances.push_back(*id);
+
     return 0;
 }
 
@@ -183,8 +193,15 @@ LIBRARY_EXPORT int32_t LVStopServer(grpc_labview::gRPCid** id)
     }
     server->StopServer();
 
+    // Remove the server_instance from the array
+    auto it = std::find(server_instances.begin(), server_instances.end(), *id);
+    if (it != server_instances.end()) {
+        server_instances.erase(it);
+    }
+
     grpc_labview::DeregisterCleanupProc(ServerCleanupProc, *id);
     grpc_labview::gPointerManager.UnregisterPointer(server.get());
+
     return 0;
 }
 
@@ -194,6 +211,17 @@ int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId)
 }
 
 //---------------------------------------------------------------------
+// RegisterReflectionProtoString registers a serialized proto descriptor string to a specified
+// server instance.  This function should be called prior to calling LVStartServer.
+// This function can be called multiple times, where each call passes in a different serialized
+// descriptor string, representing a different service.
+// 
+// For each serialized descriptor string passed, these gRPC services and functions will be
+// published using the gRPC reflection service once the server is started.
+// 
+// Note that once LVStartServer is called, this function will not add to published reflection
+// information if called again.  All descriptor strings must be passed prior to calling
+// LVStartServer
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t RegisterReflectionProtoString(grpc_labview::gRPCid** id, grpc_labview::LStrHandle serializedFileDescriptor)
 {
@@ -211,12 +239,30 @@ LIBRARY_EXPORT int32_t RegisterReflectionProtoString(grpc_labview::gRPCid** id, 
 }
 
 //---------------------------------------------------------------------
+// DeserializeReflectionInfo is kept only for backwards-compatibility.
+// For LV servers generated using grpc-labview v1.0.0.6 through v1.5.1.1, this DLL function
+// was directly called from the server template (instead of a grpc-labview support
+// wrapper function).  As a result, any LV servers generated using these versions
+// require this exported function.
+// 
+// Because this function does not take a gRPCid input, an array of server instances is kept
+// and iterated through to register all serialized descriptors to all servers as a workaround.  
+// While this may not be correct (as not all servers may use all services), this is the best
+// method of backwards-compatibilty as possible without breaking the previously-generated
+// server code.
+// 
+// Starting with grpc-labview v1.6.0.1, only the RegisterReflectionProtoString function
+// above is used, which registers descriptor strings to a specified server instance.
 //---------------------------------------------------------------------
 LIBRARY_EXPORT void DeserializeReflectionInfo(grpc_labview::LStrHandle serializedFileDescriptor)
 {
     std::string serializedDescriptorStr = grpc_labview::GetLVString(serializedFileDescriptor);
-    //TODO -- need to handle backwards compatibility!
-    //grpc_labview::ProtoDescriptorStrings::getInstance()->addDescriptor(serializedDescriptorStr);
+
+    for (auto gRPCid : server_instances) {
+        if (gRPCid != nullptr) {
+            RegisterReflectionProtoString(&gRPCid, serializedFileDescriptor);
+        }
+    }
 }
 
 //---------------------------------------------------------------------
