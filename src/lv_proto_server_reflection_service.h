@@ -42,10 +42,11 @@ namespace grpc_labview
             grpc::reflection::v1alpha::ServerReflectionRequest>* stream)
             override;
 
-        void AddService(const std::string serviceName);
-        void AddFileDescriptorProto(const std::string& serializedProtoStr);
+        void AddFileDescriptorProtoString(const std::string& serializedProtoStr);
         
     private:
+        void AddService(const std::string serviceName);
+
         Status ListService(ServerContext* context, grpc::reflection::v1alpha::ListServiceResponse* response);
         Status GetFileByName(ServerContext* context, const std::string& file_name, grpc::reflection::v1alpha::ServerReflectionResponse* response);
         Status GetFileContainingSymbol(ServerContext* context, const std::string& symbol, grpc::reflection::v1alpha::ServerReflectionResponse* response);
@@ -67,16 +68,17 @@ namespace grpc_labview
             grpc::reflection::v1alpha::ErrorResponse* error_response);
         
         // grpc_descriptor_pool_ contains descriptors for built-in gRPC-managed services 
-        // such as grpc.health.v1.Health and grpc.reflection.v1alpha.ServerReflection
+        // such as grpc.reflection.v1alpha.ServerReflection
         const grpc::protobuf::DescriptorPool* grpc_descriptor_pool_;
 
         // lv_descriptor_pool_ contains descriptors for any LabVIEW gRPC services
-        // This pool is populated by calling the DeserializeReflectionInfo function
+        // This pool is populated by calling the RegisterReflectionProtoString function
         grpc::protobuf::DescriptorPool lv_descriptor_pool_;
 
-        // services_ contains a list of services which are described in lv_descriptor_pool_
+        // services_ contains a list of services which are described in either
+        // grpc_descriptor_pool_ or lv_descriptor_pool_
         // This is kept separately as there is no method to list services from a
-        //   DescriptorPool; they must be tracked separately
+        // DescriptorPool; they must be tracked separately
         std::vector<std::string>* services_;
     };
 }
