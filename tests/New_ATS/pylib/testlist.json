@@ -12,7 +12,7 @@
       "simple-oneof",
       "oneof-streaming",
       "enum-streaming",
-	  "reflection"
+      "reflection"
     ],
     "gen_type": "0",
     "labview_version": "2019",
