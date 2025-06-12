@@ -1,5 +1,5 @@
 {
-  "size": 87,
+  "size": 88,
   "signatures": [
     {
       "id": 0,
@@ -841,6 +841,15 @@
       "parameter_list": [
         "const char*",
         "uint8_t*"
+      ]
+    },
+	{
+      "id": 87,
+      "function_name": "RegisterReflectionProtoString",
+      "return_type": "int32_t",
+      "parameter_list": [
+        "grpc_labview::gRPCid**",
+        "grpc_labview::LStrHandle"
       ]
     }
   ]

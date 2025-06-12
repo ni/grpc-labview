@@ -11,7 +11,8 @@
       "sibling-oneof",
       "simple-oneof",
       "oneof-streaming",
-      "enum-streaming"
+      "enum-streaming",
+      "reflection"
     ],
     "gen_type": "0",
     "labview_version": "2019",

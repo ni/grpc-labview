@@ -28,6 +28,7 @@
 #include <event_data.h>
 #include <metadata_owner.h>
 #include <semaphore.h>
+#include "lv_proto_server_reflection_service.h"
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -99,6 +100,7 @@ namespace grpc_labview
         bool FindEventData(std::string name, LVEventData& data);
         bool HasGenericMethodEvent();
         bool HasRegisteredServerMethod(std::string methodName);
+        bool RegisterReflectionProtoString(std::string protoDescriptorString);
 
     private:
         std::mutex _mutex;
@@ -110,6 +112,7 @@ namespace grpc_labview
         std::unique_ptr<std::thread> _runThread;
         bool _shutdown;
         int _listeningPort;
+        std::unique_ptr<LVProtoServerReflectionService> _reflectionService;
 
     private:
         void RunServer(std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
@@ -237,35 +240,4 @@ namespace grpc_labview
     void OccurServerEvent(LVUserEventRef event, gRPCid* data);
     void OccurServerEvent(LVUserEventRef event, gRPCid* data, std::string eventMethodName);
     std::string read_keycert(const std::string &filename);
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    class ProtoDescriptorString {
-        // Static members
-        static ProtoDescriptorString* m_instance;
-        static std::mutex m_mutex;
-
-        // Non static members
-        std::string m_descriptor;
-        int m_refcount = 0; // Not a normal refcount. Its counts the number of time we set the descriptor string.
-
-        // Default private constructor to prevent instantiation
-        ProtoDescriptorString() = default;
-
-        // Delete copy constructor and assignment operator
-        ProtoDescriptorString(const ProtoDescriptorString&) = delete;
-        ProtoDescriptorString& operator=(const ProtoDescriptorString&) = delete;
-    public:
-        // Return the static class instance
-        static ProtoDescriptorString* getInstance();
-
-        // Set the descriptor string
-        void setDescriptor(std::string);
-
-        // Get the descriptor string
-        std::string getDescriptor();
-
-        // Delete the instance based on the refcount
-        void deleteInstance();
-    };
 }

@@ -107,6 +107,9 @@ Follow the below steps to add more tests in the testing suite.
 
    - [x] Streaming tests
    - [ ] Reflection tests
+     - [X] Simple Reflection Tests
+     - [ ] Test multiple proto files used to generate a single LV server
+     - [ ] Test concurrent server instances running different services
    - [ ] Client tests (currently we are only testing gRPC Server)
    - [ ] Modification scenarios (do some modification after first generation and then generate and test again)
      - Add/Remove/modify RPC

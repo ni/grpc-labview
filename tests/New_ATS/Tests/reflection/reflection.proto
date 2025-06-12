@@ -1,0 +1,56 @@
+
+syntax = "proto3";
+
+package test_service;
+
+service TestService {
+	rpc Method1(Method1Request) returns (Method1Response);
+	rpc Method2(Method2Request) returns (Method2Response);
+	rpc Method3(Method3Request) returns (Method3Response);
+	rpc Method4(Method4Request) returns (Method4Response);
+}
+
+
+message Method1Request {
+	uint64 input1 = 1;
+	uint64 input2 = 2;
+}
+
+message Method1Response {
+	uint64 output1 = 1;
+	uint64 output2 = 2;
+	uint64 output3 = 3;
+}
+
+message Method2Request {
+	uint64 input1 = 1;
+	uint64 input2 = 2;
+}
+
+message Method2Response {
+	uint64 output1 = 1;
+	uint64 output2 = 2;
+	uint64 output3 = 3;
+}
+
+message Method3Request {
+	uint64 input1 = 1;
+	uint64 input2 = 2;
+}
+
+message Method3Response {
+	uint64 output1 = 1;
+	uint64 output2 = 2;
+	uint64 output3 = 3;
+}
+
+message Method4Request {
+	uint64 input1 = 1;
+	uint64 input2 = 2;
+}
+
+message Method4Response {
+	uint64 output1 = 1;
+	uint64 output2 = 2;
+	uint64 output3 = 3;
+}

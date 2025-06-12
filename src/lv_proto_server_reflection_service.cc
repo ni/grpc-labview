@@ -15,24 +15,68 @@ using grpc::protobuf::FileDescriptorProto;
 
 namespace grpc_labview
 {
+    //---------------------------------------------------------------------
+    // During construction of the LVProtoServerReflectionService, generated_pool() is used to register all built-in
+    // gRPC messages into the descriptor pool.  
+    //---------------------------------------------------------------------
     LVProtoServerReflectionService::LVProtoServerReflectionService() :
-        descriptor_pool_(grpc::protobuf::DescriptorPool::generated_pool()), services_(new std::vector<std::string>()) {
-             other_pool_services_info_ptr = std::make_unique<OtherPoolServiceInfo>();
+        grpc_descriptor_pool_(grpc::protobuf::DescriptorPool::generated_pool()) {
+       
+        // Add the reflection service name manually to the published service list.  The actual methods 
+        // for the reflection service are given are registered by `grpc::protobuf::DescriptorPool::generated_pool()` 
+        // used during construction, but the actual service name needs to be added as they are tracked
+        // separately
+        AddService("grpc.reflection.v1alpha.ServerReflection");
     }
 
-    // Add the full names of registered services
-    void LVProtoServerReflectionService::SetServiceList(const std::vector<std::string>* snames) {
-        for (int i = 0; i < snames->size(); ++i)
-            services_->push_back(snames->at(i));
-    }
-
+    //---------------------------------------------------------------------
+    // Adds a service name to the list of services to be published via gRPC reflection.
+    // 
+    // As registering a service name only does not provide any description of the gRPC functions, messages,
+    // or structures used by that gRPC service, it is assumed that this function is only used to register
+    // built-in gRPC services (such as the reflection service itself).  Built-in gRPC messages and structures
+    // as provided by the `grpc_descriptor_pool`, populated using the `generated_pool()` in the constructor.
+    //---------------------------------------------------------------------
     void LVProtoServerReflectionService::AddService(const std::string serviceName) {
-        services_->push_back(serviceName);
+        services_.push_back(serviceName);
     }
 
+    //---------------------------------------------------------------------
+    // Adds a serialized proto descriptor string to the pool of known gRPC published methods which are
+    // published via gRPC reflection.  Returns true if the descriptor string was parsed and stored
+    // successfully.
+    // 
+    // When calling AddFileDescriptorProtoString, any gRPC services found in the descriptor string
+    // are automatically added to the list of registered services.
+    //---------------------------------------------------------------------
+    bool LVProtoServerReflectionService::AddFileDescriptorProtoString(const std::string& serializedProtoStr) {
+        // Parse the serialized proto string into a FileDescriptorProto, then query how many
+        // services are present in that proto file.  Add those services to the services_ list
+        FileDescriptorProto proto;
+        if (!proto.ParseFromString(serializedProtoStr)) {
+            return false;
+        }
+        const auto* proto_file_descriptor = lv_descriptor_pool_.BuildFile(proto);
+        if (proto_file_descriptor == nullptr) {
+            return false;
+        }
+
+        int numServices = proto_file_descriptor->service_count();
+        for (int i = 0; i < numServices; ++i)
+        {
+            const google::protobuf::ServiceDescriptor* serviceDescriptor = proto_file_descriptor->service(i);
+            if (serviceDescriptor != nullptr) {
+                AddService(serviceDescriptor->full_name());
+            }
+        }
+
+        return true;  // Successfully parsed and registered services
+    }
+
+    //---------------------------------------------------------------------
     // Implementation of ServerReflectionInfo(stream ServerReflectionRequest) rpc
     // in ServerReflection service
-
+    //---------------------------------------------------------------------
     Status LVProtoServerReflectionService::ServerReflectionInfo(
         ServerContext* context,
         grpc::ServerReaderWriter<grpc::reflection::v1alpha::ServerReflectionResponse,
@@ -54,17 +98,16 @@ namespace grpc_labview
                 status = GetFileContainingExtension(
                     context, &request.file_containing_extension(), &response);
                 break;
-                case ServerReflectionRequest::MessageRequestCase::
-                kAllExtensionNumbersOfType:
-                    status = GetAllExtensionNumbers(
-                        context, request.all_extension_numbers_of_type(),
-                        response.mutable_all_extension_numbers_response());
-                    break;
-                case ServerReflectionRequest::MessageRequestCase::kListServices:
-                    status = ListService(context, response.mutable_list_services_response());
-                    break;
-                default:
-                    status = Status(grpc::StatusCode::UNIMPLEMENTED, "");
+            case ServerReflectionRequest::MessageRequestCase::kAllExtensionNumbersOfType:
+                status = GetAllExtensionNumbers(
+                    context, request.all_extension_numbers_of_type(),
+                    response.mutable_all_extension_numbers_response());
+                break;
+            case ServerReflectionRequest::MessageRequestCase::kListServices:
+                status = ListService(context, response.mutable_list_services_response());
+                break;
+            default:
+                status = Status(grpc::StatusCode::UNIMPLEMENTED, "");
             }
 
             if (!status.ok()) {
@@ -77,60 +120,35 @@ namespace grpc_labview
 
         return Status::OK;
 
-    } // TODO
-
-
-    void LVProtoServerReflectionService::AddFileDescriptorProto(const std::string& serializedProtoStr) {
-        FileDescriptorProto proto;
-        proto.ParseFromString(serializedProtoStr);
-        other_pool_services_info_ptr->other_pool_file_descriptor = other_pool.BuildFile(proto);       
-        AddOtherPoolServices();
     }
-
-    void LVProtoServerReflectionService::AddOtherPoolServices()
-    {
-        if (other_pool_services_info_ptr->other_pool_file_descriptor != nullptr)
-        {
-            int numServices = other_pool_services_info_ptr->other_pool_file_descriptor->service_count();
-            for (int i = 0; i < numServices; ++i)
-            {
-                const google::protobuf::ServiceDescriptor* serviceDescriptor = other_pool_services_info_ptr->other_pool_file_descriptor->service(i);
-                other_pool_services_info_ptr->other_pool_services_.push_back(serviceDescriptor->full_name());
-            }
-        }
-    }
-
-
+    
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     Status LVProtoServerReflectionService::ListService(ServerContext* context,
         grpc::reflection::v1alpha::ListServiceResponse* response) {
 
-        if (services_ == nullptr) {
-            return Status(grpc::StatusCode::NOT_FOUND, "Services not found.");
-        }
-        for (const auto& value : *services_) {
+        for (const auto& value : services_) {
             grpc::reflection::v1alpha::ServiceResponse* service_response = response->add_service();
             service_response->set_name(value);
         }
-        for (const auto value : other_pool_services_info_ptr->other_pool_services_) {
-            grpc::reflection::v1alpha::ServiceResponse* service_response = response->add_service();
-            service_response->set_name(value);
-        }
-
+        
         return Status::OK;
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     Status LVProtoServerReflectionService::GetFileByName(ServerContext* context, const std::string& file_name,
         grpc::reflection::v1alpha::ServerReflectionResponse* response) {
 
-        if (descriptor_pool_ == nullptr) {
+        if (grpc_descriptor_pool_ == nullptr) {
             return Status::CANCELLED;
         }
 
         const grpc::protobuf::FileDescriptor* file_desc =
-            descriptor_pool_->FindFileByName(file_name);
+            grpc_descriptor_pool_->FindFileByName(file_name);
         if (file_desc == nullptr) {
-            // check in other pools
-            file_desc = other_pool.FindFileByName(file_name);
+            // check in the lv descriptor pool
+            file_desc = lv_descriptor_pool_.FindFileByName(file_name);
         }
 
         if (file_desc == nullptr) // we couldn't find it anywhere
@@ -141,19 +159,21 @@ namespace grpc_labview
         return Status::OK;
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     Status LVProtoServerReflectionService::GetFileContainingSymbol(
         ServerContext* context, const std::string& symbol,
         grpc::reflection::v1alpha::ServerReflectionResponse* response) {
 
-        if (descriptor_pool_ == nullptr) {
+        if (grpc_descriptor_pool_ == nullptr) {
             return Status::CANCELLED;
         }
 
         const grpc::protobuf::FileDescriptor* file_desc =
-            descriptor_pool_->FindFileContainingSymbol(symbol);
+            grpc_descriptor_pool_->FindFileContainingSymbol(symbol);
 
         if (file_desc == nullptr) {
-            file_desc = other_pool.FindFileContainingSymbol(symbol);
+            file_desc = lv_descriptor_pool_.FindFileContainingSymbol(symbol);
         }
 
         if (file_desc == nullptr) {
@@ -165,26 +185,28 @@ namespace grpc_labview
 
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     Status LVProtoServerReflectionService::GetFileContainingExtension(
         ServerContext* context,
         const grpc::reflection::v1alpha::ExtensionRequest* request,
         grpc::reflection::v1alpha::ServerReflectionResponse* response) {
-        if (descriptor_pool_ == nullptr) {
+        if (grpc_descriptor_pool_ == nullptr) {
             return Status::CANCELLED;
         }
 
         const grpc::protobuf::Descriptor* desc =
-            descriptor_pool_->FindMessageTypeByName(request->containing_type());
+            grpc_descriptor_pool_->FindMessageTypeByName(request->containing_type());
         if (desc == nullptr) {
-            desc = other_pool.FindMessageTypeByName(request->containing_type());
+            desc = lv_descriptor_pool_.FindMessageTypeByName(request->containing_type());
         }
         if (desc == nullptr) {
             return Status(grpc::StatusCode::NOT_FOUND, "Type not found.");
         }
 
-        const grpc::protobuf::FieldDescriptor* field_desc = descriptor_pool_->FindExtensionByNumber(desc, request->extension_number());
+        const grpc::protobuf::FieldDescriptor* field_desc = grpc_descriptor_pool_->FindExtensionByNumber(desc, request->extension_number());
         if (field_desc == nullptr) {
-            field_desc = other_pool.FindExtensionByNumber(desc, request->extension_number());
+            field_desc = lv_descriptor_pool_.FindExtensionByNumber(desc, request->extension_number());
         }
         if (field_desc == nullptr) {
             return Status(grpc::StatusCode::NOT_FOUND, "Extension not found.");
@@ -194,25 +216,27 @@ namespace grpc_labview
         return Status::OK;
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     Status LVProtoServerReflectionService::GetAllExtensionNumbers(
         ServerContext* context, const std::string& type,
         grpc::reflection::v1alpha::ExtensionNumberResponse* response) {
-        if (descriptor_pool_ == nullptr) {
+        if (grpc_descriptor_pool_ == nullptr) {
             return Status::CANCELLED;
         }
 
         const grpc::protobuf::Descriptor* desc =
-            descriptor_pool_->FindMessageTypeByName(type);
+            grpc_descriptor_pool_->FindMessageTypeByName(type);
         if (desc == nullptr) 
-            desc = other_pool.FindMessageTypeByName(type);
+            desc = lv_descriptor_pool_.FindMessageTypeByName(type);
 
         if (desc == nullptr)
             return Status(grpc::StatusCode::NOT_FOUND, "Type not found.");        
 
         std::vector<const grpc::protobuf::FieldDescriptor*> extensions;
-        descriptor_pool_->FindAllExtensions(desc, &extensions);
+        grpc_descriptor_pool_->FindAllExtensions(desc, &extensions);
         if (extensions.empty())
-            other_pool.FindAllExtensions(desc, &extensions);
+            lv_descriptor_pool_.FindAllExtensions(desc, &extensions);
         for (const auto& value : extensions) {
             response->add_extension_number(value->number());
         }
@@ -220,6 +244,8 @@ namespace grpc_labview
         return Status::OK;
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void LVProtoServerReflectionService::FillFileDescriptorResponse(
         const grpc::protobuf::FileDescriptor* file_desc,
         grpc::reflection::v1alpha::ServerReflectionResponse* response,
@@ -240,6 +266,8 @@ namespace grpc_labview
         }
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void LVProtoServerReflectionService::FillErrorResponse(const Status& status,
         grpc::reflection::v1alpha::ErrorResponse* error_response) {
         error_response->set_error_code(status.error_code());

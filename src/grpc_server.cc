@@ -8,7 +8,7 @@
 #include <iostream>
 #include <future>
 #include <grpcpp/impl/server_initializer.h>
-#include "lv_proto_server_reflection_plugin.h"
+#include "lv_proto_server_reflection_service.h"
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -24,7 +24,9 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     LabVIEWgRPCServer::LabVIEWgRPCServer() :
         _shutdown(false),
-        _genericMethodEvent(0)
+        _genericMethodEvent(0),
+        _listeningPort(0),
+        _reflectionService(std::make_unique<LVProtoServerReflectionService>())
     {
     }
 
@@ -94,6 +96,17 @@ namespace grpc_labview
     int LabVIEWgRPCServer::ListeningPort()
     {
         return _listeningPort;
+    }
+
+    //---------------------------------------------------------------------
+    // Registers a serialized proto descriptor string to be published with the gRPC reflection
+    // service once the gRPC server is running.
+    // 
+    // Returns true if the descriptor string was successfully parsed
+    //---------------------------------------------------------------------
+    bool LabVIEWgRPCServer::RegisterReflectionProtoString(std::string protoDescriptorString)
+    {
+        return _reflectionService->AddFileDescriptorProtoString(protoDescriptorString);
     }
 
     //---------------------------------------------------------------------
@@ -189,9 +202,10 @@ namespace grpc_labview
         }
 
         grpc::EnableDefaultHealthCheckService(true);
-        InitLVProtoReflectionServerBuilderPlugin();
-        // grpc::reflection::InitProtoReflectionServerBuilderPlugin();
         ServerBuilder builder;
+        
+        // Register the reflection service into the server
+        builder.RegisterService(_reflectionService.get());
 
         std::shared_ptr<grpc::ServerCredentials> creds;
         if (serverCertificatePath.length() > 1)
@@ -269,45 +283,6 @@ namespace grpc_labview
             }
 
             _server = nullptr;
-        }
-        grpc_labview::ProtoDescriptorString::getInstance()->deleteInstance();
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-
-    // Initialize the static members
-    ProtoDescriptorString* ProtoDescriptorString::m_instance = nullptr;
-    std::mutex ProtoDescriptorString::m_mutex;
-
-    // Return the static class instance. Thread safe.
-    ProtoDescriptorString* ProtoDescriptorString::getInstance() {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        if (m_instance == nullptr) {
-            m_instance = new ProtoDescriptorString();
-        }
-        return m_instance;
-    }
-
-    // Get the descriptor string
-    std::string ProtoDescriptorString::getDescriptor() {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        return m_descriptor;
-    }
-
-    // Set the descriptor string
-    void ProtoDescriptorString::setDescriptor(std::string str) {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        m_refcount++;
-        m_descriptor = str;
-    }
-
-    // Delete the instaance based on the refcount
-    void ProtoDescriptorString::deleteInstance() {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        if (!--m_refcount) {
-            delete m_instance;
-            m_instance = nullptr;
         }
     }
 }

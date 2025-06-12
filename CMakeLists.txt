@@ -92,7 +92,6 @@ add_library(labview_grpc_server SHARED
   src/lv_message.cc
   src/lv_message_efficient.cc
   src/lv_message_value.cc
-  src/lv_proto_server_reflection_plugin.cc
   src/lv_proto_server_reflection_service.cc
   src/message_element_metadata_owner.cc
   src/message_metadata.cc

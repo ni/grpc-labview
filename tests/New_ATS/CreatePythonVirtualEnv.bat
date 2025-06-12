@@ -13,6 +13,7 @@ IF NOT exist %script_dir%\venv (
     echo Installing grpc and grpcio-tools into Virtual Environment
     call %script_dir%\venv\Scripts\python.exe -m pip install --upgrade pip
     call %script_dir%\venv\Scripts\python.exe -m pip install grpcio-tools==1.66.0 pytest
+    call %script_dir%\venv\Scripts\python.exe -m pip install grpcio-reflection==1.66.0
     echo Successfully Installed Virtual Environment
 ) ELSE (
     echo Virtual Environment found
