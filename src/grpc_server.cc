@@ -25,6 +25,7 @@ namespace grpc_labview
     LabVIEWgRPCServer::LabVIEWgRPCServer() :
         _shutdown(false),
         _genericMethodEvent(0),
+        _listeningPort(0),
         _reflectionService(std::make_unique<LVProtoServerReflectionService>())
     {
     }
@@ -99,8 +100,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     // Registers a serialized proto descriptor string to be published with the gRPC reflection
-    // service once the gRPC server is running.  All descriptor strings should be registered
-    // prior to calling `Run`.
+    // service once the gRPC server is running.
     // 
     // Returns true if the descriptor string was successfully parsed
     //---------------------------------------------------------------------

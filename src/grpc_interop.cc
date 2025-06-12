@@ -212,16 +212,15 @@ int32_t ServerCleanupProc(grpc_labview::gRPCid* serverId)
 
 //---------------------------------------------------------------------
 // RegisterReflectionProtoString registers a serialized proto descriptor string to a specified
-// server instance.  This function should be called prior to calling LVStartServer.
-// This function can be called multiple times, where each call passes in a different serialized
-// descriptor string, representing a different service.
+// server instance. This function can be called multiple times, where each call passes in a 
+// different serialized descriptor string, representing a different service.
 // 
 // For each serialized descriptor string passed, these gRPC services and functions will be
 // published using the gRPC reflection service once the server is started.
 // 
-// Note that once LVStartServer is called, this function will not add to published reflection
-// information if called again.  All descriptor strings must be passed prior to calling
-// LVStartServer
+// Note that this function can be called before or after starting a gRPC server instance.
+// However, in most cases it likely makes sense to call this function before running
+// the server.
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t RegisterReflectionProtoString(grpc_labview::gRPCid** id, grpc_labview::LStrHandle serializedFileDescriptor)
 {
@@ -251,7 +250,14 @@ LIBRARY_EXPORT int32_t RegisterReflectionProtoString(grpc_labview::gRPCid** id, 
 // and iterated through to register all serialized descriptors to all servers as a workaround.  
 // While this may not be correct (as not all servers may use all services), this is the best
 // method of backwards-compatibilty as possible without breaking the previously-generated
-// server code.
+// server code.  
+// 
+// This function will only register the reflection strings to servers which
+// are created _but not running_.  This is to aid in backwards-compatibility.  If multiple
+// servers are being created, it is likely that they are created and started at different times.
+// As a result, only registering services to the server which is not running will likely
+// be the appropriate server.  As a result, all descriptor strings must be passed prior to calling
+// LVStartServer when using this deprecated function.
 // 
 // Starting with grpc-labview v1.6.0.1, only the RegisterReflectionProtoString function
 // above is used, which registers descriptor strings to a specified server instance.
@@ -260,9 +266,22 @@ LIBRARY_EXPORT void DeserializeReflectionInfo(grpc_labview::LStrHandle serialize
 {
     std::string serializedDescriptorStr = grpc_labview::GetLVString(serializedFileDescriptor);
 
-    for (auto gRPCid : server_instances) {
-        if (gRPCid != nullptr) {
-            RegisterReflectionProtoString(&gRPCid, serializedFileDescriptor);
+    // For every server instance, check to see if the server is not running by seeing
+    // if the listening port is still 0 (when a server is running listening port != 0)
+    // If the server is not running, register the reflection strings to that server
+    for (auto id : server_instances) {
+        if (id != nullptr) {
+            auto server = (*id).CastTo<grpc_labview::LabVIEWgRPCServer>();
+            if (server == nullptr)
+            {
+                return;
+            }
+            else {
+                if (server->ListeningPort() == 0) {
+                    RegisterReflectionProtoString(&id, serializedFileDescriptor);
+                }
+            }
+
         }
     }
 }
