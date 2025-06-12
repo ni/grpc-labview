@@ -1,0 +1,14 @@
+[
+  {
+    "input": { "function": "get_services" },
+    "output": { "required_output": ["grpc.reflection.v1alpha.ServerReflection", "test_service.TestService"]}
+  },
+  {
+    "input": { "function": "get_methods", "service": "test_service.TestService"},
+    "output": { "required_output": ["Method1", "Method2", "Method3", "Method4"]}
+  },
+  {
+    "input": { "function": "get_message", "message": "test_service.Method1Request"},
+    "output": { "required_output": ["input1", "input2"]}
+  }
+]
