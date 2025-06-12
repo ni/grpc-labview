@@ -1,7 +1,7 @@
 # gRPC Reflection
 
 ## What is reflection?
-gRPC reflection is a mechanism that allows clients to dynamically discover the services, methods, and message types supported by a gRPC server at runtime, without requiring `.proto` files. With reflection enabled, a client can query the server for its service definitions, including available RPC methods and their input/output message structures. This is especially useful for debugging, building generic gRPC tools (like CLI clients and browsers), and supporting dynamic or exploratory client behavior. gRPC reflection works by exposing a special reflection service that responds to these metadata queries using standard gRPC calls.
+gRPC reflection is a mechanism that allows clients to dynamically discover the services, methods, and message types supported by a gRPC server at runtime, without requiring `.proto` files. With reflection enabled, a client can query the server for its service definitions, including available RPC methods and their input/output message structures. This is especially useful for debugging, building generic gRPC tools (like CLI clients and browsers) and supporting dynamic or exploratory client behavior. gRPC reflection works by exposing a special reflection service that responds to these metadata queries using standard gRPC calls.
 
 In grpc-labview, this reflection service is enabled for all servers created created since v1.0.0.6.
 
@@ -11,7 +11,7 @@ gRPC reflection tools, such as `grpcurl` and `grpcui`, leverage the gRPC reflect
 
 ### `grpcurl`
 
-`grpcurl` can be downloaded from (https://github.com/fullstorydev/grpcurl)[https://github.com/fullstorydev/grpcurl].
+`grpcurl` can be downloaded from https://github.com/fullstorydev/grpcurl
 
 `grpcurl` is a powerful command-line tool.  Commonly used functions are listed below:
 
@@ -61,7 +61,7 @@ message Method1Request {
 
 ## `grpcui`
 
-`grpcui` can be downloaded from (https://github.com/fullstorydev/grpcui)[https://github.com/fullstorydev/grpcui].
+`grpcui` can be downloaded from https://github.com/fullstorydev/grpcui
 
 `grpcui` is a powerful graphical version of `grpcurl`.  One starts the utility on the command line, but then a web service is created which you can interact with.
 
