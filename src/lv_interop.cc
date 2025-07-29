@@ -165,8 +165,8 @@ namespace grpc_labview
 
         LStrHandle utf8String = nullptr;
         auto error = NumericArrayResize(0x01, 1, &utf8String, length);
-        if (error != 0) throw std::bad_alloc();
         std::unique_ptr<LStrPtr, long (*)(void*)> utf8StringDeleter(utf8String, &DSDisposeHandle);
+        if (error != 0) throw std::bad_alloc();
 
         memcpy((*utf8String)->str, str.c_str(), length);
         (*utf8String)->cnt = (int)length;
@@ -186,8 +186,8 @@ namespace grpc_labview
 
         LStrHandle utf8String = nullptr;
         auto error = ConvertSystemStringToUTF8(lvString, &utf8String);
-        if (error != 0) throw std::runtime_error("Failed to convert string encoding.");
         std::unique_ptr<LStrPtr, long (*)(void*)> utf8StringDeleter(utf8String, &DSDisposeHandle);
+        if (error != 0) throw std::runtime_error("Failed to convert string encoding.");
 
         auto count = (*utf8String)->cnt;
         auto chars = (*utf8String)->str;
