@@ -65,7 +65,11 @@ namespace grpc_labview
 
     LIBRARY_EXPORT void DeserializeReflectionInfo(grpc_labview::LStrHandle serializedFileDescriptor)
     {
-        std::string serializedDescriptorStr = grpc_labview::GetLVString(serializedFileDescriptor);
-        grpc_labview::ProtoDescriptorString::getInstance()->setDescriptor(serializedDescriptorStr);
+        try {
+            std::string serializedDescriptorStr = grpc_labview::GetLVString(serializedFileDescriptor);
+            grpc_labview::ProtoDescriptorString::getInstance()->setDescriptor(serializedDescriptorStr);
+        } catch (const std::exception&) {
+            // Ignore errors
+        }
     }
 }
