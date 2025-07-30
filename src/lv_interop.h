@@ -160,4 +160,6 @@ namespace grpc_labview
     int SignalOccurrence(MagicCookie occurrence);
     int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id, CleanupProcMode cleanupCondition = CleanupProcMode::CleanOnIdle);
     int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
+    int ConvertSystemStringToUTF8(LStrHandle stringIn, LStrHandle *stringOut);
+    int ConvertUTF8StringToSystem(LStrHandle stringIn, LStrHandle *stringOut);
 }

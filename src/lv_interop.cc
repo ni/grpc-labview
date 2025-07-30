@@ -20,6 +20,8 @@ typedef int32_t(*RTSetCleanupProc_T)(grpc_labview::CleanupProcPtr cleanUpProc, g
 typedef unsigned char** (*DSNewHandlePtr_T)(size_t);
 typedef int (*DSSetHandleSize_T)(void* h, size_t);
 typedef long (*DSDisposeHandle_T)(void* h);
+typedef int (*ConvertSystemStringToUTF8_T)(grpc_labview::LStrHandle, grpc_labview::LStrHandle *);
+typedef int (*ConvertUTF8StringToSystem_T)(grpc_labview::LStrHandle, grpc_labview::LStrHandle *);
 
 
 //---------------------------------------------------------------------
@@ -33,6 +35,8 @@ static std::string ModulePath = "";
 static DSNewHandlePtr_T DSNewHandleImpl = nullptr;
 static DSSetHandleSize_T DSSetHandleSizeImpl = nullptr;
 static DSDisposeHandle_T DSDisposeHandleImpl = nullptr;
+static ConvertSystemStringToUTF8_T ConvertSystemStringToUTF8Impl = nullptr;
+static ConvertUTF8StringToSystem_T ConvertUTF8StringToSystemImpl = nullptr;
 
 namespace grpc_labview
 {
@@ -83,6 +87,8 @@ namespace grpc_labview
         DSNewHandleImpl = (DSNewHandlePtr_T)GetProcAddress(lvModule, "DSNewHandle");
         DSSetHandleSizeImpl = (DSSetHandleSize_T)GetProcAddress(lvModule, "DSSetHandleSize");
         DSDisposeHandleImpl = (DSDisposeHandle_T)GetProcAddress(lvModule, "DSDisposeHandle");
+        ConvertSystemStringToUTF8Impl = (ConvertSystemStringToUTF8_T)GetProcAddress(lvModule, "ConvertSystemStringToUTF8");
+        ConvertUTF8StringToSystemImpl = (ConvertUTF8StringToSystem_T)GetProcAddress(lvModule, "ConvertUTF8StringToSystem");
     }
 
 #else
@@ -103,6 +109,8 @@ namespace grpc_labview
         DSNewHandleImpl = (DSNewHandlePtr_T)dlsym(RTLD_DEFAULT, "DSNewHandle");
         DSSetHandleSizeImpl = (DSSetHandleSize_T)dlsym(RTLD_DEFAULT, "DSSetHandleSize");
         DSDisposeHandleImpl = (DSDisposeHandle_T)dlsym(RTLD_DEFAULT, "DSDisposeHandle");
+        ConvertSystemStringToUTF8Impl = (ConvertSystemStringToUTF8_T)dlsym(RTLD_DEFAULT, "ConvertSystemStringToUTF8");
+        ConvertUTF8StringToSystemImpl = (ConvertUTF8StringToSystem_T)dlsym(RTLD_DEFAULT, "ConvertUTF8StringToSystem");
     }
 
 #endif
@@ -154,9 +162,17 @@ namespace grpc_labview
     void SetLVString(LStrHandle* lvString, std::string str)
     {
         auto length = str.length();
-        auto error = NumericArrayResize(0x01, 1, lvString, length);
-        memcpy((**lvString)->str, str.c_str(), length);
-        (**lvString)->cnt = (int)length;
+
+        LStrHandle utf8String = nullptr;
+        auto error = NumericArrayResize(0x01, 1, &utf8String, length);
+        std::unique_ptr<LStrPtr, long (*)(void*)> utf8StringDeleter(utf8String, &DSDisposeHandle);
+        if (error != 0) throw std::bad_alloc();
+
+        memcpy((*utf8String)->str, str.c_str(), length);
+        (*utf8String)->cnt = (int)length;
+
+        error = ConvertUTF8StringToSystem(utf8String, lvString);
+        if (error != 0) throw std::runtime_error("Failed to convert string encoding.");
     }
 
     //---------------------------------------------------------------------
@@ -168,8 +184,13 @@ namespace grpc_labview
             return std::string();
         }
 
-        auto count = (*lvString)->cnt;
-        auto chars = (*lvString)->str;
+        LStrHandle utf8String = nullptr;
+        auto error = ConvertSystemStringToUTF8(lvString, &utf8String);
+        std::unique_ptr<LStrPtr, long (*)(void*)> utf8StringDeleter(utf8String, &DSDisposeHandle);
+        if (error != 0) throw std::runtime_error("Failed to convert string encoding.");
+
+        auto count = (*utf8String)->cnt;
+        auto chars = (*utf8String)->str;
 
         std::string result(chars, count);
         return result;
@@ -217,5 +238,19 @@ namespace grpc_labview
         default:
             return 0x8; // uQ
         }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    int ConvertSystemStringToUTF8(LStrHandle stringIn, LStrHandle *stringOut)
+    {
+        return ConvertSystemStringToUTF8Impl(stringIn, stringOut);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    int ConvertUTF8StringToSystem(LStrHandle stringIn, LStrHandle *stringOut)
+    {
+        return ConvertUTF8StringToSystemImpl(stringIn, stringOut);
     }
 }
