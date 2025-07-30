@@ -83,6 +83,7 @@ add_library(labview_grpc_server SHARED
   src/any_support.cc
   src/cluster_copier.cc
   src/event_data.cc
+  src/exceptions.cc
   src/feature_toggles.cc
   src/grpc_client.cc
   src/grpc_interop.cc
@@ -110,6 +111,7 @@ target_link_libraries(labview_grpc_server
 # server VIs from a .proto file
 #----------------------------------------------------------------------
 add_library(labview_grpc_generator SHARED
+  src/exceptions.cc
   src/feature_toggles.cc
   src/lv_interop.cc
   src/path_support.cc

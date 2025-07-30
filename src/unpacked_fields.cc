@@ -215,18 +215,22 @@ namespace grpc_labview
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t UnpackFieldsFromBuffer(grpc_labview::LV1DArrayHandle lvBuffer, grpc_labview::gRPCid** unpackedFieldsRef)
 {
-    char* elements = (*lvBuffer)->bytes<char>();
-    std::string buffer(elements, (*lvBuffer)->cnt);
+    try {
+        char* elements = (*lvBuffer)->bytes<char>();
+        std::string buffer(elements, (*lvBuffer)->cnt);
 
-    auto message = new grpc_labview::LVMessage(nullptr);
-    if (message->ParseFromString(buffer))
-    {
-        auto fields = new grpc_labview::UnpackedFields(message);
-        grpc_labview::gPointerManager.RegisterPointer(fields);
-        *unpackedFieldsRef = fields;
-        return 0;
+        auto message = new grpc_labview::LVMessage(nullptr);
+        if (message->ParseFromString(buffer))
+        {
+            auto fields = new grpc_labview::UnpackedFields(message);
+            grpc_labview::gPointerManager.RegisterPointer(fields);
+            *unpackedFieldsRef = fields;
+            return 0;
+        }
+        return -2;
+    } catch (const std::exception&) {
+        return grpc_labview::TranslateException();
     }
-    return -2;
 }
 
 //---------------------------------------------------------------------
@@ -240,19 +244,23 @@ LIBRARY_EXPORT int32_t UnpackFieldsFromAny(grpc_labview::AnyCluster* anyCluster,
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t GetUnpackedField(grpc_labview::gRPCid* id, int protobufIndex, grpc_labview::LVMessageMetadataType valueType, int isRepeated, int8_t* buffer)
 {
-    if (id == nullptr)
-    {
-        return -1;
-    }
+    try {
+        if (id == nullptr)
+        {
+            return -1;
+        }
 
-    auto unpackedFields = id->CastTo<grpc_labview::UnpackedFields>();
-    if (!unpackedFields)
-    {
-        return -1;
-    }
+        auto unpackedFields = id->CastTo<grpc_labview::UnpackedFields>();
+        if (!unpackedFields)
+        {
+            return -1;
+        }
 
-    unpackedFields->GetField(protobufIndex, valueType, isRepeated, buffer);
-    return 0;
+        unpackedFields->GetField(protobufIndex, valueType, isRepeated, buffer);
+        return 0;
+    } catch (const std::exception&) {
+        return grpc_labview::TranslateException();
+    }
 }
 
 //---------------------------------------------------------------------
@@ -266,6 +274,10 @@ LIBRARY_EXPORT int32_t GetUnpackedMessageField(grpc_labview::gRPCid* id, int pro
 //---------------------------------------------------------------------
 LIBRARY_EXPORT int32_t FreeUnpackedFields(grpc_labview::gRPCid* id)
 {
-    grpc_labview::gPointerManager.UnregisterPointer(id);
-    return 0;
+    try {
+        grpc_labview::gPointerManager.UnregisterPointer(id);
+        return 0;
+    } catch (const std::exception&) {
+        return grpc_labview::TranslateException();
+    }
 }
