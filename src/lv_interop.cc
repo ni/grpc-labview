@@ -42,7 +42,7 @@ namespace grpc_labview
     // Allows for definition of the LVRT DLL path to be used for callback functions
     // This function should be called prior to calling InitCallbacks()
     //---------------------------------------------------------------------
-    void SetLVRTModulePath(std::string modulePath)
+    void SetLVRTModulePath(const std::string& modulePath)
     {
         ModulePath = modulePath;
     }
@@ -151,7 +151,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void SetLVString(LStrHandle* lvString, std::string str)
+    void SetLVString(LStrHandle* lvString, const std::string& str)
     {
         auto length = str.length();
         auto error = NumericArrayResize(0x01, 1, lvString, length);
