@@ -19,3 +19,5 @@ In the example above, the `EfficientMessageCopy` and `useOccurrence` features ar
 1. `EfficientMessageCopy` - This feature is used to enable or disable the efficient message copy feature. When enabled, the client will use efficient message copy to have throughput. When disabled, the client will use the default message copy.
 
 2. `useOccurrence` - This feature is used to enable or disable the occurrence feature. When enabled, the client will use occurrence to manage synchroniation between LabVIEW execution threads. When disabled, the client will use not use LabVIEW occurrences.
+
+3. `utf8Strings` - This feature is used to enable or disable UTF-8 string support. When enabled, the client will treat strings in protobuf messages as UTF-8, as documented in https://protobuf.dev/programming-guides/encoding/. When disabled, the client will treat strings in protobuf messages as LabVIEW's native string encoding.
