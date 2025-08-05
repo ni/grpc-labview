@@ -4,6 +4,7 @@
 #include <lv_message_efficient.h>
 #include <well_known_messages.h>
 #include <sstream>
+#include <feature_toggles.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -107,6 +108,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     const char* LVMessageEfficient::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx)
     {
+        auto featureConfig = grpc_labview::FeatureConfig::getInstance();
         if (fieldInfo.isRepeated)
         {
             auto repeatedStringValuesIt = _repeatedStringValuesMap.find(fieldInfo.fieldName);
@@ -123,6 +125,11 @@ namespace grpc_labview
                 protobuf_ptr += tagSize;
                 auto str = repeatedString.Add();
                 protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
+#ifndef NDEBUG
+                if (featureConfig.IsFeatureEnabled("data_utf8Strings")) {
+                    VerifyUTF8(*str, fieldInfo.fieldName.c_str());
+                }
+#endif
                 if (!ctx->DataAvailable(protobuf_ptr))
                 {
                     break;
@@ -133,6 +140,11 @@ namespace grpc_labview
         {
             auto str = std::string();
             protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
+#ifndef NDEBUG
+            if (featureConfig.IsFeatureEnabled("data_utf8Strings")) {
+                VerifyUTF8(str, fieldInfo.fieldName.c_str());
+            }
+#endif
             auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
             SetLVString((LStrHandle*)lv_ptr, str);
         }
@@ -141,9 +153,43 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char* LVMessageEfficient::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, ParseContext* ctx)
+    const char* LVMessageEfficient::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx)
     {
-        return ParseString(tag, fieldInfo, index, ptr, ctx);
+        auto featureConfig = grpc_labview::FeatureConfig::getInstance();
+        if (!featureConfig.IsFeatureEnabled("data_utf8Strings")) {
+            return ParseString(tag, fieldInfo, index, protobuf_ptr, ctx);
+        }
+
+        if (fieldInfo.isRepeated)
+        {
+            auto repeatedBytesValuesIt = _repeatedBytesValuesMap.find(fieldInfo.fieldName);
+            if (repeatedBytesValuesIt == _repeatedBytesValuesMap.end())
+            {
+                auto m_val = std::make_shared<RepeatedBytesValue>(fieldInfo);
+                repeatedBytesValuesIt = _repeatedBytesValuesMap.emplace(fieldInfo.fieldName, m_val).first;
+            }
+
+            auto& repeatedBytes = repeatedBytesValuesIt->second.get()->_repeatedBytes;
+            auto tagSize = CalculateTagWireSize(tag);
+            protobuf_ptr -= tagSize;
+            do {
+                protobuf_ptr += tagSize;
+                auto bytes = repeatedBytes.Add();
+                protobuf_ptr = InlineGreedyStringParser(bytes, protobuf_ptr, ctx);
+                if (!ctx->DataAvailable(protobuf_ptr))
+                {
+                    break;
+                }
+            } while (ExpectTag(tag, protobuf_ptr));
+        }
+        else
+        {
+            auto bytes = std::string();
+            protobuf_ptr = InlineGreedyStringParser(&bytes, protobuf_ptr, ctx);
+            auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
+            SetLVBytes((LStrHandle*)lv_ptr, bytes);
+        }
+        return protobuf_ptr;
     }
 
     //---------------------------------------------------------------------
@@ -301,6 +347,29 @@ namespace grpc_labview
                 *lvStringPtr = nullptr;
                 SetLVString(lvStringPtr, str);
                 lvStringPtr++;
+            }
+        }
+
+        auto featureConfig = grpc_labview::FeatureConfig::getInstance();
+        if (featureConfig.IsFeatureEnabled("data_utf8Strings")) {
+            for (auto repeatedBytesValue : _repeatedBytesValuesMap)
+            {
+                auto& fieldInfo = repeatedBytesValue.second.get()->_fieldInfo;
+                auto& repeatedBytes = repeatedBytesValue.second.get()->_repeatedBytes;
+                auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
+
+                NumericArrayResize(GetTypeCodeForSize(sizeof(char*)), 1, reinterpret_cast<void*>(lv_ptr), repeatedBytes.size());
+                auto arrayHandle = *(LV1DArrayHandle*)lv_ptr;
+                (*arrayHandle)->cnt = repeatedBytes.size();
+
+                // Copy the repeated bytes values into the LabVIEW array
+                auto lvBytesPtr = (*arrayHandle)->bytes<LStrHandle>();
+                for (auto& bytes : repeatedBytes)
+                {
+                    *lvBytesPtr = nullptr;
+                    SetLVBytes(lvBytesPtr, bytes);
+                    lvBytesPtr++;
+                }
             }
         }
     }

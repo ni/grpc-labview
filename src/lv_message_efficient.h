@@ -44,9 +44,18 @@ namespace grpc_labview
                 _fieldInfo(fieldInfo), _repeatedString(google::protobuf::RepeatedPtrField<std::string>()) {}
         };
 
+        struct RepeatedBytesValue {
+            const MessageElementMetadata& _fieldInfo;
+            google::protobuf::RepeatedPtrField<std::string> _repeatedBytes;
+
+            RepeatedBytesValue(const MessageElementMetadata& fieldInfo) :
+                _fieldInfo(fieldInfo), _repeatedBytes(google::protobuf::RepeatedPtrField<std::string>()) {}
+        };
+
     public:
         std::unordered_map<std::string, std::shared_ptr<RepeatedMessageValue>> _repeatedMessageValuesMap;
         std::unordered_map<std::string, std::shared_ptr<RepeatedStringValue>> _repeatedStringValuesMap;
+        std::unordered_map<std::string, std::shared_ptr<RepeatedBytesValue>> _repeatedBytesValuesMap;
 
     protected:
         int8_t* _LVClusterHandle;

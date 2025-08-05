@@ -3,6 +3,7 @@
 #include <grpc_server.h>
 #include <lv_message.h>
 #include <sstream>
+#include <feature_toggles.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -352,6 +353,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata &fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
     {
+        auto featureConfig = grpc_labview::FeatureConfig::getInstance();
         if (fieldInfo.isRepeated)
         {
             std::shared_ptr<LVRepeatedStringMessageValue> v;
@@ -373,6 +375,11 @@ namespace grpc_labview
                 protobuf_ptr += tagSize;
                 auto str = v->_value.Add();
                 protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
+#ifndef NDEBUG
+                if (featureConfig.IsFeatureEnabled("data_utf8Strings")) {
+                    VerifyUTF8(*str, fieldInfo.fieldName.c_str());
+                }
+#endif
                 if (!ctx->DataAvailable(protobuf_ptr))
                 {
                     break;
@@ -383,6 +390,11 @@ namespace grpc_labview
         {
             auto str = std::string();
             protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
+#ifndef NDEBUG
+            if (featureConfig.IsFeatureEnabled("data_utf8Strings")) {
+                VerifyUTF8(str, fieldInfo.fieldName.c_str());
+            }
+#endif
             auto v = std::make_shared<LVStringMessageValue>(index, str);
             _values.emplace(index, v);
         }
@@ -391,9 +403,48 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char *LVMessage::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
+    const char *LVMessage::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata &fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
     {
-        return ParseString(tag, fieldInfo, index, ptr, ctx);
+        auto featureConfig = grpc_labview::FeatureConfig::getInstance();
+        if (!featureConfig.IsFeatureEnabled("data_utf8Strings")) {
+            return ParseString(tag, fieldInfo, index, protobuf_ptr, ctx);
+        }
+
+        if (fieldInfo.isRepeated)
+        {
+            std::shared_ptr<LVRepeatedBytesMessageValue> v;
+            auto it = _values.find(index);
+            if (it == _values.end())
+            {
+                v = std::make_shared<LVRepeatedBytesMessageValue>(index);
+                _values.emplace(index, v);
+            }
+            else
+            {
+                v = std::static_pointer_cast<LVRepeatedBytesMessageValue>((*it).second);
+            }
+
+            auto tagSize = CalculateTagWireSize(tag);
+            protobuf_ptr -= tagSize;
+            do
+            {
+                protobuf_ptr += tagSize;
+                auto bytes = v->_value.Add();
+                protobuf_ptr = InlineGreedyStringParser(bytes, protobuf_ptr, ctx);
+                if (!ctx->DataAvailable(protobuf_ptr))
+                {
+                    break;
+                }
+            } while (ExpectTag(tag, protobuf_ptr));
+        }
+        else
+        {
+            auto bytes = std::string();
+            protobuf_ptr = InlineGreedyStringParser(&bytes, protobuf_ptr, ctx);
+            auto v = std::make_shared<LVBytesMessageValue>(index, bytes);
+            _values.emplace(index, v);
+        }
+        return protobuf_ptr;
     }
 
     //---------------------------------------------------------------------
