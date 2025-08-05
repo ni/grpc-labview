@@ -150,6 +150,8 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void SetLVRTModulePath(const std::string& modulePath);
     void InitCallbacks();
+    void SetLVBytes(LStrHandle* lvString, const std::string& str);
+    std::string GetLVBytes(LStrHandle lvString);
     void SetLVString(LStrHandle* lvString, const std::string& str);
     std::string GetLVString(LStrHandle lvString);
     int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size);
@@ -160,4 +162,6 @@ namespace grpc_labview
     int SignalOccurrence(MagicCookie occurrence);
     int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id, CleanupProcMode cleanupCondition = CleanupProcMode::CleanOnIdle);
     int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
+    int ConvertSystemStringToUTF8(LStrHandle stringIn, LStrHandle *stringOut);
+    int ConvertUTF8StringToSystem(LStrHandle stringIn, LStrHandle *stringOut);
 }
