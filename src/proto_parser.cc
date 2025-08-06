@@ -651,7 +651,7 @@ LIBRARY_EXPORT void SerializeReflectionInfo(grpc_labview::LVProtoParser* parser,
         parser->m_FileDescriptor->CopyTo(&fProto);
         std::string output;
         fProto.SerializeToString(&output);
-        grpc_labview::SetLVString(outbuffer, output);
+        grpc_labview::SetLVBytes(outbuffer, output);
     } catch (const std::exception&) {
         // Ignore errors
     }
