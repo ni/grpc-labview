@@ -16,7 +16,7 @@ namespace grpc_labview {
     // If filePath contains a path, that specific configuration file will be used
     //   This filePath can contain either a filename (which is assumed to be in the
     //   same directory as this shared library) or an absolute path.
-    // 
+    //
     // Note that all features will be re-initialized using the new file.
     void FeatureConfig::ReloadFeaturesFromFile(const std::string& filePath) {
         // Clear all features from the map to re-initialize
@@ -27,8 +27,11 @@ namespace grpc_labview {
         ReadFeatureFile(filePath);
 
         //TODO: remove this post fixing LVMessageEfficient to let enable feature. See issue: #433
-        if (featureFlags.find("data_EfficientMessageCopy") != featureFlags.end())
-            featureFlags["data_EfficientMessageCopy"] = false;
+        if (featureFlags.find(kFeatureEfficientMessageCopy) != featureFlags.end())
+            featureFlags[kFeatureEfficientMessageCopy] = false;
+
+        efficientMessageCopy = IsFeatureEnabled(kFeatureEfficientMessageCopy);
+        useOccurrence = IsFeatureEnabled(kFeatureUseOccurrence);
     }
 
     // Function to check if a feature is enabled
@@ -40,21 +43,21 @@ namespace grpc_labview {
     // Function to read feature configurations from an INI file
     void FeatureConfig::ReadFeatureFile(const std::string& filePath) {
         std::filesystem::path configFilePath = filePath;
-        
+
         if (configFilePath.empty()) {
             // If no filepath passed into this function, use the default
             // configuration file path.
             configFilePath = GetDefaultConfigPath();
         }
         else if (configFilePath.is_relative()) {
-            // If a relative path (ie, just a filename) was passed in, 
+            // If a relative path (ie, just a filename) was passed in,
             // assume that the is in the current directory
             configFilePath = GetFolderContainingDLL() / configFilePath;
         }
 
         // This flag is used to indicate that the default/given feature file was found/used.
         // Reset this flag to set to true after the file is successfully opened
-        featureFlags["featureFileFound"] = false;
+        featureFlags[kFeatureFileFound] = false;
 
         std::ifstream configFile(configFilePath.string());
         if (!configFile.is_open()) {
@@ -64,7 +67,7 @@ namespace grpc_labview {
         // Set this feature to true once the file is opened.  Note that this feature flag
         // does not indicate if the file was successfully parsed; only that it was found
         // and opened.
-        featureFlags["featureFileFound"] = true;
+        featureFlags[kFeatureFileFound] = true;
 
         std::string line;
         std::string currentSection; // For handling INI sections
@@ -106,7 +109,7 @@ namespace grpc_labview {
         std::filesystem::path configPath = GetFolderContainingDLL();
 
         // Add the default config filename to path
-        configPath /= defaultConfigFileName;  
+        configPath /= defaultConfigFileName;
         return configPath;
     }
 }

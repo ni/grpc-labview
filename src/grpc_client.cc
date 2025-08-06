@@ -367,7 +367,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall2(
         clientCall->_client = client;
         clientCall->_methodName = methodName;
 
-        if (featureConfig.IsFeatureEnabled("data_useOccurrence"))
+        if (featureConfig.IsUseOccurrenceEnabled())
         {
             clientCall->_occurrence = *occurrence;
         }
@@ -376,7 +376,7 @@ LIBRARY_EXPORT int32_t ClientUnaryCall2(
         }
         clientCall->_context = clientContext;
 
-        if (featureConfig.IsFeatureEnabled("data_EfficientMessageCopy") && responseCluster != nullptr)
+        if (featureConfig.IsEfficientMessageCopyEnabled() && responseCluster != nullptr)
         {
             clientCall->_useLVEfficientMessage = true;
         }
@@ -676,7 +676,7 @@ LIBRARY_EXPORT int32_t ClientBeginReadFromStream(grpc_labview::gRPCid* callId, g
         auto featureConfig = grpc_labview::FeatureConfig::getInstance();
 
         grpc_labview::MagicCookie occurrence = 0;
-        if (featureConfig.IsFeatureEnabled("data_useOccurrence"))
+        if (featureConfig.IsUseOccurrenceEnabled())
         {
             occurrence = *occurrencePtr;
         }
@@ -831,7 +831,7 @@ LIBRARY_EXPORT int32_t ClientCompleteClientStreamingCall(grpc_labview::gRPCid* c
         }
         auto featureConfig = grpc_labview::FeatureConfig::getInstance();
 
-        if (featureConfig.IsFeatureEnabled("data_useOccurrence")) {
+        if (featureConfig.IsUseOccurrenceEnabled()) {
             call->_occurrence = *occurrencePtr;
         }
         else {

@@ -4,6 +4,10 @@
 
 
 namespace grpc_labview {
+    static constexpr const char* kFeatureFileFound = "featureFileFound";
+    static constexpr const char* kFeatureEfficientMessageCopy = "data_EfficientMessageCopy";
+    static constexpr const char* kFeatureUseOccurrence = "data_useOccurrence";
+
     class FeatureConfig {
     public:
         // Singleton instance
@@ -18,20 +22,30 @@ namespace grpc_labview {
         // Function to check if a feature is enabled
         bool IsFeatureEnabled(const std::string& featureName) const;
 
+        // Functions to check specific feature toggles
+        bool IsEfficientMessageCopyEnabled() const { return efficientMessageCopy; }
+        bool IsUseOccurrenceEnabled() const { return useOccurrence; }
+
     private:
         std::unordered_map<std::string, bool> featureFlags;
         const std::string defaultConfigFileName = "feature_config.ini";
+
+        bool efficientMessageCopy;
+        bool useOccurrence;
 
         // This stores the default feature configuration.
         // During ReloadFeaturesFromFile(), this configuration is always applied first prior to reading the
         // features configuration file
         void ApplyDefaultFeatures() {
-            featureFlags["featureFileFound"] = false;  // Used to indicate if the feature file was found/used during initialization
-            featureFlags["data_EfficientMessageCopy"] = false;
-            featureFlags["data_useOccurrence"] = true;
+            featureFlags[kFeatureFileFound] = false;  // Used to indicate if the feature file was found/used during initialization
+            featureFlags[kFeatureEfficientMessageCopy] = false;
+            featureFlags[kFeatureUseOccurrence] = true;
         }
-        
-        FeatureConfig() {
+
+        FeatureConfig() :
+            efficientMessageCopy(false),
+            useOccurrence(false)
+        {
             // Read the default configuration file during initialization
             ReloadFeaturesFromFile("");
         }
