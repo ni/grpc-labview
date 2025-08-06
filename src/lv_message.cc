@@ -376,7 +376,7 @@ namespace grpc_labview
                 auto str = v->_value.Add();
                 protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
 #ifndef NDEBUG
-                if (featureConfig.IsFeatureEnabled("data_utf8Strings")) {
+                if (featureConfig.AreUtf8StringsEnabled()) {
                     VerifyUTF8(*str, fieldInfo.fieldName.c_str());
                 }
 #endif
@@ -391,7 +391,7 @@ namespace grpc_labview
             auto str = std::string();
             protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
 #ifndef NDEBUG
-            if (featureConfig.IsFeatureEnabled("data_utf8Strings")) {
+            if (featureConfig.AreUtf8StringsEnabled()) {
                 VerifyUTF8(str, fieldInfo.fieldName.c_str());
             }
 #endif
@@ -406,7 +406,7 @@ namespace grpc_labview
     const char *LVMessage::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata &fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
     {
         auto featureConfig = grpc_labview::FeatureConfig::getInstance();
-        if (!featureConfig.IsFeatureEnabled("data_utf8Strings")) {
+        if (!featureConfig.AreUtf8StringsEnabled()) {
             return ParseString(tag, fieldInfo, index, protobuf_ptr, ctx);
         }
 

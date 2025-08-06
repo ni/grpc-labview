@@ -285,7 +285,7 @@ namespace grpc_labview {
     void ClusterDataCopier::CopyBytesToCluster(const std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<const LVMessageValue>& value)
     {
         auto featureConfig = grpc_labview::FeatureConfig::getInstance();
-        if (!featureConfig.IsFeatureEnabled("data_utf8Strings")) {
+        if (!featureConfig.AreUtf8StringsEnabled()) {
             CopyStringToCluster(metadata, start, value);
             return;
         }
@@ -725,7 +725,7 @@ namespace grpc_labview {
     void ClusterDataCopier::CopyBytesFromCluster(const std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
         auto featureConfig = grpc_labview::FeatureConfig::getInstance();
-        if (!featureConfig.IsFeatureEnabled("data_utf8Strings")) {
+        if (!featureConfig.AreUtf8StringsEnabled()) {
             CopyStringFromCluster(metadata, start, message);
             return;
         }
