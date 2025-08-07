@@ -98,6 +98,7 @@ add_library(labview_grpc_server SHARED
   src/message_element_metadata_owner.cc
   src/message_metadata.cc
   src/path_support.cc
+  src/string_utils.cc
   src/unpacked_fields.cc
   src/well_known_messages.cc
 )
@@ -116,6 +117,7 @@ add_library(labview_grpc_generator SHARED
   src/lv_interop.cc
   src/path_support.cc
   src/proto_parser.cc
+  src/string_utils.cc
   )
 target_link_libraries(labview_grpc_generator
    ${_REFLECTION}
