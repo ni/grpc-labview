@@ -16,6 +16,10 @@ In the example above, the `EfficientMessageCopy` and `useOccurrence` features ar
 
 ### More about the flags
 
-1. `EfficientMessageCopy` - This feature is used to enable or disable the efficient message copy feature. When enabled, the client will use efficient message copy to have throughput. When disabled, the client will use the default message copy.
+- `EfficientMessageCopy` - This feature is used to enable or disable the efficient message copy feature. When enabled, the client will use efficient message copy to have throughput. When disabled, the client will use the default message copy.
 
-2. `useOccurrence` - This feature is used to enable or disable the occurrence feature. When enabled, the client will use occurrence to manage synchroniation between LabVIEW execution threads. When disabled, the client will use not use LabVIEW occurrences.
+- `useOccurrence` - This feature is used to enable or disable the occurrence feature. When enabled, the client will use occurrence to manage synchroniation between LabVIEW execution threads. When disabled, the client will use not use LabVIEW occurrences.
+
+- `utf8Strings` - This feature is used to enable or disable UTF-8 string support. When enabled, the client will treat strings in protobuf messages as UTF-8, as documented in https://protobuf.dev/programming-guides/encoding/. When disabled, the client will treat strings in protobuf messages as LabVIEW's native string encoding. This feature is enabled by default.
+
+- `verifyStringEncoding` - This feature is used to enable or disable verification of string encoding. When enabled, functions that take protobuf message/field names will error if the names are not ASCII, parsing gRPC string fields will error if they are not valid UTF-8, and writing gRPC string fields will log if they are not valid UTF-8. This feature is enabled by default.

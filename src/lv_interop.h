@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <string>
+#include <string_view>
 #include <memory>
 #include <pointer_manager.h>
 
@@ -148,10 +149,21 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void SetLVRTModulePath(std::string modulePath);
+    void SetLVRTModulePath(const std::string& modulePath);
     void InitCallbacks();
-    void SetLVString(LStrHandle* lvString, std::string str);
+
+    // Protobuf package/message/field names are ASCII strings.
+    void SetLVAsciiString(LStrHandle* lvString, std::string_view str);
+    std::string GetLVAsciiString(LStrHandle lvString);
+
+    // Protobuf `bytes` fields are binary data.
+    void SetLVBytes(LStrHandle* lvString, std::string_view str);
+    std::string GetLVBytes(LStrHandle lvString);
+
+    // Protobuf `string` fields are UTF-8 strings.
+    void SetLVString(LStrHandle* lvString, std::string_view str);
     std::string GetLVString(LStrHandle lvString);
+
     int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size);
     int PostUserEvent(LVUserEventRef ref, void* data);
     unsigned char** DSNewHandle(size_t n);
@@ -160,4 +172,6 @@ namespace grpc_labview
     int SignalOccurrence(MagicCookie occurrence);
     int32_t RegisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id, CleanupProcMode cleanupCondition = CleanupProcMode::CleanOnIdle);
     int32_t DeregisterCleanupProc(CleanupProcPtr cleanUpProc, grpc_labview::gRPCid* id);
+    int ConvertSystemStringToUTF8(LStrHandle stringIn, LStrHandle *stringOut);
+    int ConvertUTF8StringToSystem(LStrHandle stringIn, LStrHandle *stringOut);
 }

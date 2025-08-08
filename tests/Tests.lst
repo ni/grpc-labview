@@ -1,4 +1,8 @@
 AutoTests\Test_HelloWorld.vi
+AutoTests\Test_HelloWorld_Internationalization.vi
+AutoTests\Test_HelloWorld_InvalidAsciiEncoding.vi
+AutoTests\Test_HelloWorld_InvalidUtf8Encoding.vi
+AutoTests\Test_HelloWorld_Utf8Encoding.vi
 AutoTests\Test_RouteGuide_Unary.vi
 AutoTests\Test_RouteGuide_ResponseStreaming.vi
 AutoTests\Test_RouteGuide_BidirectionalStreaming.vi

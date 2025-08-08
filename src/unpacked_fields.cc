@@ -203,7 +203,7 @@ namespace grpc_labview
                 }
                 else
                 {
-                    SetLVString((LStrHandle*)buffer, field->length_delimited());
+                    SetLVBytes((LStrHandle*)buffer, field->length_delimited());
                 }
                 break;
         }

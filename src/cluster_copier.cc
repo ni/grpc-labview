@@ -3,6 +3,7 @@
 #include <cluster_copier.h>
 #include <well_known_messages.h>
 #include <lv_message.h>
+#include <feature_toggles.h>
 
 namespace grpc_labview {
 
@@ -283,7 +284,33 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyBytesToCluster(const std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, const std::shared_ptr<const LVMessageValue>& value)
     {
-        CopyStringToCluster(metadata, start, value);
+        if (!FeatureConfig::getInstance().AreUtf8StringsEnabled()) {
+            CopyStringToCluster(metadata, start, value);
+            return;
+        }
+
+        if (metadata->isRepeated)
+        {
+            auto repeatedBytes = static_cast<const LVRepeatedBytesMessageValue&>(*value);
+            if (repeatedBytes._value.size() != 0)
+            {
+                NumericArrayResize(GetTypeCodeForSize(sizeof(LStrHandle)), 1, start, repeatedBytes._value.size());
+                auto array = *(LV1DArrayHandle*)start;
+                (*array)->cnt = repeatedBytes._value.size();
+                int x = 0;
+                auto lvBytes = (*array)->bytes<LStrHandle>();
+                for (auto& bytes : repeatedBytes._value)
+                {
+                    *lvBytes = nullptr;
+                    SetLVBytes(lvBytes, bytes);
+                    lvBytes += 1;
+                }
+            }
+        }
+        else
+        {
+            SetLVBytes((LStrHandle*)start, ((LVBytesMessageValue*)value.get())->_value);
+        }
     }
 
     //---------------------------------------------------------------------
@@ -696,7 +723,35 @@ namespace grpc_labview {
     //---------------------------------------------------------------------
     void ClusterDataCopier::CopyBytesFromCluster(const std::shared_ptr<const MessageElementMetadata> metadata, int8_t* start, LVMessage& message)
     {
-        CopyStringFromCluster(metadata, start, message);
+        if (!FeatureConfig::getInstance().AreUtf8StringsEnabled()) {
+            CopyStringFromCluster(metadata, start, message);
+            return;
+        }
+
+        if (metadata->isRepeated)
+        {
+            auto array = *(LV1DArrayHandle*)start;
+            auto arraySize = (array && *array) ? (*array)->cnt : 0;
+            if (arraySize != 0)
+            {
+                auto repeatedBytesValue = std::make_shared<LVRepeatedBytesMessageValue>(metadata->protobufIndex);
+                message._values.emplace(metadata->protobufIndex, repeatedBytesValue);
+                auto lvBytes = (*array)->bytes<LStrHandle>();
+                repeatedBytesValue->_value.Reserve(arraySize);
+                for (int x = 0; x < arraySize; ++x)
+                {
+                    auto bytes = GetLVBytes(*lvBytes);
+                    repeatedBytesValue->_value.Add(std::move(bytes));
+                    lvBytes += 1;
+                }
+            }
+        }
+        else
+        {
+            auto bytes = GetLVBytes(*(LStrHandle*)start);
+            auto bytesValue = std::make_shared<LVBytesMessageValue>(metadata->protobufIndex, bytes);
+            message._values.emplace(metadata->protobufIndex, bytesValue);
+        }
     }
 
     //---------------------------------------------------------------------

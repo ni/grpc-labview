@@ -32,6 +32,8 @@ namespace grpc_labview {
 
         efficientMessageCopy = IsFeatureEnabled(kFeatureEfficientMessageCopy);
         useOccurrence = IsFeatureEnabled(kFeatureUseOccurrence);
+        utf8Strings = IsFeatureEnabled(kFeatureUtf8Strings);
+        verifyStringEncoding = IsFeatureEnabled(kFeatureVerifyStringEncoding);
     }
 
     // Function to check if a feature is enabled

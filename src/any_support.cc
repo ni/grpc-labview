@@ -5,6 +5,7 @@
 #include <google/protobuf/any.pb.h>
 #include <serialization_session.h>
 #include <lv_message.h>
+#include <string_utils.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -45,6 +46,11 @@ LIBRARY_EXPORT int32_t PackToBuffer(grpc_labview::gRPCid* id, const char* messag
             return -1;
         }
 
+        if (!grpc_labview::VerifyAsciiString(messageType))
+        {
+            return -2;
+        }
+
         auto metadata = metadataOwner->FindMetadata(messageType);
         if (metadata == nullptr)
         {
@@ -80,13 +86,18 @@ LIBRARY_EXPORT int32_t PackToAny(grpc_labview::gRPCid* id, const char* messageTy
             return -1;
         }
 
+        if (!grpc_labview::VerifyAsciiString(messageType))
+        {
+            return -2;
+        }
+
         auto metadata = metadataOwner->FindMetadata(messageType);
         if (metadata == nullptr)
         {
             return -2;
         }
 
-        SetLVString(&anyCluster->TypeUrl, "/" + metadata->typeUrl);
+        SetLVAsciiString(&anyCluster->TypeUrl, "/" + metadata->typeUrl);
         return PackToBuffer(id, messageType, cluster, &anyCluster->Bytes);
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
@@ -102,6 +113,11 @@ LIBRARY_EXPORT int32_t UnpackFromBuffer(grpc_labview::gRPCid* id, grpc_labview::
         if (!metadataOwner)
         {
             return -1;
+        }
+
+        if (!grpc_labview::VerifyAsciiString(messageType))
+        {
+            return -2;
         }
 
         auto metadata = metadataOwner->FindMetadata(messageType);
@@ -146,13 +162,18 @@ LIBRARY_EXPORT int32_t TryUnpackFromAny(grpc_labview::gRPCid* id, grpc_labview::
             return -1;
         }
 
+        if (!grpc_labview::VerifyAsciiString(messageType))
+        {
+            return -2;
+        }
+
         auto metadata = metadataOwner->FindMetadata(messageType);
         if (metadata == nullptr)
         {
             return -2;
         }
 
-        if (grpc_labview::GetLVString(anyCluster->TypeUrl) != messageType)
+        if (grpc_labview::GetLVAsciiString(anyCluster->TypeUrl) != messageType)
         {
             return -1;
         }
@@ -173,13 +194,18 @@ LIBRARY_EXPORT int32_t IsAnyOfType(grpc_labview::gRPCid* id, grpc_labview::AnyCl
             return -1;
         }
 
+        if (!grpc_labview::VerifyAsciiString(messageType))
+        {
+            return -2;
+        }
+
         auto metadata = metadataOwner->FindMetadata(messageType);
         if (metadata == nullptr)
         {
             return -2;
         }
 
-        if (grpc_labview::GetLVString(anyCluster->TypeUrl) != metadata->typeUrl)
+        if (grpc_labview::GetLVAsciiString(anyCluster->TypeUrl) != metadata->typeUrl)
         {
             return -1;
         }
@@ -300,6 +326,8 @@ LIBRARY_EXPORT int32_t AnyBuilderBuildToBuffer(grpc_labview::gRPCid* builderId, 
             return -1;
         }
 
+        // The typeUrl parameter is unused.
+
         grpc_labview::gPointerManager.UnregisterPointer(builderId);
         std::string buffer;
         if (message->SerializeToString(&buffer))
@@ -327,7 +355,9 @@ LIBRARY_EXPORT int32_t AnyBuilderBuild(grpc_labview::gRPCid* builderId, const ch
             return -1;
         }
 
-        grpc_labview::SetLVString(&anyCluster->TypeUrl, message->_metadata->typeUrl);
+        // The typeUrl parameter is unused.
+
+        grpc_labview::SetLVAsciiString(&anyCluster->TypeUrl, message->_metadata->typeUrl);
         return AnyBuilderBuildToBuffer(builderId, typeUrl, &anyCluster->Bytes);
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
