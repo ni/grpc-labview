@@ -6,6 +6,7 @@
 #include <memory>
 #include <grpcpp/grpcpp.h>
 #include <feature_toggles.h>
+#include <string_utils.h>
 
 #ifndef _WIN32
 #include <dlfcn.h>
@@ -159,11 +160,32 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void SetLVBytes(LStrHandle* lvString, const std::string& str)
+    void SetLVAsciiString(LStrHandle* lvString, std::string_view str)
+    {
+        if (!VerifyAsciiString(str)) {
+            throw std::runtime_error("String contains non-ASCII characters.");
+        }
+        SetLVBytes(lvString, str);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    std::string GetLVAsciiString(LStrHandle lvString)
+    {
+        std::string result = GetLVBytes(lvString);
+        if (!VerifyAsciiString(result)) {
+            throw std::runtime_error("String contains non-ASCII characters.");
+        }
+        return result;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void SetLVBytes(LStrHandle* lvString, std::string_view str)
     {
         auto length = str.length();
         auto error = NumericArrayResize(0x01, 1, lvString, length);
-        memcpy((**lvString)->str, str.c_str(), length);
+        memcpy((**lvString)->str, str.data(), length);
         (**lvString)->cnt = (int)length;
     }
 
@@ -185,10 +207,9 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void SetLVString(LStrHandle* lvString, const std::string& str)
+    void SetLVString(LStrHandle* lvString, std::string_view str)
     {
-        auto featureConfig = grpc_labview::FeatureConfig::getInstance();
-        if (!featureConfig.AreUtf8StringsEnabled()) {
+        if (!FeatureConfig::getInstance().AreUtf8StringsEnabled()) {
             SetLVBytes(lvString, str);
             return;
         }
@@ -205,8 +226,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     std::string GetLVString(LStrHandle lvString)
     {
-        auto featureConfig = grpc_labview::FeatureConfig::getInstance();
-        if (!featureConfig.AreUtf8StringsEnabled()) {
+        if (!FeatureConfig::getInstance().AreUtf8StringsEnabled()) {
             return GetLVBytes(lvString);
         }
 

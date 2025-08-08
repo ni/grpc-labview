@@ -55,16 +55,16 @@ namespace grpc_labview
     {
         _owner = owner;
         clusterOffset = 0;
-        embeddedMessageName = GetLVString(lvElement->embeddedMessageName);
+        embeddedMessageName = GetLVAsciiString(lvElement->embeddedMessageName);
         isRepeated = lvElement->isRepeated;
         protobufIndex = lvElement->protobufIndex;
         type = (LVMessageMetadataType)lvElement->valueType;
 
         if (metadataVersion >= 2)
         {
-            fieldName = GetLVString(lvElement->fieldName);
+            fieldName = GetLVAsciiString(lvElement->fieldName);
             isInOneof = lvElement->isInOneof;
-            oneofContainerName = GetLVString(lvElement->oneofContainerName);
+            oneofContainerName = GetLVAsciiString(lvElement->oneofContainerName);
         }
         else
         {
@@ -87,7 +87,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     MessageMetadata::MessageMetadata(IMessageElementMetadataOwner* metadataOwner, LVMessageMetadata* lvMetadata)
     {
-        auto name = GetLVString(lvMetadata->messageName);
+        auto name = GetLVAsciiString(lvMetadata->messageName);
         messageName = name;
         typeUrl = name;
         clusterSize = 0;
@@ -106,9 +106,9 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     MessageMetadata::MessageMetadata(IMessageElementMetadataOwner* metadataOwner, LVMessageMetadata2* lvMetadata)
     {
-        auto name = GetLVString(lvMetadata->messageName);
+        auto name = GetLVAsciiString(lvMetadata->messageName);
         messageName = name;
-        typeUrl = GetLVString(lvMetadata->typeUrl);
+        typeUrl = GetLVAsciiString(lvMetadata->typeUrl);
         clusterSize = 0;
         alignmentRequirement = 0;
 

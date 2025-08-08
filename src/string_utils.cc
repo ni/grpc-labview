@@ -19,26 +19,28 @@ namespace grpc_labview
         return true;
     }
 
-    void VerifyAsciiString(std::string_view str)
+    bool VerifyAsciiString(std::string_view str)
     {
         if (!FeatureConfig::getInstance().IsVerifyStringEncodingEnabled()) {
-            return;
+            return true;
         }
 
         if (!IsAscii(str)) {
-            throw std::runtime_error("String contains non-ASCII characters.");
+#ifndef NDEBUG
+            std::cerr << "ERROR: String contains non-ASCII characters.";
+#endif
+            return false;
         }
+        return true;
     }
 
-    void VerifyUtf8String(std::string_view str, WireFormatLite::Operation operation, std::string_view field_name);
+    bool VerifyUtf8String(std::string_view str, WireFormatLite::Operation operation, const char* field_name)
     {
         if (!FeatureConfig::getInstance().IsVerifyStringEncodingEnabled()) {
-            return;
+            return true;
         }
 
-        // WireFormatLite::VerifyUtf8String logs the operation and field name.
-        if (!WireFormatLite::VerifyUtf8String(str.data(), str.size(), operation, field_name)) {
-            throw std::runtime_error("String contains invalid UTF-8 data.");
-        }
+        // WireFormatLite::VerifyUtf8String logs the failure.
+        return WireFormatLite::VerifyUtf8String(str.data(), str.size(), operation, field_name);
     }
 }

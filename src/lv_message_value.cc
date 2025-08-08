@@ -3,6 +3,7 @@
 #include <grpc_server.h>
 #include <lv_message.h>
 #include <message_value.h>
+#include <string_utils.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -92,6 +93,7 @@ namespace grpc_labview
     google::protobuf::uint8* LVStringMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
     {
         target = stream->EnsureSpace(target);
+        VerifyUtf8String(_value, WireFormatLite::SERIALIZE); // log only, no error
         return stream->WriteString(_protobufId, _value, target);
     }
 
@@ -122,6 +124,7 @@ namespace grpc_labview
         for (int i = 0, n = _value.size(); i < n; i++)
         {
             const auto& s = _value[i];
+            VerifyUtf8String(s, WireFormatLite::SERIALIZE); // log only, no error
             target = stream->WriteString(_protobufId, s, target);
         }
         return target;

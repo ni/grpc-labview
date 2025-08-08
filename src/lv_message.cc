@@ -4,6 +4,7 @@
 #include <lv_message.h>
 #include <sstream>
 #include <feature_toggles.h>
+#include <string_utils.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -375,11 +376,7 @@ namespace grpc_labview
                 protobuf_ptr += tagSize;
                 auto str = v->_value.Add();
                 protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
-#ifndef NDEBUG
-                if (featureConfig.AreUtf8StringsEnabled()) {
-                    VerifyUTF8(*str, fieldInfo.fieldName.c_str());
-                }
-#endif
+                if (!VerifyUtf8String(*str, WireFormatLite::PARSE, fieldInfo.fieldName.c_str())) return nullptr;
                 if (!ctx->DataAvailable(protobuf_ptr))
                 {
                     break;
@@ -390,11 +387,7 @@ namespace grpc_labview
         {
             auto str = std::string();
             protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
-#ifndef NDEBUG
-            if (featureConfig.AreUtf8StringsEnabled()) {
-                VerifyUTF8(str, fieldInfo.fieldName.c_str());
-            }
-#endif
+            if (!VerifyUtf8String(str, WireFormatLite::PARSE, fieldInfo.fieldName.c_str())) return nullptr;
             auto v = std::make_shared<LVStringMessageValue>(index, str);
             _values.emplace(index, v);
         }
@@ -405,8 +398,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     const char *LVMessage::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata &fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
     {
-        auto featureConfig = grpc_labview::FeatureConfig::getInstance();
-        if (!featureConfig.AreUtf8StringsEnabled()) {
+        if (!FeatureConfig::getInstance().AreUtf8StringsEnabled()) {
             return ParseString(tag, fieldInfo, index, protobuf_ptr, ctx);
         }
 

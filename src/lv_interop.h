@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <string>
+#include <string_view>
 #include <memory>
 #include <pointer_manager.h>
 
@@ -150,10 +151,19 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void SetLVRTModulePath(const std::string& modulePath);
     void InitCallbacks();
-    void SetLVBytes(LStrHandle* lvString, const std::string& str);
+
+    // Protobuf package/message/field names are ASCII strings.
+    void SetLVAsciiString(LStrHandle* lvString, std::string_view str);
+    std::string GetLVAsciiString(LStrHandle lvString);
+
+    // Protobuf `bytes` fields are binary data.
+    void SetLVBytes(LStrHandle* lvString, std::string_view str);
     std::string GetLVBytes(LStrHandle lvString);
-    void SetLVString(LStrHandle* lvString, const std::string& str);
+
+    // Protobuf `string` fields are UTF-8 strings.
+    void SetLVString(LStrHandle* lvString, std::string_view str);
     std::string GetLVString(LStrHandle lvString);
+
     int NumericArrayResize(int32_t typeCode, int32_t numDims, void* handle, size_t size);
     int PostUserEvent(LVUserEventRef ref, void* data);
     unsigned char** DSNewHandle(size_t n);

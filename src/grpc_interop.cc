@@ -29,7 +29,7 @@ namespace grpc_labview
         eventData.methodData = data;
         eventData.methodName = nullptr;
 
-        SetLVString(&eventData.methodName, eventMethodName);
+        SetLVAsciiString(&eventData.methodName, eventMethodName);
 
         auto error = PostUserEvent(event, &eventData);
 
@@ -112,9 +112,9 @@ namespace grpc_labview
     {
         std::shared_ptr<EnumMetadata> enumMetadata(new EnumMetadata());
 
-        enumMetadata->messageName = GetLVString(lvMetadata->messageName);
-        enumMetadata->typeUrl = GetLVString(lvMetadata->typeUrl);
-        enumMetadata->elements = GetLVString(lvMetadata->elements);
+        enumMetadata->messageName = GetLVAsciiString(lvMetadata->messageName);
+        enumMetadata->typeUrl = GetLVAsciiString(lvMetadata->typeUrl);
+        enumMetadata->elements = GetLVAsciiString(lvMetadata->elements);
         enumMetadata->allowAlias = lvMetadata->allowAlias;
 
         // Create the map between LV enum and proto enum values
