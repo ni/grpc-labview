@@ -6,6 +6,7 @@
 #include <memory>
 #include <grpcpp/grpcpp.h>
 #include <feature_toggles.h>
+#include <string_utils.h>
 
 #ifndef _WIN32
 #include <dlfcn.h>
@@ -20,6 +21,8 @@ typedef int32_t(*RTSetCleanupProc_T)(grpc_labview::CleanupProcPtr cleanUpProc, g
 typedef unsigned char** (*DSNewHandlePtr_T)(size_t);
 typedef int (*DSSetHandleSize_T)(void* h, size_t);
 typedef long (*DSDisposeHandle_T)(void* h);
+typedef int (*ConvertSystemStringToUTF8_T)(grpc_labview::LStrHandle, grpc_labview::LStrHandle *);
+typedef int (*ConvertUTF8StringToSystem_T)(grpc_labview::LStrHandle, grpc_labview::LStrHandle *);
 
 
 //---------------------------------------------------------------------
@@ -33,6 +36,8 @@ static std::string ModulePath = "";
 static DSNewHandlePtr_T DSNewHandleImpl = nullptr;
 static DSSetHandleSize_T DSSetHandleSizeImpl = nullptr;
 static DSDisposeHandle_T DSDisposeHandleImpl = nullptr;
+static ConvertSystemStringToUTF8_T ConvertSystemStringToUTF8Impl = nullptr;
+static ConvertUTF8StringToSystem_T ConvertUTF8StringToSystemImpl = nullptr;
 
 namespace grpc_labview
 {
@@ -42,7 +47,7 @@ namespace grpc_labview
     // Allows for definition of the LVRT DLL path to be used for callback functions
     // This function should be called prior to calling InitCallbacks()
     //---------------------------------------------------------------------
-    void SetLVRTModulePath(std::string modulePath)
+    void SetLVRTModulePath(const std::string& modulePath)
     {
         ModulePath = modulePath;
     }
@@ -83,6 +88,8 @@ namespace grpc_labview
         DSNewHandleImpl = (DSNewHandlePtr_T)GetProcAddress(lvModule, "DSNewHandle");
         DSSetHandleSizeImpl = (DSSetHandleSize_T)GetProcAddress(lvModule, "DSSetHandleSize");
         DSDisposeHandleImpl = (DSDisposeHandle_T)GetProcAddress(lvModule, "DSDisposeHandle");
+        ConvertSystemStringToUTF8Impl = (ConvertSystemStringToUTF8_T)GetProcAddress(lvModule, "ConvertSystemStringToUTF8");
+        ConvertUTF8StringToSystemImpl = (ConvertUTF8StringToSystem_T)GetProcAddress(lvModule, "ConvertUTF8StringToSystem");
     }
 
 #else
@@ -103,6 +110,8 @@ namespace grpc_labview
         DSNewHandleImpl = (DSNewHandlePtr_T)dlsym(RTLD_DEFAULT, "DSNewHandle");
         DSSetHandleSizeImpl = (DSSetHandleSize_T)dlsym(RTLD_DEFAULT, "DSSetHandleSize");
         DSDisposeHandleImpl = (DSDisposeHandle_T)dlsym(RTLD_DEFAULT, "DSDisposeHandle");
+        ConvertSystemStringToUTF8Impl = (ConvertSystemStringToUTF8_T)dlsym(RTLD_DEFAULT, "ConvertSystemStringToUTF8");
+        ConvertUTF8StringToSystemImpl = (ConvertUTF8StringToSystem_T)dlsym(RTLD_DEFAULT, "ConvertUTF8StringToSystem");
     }
 
 #endif
@@ -151,17 +160,38 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void SetLVString(LStrHandle* lvString, std::string str)
+    void SetLVAsciiString(LStrHandle* lvString, std::string_view str)
+    {
+        if (!VerifyAsciiString(str)) {
+            throw std::runtime_error("String contains non-ASCII characters.");
+        }
+        SetLVBytes(lvString, str);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    std::string GetLVAsciiString(LStrHandle lvString)
+    {
+        std::string result = GetLVBytes(lvString);
+        if (!VerifyAsciiString(result)) {
+            throw std::runtime_error("String contains non-ASCII characters.");
+        }
+        return result;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void SetLVBytes(LStrHandle* lvString, std::string_view str)
     {
         auto length = str.length();
         auto error = NumericArrayResize(0x01, 1, lvString, length);
-        memcpy((**lvString)->str, str.c_str(), length);
+        memcpy((**lvString)->str, str.data(), length);
         (**lvString)->cnt = (int)length;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    std::string GetLVString(LStrHandle lvString)
+    std::string GetLVBytes(LStrHandle lvString)
     {
         if (lvString == nullptr || *lvString == nullptr)
         {
@@ -173,6 +203,39 @@ namespace grpc_labview
 
         std::string result(chars, count);
         return result;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void SetLVString(LStrHandle* lvString, std::string_view str)
+    {
+        if (!FeatureConfig::getInstance().AreUtf8StringsEnabled()) {
+            SetLVBytes(lvString, str);
+            return;
+        }
+
+        LStrHandle utf8String = nullptr;
+        SetLVBytes(&utf8String, str);
+        std::unique_ptr<LStrPtr, long (*)(void*)> utf8StringDeleter(utf8String, &DSDisposeHandle);
+
+        auto error = ConvertUTF8StringToSystem(utf8String, lvString);
+        if (error != 0) throw std::runtime_error("Failed to convert string encoding.");
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    std::string GetLVString(LStrHandle lvString)
+    {
+        if (!FeatureConfig::getInstance().AreUtf8StringsEnabled()) {
+            return GetLVBytes(lvString);
+        }
+
+        LStrHandle utf8String = nullptr;
+        auto error = ConvertSystemStringToUTF8(lvString, &utf8String);
+        std::unique_ptr<LStrPtr, long (*)(void*)> utf8StringDeleter(utf8String, &DSDisposeHandle);
+        if (error != 0) throw std::runtime_error("Failed to convert string encoding.");
+
+        return GetLVBytes(utf8String);
     }
 
     //---------------------------------------------------------------------
@@ -189,6 +252,8 @@ namespace grpc_labview
         return RTSetCleanupProc(cleanUpProc, id, (int32_t)CleanupProcMode::CleanOnRemove);
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     int AlignClusterOffset(int clusterOffset, int alignmentRequirement)
     {
 #ifndef _PS_4
@@ -203,6 +268,8 @@ namespace grpc_labview
 #endif
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     int32_t GetTypeCodeForSize(int byteSize)
     {
         switch (byteSize)
@@ -217,5 +284,19 @@ namespace grpc_labview
         default:
             return 0x8; // uQ
         }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    int ConvertSystemStringToUTF8(LStrHandle stringIn, LStrHandle *stringOut)
+    {
+        return ConvertSystemStringToUTF8Impl(stringIn, stringOut);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    int ConvertUTF8StringToSystem(LStrHandle stringIn, LStrHandle *stringOut)
+    {
+        return ConvertUTF8StringToSystemImpl(stringIn, stringOut);
     }
 }

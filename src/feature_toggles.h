@@ -7,6 +7,8 @@ namespace grpc_labview {
     static constexpr const char* kFeatureFileFound = "featureFileFound";
     static constexpr const char* kFeatureEfficientMessageCopy = "data_EfficientMessageCopy";
     static constexpr const char* kFeatureUseOccurrence = "data_useOccurrence";
+    static constexpr const char* kFeatureUtf8Strings = "data_utf8Strings";
+    static constexpr const char* kFeatureVerifyStringEncoding = "data_verifyStringEncoding";
 
     class FeatureConfig {
     public:
@@ -25,6 +27,8 @@ namespace grpc_labview {
         // Functions to check specific feature toggles
         bool IsEfficientMessageCopyEnabled() const { return efficientMessageCopy; }
         bool IsUseOccurrenceEnabled() const { return useOccurrence; }
+        bool AreUtf8StringsEnabled() const { return utf8Strings; }
+        bool IsVerifyStringEncodingEnabled() const { return verifyStringEncoding; }
 
     private:
         std::unordered_map<std::string, bool> featureFlags;
@@ -32,6 +36,8 @@ namespace grpc_labview {
 
         bool efficientMessageCopy;
         bool useOccurrence;
+        bool utf8Strings;
+        bool verifyStringEncoding;
 
         // This stores the default feature configuration.
         // During ReloadFeaturesFromFile(), this configuration is always applied first prior to reading the
@@ -40,11 +46,15 @@ namespace grpc_labview {
             featureFlags[kFeatureFileFound] = false;  // Used to indicate if the feature file was found/used during initialization
             featureFlags[kFeatureEfficientMessageCopy] = false;
             featureFlags[kFeatureUseOccurrence] = true;
+            featureFlags[kFeatureUtf8Strings] = true;
+            featureFlags[kFeatureVerifyStringEncoding] = true;
         }
 
         FeatureConfig() :
             efficientMessageCopy(false),
-            useOccurrence(false)
+            useOccurrence(false),
+            utf8Strings(false),
+            verifyStringEncoding(false)
         {
             // Read the default configuration file during initialization
             ReloadFeaturesFromFile("");

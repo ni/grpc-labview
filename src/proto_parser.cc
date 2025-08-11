@@ -434,7 +434,7 @@ LIBRARY_EXPORT int LVGetServiceName(ServiceDescriptor* service, grpc_labview::LS
         {
             return -1;
         }
-        grpc_labview::SetLVString(name, service->name());
+        grpc_labview::SetLVAsciiString(name, service->name());
         return 0;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
@@ -477,7 +477,7 @@ LIBRARY_EXPORT int LVGetMethodName(MethodDescriptor* method, grpc_labview::LStrH
         {
             return -1;
         }
-        SetLVString(name, method->name());
+        SetLVAsciiString(name, method->name());
         return 0;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
@@ -493,7 +493,7 @@ LIBRARY_EXPORT int LVGetMethodFullName(MethodDescriptor* method, grpc_labview::L
         {
             return -1;
         }
-        grpc_labview::SetLVString(name, method->full_name());
+        grpc_labview::SetLVAsciiString(name, method->full_name());
         return 0;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
@@ -573,7 +573,7 @@ LIBRARY_EXPORT int LVMessageName(Descriptor* descriptor, grpc_labview::LStrHandl
         {
             return -1;
         }
-        SetLVString(name, grpc_labview::TransformMessageName(descriptor->full_name()));
+        SetLVAsciiString(name, grpc_labview::TransformMessageName(descriptor->full_name()));
         return 0;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
@@ -589,7 +589,7 @@ LIBRARY_EXPORT int LVMessageTypeUrl(Descriptor* descriptor, grpc_labview::LStrHa
         {
             return -1;
         }
-        SetLVString(name, descriptor->full_name());
+        SetLVAsciiString(name, descriptor->full_name());
         return 0;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
@@ -621,7 +621,7 @@ LIBRARY_EXPORT int LVEnumName(EnumDescriptor* descriptor, grpc_labview::LStrHand
         {
             return -1;
         }
-        SetLVString(name, grpc_labview::TransformMessageName(descriptor->full_name()));
+        SetLVAsciiString(name, grpc_labview::TransformMessageName(descriptor->full_name()));
         return 0;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
@@ -637,7 +637,7 @@ LIBRARY_EXPORT int LVEnumTypeUrl(EnumDescriptor* descriptor, grpc_labview::LStrH
         {
             return -1;
         }
-        SetLVString(name, descriptor->full_name());
+        SetLVAsciiString(name, descriptor->full_name());
         return 0;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
@@ -651,7 +651,7 @@ LIBRARY_EXPORT void SerializeReflectionInfo(grpc_labview::LVProtoParser* parser,
         parser->m_FileDescriptor->CopyTo(&fProto);
         std::string output;
         fProto.SerializeToString(&output);
-        grpc_labview::SetLVString(outbuffer, output);
+        grpc_labview::SetLVBytes(outbuffer, output);
     } catch (const std::exception&) {
         // Ignore errors
     }
@@ -752,19 +752,19 @@ LIBRARY_EXPORT int LVFieldInfo(FieldDescriptor* field, grpc_labview::MessageFiel
         }
         if (field->type() == FieldDescriptor::TYPE_MESSAGE)
         {
-            SetLVString(&info->embeddedMessage, grpc_labview::TransformMessageName(field->message_type()->full_name()));
+            SetLVAsciiString(&info->embeddedMessage, grpc_labview::TransformMessageName(field->message_type()->full_name()));
         }
         if (field->type() == FieldDescriptor::TYPE_ENUM)
         {
-            SetLVString(&info->embeddedMessage, grpc_labview::TransformMessageName(field->enum_type()->full_name()));
+            SetLVAsciiString(&info->embeddedMessage, grpc_labview::TransformMessageName(field->enum_type()->full_name()));
         }
-        SetLVString(&info->fieldName, field->name());
+        SetLVAsciiString(&info->fieldName, field->name());
         info->protobufIndex = field->number();
         info->isRepeated = field->is_repeated();
         info->isInOneof = (field->real_containing_oneof() != nullptr);
         if (info->isInOneof)
         {
-            SetLVString(&info->oneofContainerName, grpc_labview::TransformMessageName(field->real_containing_oneof()->full_name()));
+            SetLVAsciiString(&info->oneofContainerName, grpc_labview::TransformMessageName(field->real_containing_oneof()->full_name()));
         }
 
         if (info->type == 99)
@@ -785,9 +785,9 @@ LIBRARY_EXPORT int GetEnumInfo(EnumDescriptor* enumDescriptor, grpc_labview::Enu
             return -1;
         }
 
-        SetLVString(&info->name, grpc_labview::TransformMessageName(enumDescriptor->full_name()));
-        SetLVString(&info->typeUrl, enumDescriptor->full_name());
-        SetLVString(&info->enumValues, GetEnumNames(enumDescriptor));
+        SetLVAsciiString(&info->name, grpc_labview::TransformMessageName(enumDescriptor->full_name()));
+        SetLVAsciiString(&info->typeUrl, enumDescriptor->full_name());
+        SetLVAsciiString(&info->enumValues, GetEnumNames(enumDescriptor));
         info->isAliasAllowed = (enumDescriptor->options().has_allow_alias() && enumDescriptor->options().allow_alias());
 
         return 0;
