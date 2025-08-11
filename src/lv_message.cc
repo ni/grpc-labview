@@ -376,7 +376,9 @@ namespace grpc_labview
                 protobuf_ptr += tagSize;
                 auto str = v->_value.Add();
                 protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
-                if (!VerifyUtf8String(*str, WireFormatLite::PARSE, fieldInfo.fieldName.c_str())) return nullptr;
+                if (!VerifyUtf8String(*str, WireFormatLite::PARSE, fieldInfo.fieldName.c_str())) {
+                    throw std::runtime_error("String contains invalid UTF-8 data.");
+                }
                 if (!ctx->DataAvailable(protobuf_ptr))
                 {
                     break;
@@ -387,7 +389,9 @@ namespace grpc_labview
         {
             auto str = std::string();
             protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
-            if (!VerifyUtf8String(str, WireFormatLite::PARSE, fieldInfo.fieldName.c_str())) return nullptr;
+            if (!VerifyUtf8String(str, WireFormatLite::PARSE, fieldInfo.fieldName.c_str())) {
+                throw std::runtime_error("String contains invalid UTF-8 data.");
+            }
             auto v = std::make_shared<LVStringMessageValue>(index, str);
             _values.emplace(index, v);
         }
