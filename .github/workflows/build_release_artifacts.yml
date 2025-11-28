@@ -32,6 +32,19 @@ jobs:
         run: python ${{runner.workspace}}\grpc-labview\build-it\build.py --libraryVersion ${{github.ref_name}} --target All --pathToBinaries ${{ runner.temp }}\grpc-labview-staged-artifacts\TopLevelDlls
 
       - if: startsWith(github.ref, 'refs/tags/v')
+        name: Sign DLLs before packaging
+        run: |
+          # Sign any DLLs that might be in the built VI packages
+          Get-ChildItem -Path "${{runner.workspace}}\grpc-labview\labview source\Builds" -Filter "*.dll" -Recurse | ForEach-Object {
+            Write-Host "Signing DLL in builds: $($_.FullName)"
+            nisigntool "$($_.FullName)"
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "Failed to sign DLL: $($_.FullName)"
+              exit 1
+            }
+          }
+
+      - if: startsWith(github.ref, 'refs/tags/v')
         name: Zip Release Artifacts
         run: |
           cd "${{runner.workspace}}/grpc-labview/labview source/Builds"
