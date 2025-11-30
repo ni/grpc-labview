@@ -20,6 +20,44 @@ jobs:
         with:
           path: ${{ runner.temp }}\grpc-labview-artifacts
 
+      - if: startsWith(github.ref, 'refs/tags/v')
+        name: Sign DLLs after downloading artifacts
+        run: |
+          # Extract, sign, and recompress tar.gz artifacts
+          $artifactsPath = "${{ steps.download_artifacts.outputs.download-path }}"
+          Get-ChildItem -Path $artifactsPath -Filter "*.tar.gz" -Recurse | ForEach-Object {
+            $tarFile = $_.FullName
+            $tarName = $_.Name
+            $extractPath = Join-Path $artifactsPath "temp_extract_$($_.BaseName)"
+            
+            Write-Host "Extracting artifact: $tarName"
+            New-Item -ItemType Directory -Path $extractPath -Force | Out-Null
+            tar -xzf "$tarFile" -C $extractPath
+            
+            # Sign any DLLs in the extracted content
+            Get-ChildItem -Path $extractPath -Filter "*.dll" -Recurse | ForEach-Object {
+              Write-Host "Signing DLL: $($_.Name)"
+              nisigntool "$($_.FullName)"
+              if ($LASTEXITCODE -ne 0) {
+                Write-Error "Failed to sign DLL: $($_.FullName)"
+                exit 1
+              }
+            }
+            
+            # Remove original tar.gz file
+            Remove-Item $tarFile -Force
+            
+            # Recompress with same name
+            Write-Host "Recompressing as: $tarName"
+            Push-Location $extractPath
+            tar -czf $tarFile *
+            Pop-Location
+            
+            # Clean up temp extraction directory
+            Remove-Item $extractPath -Recurse -Force
+            Write-Host "Completed processing: $tarName"
+          }
+
       - name: Stage Artifacts
         run: python ${{runner.workspace}}\grpc-labview\build-it\stage_artifacts.py --downloaded_path ${{ steps.download_artifacts.outputs.download-path }} --staging_path ${{ runner.temp }}\grpc-labview-staged-artifacts
 
@@ -30,19 +68,6 @@ jobs:
       - if: startsWith(github.ref, 'refs/tags/v')
         name: Build VI Packages for release
         run: python ${{runner.workspace}}\grpc-labview\build-it\build.py --libraryVersion ${{github.ref_name}} --target All --pathToBinaries ${{ runner.temp }}\grpc-labview-staged-artifacts\TopLevelDlls
-
-      - if: startsWith(github.ref, 'refs/tags/v')
-        name: Sign DLLs before packaging
-        run: |
-          # Sign any DLLs that might be in the built VI packages
-          Get-ChildItem -Path "${{runner.workspace}}\grpc-labview\labview source\Builds" -Filter "*.dll" -Recurse | ForEach-Object {
-            Write-Host "Signing DLL in builds: $($_.FullName)"
-            nisigntool "$($_.FullName)"
-            if ($LASTEXITCODE -ne 0) {
-              Write-Error "Failed to sign DLL: $($_.FullName)"
-              exit 1
-            }
-          }
 
       - if: startsWith(github.ref, 'refs/tags/v')
         name: Zip Release Artifacts
