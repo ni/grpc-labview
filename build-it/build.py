@@ -38,6 +38,16 @@ class LVgRPCBuilder:
             help="Build cpp",
             action="store_true"
         )
+        parser.add_argument(
+            "--labview-version",
+            help="Specify the Labview version by year using either 2 or 4 digits. For example, 19, 2019, 2023",
+            default="2019"
+        )
+        parser.add_argument(
+            "--labview-port",
+            help="LabVIEW port",
+            default="3363"
+        )
         return parser.parse_args()
 
     def get_cmake_args(self, args):
@@ -81,12 +91,38 @@ class LVgRPCBuilder:
         else:
             self.copy_binaries_for_target(args)
 
+    def get_labview_exe_path(self, args):
+        # Convert 2-digit year to 4-digit year if necessary
+        if len(args.labview_version) == 2:
+            year = "20" + args.labview_version
+        else:
+            year = args.labview_version
+        
+        # Construct the path to LabVIEW.exe
+        labview_path = os.path.join("C:\\", "Program Files", "National Instruments", f"LabVIEW {year}", "LabVIEW.exe")
+        
+        # Check if the path exists
+        if not os.path.exists(labview_path):
+            raise Exception(f"LabVIEW {year} not found at {labview_path}")
+        
+        return labview_path
+
     def build(self, args):
         if not args.target == "All" and args.buildcpp:
             self.cpp_build(args)
         self.copy_built_binaries(args)
+
         build_vi_path = os.path.join(self.build_script_directory, "LV Build", "BuildGRPCPackages.vi")
-        build_vipkgs = subprocess.run(["LabVIEWCLI", "-OperationName", "RunVI", "-VIPath", build_vi_path, os.path.join(self.root_directory, "labview source")], capture_output = True)
+        build_labview_path = self.get_labview_exe_path(args)
+        #build_vipkgs = subprocess.run(["LabVIEWCLI", "-LabVIEWPath", build_labview_path, "-PortNumber", args.labview_port, "-OperationName", "RunVI", "-VIPath", build_vi_path, os.path.join(self.root_directory, "labview source"), args.labview_version], capture_output = True)
+        build_vipkgs = subprocess.run([
+            "LabVIEWCLI", "-LabVIEWPath", str(build_labview_path), 
+            "-PortNumber", str(args.labview_port), 
+            "-OperationName", "RunVI", 
+            "-VIPath", build_vi_path, os.path.join(self.root_directory, "labview source"), 
+            str(args.labview_version)], 
+            capture_output = True)
+
         if (build_vipkgs.returncode != 0):
             raise Exception(f'Failed to Build vipkgs { build_vipkgs.stderr.decode() }')
 
