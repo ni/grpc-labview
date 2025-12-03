@@ -45,8 +45,13 @@ class LVgRPCBuilder:
         )
         parser.add_argument(
             "--labview-port",
-            help="LabVIEW port",
-            default="3363"
+            help="LabVIEW port. The default of Auto will attempt to read the port from the LabVIEW.ini or specify this to override.",
+            default="Auto"
+        )
+        parser.add_argument(
+            "--labview-bits",
+            help="LabVIEW bitness (32 or 64)",
+            default="32"
         )
         return parser.parse_args()
 
@@ -57,7 +62,7 @@ class LVgRPCBuilder:
             return [".."]
 
     def cpp_build(self, args):
-        cpp_build_directory = os.path.join(self.root_directory, "build");
+        cpp_build_directory = os.path.join(self.root_directory, "build")
         if os.path.exists(cpp_build_directory):
             distutils.dir_util.remove_tree(cpp_build_directory)
         os.makedirs(cpp_build_directory)
@@ -98,14 +103,36 @@ class LVgRPCBuilder:
         else:
             year = args.labview_version
         
+        # Determine Program Files folder based on bitness
+        if args.labview_bits == "32":
+            program_files = "Program Files (x86)"
+        else:
+            program_files = "Program Files"
+        
         # Construct the path to LabVIEW.exe
-        labview_path = os.path.join("C:\\", "Program Files", "National Instruments", f"LabVIEW {year}", "LabVIEW.exe")
+        labview_path = os.path.join("C:\\", program_files, "National Instruments", f"LabVIEW {year}", "LabVIEW.exe")
         
         # Check if the path exists
         if not os.path.exists(labview_path):
-            raise Exception(f"LabVIEW {year} not found at {labview_path}")
+            raise Exception(f"LabVIEW {year} ({args.labview_bits}-bit) not found at {labview_path}")
         
         return labview_path
+    
+    def get_labview_port(self, labview_exe_path, args):
+        if args.labview_port.lower() == "auto":
+            # Replace .exe with .ini to get the ini file path
+            labview_ini_path = labview_exe_path.replace(".exe", ".ini")
+            
+            if not os.path.exists(labview_ini_path):
+                raise Exception(f"LabVIEW.ini not found at {labview_ini_path}")
+            
+            with open(labview_ini_path, 'r') as ini_file:
+                for line in ini_file:
+                    if line.startswith("server.tcp.port="):
+                        return str(line.split('=')[1].strip())
+            raise Exception("server.tcp.port not found in LabVIEW.ini")
+        else:
+            return str(args.labview_port)
 
     def build(self, args):
         if not args.target == "All" and args.buildcpp:
@@ -113,15 +140,32 @@ class LVgRPCBuilder:
         self.copy_built_binaries(args)
 
         build_vi_path = os.path.join(self.build_script_directory, "LV Build", "BuildGRPCPackages.vi")
+        build_output_path = os.path.join(self.root_directory, "labview source", "Builds")
         build_labview_path = self.get_labview_exe_path(args)
-        #build_vipkgs = subprocess.run(["LabVIEWCLI", "-LabVIEWPath", build_labview_path, "-PortNumber", args.labview_port, "-OperationName", "RunVI", "-VIPath", build_vi_path, os.path.join(self.root_directory, "labview source"), args.labview_version], capture_output = True)
+        labview_port = self.get_labview_port(build_labview_path, args)
+
+        print(f"Using LabVIEW at {build_labview_path} on port {labview_port} to build vipkgs")
+
+        # Before building vipkgs, ensure the output directory is empty   
+        if os.path.exists(build_output_path):
+            distutils.dir_util.remove_tree(build_output_path)
+        os.makedirs(build_output_path)
+
+        # Build the packages using LabVIEWCLI
         build_vipkgs = subprocess.run([
             "LabVIEWCLI", "-LabVIEWPath", str(build_labview_path), 
-            "-PortNumber", str(args.labview_port), 
+            "-PortNumber", str(labview_port), 
             "-OperationName", "RunVI", 
             "-VIPath", build_vi_path, os.path.join(self.root_directory, "labview source"), 
-            str(args.labview_version)], 
+            str(args.labview_version), str(args.labview_bits)], 
             capture_output = True)
+        
+        # Close the LabVIEW instance after building
+        subprocess.run([
+            "LabVIEWCLI", "-LabVIEWPath", str(build_labview_path), 
+            "-PortNumber", str(labview_port), 
+            "-OperationName", "CloseLabVIEW"], 
+            capture_output = False)
 
         if (build_vipkgs.returncode != 0):
             raise Exception(f'Failed to Build vipkgs { build_vipkgs.stderr.decode() }')
