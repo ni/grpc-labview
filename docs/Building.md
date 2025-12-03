@@ -167,7 +167,7 @@ You would need to build the VIP files if you make changes to the LabVIEW pieces 
 Download the repo. Run the command below to build the VIP files.
 
 ```
-> python build-it\build.py --target <BUILD_TARGET> [--pathToBinaries <PATH_TO_PREBUILT_BINARIES>] [--buildcpp] [--labview-version <VERSION>] [--labview-port <PORT>]
+> python build-it\build.py --target <BUILD_TARGET> [--pathToBinaries <PATH_TO_PREBUILT_BINARIES>] [--buildcpp] [--labview-version <VERSION>] [--labview-bits <32|64>] [--labview-port <PORT>]
 ```
 
 The accepted vaues for BUILD_TARGET are:
@@ -179,7 +179,8 @@ If you choose to build for Win32 or Win64 target you can specify the *--buildcpp
 
 Optional parameters:
 - *--labview-version*: Specify the LabVIEW version by year using either 2 or 4 digits (e.g., 19, 2019, 2023). Default is "2019".
-- *--labview-port*: Specify the LabVIEW port number. Default is "3363".
+- *--labview-bits*: Specify either 64 or 32 as the "bitness" of the LabVIEW to use for the building. Default is "64".
+- *--labview-port*: Specify the LabVIEW port number. Default is "Auto".  When this is "Auto", the port number will be read from the matching LAbVIEW's .INI file.  Specify a value to override.
 
 If you choose to build "All" target then you need to specify a folder where we can find the pre built binaries for all the supported targets using the *--pathToBinaries** option. The --buildcpp option would be ignored in this mode even if specified.  We expect the folder specified to have the following structure.
 
