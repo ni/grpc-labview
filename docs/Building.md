@@ -154,7 +154,7 @@ You would need to build the VIP files if you make changes to the LabVIEW pieces 
 - The codebase is maintained in LabVIEW 2019 for backwards compatibility
    - To contribute, Install LabVIEW 2019
    - Otherwise any LabVIEW 2019 or newer is sufficient to build
-   - Both bitnesses are supported.  64-bit is modern and recommended.
+   - Both bitnesses are supported.  64-bit is modern and recommended. 32-bit is the default to support the CI system.
 - Install LabVIEW CLI
 - Install JKI VI Package Manager. You would need Community or Pro edition to build VIP files.
 - Install VI Package Manager API for LabVIEW. (Download [location](https://www.ni.com/en-in/support/downloads/tools-network/download.vi-package-manager-api.html#374501))
@@ -179,7 +179,7 @@ If you choose to build for Win32 or Win64 target you can specify the *--buildcpp
 
 Optional parameters:
 - *--labview-version*: Specify the LabVIEW version by year using either 2 or 4 digits (e.g., 19, 2019, 2023). Default is "2019".
-- *--labview-bits*: Specify either 64 or 32 as the "bitness" of the LabVIEW to use for the building. Default is "64".
+- *--labview-bits*: Specify either 64 or 32 as the "bitness" of the LabVIEW to use for the building. Default is "32".
 - *--labview-port*: Specify the LabVIEW port number. Default is "Auto".  When this is "Auto", the port number will be read from the matching LAbVIEW's .INI file.  Specify a value to override.
 
 If you choose to build "All" target then you need to specify a folder where we can find the pre built binaries for all the supported targets using the *--pathToBinaries** option. The --buildcpp option would be ignored in this mode even if specified.  We expect the folder specified to have the following structure.

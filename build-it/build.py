@@ -51,7 +51,7 @@ class LVgRPCBuilder:
         parser.add_argument(
             "--labview-bits",
             help="LabVIEW bitness (32 or 64)",
-            default="64"
+            default="32"
         )
         return parser.parse_args()
 
