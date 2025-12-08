@@ -20,8 +20,7 @@ jobs:
         with:
           path: ${{ runner.temp }}\grpc-labview-artifacts
 
-      - if: startsWith(github.ref, 'refs/tags/v')
-        name: Sign DLLs after downloading artifacts
+      - name: Sign DLLs after downloading artifacts
         run: |
           # Extract, sign, and recompress tar.gz artifacts
           $artifactsPath = "${{ steps.download_artifacts.outputs.download-path }}"
@@ -58,17 +57,17 @@ jobs:
             Write-Host "Completed processing: $tarName"
           }
 
-      - if: startsWith(github.ref, 'refs/tags/v')
-        name: Copy signed artifacts for inspection
-        run: |
-          # Create directory for artifact inspection
-          $checkDir = "${{runner.workspace}}\check_artifacts_signature"
-          New-Item -ItemType Directory -Path $checkDir -Force | Out-Null
+      # - if: startsWith(github.ref, 'refs/tags/v')
+      #   name: Copy signed artifacts for inspection
+      #   run: |
+      #     # Create directory for artifact inspection
+      #     $checkDir = "${{runner.workspace}}\check_artifacts_signature"
+      #     New-Item -ItemType Directory -Path $checkDir -Force | Out-Null
           
-          # Copy all artifacts to inspection directory
-          $artifactsPath = "${{ steps.download_artifacts.outputs.download-path }}"
-          Copy-Item -Path "$artifactsPath\*" -Destination $checkDir -Recurse -Force
-          Write-Host "Copied signed artifacts to: $checkDir"
+      #     # Copy all artifacts to inspection directory
+      #     $artifactsPath = "${{ steps.download_artifacts.outputs.download-path }}"
+      #     Copy-Item -Path "$artifactsPath\*" -Destination $checkDir -Recurse -Force
+      #     Write-Host "Copied signed artifacts to: $checkDir"
 
       - name: Stage Artifacts
         run: python ${{runner.workspace}}\grpc-labview\build-it\stage_artifacts.py --downloaded_path ${{ steps.download_artifacts.outputs.download-path }} --staging_path ${{ runner.temp }}\grpc-labview-staged-artifacts
