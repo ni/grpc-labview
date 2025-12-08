@@ -23,7 +23,7 @@ jobs:
     uses: ./.github/workflows/build_on_rt.yml
   
   build_release_arifacts:
-    if: ${{ github.repository == 'yash-ni/grpc-labview' || github.event.pull_request.head.repo.full_name == 'yash-ni/grpc-labview' }}
+    if: ${{ github.repository == 'ni/grpc-labview' || github.event.pull_request.head.repo.full_name == 'ni/grpc-labview' }}
     needs:
       - build_windows_x64
       - build_windows_x86

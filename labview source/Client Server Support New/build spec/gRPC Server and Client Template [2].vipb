@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-29 00:29:27" Modified_Date="2025-11-28 15:07:25" Creator="navin" Comments="" ID="89a2c28050cef30e11ec8329df368395">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-29 00:29:27" Modified_Date="2025-06-28 01:29:52" Creator="navin" Comments="" ID="b1c4cf42b884a425406af2b640bee3ed">
   <Library_General_Settings>
     <Package_File_Name>NI_lib_gRPC_Server_and_Client_Template[2]</Package_File_Name>
-    <Library_Version>1.6.1.1</Library_Version>
+    <Library_Version>1.6.0.1</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>..\..\Builds</Library_Output_Folder>
@@ -107,6 +107,18 @@ This library also provides a scripting tool to auto generate the server and clie
         <Additional_Destination>false</Additional_Destination>
         <Additional_Destination_Index>0</Additional_Destination_Index>
       </Destination_Overrides>
+      <Destination_Overrides>
+        <Path>gRPC Scripting Tools</Path>
+        <Destination>0</Destination>
+        <Additional_Destination>false</Additional_Destination>
+        <Additional_Destination_Index>0</Additional_Destination_Index>
+      </Destination_Overrides>
+      <Destination_Overrides>
+        <Path>gRPC Scripting Tools/Open gRPC Server-Client [2] - Code Generator.vi</Path>
+        <Destination>7</Destination>
+        <Additional_Destination>false</Additional_Destination>
+        <Additional_Destination_Index>0</Additional_Destination_Index>
+      </Destination_Overrides>
       <Password_Overrides>
         <Path>.</Path>
         <Password/>
@@ -117,6 +129,17 @@ This library also provides a scripting tool to auto generate the server and clie
         <Namespace_Type>Suffix</Namespace_Type>
         <Namespace/>
       </Namespace_Overrides>
+      <Namespace_Overrides>
+        <Path>gRPC Scripting Tools/gRPC Template Creation Utility.lvlib</Path>
+        <Namespace_Type>Suffix</Namespace_Type>
+        <Namespace>-release</Namespace>
+      </Namespace_Overrides>
+      <Exclusions>
+        <Path>build spec</Path>
+      </Exclusions>
+      <Exclusions>
+        <Path>ClientServer Support New.lvproj</Path>
+      </Exclusions>
       <Place_Folder_Contents>
         <Path/>
       </Place_Folder_Contents>

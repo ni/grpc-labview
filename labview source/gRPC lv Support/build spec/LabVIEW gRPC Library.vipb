@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-28 23:37:57" Modified_Date="2025-11-28 15:10:47" Creator="navin" Comments="" ID="59414566cd228dfd5830a0b598b58e6c">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-10-28 23:37:57" Modified_Date="2025-06-28 01:30:02" Creator="navin" Comments="" ID="d66b65e1482abf139c69a84402fac3e6">
   <Library_General_Settings>
     <Package_File_Name>NI_lib_LabVIEW_gRPC_Library</Package_File_Name>
-    <Library_Version>1.6.1.1</Library_Version>
+    <Library_Version>1.6.0.1</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>..\..\Builds</Library_Output_Folder>
@@ -102,6 +102,18 @@ https://github.com/ni/grpc-labview</Description>
         <Additional_Destination>false</Additional_Destination>
         <Additional_Destination_Index>0</Additional_Destination_Index>
       </Destination_Overrides>
+      <Destination_Overrides>
+        <Path>Client API</Path>
+        <Destination>0</Destination>
+        <Additional_Destination>false</Additional_Destination>
+        <Additional_Destination_Index>0</Additional_Destination_Index>
+      </Destination_Overrides>
+      <Destination_Overrides>
+        <Path>Server API</Path>
+        <Destination>0</Destination>
+        <Additional_Destination>false</Additional_Destination>
+        <Additional_Destination_Index>0</Additional_Destination_Index>
+      </Destination_Overrides>
       <Password_Overrides>
         <Path>.</Path>
         <Password/>
@@ -112,6 +124,17 @@ https://github.com/ni/grpc-labview</Description>
         <Namespace_Type>Suffix</Namespace_Type>
         <Namespace/>
       </Namespace_Overrides>
+      <Namespace_Overrides>
+        <Path>grpc-lvsupport.lvlib</Path>
+        <Namespace_Type>Suffix</Namespace_Type>
+        <Namespace>-release</Namespace>
+      </Namespace_Overrides>
+      <Exclusions>
+        <Path>build spec</Path>
+      </Exclusions>
+      <Exclusions>
+        <Path>grpc-labview.lvproj</Path>
+      </Exclusions>
       <Place_Folder_Contents>
         <Path/>
       </Place_Folder_Contents>
@@ -229,7 +252,7 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Server API</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>CFEB3EBA9B154949FA810322CF181514</GUID>
+      <GUID>C2DBE56FD031967A368DA14004C9A1F5</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -253,6 +276,20 @@ https://github.com/ni/grpc-labview</Description>
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Client Unary Call.vim</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>1</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Client API\Client Unary Call.vim</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
         <NameSub_Menu_Name>Close Client.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
@@ -262,6 +299,20 @@ https://github.com/ni/grpc-labview</Description>
         </Position>
         <Icon>00000000</Icon>
         <Path>..\Client API\Close Client.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Create Client.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>3</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Client API\Create Client.vi</Path>
         <VI_Title/>
       </Items_Data>
       <Items_Data>
@@ -281,6 +332,20 @@ https://github.com/ni/grpc-labview</Description>
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Client Cancel Call Context.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>2</Row>
+          <Column>1</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Client API\Client Cancel Call Context.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
         <NameSub_Menu_Name>Close Client Context.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
@@ -292,7 +357,21 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Client API\Close Client Context.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>BA707BEF54A9D4BD0A5746F3F1B5B09A</GUID>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Client Cancel Call.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>2</Row>
+          <Column>3</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Client API\Client Cancel Call.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <GUID>38357A8026FE06E65207C3354FF489BA</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -344,6 +423,20 @@ https://github.com/ni/grpc-labview</Description>
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>CompleteMetadataRegistration.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>3</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\CompleteMetadataRegistration.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
         <NameSub_Menu_Name>CreateSerializationSession.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
@@ -353,6 +446,20 @@ https://github.com/ni/grpc-labview</Description>
         </Position>
         <Icon>00000000</Icon>
         <Path>..\Server API\CreateSerializationSession.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>FreeSerializationSession.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>5</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\FreeSerializationSession.vi</Path>
         <VI_Title/>
       </Items_Data>
       <Items_Data>
@@ -369,7 +476,21 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Server API\PackToBuffer.vim</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>F8DA35AC901B926D597BAD777D21E78C</GUID>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>UnpackFromBuffer.vim</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>2</Row>
+          <Column>1</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\UnpackFromBuffer.vim</Path>
+        <VI_Title/>
+      </Items_Data>
+      <GUID>65CDDF9B0345F0A1551C9B4197C5687B</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>2</Parent_Palette_Index>
@@ -393,6 +514,20 @@ https://github.com/ni/grpc-labview</Description>
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>AnyBuilderAddValue.vim</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>1</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\Message Requests\AnyBuilderAddValue.vim</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
         <NameSub_Menu_Name>AnyBuilderBegin.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
@@ -402,6 +537,20 @@ https://github.com/ni/grpc-labview</Description>
         </Position>
         <Icon>00000000</Icon>
         <Path>..\Server API\Message Requests\AnyBuilderBegin.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>AnyBuilderBeginNestedMessage.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>3</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\Message Requests\AnyBuilderBeginNestedMessage.vi</Path>
         <VI_Title/>
       </Items_Data>
       <Items_Data>
@@ -421,6 +570,20 @@ https://github.com/ni/grpc-labview</Description>
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>AnyBuilderBeginRepeatedNestedMessageElement.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>5</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\Message Requests\AnyBuilderBeginRepeatedNestedMessageElement.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
         <NameSub_Menu_Name>AnyBuilderBuild.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
@@ -430,6 +593,20 @@ https://github.com/ni/grpc-labview</Description>
         </Position>
         <Icon>00000000</Icon>
         <Path>..\Server API\Message Requests\AnyBuilderBuild.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>AnyBuilderBuildToBuffer.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>2</Row>
+          <Column>1</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\Message Requests\AnyBuilderBuildToBuffer.vi</Path>
         <VI_Title/>
       </Items_Data>
       <Items_Data>
@@ -449,6 +626,20 @@ https://github.com/ni/grpc-labview</Description>
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Is Call Cancelled.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>2</Row>
+          <Column>3</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\Message Requests\Is Call Cancelled.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
         <NameSub_Menu_Name>IsAnyOfType.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
@@ -458,6 +649,20 @@ https://github.com/ni/grpc-labview</Description>
         </Position>
         <Icon>00000000</Icon>
         <Path>..\Server API\Message Requests\IsAnyOfType.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>PackToAny.vim</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>2</Row>
+          <Column>5</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\Message Requests\PackToAny.vim</Path>
         <VI_Title/>
       </Items_Data>
       <Items_Data>
@@ -477,6 +682,20 @@ https://github.com/ni/grpc-labview</Description>
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>TryUnpackFromAny.vim</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>3</Row>
+          <Column>1</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\Message Requests\TryUnpackFromAny.vim</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
         <NameSub_Menu_Name>UnpackFromAny.vim</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
@@ -488,7 +707,21 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Server API\Message Requests\UnpackFromAny.vim</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>386AD7BB8BEE3F5141109666A7E5E6DB</GUID>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Write Call Response.vim</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>3</Row>
+          <Column>3</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\Message Requests\Write Call Response.vim</Path>
+        <VI_Title/>
+      </Items_Data>
+      <GUID>DD6B948A58A7EFC222870B9F5AA1C2B1</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>2</Parent_Palette_Index>
@@ -512,6 +745,20 @@ https://github.com/ni/grpc-labview</Description>
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Create And Register Generic Method Server Event.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>1</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\Server\Create And Register Generic Method Server Event.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
         <NameSub_Menu_Name>Create And Register Server Event.vim</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
@@ -521,6 +768,20 @@ https://github.com/ni/grpc-labview</Description>
         </Position>
         <Icon>00000000</Icon>
         <Path>..\Server API\Server\Create And Register Server Event.vim</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Create Server.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>3</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\Server\Create Server.vi</Path>
         <VI_Title/>
       </Items_Data>
       <Items_Data>
@@ -540,6 +801,20 @@ https://github.com/ni/grpc-labview</Description>
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Register Message Metadata.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>5</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\Server\Register Message Metadata.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
         <NameSub_Menu_Name>Start Server.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
@@ -551,7 +826,21 @@ https://github.com/ni/grpc-labview</Description>
         <Path>..\Server API\Server\Start Server.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>8FD56C2C43D3E656329CBFF5481DC129</GUID>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Stop Server.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>2</Row>
+          <Column>1</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\Server API\Server\Stop Server.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <GUID>C71C69183CD21F6BDE82BAED54BD4757</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>
