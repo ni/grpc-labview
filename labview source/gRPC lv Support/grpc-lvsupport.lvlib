@@ -93,6 +93,7 @@
 			<Item Name="Start Server.vi" Type="VI" URL="../Server API/Server/Start Server.vi"/>
 			<Item Name="Stop Server.vi" Type="VI" URL="../Server API/Server/Stop Server.vi"/>
 			<Item Name="Register Enum Metadata.vi" Type="VI" URL="../Server API/Server/Register Enum Metadata.vi"/>
+			<Item Name="_Packed Library Path.vi" Type="VI" URL="../Server API/Server/_Packed Library Path.vi"/>
 		</Item>
 		<Item Name="typeDefs" Type="Folder">
 			<Item Name="Generic Method Event Data.ctl" Type="VI" URL="../Server API/typeDefs/Generic Method Event Data.ctl"/>
