@@ -5,8 +5,6 @@ import distutils.file_util
 import os
 import subprocess
 
-import vipb_helper
-
 
 class LVgRPCBuilder:
     def __init__(self):
@@ -258,7 +256,7 @@ def main():
         # This means we should update VERSION file for a new release
         used_lib_version = format_version(args.libraryVersion)
         with open(gRPCPackageBuilder.version_file_path, "w") as version_file:
-            version_file.write(f"version={args.libraryVersion}\n")
+            version_file.write(f"version={used_lib_version}\n")
     elif args.lib_version != "":
         # This means we are overriding the version from the command line for testing purposes
         used_lib_version = format_version(args.lib_version)
