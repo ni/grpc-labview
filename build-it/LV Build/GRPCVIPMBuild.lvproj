@@ -12,6 +12,7 @@
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
 		<Item Name="Helpers" Type="Folder">
 			<Item Name="EditVIPBLVVersion.vi" Type="VI" URL="../EditVIPBLVVersion.vi"/>
+			<Item Name="EditVIPBPackageVersion.vi" Type="VI" URL="../EditVIPBPackageVersion.vi"/>
 			<Item Name="GetClientServerTemplateBuildSpecPath.vi" Type="VI" URL="../GetClientServerTemplateBuildSpecPath.vi"/>
 			<Item Name="GetInstalledVIPMPackages.vi" Type="VI" URL="../GetInstalledVIPMPackages.vi"/>
 			<Item Name="GetLVServicerBuildSpecPath.vi" Type="VI" URL="../GetLVServicerBuildSpecPath.vi"/>
@@ -33,6 +34,7 @@
 				<Item Name="Check if File or Folder Exists.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/libraryn.llb/Check if File or Folder Exists.vi"/>
 				<Item Name="Clear Errors.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/Clear Errors.vi"/>
 				<Item Name="Cluster to Array of VData__ogtkDDA31ED5A732916949AA00FDC27B02BA.vi" Type="VI" URL="/&lt;vilib&gt;/JKI/_VIPM API_internal_deps/Cluster to Array of VData__ogtkDDA31ED5A732916949AA00FDC27B02BA.vi"/>
+				<Item Name="Delimited String to 1D String Array.vi" Type="VI" URL="/&lt;vilib&gt;/AdvancedString/Delimited String to 1D String Array.vi"/>
 				<Item Name="Encode Section and Key Names__ogtkDDA31ED5A732916949AA00FDC27B02BA.vi" Type="VI" URL="/&lt;vilib&gt;/JKI/_VIPM API_internal_deps/Encode Section and Key Names__ogtkDDA31ED5A732916949AA00FDC27B02BA.vi"/>
 				<Item Name="Error Cluster From Error Code.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/Error Cluster From Error Code.vi"/>
 				<Item Name="Generate Temporary File Path.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/libraryn.llb/Generate Temporary File Path.vi"/>

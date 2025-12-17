@@ -259,7 +259,7 @@ def main():
         used_lib_version = format_version(args.libraryVersion)
         with open(gRPCPackageBuilder.version_file_path, "w") as version_file:
             version_file.write(f"version={args.libraryVersion}\n")
-    elif args.used_lib_version != "":
+    elif args.lib_version != "":
         # This means we are overriding the version from the command line for testing purposes
         used_lib_version = format_version(args.lib_version)
     else:
