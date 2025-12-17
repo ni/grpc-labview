@@ -208,11 +208,13 @@ This document provides an overview of all GitHub Actions workflows in the grpc-l
    - Recompresses artifacts
 5. **Stage Artifacts:** Organizes artifacts into proper directory structure
 6. **Build VI Packages:** ⚠️ **VERSION IS APPLIED HERE**
-   - For testing (non-release): Calls `build.py` without `--libraryVersion`, builds from existing `.vipb` files
+   - For testing (non-release): Calls `build.py` without `--libraryVersion`
+     - Reads version from `build-it/VERSION` file
+     - Builds `.vip` packages using that version
    - For release (tags starting with `v*`): Calls `build.py --libraryVersion ${{github.ref_name}}`
-     - **build.py updates the `.vipb` files with the version number**
-     - Then builds `.vip` packages from those updated `.vipb` files
-     - These `.vipb` changes are **temporary** (exist only in the runner workspace, not committed)
+     - **build.py updates the `build-it/VERSION` file** with the tag version (strips leading `v`)
+     - Then reads the version and builds `.vip` packages
+     - The VERSION file change is made but not committed during this workflow
    - Packages the signed binaries into versioned LabVIEW packages
 7. **Run CI Tests:** Executes legacy test suite
 8. **Run New Testing Suite:** Executes new automated test suite (60-minute timeout)
@@ -228,7 +230,7 @@ This document provides an overview of all GitHub Actions workflows in the grpc-l
 - For release tags: `grpc-labview.zip` attached to GitHub release
 - Test results from New_ATS suite (timestamped)
 
-**Important Note:** During this workflow, `build.py` temporarily updates the `.vipb` files to set the version, but does NOT commit these changes. The "Update VIPB on Publish Release" workflow (see below) commits the version changes to the repository after the release is published.
+**Important Note:** During this workflow, `build.py` updates the `build-it/VERSION` file to set the version, but does NOT commit these changes. The VERSION file serves as the single source of truth for version numbers during builds. After a release is published, the VERSION file should be manually updated and committed (or via a separate workflow/script).
 
 **Testing:**
 - Legacy tests via `tests/run_tests.py`
@@ -236,40 +238,47 @@ This document provides an overview of all GitHub Actions workflows in the grpc-l
 
 ---
 
-### Update VIPB on Publish Release
+### Update Version on Publish Release
 
-**File:** `.github/workflows/update_vipb_on_publish_release.yml`
+**File:** `.github/workflows/update_version_on_publish_release.yml`
 
-**Purpose:** Commits version number changes to all VIPB (VI Package Builder) source files when a release is published.
+**Purpose:** Automatically updates the `build-it/VERSION` file when a release is published and commits it to the repository.
 
 **Triggers:**
 - GitHub release published event
 
-**Runner:** `self-hosted` (requires LabVIEW CLI)
-
-**Important:** This workflow commits the `.vipb` version changes to the repository. Note that `build.py` already updated these files during the "Build Release Artifacts" workflow, but those changes were temporary (not committed). This workflow makes the changes permanent in the repository.
+**Runner:** `self-hosted`
 
 **Steps:**
 1. Checkout code with repository token
 2. Setup Python 3.10
-3. **Update VIPB Source Files:**
-   - Runs `build-it/update_vipb_version.py`
-   - Passes release tag name as `--library_version`
-   - Uses LabVIEW CLI to update all `.vipb` source files in `labview source`
-   - Strips leading `v` from version (e.g., `v1.2.3` → `1.2.3`)
+3. **Update VERSION File:**
+   - Runs `build-it/update_version.py --library_version ${{github.ref_name}}`
+   - Updates the `build-it/VERSION` file with the release tag version
+   - Strips leading `v` from version (e.g., `v1.2.3.4` → `1.2.3.4`)
 4. **Commit Changes:**
-   - Auto-commits updated `.vipb` source files with message "VIPB version bump"
+   - Auto-commits the updated `build-it/VERSION` file with message "VERSION bump"
    - Pushes directly to `master` branch
    - Uses force push option
 
-**Side Effect:** ⚠️ **This push to master triggers the CI workflow again**, which will build all platforms and packages again. However, since no tag was pushed, the packages won't be attached to any release.
+**Side Effect:** ⚠️ **This push to master triggers the CI workflow again**, which will build all platforms and packages again. However, since no tag was pushed, the packages won't be attached to any release. This run serves to validate that the repository state is buildable with the updated version.
 
 **Files Modified:**
-- `labview source/Client Server Support New/build spec/gRPC Server and Client Template [2].vipb`
-- `labview source/gRPC lv Servicer/build spec/LabVIEW gRPC Servicer.vipb`
-- `labview source/gRPC lv Support/build spec/LabVIEW gRPC Library.vipb`
+- `build-it/VERSION`
 
-**Why This Matters:** Keeps the repository's `.vipb` files in sync with the released version. Future builds (e.g., for development/testing) will start from the correct version baseline.
+**Why This Matters:** Keeps the repository's VERSION file in sync with the released version. Future builds (e.g., for development/testing) will use the correct version from the VERSION file as the baseline.
+
+---
+
+### Update VIPB on Publish Release (Deprecated)
+
+**File:** `.github/workflows/update_vipb_on_publish_release.yml`
+
+**Status:** ⚠️ **DISABLED** (via `if: false` condition)
+
+**Purpose:** This is the old workflow that updated `.vipb` files. It has been replaced by `update_version_on_publish_release.yml` which updates the `build-it/VERSION` file instead.
+
+**Why Replaced:** The VERSION file provides a simpler, single-source-of-truth versioning mechanism compared to updating multiple `.vipb` files.
 
 ---
 
@@ -345,7 +354,7 @@ CI Workflow (ci.yml)
         └── Creates release (if tag pushed)
 
 Release Published Event
-└── Update VIPB on Publish Release (update_vipb_on_publish_release.yml)
+└── Update Version on Publish Release (update_version_on_publish_release.yml)
 
 Issue Events
 └── Sync GitHub Issues to Azure DevOps (sync_github_issue_azdo.yml)
@@ -355,7 +364,7 @@ Issue Events
 
 ## Versioning Strategy
 
-The project uses **Git tags as the source of truth** for versioning:
+The project uses **Git tags and a VERSION file** for versioning:
 
 1. **Tag Creation:** Developers create a Git tag (e.g., `v1.2.3.4`) and push it
 2. **First CI Run (Tag Trigger):**
@@ -365,30 +374,38 @@ The project uses **Git tags as the source of truth** for versioning:
      - Downloads compiled DLLs/SOs from platform builds
      - Signs the binaries
      - Runs `build.py --libraryVersion v1.2.3.4`
-       - **build.py updates `.vipb` files with version** (temporary, not committed)
-       - **Builds `.vip` packages from updated `.vipb` files**
+       - **build.py updates `build-it/VERSION` file** with version (strips `v` → `1.2.3.4`)
+       - **Reads version from VERSION file and builds `.vip` packages**
+       - VERSION file change is made but not committed during this workflow
      - Runs tests
      - Creates draft GitHub release
      - Attaches versioned `.vip` packages to release
-3. **Manual Step:** Developer reviews and publishes the draft release
-4. **Source Sync:** When release is published:
-   - Update VIPB workflow updates and commits `.vipb` source files to master
-   - Commits with message "VIPB version bump"
-   - Pushes directly to master branch
-5. **Second CI Run (Master Push Trigger):**
-   - Triggered by the commit to master
+4. **Manual Step:** Developer reviews and publishes the draft release
+5. **Automatic Version File Sync:** When release is published:
+   - Update Version workflow automatically triggers
+   - Runs `update_version.py --library_version <tag>` to update `build-it/VERSION` file
+   - Commits and pushes the updated VERSION file directly to master branch
+   - This keeps the repository in sync with the released version
+6. **Second CI Run (Master Push Trigger):**
+   - Triggered by the VERSION file commit to master
    - Builds all platforms and packages again
-   - Packages are built with correct version (from committed `.vipb` files)
-   - However, these packages are NOT attached to the release (release already exists)
-   - This run serves to ensure the repository state is buildable and tests pass
+   - Validates the repository state with the updated VERSION file
+   - Packages are NOT attached to the release (release already exists)
+
+**Version Management:**
+- **VERSION file:** `build-it/VERSION` contains the current version in `version=X.Y.Z.W` format (single source of truth)
+- **For releases:** Pass `--libraryVersion` to temporarily update VERSION file during build workflow
+- **After release:** VERSION file is automatically updated and committed by the Update Version workflow
+- **For development:** Build without `--libraryVersion` to use existing VERSION file
+- **For testing:** Pass `--lib-version` to override version without updating VERSION file
 
 **Key Points:**
-- **Two CI runs occur** for each release (tag push + master commit)
+- **Two CI runs occur** for each release (tag push + VERSION file commit to master)
 - **First run** creates the release packages
-- **Second run** validates the repository state after version commit
+- **Second run** validates the repository state after VERSION file update
 - **Build artifacts (DLLs/SOs):** Unversioned binary libraries
-- **VI Packages (.vip files):** Versioned by `build.py` during packaging
-- **VIPB source files (.vipb):** Updated twice (once by build.py, once by commit)
+- **VI Packages (.vip files):** Versioned based on VERSION file or `--libraryVersion` parameter
+- **VERSION file:** Single source of truth, automatically updated after release publication
 
 **Version Format:** `vMAJOR.MINOR.PATCH.BUILD` (e.g., `v1.2.3.4`)
 </text>

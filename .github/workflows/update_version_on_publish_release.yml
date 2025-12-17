@@ -1,11 +1,11 @@
-name: Bump VIPB Verison
+name: Bump Version
 on:
   release:
     types: [published]
 
 jobs:
-  update_vipb_version:
-    name: Update VIPB Verison on Release
+  update_version:
+    name: Update Version on Release
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
@@ -16,14 +16,14 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Update VIPB Verison
+      - name: Update Version
         run: python ${{runner.workspace}}\grpc-labview\build-it\update_version.py --library_version ${{github.ref_name}}
         continue-on-error: false
 
-      - name: Commit VIPB library version bump
+      - name: Commit library version bump
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: VIPB version bump
+          commit_message: VERSION bump
           branch: master
-          file_pattern: "*vipb"
+          file_pattern: "build-it/VERSION"
           push_options: "--force"
