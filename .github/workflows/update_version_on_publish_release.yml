@@ -1,0 +1,29 @@
+name: Bump Version
+on:
+  release:
+    types: [published]
+
+jobs:
+  update_version:
+    name: Update Version on Release
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_REPO_TOKEN }}
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Update Version
+        run: python ${{runner.workspace}}\grpc-labview\build-it\update_version.py --library_version ${{github.ref_name}}
+        continue-on-error: false
+
+      - name: Commit library version bump
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: VERSION bump
+          branch: master
+          file_pattern: "build-it/VERSION"
+          push_options: "--force"
