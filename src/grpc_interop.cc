@@ -387,6 +387,12 @@ LIBRARY_EXPORT int32_t GetRequestData(grpc_labview::gRPCid** id, int8_t* lvReque
             data->_call->ReadComplete();
             return 0;
         }
+        // Check if a custom error status was set via SetCallStatus
+        auto statusCode = data->_call->GetCallStatusCode();
+        if (statusCode != grpc::StatusCode::OK)
+        {
+            return -(1000 + statusCode);
+        }
         return -2;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
