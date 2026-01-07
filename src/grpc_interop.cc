@@ -419,6 +419,11 @@ LIBRARY_EXPORT int32_t SetResponseData(grpc_labview::gRPCid** id, int8_t* lvRequ
 
         if (!data->_call->IsActive() || !data->_call->Write())
         {
+            auto statusCode = data->_call->GetCallStatusCode();
+            if (statusCode != grpc::StatusCode::OK)
+            {
+                return -(1000 + statusCode);
+            }
             return -2;
         }
         return 0;
