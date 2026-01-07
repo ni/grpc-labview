@@ -554,8 +554,7 @@ LIBRARY_EXPORT int32_t ClientOpenClientStreamingCall(
     const char* responseMessageName,
     grpc_labview::gRPCid** callId,
     int32_t timeoutMs,
-    grpc_labview::gRPCid* contextId,
-    int raiseWriteEvents)
+    grpc_labview::gRPCid* contextId)
 {
     try {
         auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
@@ -586,19 +585,10 @@ LIBRARY_EXPORT int32_t ClientOpenClientStreamingCall(
 
         // Add metadata to indicate this is an "open stream" call
         clientContext->gRPCClientContext.AddMetadata("x-grpc-labview-stream-mode", "open");
-        if (raiseWriteEvents)
-        {
-            clientContext->gRPCClientContext.AddMetadata("x-grpc-labview-write-events", "true");
-        }
-        else
-        {
-            clientContext->gRPCClientContext.AddMetadata("x-grpc-labview-write-events", "false");
-        }
 
         // Set flags on client call
         auto clientCall = new grpc_labview::ClientStreamingClientCall();
         clientCall->_isOpenStream = true;
-        clientCall->_raiseWriteEvents = (raiseWriteEvents != 0);
         
         std::unique_lock<std::mutex> lock(client->clientLock);
         client->ActiveClientCalls[clientCall] = true;

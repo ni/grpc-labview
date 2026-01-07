@@ -21,7 +21,6 @@ namespace grpc_labview
         _requestDataReady(false),
         _callStatus(grpc::Status::OK),
         _isOpenStream(false),
-        _raiseWriteEvents(false),
         _initialEventRaised(false)
     {
         Proceed(true);
@@ -144,13 +143,6 @@ namespace grpc_labview
             return false;
         }
         
-        // For open streams with write events enabled, raise a new event for each write
-        if (_isOpenStream && _raiseWriteEvents)
-        {
-            auto name = _ctx.method();
-            _server->SendEvent(name, static_cast<gRPCid*>(_methodData.get()));
-        }
-        
         return true;
     }
 
@@ -205,12 +197,6 @@ namespace grpc_labview
                     std::string(stream_mode->second.data(), stream_mode->second.size()) == "open")
                 {
                     _isOpenStream = true;
-                    auto write_events = client_metadata.find("x-grpc-labview-write-events");
-                    if (write_events != client_metadata.end())
-                    {
-                        std::string writeEventsValue(write_events->second.data(), write_events->second.size());
-                        _raiseWriteEvents = (writeEventsValue == "true");
-                    }
                     
                     // Set up request/response and raise event immediately (without reading data yet)
                     LVEventData eventData;

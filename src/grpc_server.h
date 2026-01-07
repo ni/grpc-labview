@@ -176,7 +176,6 @@ namespace grpc_labview
 
         bool _requestDataReady;
         bool _isOpenStream;        // True if client used ClientOpenClientStreamingCall
-        bool _raiseWriteEvents;    // True if server should raise event on each write
         bool _initialEventRaised;  // True if initial stream open event was raised
 
         enum class CallStatus

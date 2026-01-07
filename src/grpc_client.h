@@ -106,7 +106,6 @@ namespace grpc_labview
         ClientStreamingClientCall() { 
             _writesComplete = false; 
             _isOpenStream = false;
-            _raiseWriteEvents = false;
             _initialEventSent = false;
         }
         ~ClientStreamingClientCall();
@@ -117,7 +116,6 @@ namespace grpc_labview
     public:
         std::shared_ptr<grpc::ClientWriterInterface<grpc_labview::LVMessage>> _writer;
         bool _isOpenStream;        // True if initiated with ClientOpenClientStreamingCall
-        bool _raiseWriteEvents;    // True if WriteEvent=True was specified
         bool _initialEventSent;    // True if initial event has been raised on server
 
     private:
