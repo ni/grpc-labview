@@ -545,6 +545,79 @@ LIBRARY_EXPORT int32_t ClientBeginClientStreamingCall(
         return grpc_labview::TranslateException();
     }
 }
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t ClientOpenClientStreamingCall(
+    grpc_labview::gRPCid* clientId,
+    const char* methodName,
+    const char* requestMessageName,
+    const char* responseMessageName,
+    grpc_labview::gRPCid** callId,
+    int32_t timeoutMs,
+    grpc_labview::gRPCid* contextId,
+    int raiseWriteEvents)
+{
+    try {
+        auto client = clientId->CastTo<grpc_labview::LabVIEWgRPCClient>();
+        if (!client)
+        {
+            return -1;
+        }
+        auto requestMetadata = client->FindMetadata(requestMessageName);
+        if (requestMetadata == nullptr)
+        {
+            return -2;
+        }
+        auto responseMetadata = client->FindMetadata(responseMessageName);
+        if (responseMetadata == nullptr)
+        {
+            return -3;
+        }
+
+        auto clientContext = contextId->CastTo<grpc_labview::ClientContext>();
+        if (!clientContext)
+        {
+            clientContext = std::make_shared<grpc_labview::ClientContext>();
+        }
+        if (timeoutMs > 0)
+        {
+            clientContext->set_deadline(timeoutMs);
+        }
+
+        // Add metadata to indicate this is an "open stream" call
+        clientContext->gRPCClientContext.AddMetadata("x-grpc-labview-stream-mode", "open");
+        if (raiseWriteEvents)
+        {
+            clientContext->gRPCClientContext.AddMetadata("x-grpc-labview-write-events", "true");
+        }
+        else
+        {
+            clientContext->gRPCClientContext.AddMetadata("x-grpc-labview-write-events", "false");
+        }
+
+        // Set flags on client call
+        auto clientCall = new grpc_labview::ClientStreamingClientCall();
+        clientCall->_isOpenStream = true;
+        clientCall->_raiseWriteEvents = (raiseWriteEvents != 0);
+        
+        std::unique_lock<std::mutex> lock(client->clientLock);
+        client->ActiveClientCalls[clientCall] = true;
+        lock.unlock();
+        *callId = grpc_labview::gPointerManager.RegisterPointer(clientCall);
+        clientCall->_client = client;
+        clientCall->_request = std::make_shared<grpc_labview::LVMessage>(requestMetadata);
+        clientCall->_response = std::make_shared<grpc_labview::LVMessage>(responseMetadata);
+        clientCall->_context = clientContext;
+
+        grpc::internal::RpcMethod method(methodName, grpc::internal::RpcMethod::CLIENT_STREAMING);
+        auto writer = grpc::internal::ClientWriterFactory<grpc_labview::LVMessage>::Create(client->Channel.get(), method, &(clientCall->_context.get()->gRPCClientContext), clientCall->_response.get());
+        clientCall->_writer = std::shared_ptr<grpc::ClientWriterInterface<grpc_labview::LVMessage>>(writer);
+
+        return 0;
+    } catch (const std::exception&) {
+        return grpc_labview::TranslateException();
+    }
+}
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------

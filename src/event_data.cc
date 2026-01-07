@@ -19,7 +19,10 @@ namespace grpc_labview
         _status(CallStatus::Create),
         _writeSemaphore(0),
         _requestDataReady(false),
-        _callStatus(grpc::Status::OK)
+        _callStatus(grpc::Status::OK),
+        _isOpenStream(false),
+        _raiseWriteEvents(false),
+        _initialEventRaised(false)
     {
         Proceed(true);
     }
@@ -140,6 +143,14 @@ namespace grpc_labview
         {
             return false;
         }
+        
+        // For open streams with write events enabled, raise a new event for each write
+        if (_isOpenStream && _raiseWriteEvents)
+        {
+            auto name = _ctx.method();
+            _server->SendEvent(name, static_cast<gRPCid*>(_methodData.get()));
+        }
+        
         return true;
     }
 
@@ -186,8 +197,49 @@ namespace grpc_labview
             auto name = _ctx.method();
             if (_server->HasRegisteredServerMethod(name) || _server->HasGenericMethodEvent())
             {
-                _stream.Read(&_rb, this);
-                _status = CallStatus::Process;
+                // Check if this is an "open stream" call by looking for metadata
+                auto client_metadata = _ctx.client_metadata();
+                auto stream_mode = client_metadata.find("x-grpc-labview-stream-mode");
+                
+                if (stream_mode != client_metadata.end() && 
+                    std::string(stream_mode->second.data(), stream_mode->second.size()) == "open")
+                {
+                    _isOpenStream = true;
+                    auto write_events = client_metadata.find("x-grpc-labview-write-events");
+                    if (write_events != client_metadata.end())
+                    {
+                        std::string writeEventsValue(write_events->second.data(), write_events->second.size());
+                        _raiseWriteEvents = (writeEventsValue == "true");
+                    }
+                    
+                    // Set up request/response and raise event immediately (without reading data yet)
+                    LVEventData eventData;
+                    if (_server->FindEventData(name, eventData) || _server->HasGenericMethodEvent())
+                    {
+                        auto requestMetadata = _server->FindMetadata(eventData.requestMetadataName);
+                        auto responseMetadata = _server->FindMetadata(eventData.responseMetadataName);
+                        _request = std::make_shared<LVMessage>(requestMetadata);
+                        _response = std::make_shared<LVMessage>(responseMetadata);
+                        
+                        // Create method data and raise event (data will be empty since we haven't read yet)
+                        _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
+                        gPointerManager.RegisterPointer(_methodData);
+                        _server->SendEvent(name, static_cast<gRPCid*>(_methodData.get()));
+                        _initialEventRaised = true;
+                        _status = CallStatus::Process; // Move to Process status but don't issue Read yet
+                    }
+                    else
+                    {
+                        _status = CallStatus::Finish;
+                        _stream.Finish(grpc::Status(grpc::StatusCode::UNIMPLEMENTED, ""), this);
+                    }
+                }
+                else
+                {
+                    // Normal flow: read first message then raise event
+                    _stream.Read(&_rb, this);
+                    _status = CallStatus::Process;
+                }
             }
             else
             {
@@ -198,6 +250,14 @@ namespace grpc_labview
         else if (_status == CallStatus::Process)
         {
             auto name = _ctx.method();
+
+            // For open streams, initial event was already raised in Read status
+            // Skip the normal Process flow that would raise event on first data
+            if (_initialEventRaised)
+            {
+                // Event already sent, just wait for GetRequestData to be called
+                return;
+            }
 
             LVEventData eventData;
             if (_server->FindEventData(name, eventData) || _server->HasGenericMethodEvent())
