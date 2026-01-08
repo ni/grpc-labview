@@ -374,17 +374,7 @@ LIBRARY_EXPORT int32_t GetRequestData(grpc_labview::gRPCid** id, int8_t* lvReque
         }
         if (data->_call->IsActive() && data->_call->ReadNext())
         {
-            try
-            {
-                grpc_labview::ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
-            }
-            catch (const std::exception&)
-            {
-                // Before returning, set the call to complete, otherwise the server hangs waiting for the call.
-                data->_call->ReadComplete();
-                throw;
-            }
-            data->_call->ReadComplete();
+            grpc_labview::ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
             return 0;
         }
         // Check if a custom error status was set via SetCallStatus
