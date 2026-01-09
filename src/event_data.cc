@@ -8,17 +8,16 @@
 using namespace google::protobuf::internal;
 
 namespace grpc_labview
-{  
+{
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     CallData::CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService *service, grpc::ServerCompletionQueue *cq) :
-        _server(server), 
+        _server(server),
         _service(service),
         _cq(cq),
         _stream(&_ctx),
         _status(CallStatus::Create),
         _writeSemaphore(0),
-        _requestDataReady(false),
         _callStatus(grpc::Status::OK)
     {
         Proceed(true);
@@ -28,7 +27,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     std::shared_ptr<MessageMetadata> CallData::FindMetadata(const std::string& name)
     {
-        return _server->FindMetadata(name);    
+        return _server->FindMetadata(name);
     }
 
     //---------------------------------------------------------------------
@@ -55,7 +54,7 @@ namespace grpc_labview
         }
         auto wb = _response->SerializeToByteBuffer();
         grpc::WriteOptions options;
-        _status = CallStatus::Writing;
+        _status = CallStatus::WritingResponse;
         _stream.Write(*wb, this);
         _writeSemaphore.wait();
         if (IsCancelled())
@@ -120,10 +119,6 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     bool CallData::ReadNext()
     {
-        if (_requestDataReady)
-        {
-            return true;
-        }
         if (IsCancelled())
         {
             return false;
@@ -135,7 +130,6 @@ namespace grpc_labview
             return false;
         }
         _request->ParseFromByteBuffer(_rb);
-        _requestDataReady = true;
         if (IsCancelled())
         {
             return false;
@@ -145,18 +139,11 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void CallData::ReadComplete()
-    {
-        _requestDataReady = false;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
     void CallData::Proceed(bool ok)
     {
         if (!ok)
         {
-            if (_status == CallStatus::Writing)
+            if (_status == CallStatus::WritingResponse)
             {
                 _writeSemaphore.notify();
             }
@@ -168,15 +155,15 @@ namespace grpc_labview
         if (_status == CallStatus::Create)
         {
             // As part of the initial CREATE state, we *request* that the system
-            // start processing SayHello requests. In this request, "this" acts are
+            // start processing requests. In this request, "this" acts as
             // the tag uniquely identifying the request (so that different CallData
             // instances can serve different requests concurrently), in this case
             // the memory address of this CallData instance.
             _service->RequestCall(&_ctx, &_stream, _cq, _cq, this);
             _ctx.AsyncNotifyWhenDone(new CallFinishedData(this));
-            _status = CallStatus::Read;
+            _status = CallStatus::WaitingForConnection;
         }
-        else if (_status == CallStatus::Read)
+        else if (_status == CallStatus::WaitingForConnection)
         {
             // Spawn a new CallData instance to serve new clients while we process
             // the one for this CallData. The instance will deallocate itself as
@@ -184,41 +171,19 @@ namespace grpc_labview
             new CallData(_server, _service, _cq);
 
             auto name = _ctx.method();
-            if (_server->HasRegisteredServerMethod(name) || _server->HasGenericMethodEvent())
-            {
-                _stream.Read(&_rb, this);
-                _status = CallStatus::Process;
-            }
-            else
-            {
-                _status = CallStatus::Finish;
-                _stream.Finish(grpc::Status(grpc::StatusCode::UNIMPLEMENTED, ""), this);
-            }
-        }
-        else if (_status == CallStatus::Process)
-        {
-            auto name = _ctx.method();
-
             LVEventData eventData;
-            if (_server->FindEventData(name, eventData) || _server->HasGenericMethodEvent())
+            if ((_server->HasRegisteredServerMethod(name) && _server->FindEventData(name, eventData)) || _server->HasGenericMethodEvent())
             {
+
                 auto requestMetadata = _server->FindMetadata(eventData.requestMetadataName);
                 auto responseMetadata = _server->FindMetadata(eventData.responseMetadataName);
                 _request = std::make_shared<LVMessage>(requestMetadata);
                 _response = std::make_shared<LVMessage>(responseMetadata);
 
-                if (_request->ParseFromByteBuffer(_rb))
-                {
-                    _requestDataReady = true;
-                    _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
-                    gPointerManager.RegisterPointer(_methodData);
-                    _server->SendEvent(name, static_cast<gRPCid*>(_methodData.get()));
-                }
-                else
-                {
-                    _status = CallStatus::Finish;
-                    _stream.Finish(grpc::Status(grpc::StatusCode::UNAVAILABLE, ""), this);
-                }
+                _methodData = std::make_shared<GenericMethodData>(this, &_ctx, _request, _response);
+                gPointerManager.RegisterPointer(_methodData);
+                _server->SendEvent(name, static_cast<gRPCid*>(_methodData.get()));
+                _status = CallStatus::Connected;
             }
             else
             {
@@ -226,12 +191,19 @@ namespace grpc_labview
                 _stream.Finish(grpc::Status(grpc::StatusCode::UNIMPLEMENTED, ""), this);
             }
         }
-        else if (_status == CallStatus::Writing)
+        else if (_status == CallStatus::Connected)
+        {
+            // Once connected, we expect reads of request messages to be triggered by calls to ReadNext via API calls from
+            // the user's implementation of the RPC in the server. We do not expect any events to be received for this RPC
+            // in this state.
+            assert(false);
+        }
+        else if (_status == CallStatus::WritingResponse)
         {
             _writeSemaphore.notify();
         }
         else if (_status == CallStatus::PendingFinish)
-        {        
+        {
         }
         else
         {
