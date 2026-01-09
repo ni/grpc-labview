@@ -155,7 +155,6 @@ namespace grpc_labview
         bool IsCancelled();
         bool IsActive();
         bool ReadNext();
-        void ReadComplete();
         void SetCallStatusError(std::string errorMessage);
         void SetCallStatusError(grpc::StatusCode statusCode, std::string errorMessage);
         grpc::StatusCode GetCallStatusCode();
@@ -174,14 +173,12 @@ namespace grpc_labview
         std::shared_ptr<LVMessage> _request;
         std::shared_ptr<LVMessage> _response;
 
-        bool _requestDataReady;
-
         enum class CallStatus
         {
             Create,
-            Read,
-            Writing,
-            Process,
+            WaitingForConnection,
+            WritingResponse,
+            Connected,
             PendingFinish,
             Finish
         };
