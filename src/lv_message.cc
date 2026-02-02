@@ -10,6 +10,69 @@
 //---------------------------------------------------------------------
 using namespace google::protobuf::internal;
 
+//---------------------------------------------------------------------
+// Compatibility wrappers for protobuf internal functions
+// These were removed from map_type_handler.h in newer protobuf versions.
+// By placing them in a separate namespace, we avoid conflicts with
+// existing protobuf functions in older versions while providing
+// forward compatibility with newer versions.
+//---------------------------------------------------------------------
+namespace proto_compat {
+inline const char* ReadINT32(const char* ptr, int32_t* value) {
+    return VarintParse(ptr, reinterpret_cast<uint32_t*>(value));
+}
+inline const char* ReadUINT32(const char* ptr, uint32_t* value) {
+    return VarintParse(ptr, value);
+}
+inline const char* ReadINT64(const char* ptr, int64_t* value) {
+    return VarintParse(ptr, reinterpret_cast<uint64_t*>(value));
+}
+inline const char* ReadUINT64(const char* ptr, uint64_t* value) {
+    return VarintParse(ptr, value);
+}
+inline const char* ReadSINT32(const char* ptr, int32_t* value) {
+    *value = ReadVarintZigZag32(&ptr);
+    return ptr;
+}
+inline const char* ReadSINT64(const char* ptr, int64_t* value) {
+    *value = ReadVarintZigZag64(&ptr);
+    return ptr;
+}
+template <typename E>
+inline const char* ReadENUM(const char* ptr, E* value) {
+    *value = static_cast<E>(ReadVarint32(&ptr));
+    return ptr;
+}
+inline const char* ReadBOOL(const char* ptr, bool* value) {
+    *value = static_cast<bool>(ReadVarint64(&ptr));
+    return ptr;
+}
+inline const char* ReadFLOAT(const char* ptr, float* value) {
+    *value = UnalignedLoad<float>(ptr);
+    return ptr + sizeof(float);
+}
+inline const char* ReadDOUBLE(const char* ptr, double* value) {
+    *value = UnalignedLoad<double>(ptr);
+    return ptr + sizeof(double);
+}
+inline const char* ReadFIXED32(const char* ptr, uint32_t* value) {
+    *value = UnalignedLoad<uint32_t>(ptr);
+    return ptr + sizeof(uint32_t);
+}
+inline const char* ReadFIXED64(const char* ptr, uint64_t* value) {
+    *value = UnalignedLoad<uint64_t>(ptr);
+    return ptr + sizeof(uint64_t);
+}
+inline const char* ReadSFIXED32(const char* ptr, int32_t* value) {
+    *value = UnalignedLoad<int32_t>(ptr);
+    return ptr + sizeof(int32_t);
+}
+inline const char* ReadSFIXED64(const char* ptr, int64_t* value) {
+    *value = UnalignedLoad<int64_t>(ptr);
+    return ptr + sizeof(int64_t);
+}
+} // namespace proto_compat
+
 namespace grpc_labview
 {
     //---------------------------------------------------------------------
@@ -50,7 +113,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    std::unique_ptr<grpc::ByteBuffer> LVMessage::SerializeToByteBuffer()
+    std::unique_ptr<grpc::ByteBuffer> LVMessage::SerializeToByteBuffer() const
     {
         std::string buf;
         SerializeToString(&buf);
@@ -203,7 +266,7 @@ namespace grpc_labview
         else
         {
             bool result;
-            ptr = ReadBOOL(ptr, &result);
+            ptr = proto_compat::ReadBOOL(ptr, &result);
             auto v = std::make_shared<LVVariableMessageValue<bool>>(index, result);
             _values.emplace(index, v);
         }
@@ -223,7 +286,7 @@ namespace grpc_labview
         else
         {
             int32_t result;
-            ptr = ReadINT32(ptr, &result);
+            ptr = proto_compat::ReadINT32(ptr, &result);
             auto v = std::make_shared<LVVariableMessageValue<int>>(index, result);
             _values.emplace(index, v);
         }
@@ -243,7 +306,7 @@ namespace grpc_labview
         else
         {
             uint32_t result;
-            ptr = ReadUINT32(ptr, &result);
+            ptr = proto_compat::ReadUINT32(ptr, &result);
             auto v = std::make_shared<LVVariableMessageValue<uint32_t>>(index, result);
             _values.emplace(index, v);
         }
@@ -263,7 +326,7 @@ namespace grpc_labview
         else
         {
             int32_t result;
-            ptr = ReadENUM(ptr, &result);
+            ptr = proto_compat::ReadENUM(ptr, &result);
             auto v = std::make_shared<LVEnumMessageValue>(index, result);
             _values.emplace(index, v);
         }
@@ -283,7 +346,7 @@ namespace grpc_labview
         else
         {
             int64_t result;
-            ptr = ReadINT64(ptr, &result);
+            ptr = proto_compat::ReadINT64(ptr, &result);
             auto v = std::make_shared<LVVariableMessageValue<int64_t>>(index, result);
             _values.emplace(index, v);
         }
@@ -303,7 +366,7 @@ namespace grpc_labview
         else
         {
             uint64_t result;
-            ptr = ReadUINT64(ptr, &result);
+            ptr = proto_compat::ReadUINT64(ptr, &result);
             auto v = std::make_shared<LVVariableMessageValue<uint64_t>>(index, result);
             _values.emplace(index, v);
         }
@@ -323,7 +386,7 @@ namespace grpc_labview
         else
         {
             float result;
-            ptr = ReadFLOAT(ptr, &result);
+            ptr = proto_compat::ReadFLOAT(ptr, &result);
             auto v = std::make_shared<LVVariableMessageValue<float>>(index, result);
             _values.emplace(index, v);
         }
@@ -343,7 +406,7 @@ namespace grpc_labview
         else
         {
             double result;
-            ptr = ReadDOUBLE(ptr, &result);
+            ptr = proto_compat::ReadDOUBLE(ptr, &result);
             auto v = std::make_shared<LVVariableMessageValue<double>>(index, result);
             _values.emplace(index, v);
         }
@@ -482,7 +545,7 @@ namespace grpc_labview
         else
         {
             int32_t result;
-            ptr = ReadSINT32(ptr, &result);
+            ptr = proto_compat::ReadSINT32(ptr, &result);
             auto v = std::make_shared<LVSInt32MessageValue>(index, result);
             _values.emplace(index, v);
         }
@@ -502,7 +565,7 @@ namespace grpc_labview
         else
         {
             int64_t result;
-            ptr = ReadSINT64(ptr, &result);
+            ptr = proto_compat::ReadSINT64(ptr, &result);
             auto v = std::make_shared<LVSInt64MessageValue>(index, result);
             _values.emplace(index, v);
         }
@@ -522,7 +585,7 @@ namespace grpc_labview
         else
         {
             uint32_t result;
-            ptr = ReadFIXED32(ptr, &result);
+            ptr = proto_compat::ReadFIXED32(ptr, &result);
             auto v = std::make_shared<LVFixed32MessageValue>(index, result);
             _values.emplace(index, v);
         }
@@ -542,7 +605,7 @@ namespace grpc_labview
         else
         {
             uint64_t result;
-            ptr = ReadFIXED64(ptr, &result);
+            ptr = proto_compat::ReadFIXED64(ptr, &result);
             auto v = std::make_shared<LVFixed64MessageValue>(index, result);
             _values.emplace(index, v);
         }
@@ -562,7 +625,7 @@ namespace grpc_labview
         else
         {
             int32_t result;
-            ptr = ReadSFIXED32(ptr, &result);
+            ptr = proto_compat::ReadSFIXED32(ptr, &result);
             auto v = std::make_shared<LVSFixed32MessageValue>(index, result);
             _values.emplace(index, v);
         }
@@ -582,7 +645,7 @@ namespace grpc_labview
         else
         {
             int64_t result;
-            ptr = ReadSFIXED64(ptr, &result);
+            ptr = proto_compat::ReadSFIXED64(ptr, &result);
             auto v = std::make_shared<LVSFixed64MessageValue>(index, result);
             _values.emplace(index, v);
         }

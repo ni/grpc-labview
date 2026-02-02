@@ -4,6 +4,7 @@
 #include <exceptions.h>
 #include <lv_interop.h>
 #include <sstream>
+#include <fstream>
 #include <list>
 
 //---------------------------------------------------------------------

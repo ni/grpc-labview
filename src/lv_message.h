@@ -7,12 +7,18 @@
 #include <message_value.h>
 #include <message_metadata.h>
 #include <google/protobuf/message.h>
+#include <grpcpp/support/byte_buffer.h>
 
 using namespace google::protobuf::internal;
 
 namespace grpc_labview
 {
     //---------------------------------------------------------------------
+    // LVMessage - Custom message class for LabVIEW gRPC integration
+    // 
+    // This class uses grpc::SerializationTraits for gRPC integration
+    // rather than relying solely on protobuf::Message inheritance.
+    // See lv_serialization_traits.h for the traits implementation.
     //---------------------------------------------------------------------
     class LVMessage : public google::protobuf::Message, public gRPCid
     {
@@ -28,26 +34,29 @@ namespace grpc_labview
         void ArenaDtor(void* object);
         void RegisterArenaDtor(google::protobuf::Arena*);
 
-        void Clear()  final;
+        void Clear() final;
         bool IsInitialized() const final;
 
-        const char* _InternalParse(const char* ptr, google::protobuf::internal::ParseContext* ctx)  override final;
+        const char* _InternalParse(const char* ptr, google::protobuf::internal::ParseContext* ctx) override final;
         google::protobuf::uint8* _InternalSerialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override final;
-        void SetCachedSize(int size) const ;
-        int GetCachedSize(void) const ;
+        void SetCachedSize(int size) const;
+        int GetCachedSize(void) const;
         size_t ByteSizeLong() const final;
         virtual void PostInteralParseAction() {};
 
-        void MergeFrom(const google::protobuf::Message &from) final;
-        void MergeFrom(const LVMessage &from);
-        void CopyFrom(const google::protobuf::Message &from) ;
-        void CopyFrom(const LVMessage &from);
+        void MergeFrom(const google::protobuf::Message& from) final;
+        void MergeFrom(const LVMessage& from);
+        void CopyFrom(const google::protobuf::Message& from);
+        void CopyFrom(const LVMessage& from);
         void CopyOneofIndicesToCluster(int8_t* cluster) const;
-        void InternalSwap(LVMessage *other);
+        void InternalSwap(LVMessage* other);
         google::protobuf::Metadata GetMetadata() const final;
 
+        //---------------------------------------------------------------------
+        // ByteBuffer serialization methods - used by SerializationTraits
+        //---------------------------------------------------------------------
         bool ParseFromByteBuffer(const grpc::ByteBuffer& buffer);
-        std::unique_ptr<grpc::ByteBuffer> SerializeToByteBuffer();
+        std::unique_ptr<grpc::ByteBuffer> SerializeToByteBuffer() const;
 
         std::map<int, std::shared_ptr<LVMessageValue>> _values;
         std::shared_ptr<MessageMetadata> _metadata;

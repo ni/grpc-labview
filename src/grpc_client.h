@@ -4,11 +4,13 @@
 #pragma once
 
 //---------------------------------------------------------------------
+// IMPORTANT: lv_serialization_traits.h MUST be included BEFORE grpc headers
+// This registers our custom SerializationTraits<LVMessage> specialization
 //---------------------------------------------------------------------
-#include <metadata_owner.h>
+#include <lv_serialization_traits.h>
 #include <grpcpp/grpcpp.h>
-#include <lv_message.h>
 #include <grpcpp/impl/codegen/sync_stream.h>
+#include <metadata_owner.h>
 #include <future>
 #include <unordered_map>
 
