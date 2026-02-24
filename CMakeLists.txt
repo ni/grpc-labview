@@ -8,7 +8,7 @@ project(labview-grpc C CXX)
 set(ABSL_ENABLE_INSTALL ON)
 
 if(NOT MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
   # Set default visibility to hidden, only export LIBRARY_EXPORT symbols from the shared library
   add_compile_options(-fvisibility=hidden)
 else()
@@ -19,8 +19,8 @@ else()
   set(protobuf_MSVC_STATIC_RUNTIME ON CACHE BOOL "Use static runtime for protobuf" FORCE)
   set(ABSL_MSVC_STATIC_RUNTIME ON CACHE BOOL "Use static runtime for Abseil")
   set(CARES_MSVC_STATIC_RUNTIME ON CACHE BOOL "Use static runtime for c-ares")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4267 /wd4244")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4267 /wd4244") 
   add_compile_options("$<$<NOT:$<CONFIG:Debug>>:/Zi>")
   add_link_options("$<$<NOT:$<CONFIG:Debug>>:/DEBUG>")
   add_link_options("$<$<NOT:$<CONFIG:Debug>>:/OPT:REF>")
@@ -45,6 +45,15 @@ add_definitions(-D_PS_${CMAKE_SIZEOF_VOID_P})
 # Include the gRPC's cmake build
 #----------------------------------------------------------------------
 add_subdirectory(third_party/grpc ${CMAKE_CURRENT_BINARY_DIR}/grpc EXCLUDE_FROM_ALL)
+
+#----------------------------------------------------------------------
+# Workaround for MSVC C1001 ICE in descriptor_visitor.h on 32-bit builds
+# Force protobuf to use C++20 to avoid compiler internal error
+# See: https://github.com/google/bloaty/pull/410
+#----------------------------------------------------------------------
+if(MSVC)
+  set_target_properties(libprotobuf libprotobuf-lite libprotoc PROPERTIES CXX_STANDARD 20)
+endif()
 
 #----------------------------------------------------------------------
 # Use the grpc targets directly from this build.
@@ -95,6 +104,7 @@ add_library(labview_grpc_server SHARED
   src/lv_message_value.cc
   src/lv_proto_server_reflection_plugin.cc
   src/lv_proto_server_reflection_service.cc
+  src/lv_serialization_traits.cc
   src/message_element_metadata_owner.cc
   src/message_metadata.cc
   src/path_support.cc

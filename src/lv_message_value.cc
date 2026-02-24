@@ -4,10 +4,51 @@
 #include <lv_message.h>
 #include <message_value.h>
 #include <string_utils.h>
+#include <cstring>
 
 //---------------------------------------------------------------------
+// Helpers for serialization using only public CodedOutputStream API
 //---------------------------------------------------------------------
-using namespace google::protobuf::internal;
+namespace {
+    using COS = google::protobuf::io::CodedOutputStream;
+
+    constexpr int WT_VARINT  = 0;
+    constexpr int WT_FIXED64 = 1;
+    constexpr int WT_LEN     = 2;
+    constexpr int WT_FIXED32 = 5;
+
+    inline uint32_t ZigZagEncode32(int32_t n) {
+        return (static_cast<uint32_t>(n) << 1) ^ static_cast<uint32_t>(n >> 31);
+    }
+    inline uint64_t ZigZagEncode64(int64_t n) {
+        return (static_cast<uint64_t>(n) << 1) ^ static_cast<uint64_t>(n >> 63);
+    }
+    inline uint32_t MakeTag(int field_number, int wire_type) {
+        return static_cast<uint32_t>((field_number << 3) | wire_type);
+    }
+    inline size_t TagSize(int field_number, int wire_type) {
+        return COS::VarintSize32(MakeTag(field_number, wire_type));
+    }
+    inline void WriteTag(COS* out, int field_number, int wire_type) {
+        out->WriteTag(MakeTag(field_number, wire_type));
+    }
+    // Writes tag + length prefix + raw bytes
+    inline void WriteLenDelim(COS* out, int field_number, const void* data, size_t len) {
+        WriteTag(out, field_number, WT_LEN);
+        out->WriteVarint32(static_cast<uint32_t>(len));
+        out->WriteRaw(data, static_cast<int>(len));
+    }
+    // Size of a length-delimited field (tag + varint length + payload)
+    inline size_t LenDelimSize(int field_number, size_t payloadLen) {
+        return TagSize(field_number, WT_LEN)
+               + COS::VarintSize32(static_cast<uint32_t>(payloadLen))
+               + payloadLen;
+    }
+    // Varint size for a signed int32 (sign-extended encoding)
+    inline size_t Int32VarintSize(int32_t v) {
+        return v < 0 ? 10 : COS::VarintSize32(static_cast<uint32_t>(v));
+    }
+}
 
 namespace grpc_labview
 {
@@ -30,15 +71,18 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVNestedMessageMessageValue::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_MESSAGE) + WireFormatLite::MessageSize(*_value);
+        size_t nestedSize = _value->ByteSizeLong();
+        return LenDelimSize(_protobufId, nestedSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVNestedMessageMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVNestedMessageMessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::InternalWriteMessage(_protobufId, *_value, _value->GetCachedSize(), target, stream);
+        size_t nestedSize = _value->ByteSizeLong();
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(nestedSize));
+        _value->SerializeToCodedStream(output);
     }
 
     //---------------------------------------------------------------------
@@ -53,24 +97,25 @@ namespace grpc_labview
     size_t LVRepeatedNestedMessageMessageValue::ByteSizeLong()
     {
         size_t totalSize = 0;
-        totalSize += WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_MESSAGE) * _value.size();
         for (const auto& msg : _value)
         {
-            totalSize += WireFormatLite::MessageSize(*msg);
+            size_t nestedSize = msg->ByteSizeLong();
+            totalSize += LenDelimSize(_protobufId, nestedSize);
         }
         return totalSize;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedNestedMessageMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedNestedMessageMessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        for (unsigned int i = 0, n = static_cast<unsigned int>(_value.size()); i < n; i++)
+        for (const auto& msg : _value)
         {
-            target = stream->EnsureSpace(target);
-            target = WireFormatLite::InternalWriteMessage(_protobufId, *_value[i], _value[i]->GetCachedSize(), target, stream);
+            size_t nestedSize = msg->ByteSizeLong();
+            WriteTag(output, _protobufId, WT_LEN);
+            output->WriteVarint32(static_cast<uint32_t>(nestedSize));
+            msg->SerializeToCodedStream(output);
         }
-        return target;
     }
 
     //---------------------------------------------------------------------
@@ -85,16 +130,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVStringMessageValue::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_STRING) + WireFormatLite::StringSize(_value);
+        return LenDelimSize(_protobufId, _value.size());
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVStringMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVStringMessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        VerifyUtf8String(_value, WireFormatLite::SERIALIZE); // log only, no error
-        return stream->WriteString(_protobufId, _value, target);
+        VerifyUtf8String(_value); // log only, no error
+        WriteLenDelim(output, _protobufId, _value.data(), _value.size());
     }
 
     //---------------------------------------------------------------------
@@ -108,10 +152,9 @@ namespace grpc_labview
     size_t LVRepeatedStringMessageValue::ByteSizeLong()
     {
         size_t totalSize = 0;
-        totalSize += WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_STRING) * static_cast<unsigned int>(_value.size());
         for (int i = 0, n = _value.size(); i < n; i++)
         {
-            totalSize += WireFormatLite::StringSize(_value.Get(i));
+            totalSize += LenDelimSize(_protobufId, _value.Get(i).size());
         }
         return totalSize;
     }
@@ -119,15 +162,14 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
 
-    google::protobuf::uint8* LVRepeatedStringMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedStringMessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
         for (int i = 0, n = _value.size(); i < n; i++)
         {
             const auto& s = _value[i];
-            VerifyUtf8String(s, WireFormatLite::SERIALIZE); // log only, no error
-            target = stream->WriteString(_protobufId, s, target);
+            VerifyUtf8String(s); // log only, no error
+            WriteLenDelim(output, _protobufId, s.data(), s.size());
         }
-        return target;
     }
 
     //---------------------------------------------------------------------
@@ -142,15 +184,14 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVBytesMessageValue::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_BYTES) + WireFormatLite::BytesSize(_value);
+        return LenDelimSize(_protobufId, _value.size());
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVBytesMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVBytesMessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return stream->WriteBytes(_protobufId, _value, target);
+        WriteLenDelim(output, _protobufId, _value.data(), _value.size());
     }
 
     //---------------------------------------------------------------------
@@ -164,10 +205,9 @@ namespace grpc_labview
     size_t LVRepeatedBytesMessageValue::ByteSizeLong()
     {
         size_t totalSize = 0;
-        totalSize += WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_BYTES) * static_cast<unsigned int>(_value.size());
         for (int i = 0, n = _value.size(); i < n; i++)
         {
-            totalSize += WireFormatLite::BytesSize(_value.Get(i));
+            totalSize += LenDelimSize(_protobufId, _value.Get(i).size());
         }
         return totalSize;
     }
@@ -175,14 +215,13 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
 
-    google::protobuf::uint8* LVRepeatedBytesMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedBytesMessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
         for (int i = 0, n = _value.size(); i < n; i++)
         {
             const auto& s = _value[i];
-            target = stream->WriteBytes(_protobufId, s, target);
+            WriteLenDelim(output, _protobufId, s.data(), s.size());
         }
-        return target;
     }
 
     //---------------------------------------------------------------------
@@ -198,16 +237,16 @@ namespace grpc_labview
     template <>
     size_t LVVariableMessageValue<bool>::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_BOOL) + WireFormatLite::kBoolSize;
+        return TagSize(_protobufId, WT_VARINT) + 1;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVVariableMessageValue<bool>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVVariableMessageValue<bool>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteBoolToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_VARINT);
+        output->WriteVarint32(_value ? 1u : 0u);
     }
 
     //---------------------------------------------------------------------
@@ -222,28 +261,25 @@ namespace grpc_labview
     template <>
     size_t LVRepeatedMessageValue<bool>::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        unsigned int count = static_cast<unsigned int>(_value.size());
-        size_t dataSize = 1UL * count;
-        if (dataSize > 0)
-        {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
-        }
-        totalSize += dataSize;
-        return totalSize;
+        size_t dataSize = 1UL * static_cast<unsigned int>(_value.size());
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVRepeatedMessageValue<bool>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedMessageValue<bool>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_value.size() > 0)
+        int count = _value.size();
+        if (count == 0) return;
+        size_t dataSize = static_cast<size_t>(count);
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0; i < count; i++)
         {
-            target = stream->WriteFixedPacked(_protobufId, _value, target);
+            output->WriteVarint32(_value.Get(i) ? 1u : 0u);
         }
-        return target;
     }
 
     //---------------------------------------------------------------------
@@ -259,16 +295,16 @@ namespace grpc_labview
     template <>
     size_t LVVariableMessageValue<int>::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_INT32) +  WireFormatLite::Int32Size(_value);
+        return TagSize(_protobufId, WT_VARINT) + Int32VarintSize(_value);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVVariableMessageValue<int>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVVariableMessageValue<int>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteInt32ToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_VARINT);
+        output->WriteVarint64(static_cast<uint64_t>(static_cast<int64_t>(_value)));
     }
 
     //---------------------------------------------------------------------
@@ -284,16 +320,16 @@ namespace grpc_labview
     template <>
     size_t LVVariableMessageValue<uint32_t>::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_UINT32) +  WireFormatLite::UInt32Size(_value);
+        return TagSize(_protobufId, WT_VARINT) + COS::VarintSize32(_value);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVVariableMessageValue<uint32_t>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVVariableMessageValue<uint32_t>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteUInt32ToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_VARINT);
+        output->WriteVarint32(_value);
     }
 
     //---------------------------------------------------------------------
@@ -308,15 +344,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVEnumMessageValue::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_ENUM) +  WireFormatLite::EnumSize(_value);
+        return TagSize(_protobufId, WT_VARINT) + Int32VarintSize(_value);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVEnumMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVEnumMessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteEnumToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_VARINT);
+        output->WriteVarint64(static_cast<uint64_t>(static_cast<int64_t>(_value)));
     }
 
     //---------------------------------------------------------------------
@@ -332,16 +368,16 @@ namespace grpc_labview
     template <>
     size_t LVVariableMessageValue<int64_t>::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_INT64) + WireFormatLite::Int64Size(_value);
+        return TagSize(_protobufId, WT_VARINT) + COS::VarintSize64(static_cast<uint64_t>(_value));
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVVariableMessageValue<int64_t>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVVariableMessageValue<int64_t>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteInt64ToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_VARINT);
+        output->WriteVarint64(static_cast<uint64_t>(_value));
     }
 
     //---------------------------------------------------------------------
@@ -357,16 +393,16 @@ namespace grpc_labview
     template <>
     size_t LVVariableMessageValue<uint64_t>::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_UINT64) +  WireFormatLite::UInt64Size(_value);
+        return TagSize(_protobufId, WT_VARINT) + COS::VarintSize64(_value);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVVariableMessageValue<uint64_t>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVVariableMessageValue<uint64_t>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteUInt64ToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_VARINT);
+        output->WriteVarint64(_value);
     }
 
     //---------------------------------------------------------------------
@@ -381,28 +417,32 @@ namespace grpc_labview
     template <>
     size_t LVRepeatedMessageValue<int>::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        size_t dataSize = WireFormatLite::Int32Size(_value);
-        if (dataSize > 0)
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
+            dataSize += Int32VarintSize(_value.Get(i));
         }
-        _cachedSize = ToCachedSize(dataSize);
-        totalSize += dataSize;
-        return totalSize;
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVRepeatedMessageValue<int>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedMessageValue<int>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_cachedSize > 0)
+        if (_value.size() == 0) return;
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            target = stream->WriteInt32Packed(_protobufId, _value, _cachedSize, target);
+            dataSize += Int32VarintSize(_value.Get(i));
         }
-        return target;
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0, n = _value.size(); i < n; i++)
+        {
+            output->WriteVarint64(static_cast<uint64_t>(static_cast<int64_t>(_value.Get(i))));
+        }
     }
 
     //---------------------------------------------------------------------
@@ -417,28 +457,32 @@ namespace grpc_labview
     template <>
     size_t LVRepeatedMessageValue<uint32_t>::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        size_t dataSize = WireFormatLite::UInt32Size(_value);
-        if (dataSize > 0)
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::UInt32Size(static_cast<google::protobuf::int32>(dataSize));
+            dataSize += COS::VarintSize32(_value.Get(i));
         }
-        _cachedSize = ToCachedSize(dataSize);
-        totalSize += dataSize;
-        return totalSize;
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVRepeatedMessageValue<uint32_t>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedMessageValue<uint32_t>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_cachedSize > 0)
+        if (_value.size() == 0) return;
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            target = stream->WriteUInt32Packed(_protobufId, _value, _cachedSize, target);
+            dataSize += COS::VarintSize32(_value.Get(i));
         }
-        return target;
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0, n = _value.size(); i < n; i++)
+        {
+            output->WriteVarint32(_value.Get(i));
+        }
     }
 
     //---------------------------------------------------------------------
@@ -452,27 +496,31 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVRepeatedEnumMessageValue::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        size_t dataSize = WireFormatLite::EnumSize(_value);
-        if (dataSize > 0)
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::EnumSize(static_cast<google::protobuf::int32>(dataSize));
+            dataSize += Int32VarintSize(_value.Get(i));
         }
-        _cachedSize = ToCachedSize(dataSize);
-        totalSize += dataSize;
-        return totalSize;
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedEnumMessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedEnumMessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_cachedSize > 0)
+        if (_value.size() == 0) return;
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            target = stream->WriteEnumPacked(_protobufId, _value, _cachedSize, target);
+            dataSize += Int32VarintSize(_value.Get(i));
         }
-        return target;
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0, n = _value.size(); i < n; i++)
+        {
+            output->WriteVarint64(static_cast<uint64_t>(static_cast<int64_t>(_value.Get(i))));
+        }
     }
 
     //---------------------------------------------------------------------
@@ -487,28 +535,32 @@ namespace grpc_labview
     template <>
     size_t LVRepeatedMessageValue<int64_t>::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        size_t dataSize = WireFormatLite::Int64Size(_value);
-        if (dataSize > 0)
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int64Size(static_cast<google::protobuf::int32>(dataSize));
+            dataSize += COS::VarintSize64(static_cast<uint64_t>(_value.Get(i)));
         }
-        _cachedSize = ToCachedSize(dataSize);
-        totalSize += dataSize;
-        return totalSize;
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVRepeatedMessageValue<int64_t>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedMessageValue<int64_t>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_cachedSize > 0)
+        if (_value.size() == 0) return;
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            target = stream->WriteInt64Packed(_protobufId, _value, _cachedSize, target);
+            dataSize += COS::VarintSize64(static_cast<uint64_t>(_value.Get(i)));
         }
-        return target;
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0, n = _value.size(); i < n; i++)
+        {
+            output->WriteVarint64(static_cast<uint64_t>(_value.Get(i)));
+        }
     }
 
     //---------------------------------------------------------------------
@@ -523,28 +575,32 @@ namespace grpc_labview
     template <>
     size_t LVRepeatedMessageValue<uint64_t>::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        size_t dataSize = WireFormatLite::UInt64Size(_value);
-        if (dataSize > 0)
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::UInt64Size(static_cast<google::protobuf::int32>(dataSize));
+            dataSize += COS::VarintSize64(_value.Get(i));
         }
-        _cachedSize = ToCachedSize(dataSize);
-        totalSize += dataSize;
-        return totalSize;
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVRepeatedMessageValue<uint64_t>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedMessageValue<uint64_t>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_cachedSize > 0)
+        if (_value.size() == 0) return;
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            target = stream->WriteUInt64Packed(_protobufId, _value, _cachedSize, target);
+            dataSize += COS::VarintSize64(_value.Get(i));
         }
-        return target;
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0, n = _value.size(); i < n; i++)
+        {
+            output->WriteVarint64(_value.Get(i));
+        }
     }
 
     //---------------------------------------------------------------------
@@ -560,16 +616,18 @@ namespace grpc_labview
     template <>
     size_t LVVariableMessageValue<float>::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_STRING) + WireFormatLite::kFloatSize;
+        return TagSize(_protobufId, WT_FIXED32) + 4;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVVariableMessageValue<float>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVVariableMessageValue<float>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteFloatToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_FIXED32);
+        uint32_t bits;
+        memcpy(&bits, &_value, 4);
+        output->WriteLittleEndian32(bits);
     }
 
     //---------------------------------------------------------------------
@@ -584,28 +642,28 @@ namespace grpc_labview
     template <>
     size_t LVRepeatedMessageValue<float>::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        unsigned int count = static_cast<unsigned int>(_value.size());
-        size_t dataSize = 4UL * count;
-        if (dataSize > 0)
-        {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
-        }
-        totalSize += dataSize;
-        return totalSize;
+        size_t dataSize = 4UL * static_cast<unsigned int>(_value.size());
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVRepeatedMessageValue<float>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedMessageValue<float>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_value.size() > 0)
+        int count = _value.size();
+        if (count == 0) return;
+        size_t dataSize = 4UL * static_cast<unsigned int>(count);
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0; i < count; i++)
         {
-            target = stream->WriteFixedPacked(_protobufId, _value, target);
+            uint32_t bits;
+            float v = _value.Get(i);
+            memcpy(&bits, &v, 4);
+            output->WriteLittleEndian32(bits);
         }
-        return target;
     }
 
 
@@ -622,16 +680,18 @@ namespace grpc_labview
     template <>
     size_t LVVariableMessageValue<double>::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::FieldType::TYPE_DOUBLE) +  WireFormatLite::kDoubleSize;
+        return TagSize(_protobufId, WT_FIXED64) + 8;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVVariableMessageValue<double>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVVariableMessageValue<double>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteDoubleToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_FIXED64);
+        uint64_t bits;
+        memcpy(&bits, &_value, 8);
+        output->WriteLittleEndian64(bits);
     }
 
     //---------------------------------------------------------------------
@@ -646,28 +706,28 @@ namespace grpc_labview
     template <>
     size_t LVRepeatedMessageValue<double>::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        unsigned int count = static_cast<unsigned int>(_value.size());
-        size_t dataSize = 8UL * count;
-        if (dataSize > 0)
-        {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
-        }
-        totalSize += dataSize;
-        return totalSize;
+        size_t dataSize = 8UL * static_cast<unsigned int>(_value.size());
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     template <>
-    google::protobuf::uint8* LVRepeatedMessageValue<double>::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedMessageValue<double>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_value.size() > 0)
+        int count = _value.size();
+        if (count == 0) return;
+        size_t dataSize = 8UL * static_cast<unsigned int>(count);
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0; i < count; i++)
         {
-            target = stream->WriteFixedPacked(_protobufId, _value, target);
+            uint64_t bits;
+            double v = _value.Get(i);
+            memcpy(&bits, &v, 8);
+            output->WriteLittleEndian64(bits);
         }
-        return target;
     }
 
     //---------------------------------------------------------------------
@@ -682,15 +742,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVSInt32MessageValue::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_SINT32) + WireFormatLite::SInt32Size(_value);
+        return TagSize(_protobufId, WT_VARINT) + COS::VarintSize32(ZigZagEncode32(_value));
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVSInt32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVSInt32MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteSInt32ToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_VARINT);
+        output->WriteVarint32(ZigZagEncode32(_value));
     }
 
     //---------------------------------------------------------------------
@@ -704,27 +764,31 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVRepeatedSInt32MessageValue::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        size_t dataSize = WireFormatLite::SInt32Size(_value);
-        if (dataSize > 0)
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::SInt32Size(static_cast<google::protobuf::int32>(dataSize));
+            dataSize += COS::VarintSize32(ZigZagEncode32(_value.Get(i)));
         }
-        _cachedSize = ToCachedSize(dataSize);
-        totalSize += dataSize;
-        return totalSize;
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedSInt32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedSInt32MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_cachedSize > 0)
+        if (_value.size() == 0) return;
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            target = stream->WriteSInt32Packed(_protobufId, _value, _cachedSize, target);
+            dataSize += COS::VarintSize32(ZigZagEncode32(_value.Get(i)));
         }
-        return target;
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0, n = _value.size(); i < n; i++)
+        {
+            output->WriteVarint32(ZigZagEncode32(_value.Get(i)));
+        }
     }
     //---------------------------------------------------------------------
      //---------------------------------------------------------------------
@@ -738,15 +802,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVSInt64MessageValue::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_SINT64) + WireFormatLite::SInt64Size(_value);
+        return TagSize(_protobufId, WT_VARINT) + COS::VarintSize64(ZigZagEncode64(_value));
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVSInt64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVSInt64MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteSInt64ToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_VARINT);
+        output->WriteVarint64(ZigZagEncode64(_value));
     }
 
     //---------------------------------------------------------------------
@@ -760,27 +824,31 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVRepeatedSInt64MessageValue::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        size_t dataSize = WireFormatLite::SInt64Size(_value);
-        if (dataSize > 0)
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::SInt64Size(static_cast<google::protobuf::int32>(dataSize));
+            dataSize += COS::VarintSize64(ZigZagEncode64(_value.Get(i)));
         }
-        _cachedSize = ToCachedSize(dataSize);
-        totalSize += dataSize;
-        return totalSize;
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedSInt64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedSInt64MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_cachedSize > 0)
+        if (_value.size() == 0) return;
+        size_t dataSize = 0;
+        for (int i = 0, n = _value.size(); i < n; i++)
         {
-            target = stream->WriteSInt64Packed(_protobufId, _value, _cachedSize, target);
+            dataSize += COS::VarintSize64(ZigZagEncode64(_value.Get(i)));
         }
-        return target;
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0, n = _value.size(); i < n; i++)
+        {
+            output->WriteVarint64(ZigZagEncode64(_value.Get(i)));
+        }
     }
 
     //---------------------------------------------------------------------
@@ -795,15 +863,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVFixed32MessageValue::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_FIXED32) + WireFormatLite::kFixed32Size;
+        return TagSize(_protobufId, WT_FIXED32) + 4;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVFixed32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVFixed32MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteFixed32ToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_FIXED32);
+        output->WriteLittleEndian32(_value);
     }
 
     //---------------------------------------------------------------------
@@ -817,27 +885,24 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVRepeatedFixed32MessageValue::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        unsigned int count = static_cast<unsigned int>(_value.size());
-        size_t dataSize = WireFormatLite::kFixed32Size * count;
-        if (dataSize > 0)
-        {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::UInt32Size(static_cast<google::protobuf::int32>(dataSize));
-        }
-        totalSize += dataSize;
-        return totalSize;
+        size_t dataSize = 4UL * static_cast<unsigned int>(_value.size());
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedFixed32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedFixed32MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_value.size() > 0)
+        int count = _value.size();
+        if (count == 0) return;
+        size_t dataSize = 4UL * static_cast<unsigned int>(count);
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0; i < count; i++)
         {
-            target = stream->WriteFixedPacked(_protobufId, _value, target);
+            output->WriteLittleEndian32(_value.Get(i));
         }
-        return target;
     }
 
     //---------------------------------------------------------------------
@@ -852,15 +917,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVFixed64MessageValue::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_FIXED64) + WireFormatLite::kFixed64Size;
+        return TagSize(_protobufId, WT_FIXED64) + 8;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVFixed64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVFixed64MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteFixed64ToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_FIXED64);
+        output->WriteLittleEndian64(_value);
     }
 
     //---------------------------------------------------------------------
@@ -874,27 +939,24 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVRepeatedFixed64MessageValue::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        unsigned int count = static_cast<unsigned int>(_value.size());
-        size_t dataSize = WireFormatLite::kFixed64Size * count;
-        if (dataSize > 0)
-        {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::UInt64Size(static_cast<google::protobuf::int32>(dataSize));
-        }
-        totalSize += dataSize;
-        return totalSize;
+        size_t dataSize = 8UL * static_cast<unsigned int>(_value.size());
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedFixed64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedFixed64MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_value.size() > 0)
+        int count = _value.size();
+        if (count == 0) return;
+        size_t dataSize = 8UL * static_cast<unsigned int>(count);
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0; i < count; i++)
         {
-            target = stream->WriteFixedPacked(_protobufId, _value, target);
+            output->WriteLittleEndian64(_value.Get(i));
         }
-        return target;
     }
 
     //---------------------------------------------------------------------
@@ -909,15 +971,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVSFixed32MessageValue::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_SFIXED32) + WireFormatLite::kSFixed32Size;
+        return TagSize(_protobufId, WT_FIXED32) + 4;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVSFixed32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVSFixed32MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteSFixed32ToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_FIXED32);
+        output->WriteLittleEndian32(static_cast<uint32_t>(_value));
     }
 
     //---------------------------------------------------------------------
@@ -931,27 +993,24 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVRepeatedSFixed32MessageValue::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        unsigned int count = static_cast<unsigned int>(_value.size());
-        size_t dataSize = WireFormatLite::kSFixed32Size * count;
-        if (dataSize > 0)
-        {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int32Size(static_cast<google::protobuf::int32>(dataSize));
-        }
-        totalSize += dataSize;
-        return totalSize;
+        size_t dataSize = 4UL * static_cast<unsigned int>(_value.size());
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedSFixed32MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedSFixed32MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_value.size() > 0)
+        int count = _value.size();
+        if (count == 0) return;
+        size_t dataSize = 4UL * static_cast<unsigned int>(count);
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0; i < count; i++)
         {
-            target = stream->WriteFixedPacked(_protobufId, _value, target);
+            output->WriteLittleEndian32(static_cast<uint32_t>(_value.Get(i)));
         }
-        return target;
     }
 
     //---------------------------------------------------------------------
@@ -966,15 +1025,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVSFixed64MessageValue::ByteSizeLong()
     {
-        return WireFormatLite::TagSize(_protobufId, WireFormatLite::TYPE_SFIXED64) + WireFormatLite::kSFixed64Size;
+        return TagSize(_protobufId, WT_FIXED64) + 8;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVSFixed64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVSFixed64MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        target = stream->EnsureSpace(target);
-        return WireFormatLite::WriteSFixed64ToArray(_protobufId, _value, target);
+        WriteTag(output, _protobufId, WT_FIXED64);
+        output->WriteLittleEndian64(static_cast<uint64_t>(_value));
     }
 
     //---------------------------------------------------------------------
@@ -988,26 +1047,23 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVRepeatedSFixed64MessageValue::ByteSizeLong()
     {
-        size_t totalSize = 0;
-        unsigned int count = static_cast<unsigned int>(_value.size());
-        size_t dataSize = WireFormatLite::kSFixed64Size * count;
-        if (dataSize > 0)
-        {
-            // passing 2 as type to TagSize because that is what WriteLengthDelim passes during serialize
-            totalSize += WireFormatLite::TagSize(_protobufId, (WireFormatLite::FieldType)2) + WireFormatLite::Int64Size(static_cast<google::protobuf::int32>(dataSize));
-        }
-        totalSize += dataSize;
-        return totalSize;
+        size_t dataSize = 8UL * static_cast<unsigned int>(_value.size());
+        if (dataSize == 0) return 0;
+        return LenDelimSize(_protobufId, dataSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::uint8* LVRepeatedSFixed64MessageValue::Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const
+    void LVRepeatedSFixed64MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        if (_value.size() > 0)
+        int count = _value.size();
+        if (count == 0) return;
+        size_t dataSize = 8UL * static_cast<unsigned int>(count);
+        WriteTag(output, _protobufId, WT_LEN);
+        output->WriteVarint32(static_cast<uint32_t>(dataSize));
+        for (int i = 0; i < count; i++)
         {
-            target = stream->WriteFixedPacked(_protobufId, _value, target);
+            output->WriteLittleEndian64(static_cast<uint64_t>(_value.Get(i)));
         }
-        return target;
     }
 }

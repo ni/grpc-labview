@@ -9,38 +9,38 @@ namespace grpc {
 //---------------------------------------------------------------------
 // Serialize an LVMessage to a ByteBuffer
 //---------------------------------------------------------------------
-Status SerializationTraits<grpc_labview::LVMessage, void>::Serialize(
+::grpc::Status SerializationTraits<grpc_labview::LVMessage, void>::Serialize(
     const grpc_labview::LVMessage& msg,
-    ByteBuffer* bb,
+    ::grpc::ByteBuffer* bb,
     bool* own_buffer) 
 {
     // Use the existing SerializeToByteBuffer method
     auto buffer = msg.SerializeToByteBuffer();
     if (!buffer) {
-        return Status(StatusCode::INTERNAL, "LVMessage serialization failed");
+        return ::grpc::Status(::grpc::StatusCode::INTERNAL, "LVMessage serialization failed");
     }
     *bb = std::move(*buffer);
     *own_buffer = true;
-    return Status::OK;
+    return ::grpc::Status::OK;
 }
 
 //---------------------------------------------------------------------
 // Deserialize a ByteBuffer into an LVMessage
 //---------------------------------------------------------------------
-Status SerializationTraits<grpc_labview::LVMessage, void>::Deserialize(
-    ByteBuffer* bb,
+::grpc::Status SerializationTraits<grpc_labview::LVMessage, void>::Deserialize(
+    ::grpc::ByteBuffer* bb,
     grpc_labview::LVMessage* msg) 
 {
     if (!msg) {
-        return Status(StatusCode::INTERNAL, "Null message pointer");
+        return ::grpc::Status(::grpc::StatusCode::INTERNAL, "Null message pointer");
     }
     
     if (!msg->ParseFromByteBuffer(*bb)) {
-        return Status(StatusCode::INTERNAL, "LVMessage deserialization failed");
+        return ::grpc::Status(::grpc::StatusCode::INTERNAL, "LVMessage deserialization failed");
     }
     
     bb->Clear();
-    return Status::OK;
+    return ::grpc::Status::OK;
 }
 
 }  // namespace grpc

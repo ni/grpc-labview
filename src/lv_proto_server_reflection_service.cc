@@ -95,7 +95,7 @@ namespace grpc_labview
             for (int i = 0; i < numServices; ++i)
             {
                 const google::protobuf::ServiceDescriptor* serviceDescriptor = other_pool_services_info_ptr->other_pool_file_descriptor->service(i);
-                other_pool_services_info_ptr->other_pool_services_.push_back(serviceDescriptor->full_name());
+                other_pool_services_info_ptr->other_pool_services_.push_back(std::string(serviceDescriptor->full_name()));
             }
         }
     }
@@ -224,10 +224,10 @@ namespace grpc_labview
         const grpc::protobuf::FileDescriptor* file_desc,
         grpc::reflection::v1alpha::ServerReflectionResponse* response,
         std::unordered_set<std::string>* seen_files) {
-        if (seen_files->find(file_desc->name()) != seen_files->end()) {
+        if (seen_files->find(std::string(file_desc->name())) != seen_files->end()) {
             return;
         }
-        seen_files->insert(file_desc->name());
+        seen_files->insert(std::string(file_desc->name()));
 
         grpc::protobuf::FileDescriptorProto file_desc_proto;
         std::string data;

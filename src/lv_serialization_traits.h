@@ -10,9 +10,9 @@
 //---------------------------------------------------------------------
 #pragma once
 
+// Include grpc headers first to get proper definitions
 #include <grpcpp/support/byte_buffer.h>
 #include <grpcpp/support/status.h>
-#include <grpcpp/impl/codegen/serialization_traits.h>
 
 // Forward declaration - full definition in lv_message.h
 namespace grpc_labview {
@@ -20,6 +20,10 @@ namespace grpc_labview {
 }
 
 namespace grpc {
+
+// Define the SerializationTraits base template
+template <typename T, typename Enable = void>
+class SerializationTraits;
 
 //---------------------------------------------------------------------
 // SerializationTraits specialization for LVMessage
@@ -32,15 +36,15 @@ public:
     //---------------------------------------------------------------------
     // Serialize an LVMessage to a ByteBuffer for sending over the wire
     //---------------------------------------------------------------------
-    static Status Serialize(const grpc_labview::LVMessage& msg,
-                           ByteBuffer* bb,
-                           bool* own_buffer);
+    static ::grpc::Status Serialize(const grpc_labview::LVMessage& msg,
+                                    ::grpc::ByteBuffer* bb,
+                                    bool* own_buffer);
 
     //---------------------------------------------------------------------
     // Deserialize a ByteBuffer into an LVMessage
     //---------------------------------------------------------------------
-    static Status Deserialize(ByteBuffer* bb,
-                             grpc_labview::LVMessage* msg);
+    static ::grpc::Status Deserialize(::grpc::ByteBuffer* bb,
+                                      grpc_labview::LVMessage* msg);
 };
 
 }  // namespace grpc
