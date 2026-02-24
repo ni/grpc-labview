@@ -6,19 +6,15 @@
 #include <sstream>
 #include <feature_toggles.h>
 #include <string_utils.h>
+#include <google/protobuf/wire_format_lite.h>
 
 namespace {
-    inline int32_t ZigZagDecode32(uint32_t n) {
-        return static_cast<int32_t>((n >> 1) ^ (~(n & 1) + 1));
-    }
-    inline int64_t ZigZagDecode64(uint64_t n) {
-        return static_cast<int64_t>((n >> 1) ^ (~(n & 1) + 1));
-    }
+    inline int32_t ZigZagDecode32(uint32_t n) { return google::protobuf::internal::WireFormatLite::ZigZagDecode32(n); }
+    inline int64_t ZigZagDecode64(uint64_t n) { return google::protobuf::internal::WireFormatLite::ZigZagDecode64(n); }
 }
 
 namespace grpc_labview
 {
-    // Copy a vector of values into a LabVIEW 1D array at lv_ptr
     template<typename T>
     static void CopyVectorToLVArray(const std::vector<T>& vals, int8_t* lv_ptr)
     {

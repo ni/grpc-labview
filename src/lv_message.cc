@@ -8,6 +8,7 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 #include <google/protobuf/unknown_field_set.h>
+#include <google/protobuf/wire_format_lite.h>
 
 namespace {
     // Wire type constants
@@ -83,15 +84,15 @@ namespace {
     inline bool SkipField(google::protobuf::io::CodedInputStream* input, uint32_t tag) {
         return HandleField(input, tag, nullptr);
     }
-    
-    // ZigZag decoding functions
+
     inline int32_t ZigZagDecode32(uint32_t n) {
-        return static_cast<int32_t>((n >> 1) ^ (~(n & 1) + 1));
+        return google::protobuf::internal::WireFormatLite::ZigZagDecode32(n);
+    }
+    inline int64_t ZigZagDecode64(uint64_t n) {
+        return google::protobuf::internal::WireFormatLite::ZigZagDecode64(n);
     }
     
-    inline int64_t ZigZagDecode64(uint64_t n) {
-        return static_cast<int64_t>((n >> 1) ^ (~(n & 1) + 1));
-    }
+
 }
 
 namespace grpc_labview
@@ -592,9 +593,7 @@ namespace grpc_labview
                 {
                     uint32_t value;
                     if (!input->ReadVarint32(&value)) return false;
-                    // ZigZag decode
-                    int32_t decoded = ZigZagDecode32(value);
-                    v->_value.Add(decoded);
+                    v->_value.Add(ZigZagDecode32(value));
                 }
                 input->PopLimit(limit);
             }
@@ -604,8 +603,7 @@ namespace grpc_labview
         {
             uint32_t value;
             if (!input->ReadVarint32(&value)) return false;
-            int32_t decoded = ZigZagDecode32(value);
-            auto v = std::make_shared<LVVariableMessageValue<int32_t>>(field_number, decoded);
+            auto v = std::make_shared<LVVariableMessageValue<int32_t>>(field_number, ZigZagDecode32(value));
             _values.emplace(field_number, v);
         }
         return true;
@@ -626,8 +624,7 @@ namespace grpc_labview
                 {
                     uint64_t value;
                     if (!input->ReadVarint64(&value)) return false;
-                    int64_t decoded = ZigZagDecode64(value);
-                    v->_value.Add(decoded);
+                    v->_value.Add(ZigZagDecode64(value));
                 }
                 input->PopLimit(limit);
             }
@@ -637,8 +634,7 @@ namespace grpc_labview
         {
             uint64_t value;
             if (!input->ReadVarint64(&value)) return false;
-            int64_t decoded = ZigZagDecode64(value);
-            auto v = std::make_shared<LVVariableMessageValue<int64_t>>(field_number, decoded);
+            auto v = std::make_shared<LVVariableMessageValue<int64_t>>(field_number, ZigZagDecode64(value));
             _values.emplace(field_number, v);
         }
         return true;

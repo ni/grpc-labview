@@ -5,9 +5,10 @@
 #include <message_value.h>
 #include <string_utils.h>
 #include <cstring>
+#include <google/protobuf/wire_format_lite.h>
 
 //---------------------------------------------------------------------
-// Helpers for serialization using only public CodedOutputStream API
+// Helpers for serialization using public CodedOutputStream and WireFormatLite APIs
 //---------------------------------------------------------------------
 namespace {
     using COS = google::protobuf::io::CodedOutputStream;
@@ -17,12 +18,8 @@ namespace {
     constexpr int WT_LEN     = 2;
     constexpr int WT_FIXED32 = 5;
 
-    inline uint32_t ZigZagEncode32(int32_t n) {
-        return (static_cast<uint32_t>(n) << 1) ^ static_cast<uint32_t>(n >> 31);
-    }
-    inline uint64_t ZigZagEncode64(int64_t n) {
-        return (static_cast<uint64_t>(n) << 1) ^ static_cast<uint64_t>(n >> 63);
-    }
+    inline uint32_t ZigZagEncode32(int32_t n) { return google::protobuf::internal::WireFormatLite::ZigZagEncode32(n); }
+    inline uint64_t ZigZagEncode64(int64_t n) { return google::protobuf::internal::WireFormatLite::ZigZagEncode64(n); }
     inline uint32_t MakeTag(int field_number, int wire_type) {
         return static_cast<uint32_t>((field_number << 3) | wire_type);
     }
