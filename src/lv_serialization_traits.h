@@ -21,10 +21,6 @@ namespace grpc_labview {
 
 namespace grpc {
 
-// Define the SerializationTraits base template
-template <typename T, typename Enable = void>
-class SerializationTraits;
-
 //---------------------------------------------------------------------
 // SerializationTraits specialization for LVMessage
 // This tells gRPC how to serialize/deserialize our custom message type
