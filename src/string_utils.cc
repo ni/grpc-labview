@@ -26,7 +26,7 @@ namespace grpc_labview
 
         if (!IsAscii(str)) {
 #ifndef NDEBUG
-            std::cerr << "ERROR: String contains non-ASCII characters.";
+            std::cerr << "ERROR: String contains non-ASCII characters";
 #endif
             return false;
         }
@@ -42,7 +42,7 @@ namespace grpc_labview
         if (!utf8_range::IsStructurallyValid(str)) {
 #ifndef NDEBUG
             const char* safe_field_name = field_name ? field_name : "";
-            std::cerr << "ERROR: String field '" << safe_field_name << "' contains invalid UTF-8.";
+            std::cerr << "ERROR: String field '" << safe_field_name << "' contains invalid UTF-8";
 #endif
             return false;
         }
