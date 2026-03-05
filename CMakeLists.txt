@@ -227,6 +227,42 @@ target_link_libraries(test_server
  ${_GRPC_GRPCPP}
  ${_PROTOBUF_LIBPROTOBUF})
 
+#######################################################################
+# Unit Tests (Google Test)
+#######################################################################
+
+# Google Test is bundled with gRPC
+set(GTEST_DIR "${CMAKE_SOURCE_DIR}/third_party/grpc/third_party/googletest")
+add_subdirectory(${GTEST_DIR} ${CMAKE_CURRENT_BINARY_DIR}/googletest EXCLUDE_FROM_ALL)
+
+add_executable(unit_tests
+  tests/unit/lv_message_tests.cc
+  src/lv_message.cc
+  src/lv_message_value.cc
+  src/lv_serialization_traits.cc
+  src/string_utils.cc
+  src/feature_toggles.cc
+  src/message_metadata.cc
+  src/message_element_metadata_owner.cc
+  src/lv_interop.cc
+  src/path_support.cc
+  src/exceptions.cc
+  src/well_known_messages.cc
+)
+target_link_libraries(unit_tests
+  gtest
+  ${_GRPC_GRPCPP}
+  ${_PROTOBUF_LIBPROTOBUF}
+)
+target_include_directories(unit_tests PRIVATE
+  "${CMAKE_SOURCE_DIR}/src"
+  "${CMAKE_CURRENT_BINARY_DIR}"
+  "${GTEST_DIR}/googletest/include"
+)
+
+enable_testing()
+add_test(NAME unit_tests COMMAND unit_tests)
+
 add_dependencies(labview_grpc_server Detect_Compatibility_Breaks)
 add_dependencies(labview_grpc_generator Detect_Compatibility_Breaks)
 add_dependencies(test_client Detect_Compatibility_Breaks)

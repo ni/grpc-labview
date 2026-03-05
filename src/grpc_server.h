@@ -31,7 +31,7 @@
 #include <map>
 #include <event_data.h>
 #include <metadata_owner.h>
-#include <semaphore.h>
+#include <lv_semaphore.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
