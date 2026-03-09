@@ -63,6 +63,7 @@ namespace grpc_labview
         }
 
         google::protobuf::RepeatedField<T> _value;
+        mutable size_t _cachedDataSize = 0;
 
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
@@ -238,6 +239,7 @@ namespace grpc_labview
 
     public:
         google::protobuf::RepeatedField<int32_t> _value;
+        mutable size_t _cachedDataSize = 0;
 
     public:
         void* RawValue() override { return &_value; };
@@ -271,6 +273,7 @@ namespace grpc_labview
 
     public:
         google::protobuf::RepeatedField<int64_t> _value;
+        mutable size_t _cachedDataSize = 0;
 
     public:
         void* RawValue() override { return &_value; };

@@ -419,6 +419,7 @@ namespace grpc_labview
         {
             dataSize += Int32VarintSize(_value.Get(i));
         }
+        _cachedDataSize = dataSize;
         if (dataSize == 0) return 0;
         return LenDelimSize(_protobufId, dataSize);
     }
@@ -429,10 +430,14 @@ namespace grpc_labview
     void LVRepeatedMessageValue<int>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
         if (_value.size() == 0) return;
-        size_t dataSize = 0;
-        for (int i = 0, n = _value.size(); i < n; i++)
+        size_t dataSize = _cachedDataSize;
+        if (dataSize == 0)
         {
-            dataSize += Int32VarintSize(_value.Get(i));
+            for (int i = 0, n = _value.size(); i < n; i++)
+            {
+                dataSize += Int32VarintSize(_value.Get(i));
+            }
+            _cachedDataSize = dataSize;
         }
         WriteTag(output, _protobufId, WT_LEN);
         output->WriteVarint32(static_cast<uint32_t>(dataSize));
@@ -459,6 +464,7 @@ namespace grpc_labview
         {
             dataSize += COS::VarintSize32(_value.Get(i));
         }
+        _cachedDataSize = dataSize;
         if (dataSize == 0) return 0;
         return LenDelimSize(_protobufId, dataSize);
     }
@@ -469,10 +475,14 @@ namespace grpc_labview
     void LVRepeatedMessageValue<uint32_t>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
         if (_value.size() == 0) return;
-        size_t dataSize = 0;
-        for (int i = 0, n = _value.size(); i < n; i++)
+        size_t dataSize = _cachedDataSize;
+        if (dataSize == 0)
         {
-            dataSize += COS::VarintSize32(_value.Get(i));
+            for (int i = 0, n = _value.size(); i < n; i++)
+            {
+                dataSize += COS::VarintSize32(_value.Get(i));
+            }
+            _cachedDataSize = dataSize;
         }
         WriteTag(output, _protobufId, WT_LEN);
         output->WriteVarint32(static_cast<uint32_t>(dataSize));
@@ -498,6 +508,7 @@ namespace grpc_labview
         {
             dataSize += Int32VarintSize(_value.Get(i));
         }
+        _cachedDataSize = dataSize;
         if (dataSize == 0) return 0;
         return LenDelimSize(_protobufId, dataSize);
     }
@@ -507,10 +518,14 @@ namespace grpc_labview
     void LVRepeatedEnumMessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
         if (_value.size() == 0) return;
-        size_t dataSize = 0;
-        for (int i = 0, n = _value.size(); i < n; i++)
+        size_t dataSize = _cachedDataSize;
+        if (dataSize == 0)
         {
-            dataSize += Int32VarintSize(_value.Get(i));
+            for (int i = 0, n = _value.size(); i < n; i++)
+            {
+                dataSize += Int32VarintSize(_value.Get(i));
+            }
+            _cachedDataSize = dataSize;
         }
         WriteTag(output, _protobufId, WT_LEN);
         output->WriteVarint32(static_cast<uint32_t>(dataSize));
@@ -537,6 +552,7 @@ namespace grpc_labview
         {
             dataSize += COS::VarintSize64(static_cast<uint64_t>(_value.Get(i)));
         }
+        _cachedDataSize = dataSize;
         if (dataSize == 0) return 0;
         return LenDelimSize(_protobufId, dataSize);
     }
@@ -547,10 +563,14 @@ namespace grpc_labview
     void LVRepeatedMessageValue<int64_t>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
         if (_value.size() == 0) return;
-        size_t dataSize = 0;
-        for (int i = 0, n = _value.size(); i < n; i++)
+        size_t dataSize = _cachedDataSize;
+        if (dataSize == 0)
         {
-            dataSize += COS::VarintSize64(static_cast<uint64_t>(_value.Get(i)));
+            for (int i = 0, n = _value.size(); i < n; i++)
+            {
+                dataSize += COS::VarintSize64(static_cast<uint64_t>(_value.Get(i)));
+            }
+            _cachedDataSize = dataSize;
         }
         WriteTag(output, _protobufId, WT_LEN);
         output->WriteVarint32(static_cast<uint32_t>(dataSize));
@@ -577,6 +597,7 @@ namespace grpc_labview
         {
             dataSize += COS::VarintSize64(_value.Get(i));
         }
+        _cachedDataSize = dataSize;
         if (dataSize == 0) return 0;
         return LenDelimSize(_protobufId, dataSize);
     }
@@ -587,10 +608,14 @@ namespace grpc_labview
     void LVRepeatedMessageValue<uint64_t>::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
         if (_value.size() == 0) return;
-        size_t dataSize = 0;
-        for (int i = 0, n = _value.size(); i < n; i++)
+        size_t dataSize = _cachedDataSize;
+        if (dataSize == 0)
         {
-            dataSize += COS::VarintSize64(_value.Get(i));
+            for (int i = 0, n = _value.size(); i < n; i++)
+            {
+                dataSize += COS::VarintSize64(_value.Get(i));
+            }
+            _cachedDataSize = dataSize;
         }
         WriteTag(output, _protobufId, WT_LEN);
         output->WriteVarint32(static_cast<uint32_t>(dataSize));
@@ -766,6 +791,7 @@ namespace grpc_labview
         {
             dataSize += COS::VarintSize32(ZigZagEncode32(_value.Get(i)));
         }
+        _cachedDataSize = dataSize;
         if (dataSize == 0) return 0;
         return LenDelimSize(_protobufId, dataSize);
     }
@@ -775,10 +801,14 @@ namespace grpc_labview
     void LVRepeatedSInt32MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
         if (_value.size() == 0) return;
-        size_t dataSize = 0;
-        for (int i = 0, n = _value.size(); i < n; i++)
+        size_t dataSize = _cachedDataSize;
+        if (dataSize == 0)
         {
-            dataSize += COS::VarintSize32(ZigZagEncode32(_value.Get(i)));
+            for (int i = 0, n = _value.size(); i < n; i++)
+            {
+                dataSize += COS::VarintSize32(ZigZagEncode32(_value.Get(i)));
+            }
+            _cachedDataSize = dataSize;
         }
         WriteTag(output, _protobufId, WT_LEN);
         output->WriteVarint32(static_cast<uint32_t>(dataSize));
@@ -826,6 +856,7 @@ namespace grpc_labview
         {
             dataSize += COS::VarintSize64(ZigZagEncode64(_value.Get(i)));
         }
+        _cachedDataSize = dataSize;
         if (dataSize == 0) return 0;
         return LenDelimSize(_protobufId, dataSize);
     }
@@ -835,10 +866,14 @@ namespace grpc_labview
     void LVRepeatedSInt64MessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
         if (_value.size() == 0) return;
-        size_t dataSize = 0;
-        for (int i = 0, n = _value.size(); i < n; i++)
+        size_t dataSize = _cachedDataSize;
+        if (dataSize == 0)
         {
-            dataSize += COS::VarintSize64(ZigZagEncode64(_value.Get(i)));
+            for (int i = 0, n = _value.size(); i < n; i++)
+            {
+                dataSize += COS::VarintSize64(ZigZagEncode64(_value.Get(i)));
+            }
+            _cachedDataSize = dataSize;
         }
         WriteTag(output, _protobufId, WT_LEN);
         output->WriteVarint32(static_cast<uint32_t>(dataSize));
