@@ -544,26 +544,54 @@ namespace grpc_labview
         if (length > static_cast<uint32_t>(INT_MAX)) return false;
         std::string value;
         if (!input->ReadString(&value, static_cast<int>(length))) return false;
-        
-        if (fieldInfo.isRepeated)
+
+        if (!FeatureConfig::getInstance().AreUtf8StringsEnabled())
         {
-            auto it = _values.find(field_number);
-            if (it == _values.end())
+            // Legacy mode: bytes fields are stored as strings so CopyBytesToCluster
+            // can delegate to CopyStringToCluster (matching LVMessageEfficient behaviour).
+            if (fieldInfo.isRepeated)
             {
-                auto v = std::make_shared<LVRepeatedBytesMessageValue>(field_number);
-                *v->_value.Add() = value;
-                _values.emplace(field_number, v);
+                auto it = _values.find(field_number);
+                if (it == _values.end())
+                {
+                    auto v = std::make_shared<LVRepeatedStringMessageValue>(field_number);
+                    *v->_value.Add() = value;
+                    _values.emplace(field_number, v);
+                }
+                else
+                {
+                    auto v = std::static_pointer_cast<LVRepeatedStringMessageValue>(it->second);
+                    *v->_value.Add() = value;
+                }
             }
             else
             {
-                auto v = std::static_pointer_cast<LVRepeatedBytesMessageValue>(it->second);
-                *v->_value.Add() = value;
+                auto v = std::make_shared<LVStringMessageValue>(field_number, value);
+                _values.emplace(field_number, v);
             }
         }
         else
         {
-            auto v = std::make_shared<LVBytesMessageValue>(field_number, value);
-            _values.emplace(field_number, v);
+            if (fieldInfo.isRepeated)
+            {
+                auto it = _values.find(field_number);
+                if (it == _values.end())
+                {
+                    auto v = std::make_shared<LVRepeatedBytesMessageValue>(field_number);
+                    *v->_value.Add() = value;
+                    _values.emplace(field_number, v);
+                }
+                else
+                {
+                    auto v = std::static_pointer_cast<LVRepeatedBytesMessageValue>(it->second);
+                    *v->_value.Add() = value;
+                }
+            }
+            else
+            {
+                auto v = std::make_shared<LVBytesMessageValue>(field_number, value);
+                _values.emplace(field_number, v);
+            }
         }
         return true;
     }
