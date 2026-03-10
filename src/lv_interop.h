@@ -28,7 +28,6 @@
 namespace grpc_labview
 {
     class gRPCid;
-    template <typename T> class PointerManager;
     extern PointerManager<gRPCid> gPointerManager;
 
     //---------------------------------------------------------------------
