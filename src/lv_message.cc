@@ -892,7 +892,7 @@ namespace grpc_labview
         google::protobuf::io::CodedOutputStream cos(&sos);
         for (auto& e : _values)
             e.second->Serialize(&cos);
-        return true;
+        return !cos.HadError();
     }
 
     //---------------------------------------------------------------------
