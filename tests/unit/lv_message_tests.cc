@@ -229,6 +229,15 @@ std::shared_ptr<LVMessage> RoundTrip(const LVMessage& msg,
     // --- parse (wire → output) ---
     auto msg2 = std::make_shared<LVMessage>(metadata);
     EXPECT_TRUE(msg2->ParseFromString(wire));
+
+    // --- re-serialize and verify wire stability ---
+    // If parse creates the wrong value type (e.g. LVRepeatedMessageValue<int32_t>
+    // instead of LVRepeatedSInt32MessageValue), the re-serialized bytes will differ
+    // from the original, catching encode/decode asymmetries for all field types.
+    std::string wire2 = SerializeToString(*msg2);
+    EXPECT_EQ(wire, wire2) << "Wire bytes changed after parse+re-serialize — "
+                              "parse likely created wrong value type for this field";
+
     return msg2;
 }
 

@@ -584,7 +584,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            auto v = std::make_shared<LVRepeatedMessageValue<int32_t>>(field_number);
+            auto v = std::make_shared<LVRepeatedSInt32MessageValue>(field_number);
             uint32_t length;
             if (input->ReadVarint32(&length))
             {
@@ -615,7 +615,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(field_number);
+            auto v = std::make_shared<LVRepeatedSInt64MessageValue>(field_number);
             uint32_t length;
             if (input->ReadVarint32(&length))
             {
@@ -646,7 +646,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            auto v = std::make_shared<LVRepeatedMessageValue<uint32_t>>(field_number);
+            auto v = std::make_shared<LVRepeatedFixed32MessageValue>(field_number);
             uint32_t length;
             if (input->ReadVarint32(&length))
             {
@@ -677,7 +677,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            auto v = std::make_shared<LVRepeatedMessageValue<uint64_t>>(field_number);
+            auto v = std::make_shared<LVRepeatedFixed64MessageValue>(field_number);
             uint32_t length;
             if (input->ReadVarint32(&length))
             {
@@ -708,7 +708,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            auto v = std::make_shared<LVRepeatedMessageValue<int32_t>>(field_number);
+            auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(field_number);
             uint32_t length;
             if (input->ReadVarint32(&length))
             {
@@ -739,7 +739,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(field_number);
+            auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(field_number);
             uint32_t length;
             if (input->ReadVarint32(&length))
             {
