@@ -664,7 +664,7 @@ namespace grpc_labview
         {
             uint32_t value;
             if (!input->ReadVarint32(&value)) return false;
-            auto v = std::make_shared<LVVariableMessageValue<int32_t>>(field_number, ZigZagDecode32(value));
+            auto v = std::make_shared<LVSInt32MessageValue>(field_number, ZigZagDecode32(value));
             _values.emplace(field_number, v);
         }
         return true;
@@ -695,7 +695,7 @@ namespace grpc_labview
         {
             uint64_t value;
             if (!input->ReadVarint64(&value)) return false;
-            auto v = std::make_shared<LVVariableMessageValue<int64_t>>(field_number, ZigZagDecode64(value));
+            auto v = std::make_shared<LVSInt64MessageValue>(field_number, ZigZagDecode64(value));
             _values.emplace(field_number, v);
         }
         return true;
@@ -726,7 +726,7 @@ namespace grpc_labview
         {
             uint32_t value;
             if (!input->ReadLittleEndian32(&value)) return false;
-            auto v = std::make_shared<LVVariableMessageValue<uint32_t>>(field_number, value);
+            auto v = std::make_shared<LVFixed32MessageValue>(field_number, value);
             _values.emplace(field_number, v);
         }
         return true;
@@ -757,7 +757,7 @@ namespace grpc_labview
         {
             uint64_t value;
             if (!input->ReadLittleEndian64(&value)) return false;
-            auto v = std::make_shared<LVVariableMessageValue<uint64_t>>(field_number, value);
+            auto v = std::make_shared<LVFixed64MessageValue>(field_number, value);
             _values.emplace(field_number, v);
         }
         return true;
@@ -788,7 +788,7 @@ namespace grpc_labview
         {
             uint32_t value;
             if (!input->ReadLittleEndian32(&value)) return false;
-            auto v = std::make_shared<LVVariableMessageValue<int32_t>>(field_number, static_cast<int32_t>(value));
+            auto v = std::make_shared<LVSFixed32MessageValue>(field_number, static_cast<int32_t>(value));
             _values.emplace(field_number, v);
         }
         return true;
@@ -819,7 +819,7 @@ namespace grpc_labview
         {
             uint64_t value;
             if (!input->ReadLittleEndian64(&value)) return false;
-            auto v = std::make_shared<LVVariableMessageValue<int64_t>>(field_number, static_cast<int64_t>(value));
+            auto v = std::make_shared<LVSFixed64MessageValue>(field_number, static_cast<int64_t>(value));
             _values.emplace(field_number, v);
         }
         return true;
