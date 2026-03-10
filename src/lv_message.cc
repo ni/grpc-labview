@@ -61,14 +61,17 @@ namespace {
                 return true;
             }
             case WIRETYPE_START_GROUP: {
-                // Groups are deprecated; skip recursively without storing
+                // Groups are deprecated but must be skipped correctly.
+                // Inner fields are forwarded to unknownFields so nested group
+                // content is preserved when the caller wants unknown-field storage.
                 uint32_t end_tag = (field_number << 3) | WIRETYPE_END_GROUP;
                 while (true) {
                     uint32_t inner_tag = input->ReadTag();
                     if (inner_tag == 0) return false;
                     if (inner_tag == end_tag) return true;
-                    if (!HandleField(input, inner_tag, nullptr)) return false;
+                    if (!HandleField(input, inner_tag, unknownFields)) return false;
                 }
+                return false; // unreachable; guards against future refactoring
             }
             case WIRETYPE_END_GROUP:
                 return false;
