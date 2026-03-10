@@ -2,6 +2,7 @@
 //---------------------------------------------------------------------
 #include <grpc_server.h>
 #include <lv_message.h>
+#include <climits>
 #include <sstream>
 #include <feature_toggles.h>
 #include <string_utils.h>
@@ -53,8 +54,9 @@ namespace {
             case WIRETYPE_LENGTH_DELIMITED: {
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
+                if (length > static_cast<uint32_t>(INT_MAX)) return false;
                 std::string value;
-                if (!input->ReadString(&value, length)) return false;
+                if (!input->ReadString(&value, static_cast<int>(length))) return false;
                 if (unknownFields) unknownFields->AddLengthDelimited(field_number, value);
                 return true;
             }
@@ -486,9 +488,14 @@ namespace grpc_labview
     {
         uint32_t length;
         if (!input->ReadVarint32(&length)) return false;
+        if (length > static_cast<uint32_t>(INT_MAX)) return false;
         std::string value;
-        if (!input->ReadString(&value, length)) return false;
-        
+        if (!input->ReadString(&value, static_cast<int>(length))) return false;
+
+        if (!VerifyUtf8String(value, fieldInfo.fieldName.c_str())) {
+            throw std::runtime_error("String contains invalid UTF-8 data.");
+        }
+
         if (fieldInfo.isRepeated)
         {
             // For repeated strings, use RepeatedPtrField
@@ -519,8 +526,9 @@ namespace grpc_labview
     {
         uint32_t length;
         if (!input->ReadVarint32(&length)) return false;
+        if (length > static_cast<uint32_t>(INT_MAX)) return false;
         std::string value;
-        if (!input->ReadString(&value, length)) return false;
+        if (!input->ReadString(&value, static_cast<int>(length))) return false;
         
         if (fieldInfo.isRepeated)
         {
