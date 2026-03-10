@@ -158,6 +158,9 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     bool LVMessage::ParseFromCodedStream(google::protobuf::io::CodedInputStream* input)
     {
+        // Invalidate cached size: _values will be mutated during parsing.
+        _cachedByteSize = static_cast<size_t>(-1);
+
         uint32_t tag;
         
         while ((tag = input->ReadTag()) != 0)
