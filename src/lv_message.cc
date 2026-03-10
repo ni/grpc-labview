@@ -527,19 +527,19 @@ namespace grpc_labview
             auto it = _values.find(field_number);
             if (it == _values.end())
             {
-                auto v = std::make_shared<LVRepeatedStringMessageValue>(field_number);
+                auto v = std::make_shared<LVRepeatedBytesMessageValue>(field_number);
                 *v->_value.Add() = value;
                 _values.emplace(field_number, v);
             }
             else
             {
-                auto v = std::static_pointer_cast<LVRepeatedStringMessageValue>(it->second);
+                auto v = std::static_pointer_cast<LVRepeatedBytesMessageValue>(it->second);
                 *v->_value.Add() = value;
             }
         }
         else
         {
-            auto v = std::make_shared<LVStringMessageValue>(field_number, value);
+            auto v = std::make_shared<LVBytesMessageValue>(field_number, value);
             _values.emplace(field_number, v);
         }
         return true;
