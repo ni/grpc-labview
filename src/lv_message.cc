@@ -810,6 +810,7 @@ namespace grpc_labview
         _values.clear();
         _oneofContainerToSelectedIndexMap.clear();
         _unknownFields.Clear();
+        _cachedByteSize = static_cast<size_t>(-1);
     }
 
     //---------------------------------------------------------------------
@@ -826,12 +827,15 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVMessage::ByteSizeLong() const
     {
-        size_t totalSize = 0;
+        if (_cachedByteSize != static_cast<size_t>(-1))
+            return _cachedByteSize;
 
-        for (auto e : _values)
+        size_t totalSize = 0;
+        for (auto& e : _values)
         {
             totalSize += e.second->ByteSizeLong();
         }
+        _cachedByteSize = totalSize;
         return totalSize;
     }
 

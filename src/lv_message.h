@@ -50,6 +50,7 @@ namespace grpc_labview
 
     protected:
         google::protobuf::UnknownFieldSet _unknownFields;
+        mutable size_t _cachedByteSize = static_cast<size_t>(-1);
 
         // Field parse helpers - virtual so LVMessageEfficient can override for direct-to-cluster writes
         virtual bool ParseFieldFromCodedStream(google::protobuf::io::CodedInputStream* input, uint32_t tag, uint32_t field_number, const MessageElementMetadata& fieldInfo);
