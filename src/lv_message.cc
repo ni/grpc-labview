@@ -574,8 +574,31 @@ namespace grpc_labview
                                     uint32_t field_number,
                                     const MessageElementMetadata& fieldInfo)
     {
-        // Enums are encoded as int32
-        return ParseInt32Field(input, field_number, fieldInfo);
+        if (fieldInfo.isRepeated)
+        {
+            auto v = std::make_shared<LVRepeatedEnumMessageValue>(field_number);
+            uint32_t length;
+            if (input->ReadVarint32(&length))
+            {
+                auto limit = input->PushLimit(length);
+                while (input->BytesUntilLimit() > 0)
+                {
+                    uint32_t value;
+                    if (!input->ReadVarint32(&value)) return false;
+                    v->_value.Add(static_cast<int32_t>(value));
+                }
+                input->PopLimit(limit);
+            }
+            _values.emplace(field_number, v);
+        }
+        else
+        {
+            uint32_t value;
+            if (!input->ReadVarint32(&value)) return false;
+            auto v = std::make_shared<LVEnumMessageValue>(field_number, static_cast<int32_t>(value));
+            _values.emplace(field_number, v);
+        }
+        return true;
     }
     
     bool LVMessage::ParseSInt32Field(google::protobuf::io::CodedInputStream* input,
