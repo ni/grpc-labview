@@ -158,9 +158,6 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     bool LVMessage::ParseFromCodedStream(google::protobuf::io::CodedInputStream* input)
     {
-        // Invalidate cached size: _values will be mutated during parsing.
-        _cachedByteSize = static_cast<size_t>(-1);
-
         uint32_t tag;
         
         while ((tag = input->ReadTag()) != 0)
@@ -902,7 +899,6 @@ namespace grpc_labview
         _values.clear();
         _oneofContainerToSelectedIndexMap.clear();
         _unknownFields.Clear();
-        _cachedByteSize = static_cast<size_t>(-1);
     }
 
     //---------------------------------------------------------------------
@@ -919,15 +915,11 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVMessage::ByteSizeLong() const
     {
-        if (_cachedByteSize != static_cast<size_t>(-1))
-            return _cachedByteSize;
-
         size_t totalSize = 0;
         for (auto& e : _values)
         {
             totalSize += e.second->ByteSizeLong();
         }
-        _cachedByteSize = totalSize;
         return totalSize;
     }
 

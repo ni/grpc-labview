@@ -63,7 +63,7 @@ namespace grpc_labview
         }
 
         google::protobuf::RepeatedField<T> _value;
-        mutable size_t _cachedDataSize = 0;
+        mutable size_t _cachedDataSize = static_cast<size_t>(-1);
 
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
@@ -102,6 +102,9 @@ namespace grpc_labview
         void* RawValue() override { return (void*)(_value.get()); };
         size_t ByteSizeLong() override;
         void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
+
+    private:
+        mutable size_t _cachedNestedByteSize = static_cast<size_t>(-1);
     };
 
     
@@ -119,6 +122,9 @@ namespace grpc_labview
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
         void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
+
+    private:
+        mutable std::vector<size_t> _cachedNestedByteSizes;
     };
 
     //---------------------------------------------------------------------
@@ -239,7 +245,7 @@ namespace grpc_labview
 
     public:
         google::protobuf::RepeatedField<int32_t> _value;
-        mutable size_t _cachedDataSize = 0;
+        mutable size_t _cachedDataSize = static_cast<size_t>(-1);
 
     public:
         void* RawValue() override { return &_value; };
@@ -273,7 +279,7 @@ namespace grpc_labview
 
     public:
         google::protobuf::RepeatedField<int64_t> _value;
-        mutable size_t _cachedDataSize = 0;
+        mutable size_t _cachedDataSize = static_cast<size_t>(-1);
 
     public:
         void* RawValue() override { return &_value; };

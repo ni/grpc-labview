@@ -68,15 +68,18 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVNestedMessageMessageValue::ByteSizeLong()
     {
-        size_t nestedSize = _value->ByteSizeLong();
-        return LenDelimSize(_protobufId, nestedSize);
+        _cachedNestedByteSize = _value->ByteSizeLong();
+        return LenDelimSize(_protobufId, _cachedNestedByteSize);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void LVNestedMessageMessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        size_t nestedSize = _value->ByteSizeLong();
+        // Reuse size computed by ByteSizeLong() if available; fall back to recomputing.
+        size_t nestedSize = (_cachedNestedByteSize != static_cast<size_t>(-1))
+            ? _cachedNestedByteSize
+            : _value->ByteSizeLong();
         WriteTag(output, _protobufId, WT_LEN);
         output->WriteVarint32(static_cast<uint32_t>(nestedSize));
         _value->SerializeToCodedStream(output);
@@ -93,10 +96,13 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     size_t LVRepeatedNestedMessageMessageValue::ByteSizeLong()
     {
+        _cachedNestedByteSizes.clear();
+        _cachedNestedByteSizes.reserve(_value.size());
         size_t totalSize = 0;
         for (const auto& msg : _value)
         {
             size_t nestedSize = msg->ByteSizeLong();
+            _cachedNestedByteSizes.push_back(nestedSize);
             totalSize += LenDelimSize(_protobufId, nestedSize);
         }
         return totalSize;
@@ -106,12 +112,13 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void LVRepeatedNestedMessageMessageValue::Serialize(google::protobuf::io::CodedOutputStream* output) const
     {
-        for (const auto& msg : _value)
+        const bool haveCached = (_cachedNestedByteSizes.size() == _value.size());
+        for (size_t i = 0; i < _value.size(); ++i)
         {
-            size_t nestedSize = msg->ByteSizeLong();
+            size_t nestedSize = haveCached ? _cachedNestedByteSizes[i] : _value[i]->ByteSizeLong();
             WriteTag(output, _protobufId, WT_LEN);
             output->WriteVarint32(static_cast<uint32_t>(nestedSize));
-            msg->SerializeToCodedStream(output);
+            _value[i]->SerializeToCodedStream(output);
         }
     }
 
@@ -431,8 +438,9 @@ namespace grpc_labview
     {
         if (_value.size() == 0) return;
         size_t dataSize = _cachedDataSize;
-        if (dataSize == 0)
+        if (dataSize == static_cast<size_t>(-1))
         {
+            dataSize = 0;
             for (int i = 0, n = _value.size(); i < n; i++)
             {
                 dataSize += Int32VarintSize(_value.Get(i));
@@ -476,8 +484,9 @@ namespace grpc_labview
     {
         if (_value.size() == 0) return;
         size_t dataSize = _cachedDataSize;
-        if (dataSize == 0)
+        if (dataSize == static_cast<size_t>(-1))
         {
+            dataSize = 0;
             for (int i = 0, n = _value.size(); i < n; i++)
             {
                 dataSize += COS::VarintSize32(_value.Get(i));
@@ -519,8 +528,9 @@ namespace grpc_labview
     {
         if (_value.size() == 0) return;
         size_t dataSize = _cachedDataSize;
-        if (dataSize == 0)
+        if (dataSize == static_cast<size_t>(-1))
         {
+            dataSize = 0;
             for (int i = 0, n = _value.size(); i < n; i++)
             {
                 dataSize += Int32VarintSize(_value.Get(i));
@@ -564,8 +574,9 @@ namespace grpc_labview
     {
         if (_value.size() == 0) return;
         size_t dataSize = _cachedDataSize;
-        if (dataSize == 0)
+        if (dataSize == static_cast<size_t>(-1))
         {
+            dataSize = 0;
             for (int i = 0, n = _value.size(); i < n; i++)
             {
                 dataSize += COS::VarintSize64(static_cast<uint64_t>(_value.Get(i)));
@@ -609,8 +620,9 @@ namespace grpc_labview
     {
         if (_value.size() == 0) return;
         size_t dataSize = _cachedDataSize;
-        if (dataSize == 0)
+        if (dataSize == static_cast<size_t>(-1))
         {
+            dataSize = 0;
             for (int i = 0, n = _value.size(); i < n; i++)
             {
                 dataSize += COS::VarintSize64(_value.Get(i));
@@ -802,8 +814,9 @@ namespace grpc_labview
     {
         if (_value.size() == 0) return;
         size_t dataSize = _cachedDataSize;
-        if (dataSize == 0)
+        if (dataSize == static_cast<size_t>(-1))
         {
+            dataSize = 0;
             for (int i = 0, n = _value.size(); i < n; i++)
             {
                 dataSize += COS::VarintSize32(ZigZagEncode32(_value.Get(i)));
@@ -867,8 +880,9 @@ namespace grpc_labview
     {
         if (_value.size() == 0) return;
         size_t dataSize = _cachedDataSize;
-        if (dataSize == 0)
+        if (dataSize == static_cast<size_t>(-1))
         {
+            dataSize = 0;
             for (int i = 0, n = _value.size(); i < n; i++)
             {
                 dataSize += COS::VarintSize64(ZigZagEncode64(_value.Get(i)));
