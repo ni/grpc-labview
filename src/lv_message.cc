@@ -180,7 +180,19 @@ namespace grpc_labview
 
                     if (fieldInfo->isInOneof)
                     {
-                        _oneofContainerToSelectedIndexMap.insert({ fieldInfo->oneofContainerName, fieldInfo->protobufIndex });
+                        // Protobuf "last value wins" semantics for oneof: if a different member of
+                        // this oneof was already parsed, evict its stale entry from _values so it
+                        // is not re-serialised, then update the selected-index to this field.
+                        auto existing = _oneofContainerToSelectedIndexMap.find(fieldInfo->oneofContainerName);
+                        if (existing != _oneofContainerToSelectedIndexMap.end())
+                        {
+                            _values.erase(existing->second);
+                            existing->second = fieldInfo->protobufIndex;
+                        }
+                        else
+                        {
+                            _oneofContainerToSelectedIndexMap.emplace(fieldInfo->oneofContainerName, fieldInfo->protobufIndex);
+                        }
                     }
 
                     // Parse field based on type using CodedInputStream
