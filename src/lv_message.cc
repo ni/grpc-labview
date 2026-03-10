@@ -565,8 +565,26 @@ namespace grpc_labview
         
         input->PopLimit(limit);
         
-        auto v = std::make_shared<LVNestedMessageMessageValue>(field_number, nestedMessage);
-        _values.emplace(field_number, v);
+        if (fieldInfo.isRepeated)
+        {
+            auto it = _values.find(field_number);
+            if (it == _values.end())
+            {
+                auto v = std::make_shared<LVRepeatedNestedMessageMessageValue>(field_number);
+                v->_value.push_back(nestedMessage);
+                _values.emplace(field_number, v);
+            }
+            else
+            {
+                auto v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>(it->second);
+                v->_value.push_back(nestedMessage);
+            }
+        }
+        else
+        {
+            auto v = std::make_shared<LVNestedMessageMessageValue>(field_number, nestedMessage);
+            _values.emplace(field_number, v);
+        }
         return true;
     }
     
