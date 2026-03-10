@@ -126,12 +126,8 @@ namespace grpc_labview
         {
             buf.append(reinterpret_cast<const char *>(s->begin()), s->size());
         }
-        
-        if (buf.empty()) {
-            return true;  // Empty message is valid
-        }
-        
-        // Use public CodedInputStream API
+
+        // Use public CodedInputStream API (handles empty and non-empty data uniformly)
         return ParseFromString(buf);
     }
     
