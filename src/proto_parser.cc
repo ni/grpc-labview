@@ -47,10 +47,12 @@ namespace grpc_labview
     class ErrorCollector : public MultiFileErrorCollector
     {
     public:
+        // Non-virtual helpers called directly (e.g. by AddFieldError)
         void AddError(const std::string& filename, int line, int column, const std::string& message);
         void AddWarning(const std::string& filename, int line, int column, const std::string& message);
-        void RecordError(absl::string_view filename, int line, int column, absl::string_view message);
-        void RecordWarning(absl::string_view filename, int line, int column, absl::string_view message);
+        // Overrides of MultiFileErrorCollector virtuals
+        void RecordError(absl::string_view filename, int line, int column, absl::string_view message) override;
+        void RecordWarning(absl::string_view filename, int line, int column, absl::string_view message) override;
         std::string GetLVErrorMessage();
 
     private:
