@@ -53,20 +53,20 @@ namespace grpc_labview
 
         // Field parse helpers - virtual so LVMessageEfficient can override for direct-to-cluster writes
         virtual bool ParseFieldFromCodedStream(google::protobuf::io::CodedInputStream* input, uint32_t tag, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseUInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseUInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseSInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseSInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseSFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseSFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseFloatField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseDoubleField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseBoolField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
-        virtual bool ParseEnumField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
+        virtual bool ParseInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseUInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseUInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseSInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseSInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseSFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseSFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseFloatField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseDoubleField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseBoolField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
+        virtual bool ParseEnumField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type);
         virtual bool ParseStringField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
         virtual bool ParseBytesField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);
         virtual bool ParseMessageField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo);

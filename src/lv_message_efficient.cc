@@ -11,6 +11,7 @@
 namespace {
     inline int32_t ZigZagDecode32(uint32_t n) { return google::protobuf::internal::WireFormatLite::ZigZagDecode32(n); }
     inline int64_t ZigZagDecode64(uint64_t n) { return google::protobuf::internal::WireFormatLite::ZigZagDecode64(n); }
+    constexpr uint32_t WIRETYPE_LENGTH_DELIMITED = 2;
 }
 
 namespace grpc_labview
@@ -27,22 +28,41 @@ namespace grpc_labview
             std::memcpy((*arr)->bytes<T>(), vals.data(), cnt * sizeof(T));
         }
     }
+
+    template<typename T>
+    static void AppendToLVArray(T val, int8_t* lv_ptr)
+    {
+        auto arr = *(LV1DArrayHandle*)lv_ptr;
+        int32_t cnt = (arr != nullptr) ? (*arr)->cnt : 0;
+        NumericArrayResize(GetTypeCodeForSize(sizeof(T)), 1, reinterpret_cast<void*>(lv_ptr), static_cast<size_t>(cnt) + 1);
+        arr = *(LV1DArrayHandle*)lv_ptr;
+        (*arr)->cnt = cnt + 1;
+        (*arr)->bytes<T>()[cnt] = val;
+    }
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<int32_t> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint32_t raw; if (!input->ReadVarint32(&raw)) { input->PopLimit(limit); return false; }
-                vals.push_back(static_cast<int32_t>(raw));
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<int32_t> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint32_t raw; if (!input->ReadVarint32(&raw)) { input->PopLimit(limit); return false; }
+                    vals.push_back(static_cast<int32_t>(raw));
+                }
+                input->PopLimit(limit);
+                CopyVectorToLVArray(vals, lv_ptr);
             }
-            input->PopLimit(limit);
-            CopyVectorToLVArray(vals, lv_ptr);
+            else // unpacked: single element per tag occurrence
+            {
+                uint32_t raw; if (!input->ReadVarint32(&raw)) return false;
+                AppendToLVArray(static_cast<int32_t>(raw), lv_ptr);
+            }
         }
         else
         {
@@ -54,20 +74,28 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseUInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseUInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<uint32_t> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint32_t v; if (!input->ReadVarint32(&v)) { input->PopLimit(limit); return false; }
-                vals.push_back(v);
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<uint32_t> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint32_t v; if (!input->ReadVarint32(&v)) { input->PopLimit(limit); return false; }
+                    vals.push_back(v);
+                }
+                input->PopLimit(limit);
+                CopyVectorToLVArray(vals, lv_ptr);
             }
-            input->PopLimit(limit);
-            CopyVectorToLVArray(vals, lv_ptr);
+            else // unpacked: single element per tag occurrence
+            {
+                uint32_t v; if (!input->ReadVarint32(&v)) return false;
+                AppendToLVArray(v, lv_ptr);
+            }
         }
         else
         {
@@ -78,20 +106,28 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<int64_t> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint64_t raw; if (!input->ReadVarint64(&raw)) { input->PopLimit(limit); return false; }
-                vals.push_back(static_cast<int64_t>(raw));
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<int64_t> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint64_t raw; if (!input->ReadVarint64(&raw)) { input->PopLimit(limit); return false; }
+                    vals.push_back(static_cast<int64_t>(raw));
+                }
+                input->PopLimit(limit);
+                CopyVectorToLVArray(vals, lv_ptr);
             }
-            input->PopLimit(limit);
-            CopyVectorToLVArray(vals, lv_ptr);
+            else // unpacked: single element per tag occurrence
+            {
+                uint64_t raw; if (!input->ReadVarint64(&raw)) return false;
+                AppendToLVArray(static_cast<int64_t>(raw), lv_ptr);
+            }
         }
         else
         {
@@ -103,20 +139,28 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseUInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseUInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<uint64_t> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint64_t v; if (!input->ReadVarint64(&v)) { input->PopLimit(limit); return false; }
-                vals.push_back(v);
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<uint64_t> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint64_t v; if (!input->ReadVarint64(&v)) { input->PopLimit(limit); return false; }
+                    vals.push_back(v);
+                }
+                input->PopLimit(limit);
+                CopyVectorToLVArray(vals, lv_ptr);
             }
-            input->PopLimit(limit);
-            CopyVectorToLVArray(vals, lv_ptr);
+            else // unpacked: single element per tag occurrence
+            {
+                uint64_t v; if (!input->ReadVarint64(&v)) return false;
+                AppendToLVArray(v, lv_ptr);
+            }
         }
         else
         {
@@ -127,27 +171,41 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseBoolField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseBoolField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<bool> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint64_t raw; if (!input->ReadVarint64(&raw)) { input->PopLimit(limit); return false; }
-                vals.push_back(raw != 0);
-            }
-            input->PopLimit(limit);
-            auto cnt = vals.size();
-            if (cnt > 0) {
-                NumericArrayResize(GetTypeCodeForSize(sizeof(bool)), 1, reinterpret_cast<void*>(lv_ptr), cnt);
-                auto arr = *(LV1DArrayHandle*)lv_ptr;
-                (*arr)->cnt = static_cast<int32_t>(cnt);
-                for (size_t i = 0; i < cnt; ++i) {
-                    (*arr)->bytes<bool>()[i] = vals[i];
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<bool> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint64_t raw; if (!input->ReadVarint64(&raw)) { input->PopLimit(limit); return false; }
+                    vals.push_back(raw != 0);
                 }
+                input->PopLimit(limit);
+                auto cnt = vals.size();
+                if (cnt > 0) {
+                    NumericArrayResize(GetTypeCodeForSize(sizeof(bool)), 1, reinterpret_cast<void*>(lv_ptr), cnt);
+                    auto arr = *(LV1DArrayHandle*)lv_ptr;
+                    (*arr)->cnt = static_cast<int32_t>(cnt);
+                    for (size_t i = 0; i < cnt; ++i) {
+                        (*arr)->bytes<bool>()[i] = vals[i];
+                    }
+                }
+            }
+            else // unpacked: single element per tag occurrence
+            {
+                uint64_t raw; if (!input->ReadVarint64(&raw)) return false;
+                bool val = (raw != 0);
+                auto arr = *(LV1DArrayHandle*)lv_ptr;
+                int32_t cnt = (arr != nullptr) ? (*arr)->cnt : 0;
+                NumericArrayResize(GetTypeCodeForSize(sizeof(bool)), 1, reinterpret_cast<void*>(lv_ptr), static_cast<size_t>(cnt) + 1);
+                arr = *(LV1DArrayHandle*)lv_ptr;
+                (*arr)->cnt = cnt + 1;
+                (*arr)->bytes<bool>()[cnt] = val;
             }
         }
         else
@@ -160,21 +218,30 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseFloatField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseFloatField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<float> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint32_t raw; if (!input->ReadLittleEndian32(&raw)) { input->PopLimit(limit); return false; }
-                float f; memcpy(&f, &raw, sizeof(float));
-                vals.push_back(f);
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<float> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint32_t raw; if (!input->ReadLittleEndian32(&raw)) { input->PopLimit(limit); return false; }
+                    float f; memcpy(&f, &raw, sizeof(float));
+                    vals.push_back(f);
+                }
+                input->PopLimit(limit);
+                CopyVectorToLVArray(vals, lv_ptr);
             }
-            input->PopLimit(limit);
-            CopyVectorToLVArray(vals, lv_ptr);
+            else // unpacked: single element per tag occurrence
+            {
+                uint32_t raw; if (!input->ReadLittleEndian32(&raw)) return false;
+                float f; memcpy(&f, &raw, sizeof(float));
+                AppendToLVArray(f, lv_ptr);
+            }
         }
         else
         {
@@ -186,21 +253,30 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseDoubleField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseDoubleField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<double> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint64_t raw; if (!input->ReadLittleEndian64(&raw)) { input->PopLimit(limit); return false; }
-                double d; memcpy(&d, &raw, sizeof(double));
-                vals.push_back(d);
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<double> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint64_t raw; if (!input->ReadLittleEndian64(&raw)) { input->PopLimit(limit); return false; }
+                    double d; memcpy(&d, &raw, sizeof(double));
+                    vals.push_back(d);
+                }
+                input->PopLimit(limit);
+                CopyVectorToLVArray(vals, lv_ptr);
             }
-            input->PopLimit(limit);
-            CopyVectorToLVArray(vals, lv_ptr);
+            else // unpacked: single element per tag occurrence
+            {
+                uint64_t raw; if (!input->ReadLittleEndian64(&raw)) return false;
+                double d; memcpy(&d, &raw, sizeof(double));
+                AppendToLVArray(d, lv_ptr);
+            }
         }
         else
         {
@@ -212,20 +288,28 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseSInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseSInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<int32_t> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint32_t raw; if (!input->ReadVarint32(&raw)) { input->PopLimit(limit); return false; }
-                vals.push_back(ZigZagDecode32(raw));
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<int32_t> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint32_t raw; if (!input->ReadVarint32(&raw)) { input->PopLimit(limit); return false; }
+                    vals.push_back(ZigZagDecode32(raw));
+                }
+                input->PopLimit(limit);
+                CopyVectorToLVArray(vals, lv_ptr);
             }
-            input->PopLimit(limit);
-            CopyVectorToLVArray(vals, lv_ptr);
+            else // unpacked: single element per tag occurrence
+            {
+                uint32_t raw; if (!input->ReadVarint32(&raw)) return false;
+                AppendToLVArray(ZigZagDecode32(raw), lv_ptr);
+            }
         }
         else
         {
@@ -237,20 +321,28 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseSInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseSInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<int64_t> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint64_t raw; if (!input->ReadVarint64(&raw)) { input->PopLimit(limit); return false; }
-                vals.push_back(ZigZagDecode64(raw));
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<int64_t> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint64_t raw; if (!input->ReadVarint64(&raw)) { input->PopLimit(limit); return false; }
+                    vals.push_back(ZigZagDecode64(raw));
+                }
+                input->PopLimit(limit);
+                CopyVectorToLVArray(vals, lv_ptr);
             }
-            input->PopLimit(limit);
-            CopyVectorToLVArray(vals, lv_ptr);
+            else // unpacked: single element per tag occurrence
+            {
+                uint64_t raw; if (!input->ReadVarint64(&raw)) return false;
+                AppendToLVArray(ZigZagDecode64(raw), lv_ptr);
+            }
         }
         else
         {
@@ -262,20 +354,28 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<uint32_t> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint32_t v; if (!input->ReadLittleEndian32(&v)) { input->PopLimit(limit); return false; }
-                vals.push_back(v);
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<uint32_t> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint32_t v; if (!input->ReadLittleEndian32(&v)) { input->PopLimit(limit); return false; }
+                    vals.push_back(v);
+                }
+                input->PopLimit(limit);
+                CopyVectorToLVArray(vals, lv_ptr);
             }
-            input->PopLimit(limit);
-            CopyVectorToLVArray(vals, lv_ptr);
+            else // unpacked: single element per tag occurrence
+            {
+                uint32_t v; if (!input->ReadLittleEndian32(&v)) return false;
+                AppendToLVArray(v, lv_ptr);
+            }
         }
         else
         {
@@ -286,20 +386,28 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<uint64_t> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint64_t v; if (!input->ReadLittleEndian64(&v)) { input->PopLimit(limit); return false; }
-                vals.push_back(v);
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<uint64_t> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint64_t v; if (!input->ReadLittleEndian64(&v)) { input->PopLimit(limit); return false; }
+                    vals.push_back(v);
+                }
+                input->PopLimit(limit);
+                CopyVectorToLVArray(vals, lv_ptr);
             }
-            input->PopLimit(limit);
-            CopyVectorToLVArray(vals, lv_ptr);
+            else // unpacked: single element per tag occurrence
+            {
+                uint64_t v; if (!input->ReadLittleEndian64(&v)) return false;
+                AppendToLVArray(v, lv_ptr);
+            }
         }
         else
         {
@@ -310,20 +418,28 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseSFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseSFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<int32_t> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint32_t raw; if (!input->ReadLittleEndian32(&raw)) { input->PopLimit(limit); return false; }
-                vals.push_back(static_cast<int32_t>(raw));
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<int32_t> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint32_t raw; if (!input->ReadLittleEndian32(&raw)) { input->PopLimit(limit); return false; }
+                    vals.push_back(static_cast<int32_t>(raw));
+                }
+                input->PopLimit(limit);
+                CopyVectorToLVArray(vals, lv_ptr);
             }
-            input->PopLimit(limit);
-            CopyVectorToLVArray(vals, lv_ptr);
+            else // unpacked: single element per tag occurrence
+            {
+                uint32_t raw; if (!input->ReadLittleEndian32(&raw)) return false;
+                AppendToLVArray(static_cast<int32_t>(raw), lv_ptr);
+            }
         }
         else
         {
@@ -335,20 +451,28 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseSFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseSFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<int64_t> vals;
-            while (input->BytesUntilLimit() > 0) {
-                uint64_t raw; if (!input->ReadLittleEndian64(&raw)) { input->PopLimit(limit); return false; }
-                vals.push_back(static_cast<int64_t>(raw));
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            {
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<int64_t> vals;
+                while (input->BytesUntilLimit() > 0) {
+                    uint64_t raw; if (!input->ReadLittleEndian64(&raw)) { input->PopLimit(limit); return false; }
+                    vals.push_back(static_cast<int64_t>(raw));
+                }
+                input->PopLimit(limit);
+                CopyVectorToLVArray(vals, lv_ptr);
             }
-            input->PopLimit(limit);
-            CopyVectorToLVArray(vals, lv_ptr);
+            else // unpacked: single element per tag occurrence
+            {
+                uint64_t raw; if (!input->ReadLittleEndian64(&raw)) return false;
+                AppendToLVArray(static_cast<int64_t>(raw), lv_ptr);
+            }
         }
         else
         {
@@ -360,29 +484,43 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseEnumField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseEnumField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
     {
         std::shared_ptr<EnumMetadata> enumMetadata = fieldInfo._owner->FindEnumMetadata(fieldInfo.embeddedMessageName);
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
 
         if (fieldInfo.isRepeated)
         {
-            uint32_t length; if (!input->ReadVarint32(&length)) return false;
-            auto limit = input->PushLimit(static_cast<int>(length));
-            std::vector<int32_t> vals;
-            while (input->BytesUntilLimit() > 0)
+            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                uint32_t raw; if (!input->ReadVarint32(&raw)) { input->PopLimit(limit); return false; }
-                vals.push_back(enumMetadata->GetLVEnumValueFromProtoValue(static_cast<int32_t>(raw)));
+                uint32_t length; if (!input->ReadVarint32(&length)) return false;
+                auto limit = input->PushLimit(static_cast<int>(length));
+                std::vector<int32_t> vals;
+                while (input->BytesUntilLimit() > 0)
+                {
+                    uint32_t raw; if (!input->ReadVarint32(&raw)) { input->PopLimit(limit); return false; }
+                    vals.push_back(enumMetadata->GetLVEnumValueFromProtoValue(static_cast<int32_t>(raw)));
+                }
+                input->PopLimit(limit);
+                auto cnt = vals.size();
+                if (cnt > 0)
+                {
+                    NumericArrayResize(GetTypeCodeForSize(sizeof(int32_t)), 1, reinterpret_cast<void*>(lv_ptr), cnt);
+                    auto arr = *(LV1DArrayHandle*)lv_ptr;
+                    (*arr)->cnt = static_cast<int32_t>(cnt);
+                    memcpy((*arr)->bytes<int32_t>(), vals.data(), cnt * sizeof(int32_t));
+                }
             }
-            input->PopLimit(limit);
-            auto cnt = vals.size();
-            if (cnt > 0)
+            else // unpacked: single element per tag occurrence
             {
-                NumericArrayResize(GetTypeCodeForSize(sizeof(int32_t)), 1, reinterpret_cast<void*>(lv_ptr), cnt);
+                uint32_t raw; if (!input->ReadVarint32(&raw)) return false;
+                int32_t mapped = enumMetadata->GetLVEnumValueFromProtoValue(static_cast<int32_t>(raw));
                 auto arr = *(LV1DArrayHandle*)lv_ptr;
-                (*arr)->cnt = static_cast<int32_t>(cnt);
-                memcpy((*arr)->bytes<int32_t>(), vals.data(), cnt * sizeof(int32_t));
+                int32_t cnt = (arr != nullptr) ? (*arr)->cnt : 0;
+                NumericArrayResize(GetTypeCodeForSize(sizeof(int32_t)), 1, reinterpret_cast<void*>(lv_ptr), static_cast<size_t>(cnt) + 1);
+                arr = *(LV1DArrayHandle*)lv_ptr;
+                (*arr)->cnt = cnt + 1;
+                (*arr)->bytes<int32_t>()[cnt] = mapped;
             }
         }
         else
