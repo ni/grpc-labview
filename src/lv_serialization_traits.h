@@ -5,12 +5,12 @@
 // allows gRPC to serialize/deserialize LVMessage without requiring
 // inheritance from google::protobuf::Message.
 //
-// IMPORTANT: This header MUST be included BEFORE any gRPC headers
-// in files that use LVMessage with gRPC calls.
+// IMPORTANT: In translation units that use LVMessage as a gRPC RPC payload,
+// include this header before including other gRPC headers.
 //---------------------------------------------------------------------
 #pragma once
 
-// Include grpc headers first to get proper definitions
+// Required gRPC headers for SerializationTraits implementation
 #include <grpcpp/support/byte_buffer.h>
 #include <grpcpp/support/status.h>
 
