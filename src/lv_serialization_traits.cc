@@ -32,14 +32,13 @@ namespace grpc {
     grpc_labview::LVMessage* msg) 
 {
     if (!msg) {
-        return ::grpc::Status(::grpc::StatusCode::INTERNAL, "Null message pointer");
+        return ::grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, "Null message pointer");
     }
     
     if (!msg->ParseFromByteBuffer(*bb)) {
         return ::grpc::Status(::grpc::StatusCode::INTERNAL, "LVMessage deserialization failed");
     }
     
-    bb->Clear();
     return ::grpc::Status::OK;
 }
 

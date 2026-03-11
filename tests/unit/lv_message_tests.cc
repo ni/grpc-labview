@@ -629,7 +629,7 @@ TEST_F(ScalarRoundTripTest, Bytes_BinaryData)
     auto msg2 = RoundTrip(msg, meta);
     auto it = msg2->_values.find(1);
     ASSERT_NE(it, msg2->_values.end());
-    auto* sv = dynamic_cast<LVStringMessageValue*>(it->second.get());
+    auto* sv = dynamic_cast<LVBytesMessageValue*>(it->second.get());
     ASSERT_NE(sv, nullptr);
     EXPECT_EQ(sv->_value, binary);
 }
@@ -938,8 +938,7 @@ TEST_F(RepeatedRoundTripTest, RepeatedBytes)
     auto msg2 = RoundTrip(msg, meta);
     auto it = msg2->_values.find(1);
     ASSERT_NE(it, msg2->_values.end());
-    // Bytes are parsed as LVRepeatedStringMessageValue (same as strings for wire format)
-    auto* rv = dynamic_cast<LVRepeatedStringMessageValue*>(it->second.get());
+    auto* rv = dynamic_cast<LVRepeatedBytesMessageValue*>(it->second.get());
     ASSERT_NE(rv, nullptr);
     ASSERT_EQ(rv->_value.size(), 2);
     EXPECT_EQ(rv->_value[0], std::string("\x00\x01\x02", 3));
@@ -1092,11 +1091,11 @@ TEST_F(MultiFieldTest, AllScalarTypes)
     EXPECT_DOUBLE_EQ(GetScalarValue<double>(*msg2, 6), 6.6);
     EXPECT_EQ(GetScalarValue<bool>(*msg2, 7), true);
     EXPECT_EQ(GetStringValue(*msg2, 8), "test_string");
-    // Field 9 (bytes) parsed as StringMessageValue
+    // Field 9 (bytes) parsed as LVBytesMessageValue (utf8Strings feature is enabled by default)
     {
         auto it9 = msg2->_values.find(9);
         ASSERT_NE(it9, msg2->_values.end());
-        auto* sv = dynamic_cast<LVStringMessageValue*>(it9->second.get());
+        auto* sv = dynamic_cast<LVBytesMessageValue*>(it9->second.get());
         ASSERT_NE(sv, nullptr);
         EXPECT_EQ(sv->_value, std::string("\x00\x01\x02", 3));
     }
