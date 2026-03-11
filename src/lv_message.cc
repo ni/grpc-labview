@@ -276,17 +276,15 @@ namespace grpc_labview
             
             // Check if it's packed
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint32_t value;
-                    if (!input->ReadVarint32(&value)) return false;
-                    v->_value.Add(static_cast<int32_t>(value));
-                }
-                input->PopLimit(limit);
+                uint32_t value;
+                if (!input->ReadVarint32(&value)) return false;
+                v->_value.Add(static_cast<int32_t>(value));
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -307,17 +305,15 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint64_t value;
-                    if (!input->ReadVarint64(&value)) return false;
-                    v->_value.Add(static_cast<int64_t>(value));
-                }
-                input->PopLimit(limit);
+                uint64_t value;
+                if (!input->ReadVarint64(&value)) return false;
+                v->_value.Add(static_cast<int64_t>(value));
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -338,17 +334,15 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedMessageValue<uint32_t>>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint32_t value;
-                    if (!input->ReadVarint32(&value)) return false;
-                    v->_value.Add(value);
-                }
-                input->PopLimit(limit);
+                uint32_t value;
+                if (!input->ReadVarint32(&value)) return false;
+                v->_value.Add(value);
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -369,17 +363,15 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedMessageValue<uint64_t>>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint64_t value;
-                    if (!input->ReadVarint64(&value)) return false;
-                    v->_value.Add(value);
-                }
-                input->PopLimit(limit);
+                uint64_t value;
+                if (!input->ReadVarint64(&value)) return false;
+                v->_value.Add(value);
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -400,19 +392,17 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedMessageValue<float>>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint32_t value;
-                    if (!input->ReadLittleEndian32(&value)) return false;
-                    float f;
-                    memcpy(&f, &value, sizeof(float));
-                    v->_value.Add(f);
-                }
-                input->PopLimit(limit);
+                uint32_t value;
+                if (!input->ReadLittleEndian32(&value)) return false;
+                float f;
+                memcpy(&f, &value, sizeof(float));
+                v->_value.Add(f);
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -435,19 +425,17 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedMessageValue<double>>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint64_t value;
-                    if (!input->ReadLittleEndian64(&value)) return false;
-                    double d;
-                    memcpy(&d, &value, sizeof(double));
-                    v->_value.Add(d);
-                }
-                input->PopLimit(limit);
+                uint64_t value;
+                if (!input->ReadLittleEndian64(&value)) return false;
+                double d;
+                memcpy(&d, &value, sizeof(double));
+                v->_value.Add(d);
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -470,17 +458,15 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedMessageValue<bool>>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint64_t value;
-                    if (!input->ReadVarint64(&value)) return false;
-                    v->_value.Add(value != 0);
-                }
-                input->PopLimit(limit);
+                uint64_t value;
+                if (!input->ReadVarint64(&value)) return false;
+                v->_value.Add(value != 0);
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -643,17 +629,15 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedEnumMessageValue>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint32_t value;
-                    if (!input->ReadVarint32(&value)) return false;
-                    v->_value.Add(static_cast<int32_t>(value));
-                }
-                input->PopLimit(limit);
+                uint32_t value;
+                if (!input->ReadVarint32(&value)) return false;
+                v->_value.Add(static_cast<int32_t>(value));
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -674,17 +658,15 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedSInt32MessageValue>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint32_t value;
-                    if (!input->ReadVarint32(&value)) return false;
-                    v->_value.Add(ZigZagDecode32(value));
-                }
-                input->PopLimit(limit);
+                uint32_t value;
+                if (!input->ReadVarint32(&value)) return false;
+                v->_value.Add(ZigZagDecode32(value));
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -705,17 +687,15 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedSInt64MessageValue>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint64_t value;
-                    if (!input->ReadVarint64(&value)) return false;
-                    v->_value.Add(ZigZagDecode64(value));
-                }
-                input->PopLimit(limit);
+                uint64_t value;
+                if (!input->ReadVarint64(&value)) return false;
+                v->_value.Add(ZigZagDecode64(value));
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -736,17 +716,15 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedFixed32MessageValue>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint32_t value;
-                    if (!input->ReadLittleEndian32(&value)) return false;
-                    v->_value.Add(value);
-                }
-                input->PopLimit(limit);
+                uint32_t value;
+                if (!input->ReadLittleEndian32(&value)) return false;
+                v->_value.Add(value);
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -767,17 +745,15 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedFixed64MessageValue>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint64_t value;
-                    if (!input->ReadLittleEndian64(&value)) return false;
-                    v->_value.Add(value);
-                }
-                input->PopLimit(limit);
+                uint64_t value;
+                if (!input->ReadLittleEndian64(&value)) return false;
+                v->_value.Add(value);
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -798,17 +774,15 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint32_t value;
-                    if (!input->ReadLittleEndian32(&value)) return false;
-                    v->_value.Add(static_cast<int32_t>(value));
-                }
-                input->PopLimit(limit);
+                uint32_t value;
+                if (!input->ReadLittleEndian32(&value)) return false;
+                v->_value.Add(static_cast<int32_t>(value));
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
@@ -829,17 +803,15 @@ namespace grpc_labview
         {
             auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(field_number);
             uint32_t length;
-            if (input->ReadVarint32(&length))
+            if (!input->ReadVarint32(&length)) return false;
+            auto limit = input->PushLimit(length);
+            while (input->BytesUntilLimit() > 0)
             {
-                auto limit = input->PushLimit(length);
-                while (input->BytesUntilLimit() > 0)
-                {
-                    uint64_t value;
-                    if (!input->ReadLittleEndian64(&value)) return false;
-                    v->_value.Add(static_cast<int64_t>(value));
-                }
-                input->PopLimit(limit);
+                uint64_t value;
+                if (!input->ReadLittleEndian64(&value)) return false;
+                v->_value.Add(static_cast<int64_t>(value));
             }
+            input->PopLimit(limit);
             _values.emplace(field_number, v);
         }
         else
