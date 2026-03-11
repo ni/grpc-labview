@@ -1877,6 +1877,387 @@ TEST_F(StressTest, LargeRepeatedField)
 }
 
 // =====================================================================
+// Packed and unpacked repeated field parse tests
+// Wire bytes are built manually to exercise each encoding path directly.
+// The existing RepeatedRoundTripTest suite always serializes packed (proto3
+// default). These tests feed raw unpacked wire to verify the new unpacked
+// path, and mixed (packed-first) wire to verify both encodings accumulate
+// into the same field.
+// =====================================================================
+
+// Additional wire-building helpers for repeated fields.
+
+// N separate (tag, varint64) pairs — unpacked repeated varint.
+static std::string MakeUnpackedVarintRepeated(int field_number, const std::vector<uint64_t>& values)
+{
+    std::string out;
+    for (uint64_t v : values) out += MakeVarintField(field_number, v);
+    return out;
+}
+
+// Single (tag, length, varints…) — packed repeated varint.
+static std::string MakePackedVarintRepeated(int field_number, const std::vector<uint64_t>& values)
+{
+    std::string payload;
+    {
+        google::protobuf::io::StringOutputStream sos(&payload);
+        google::protobuf::io::CodedOutputStream cos(&sos);
+        for (uint64_t v : values) cos.WriteVarint64(v);
+    }
+    return MakeLenDelimField(field_number, payload);
+}
+
+// N separate fixed32 tags — unpacked repeated fixed32.
+static std::string MakeUnpackedFixed32Repeated(int field_number, const std::vector<uint32_t>& values)
+{
+    std::string out;
+    for (uint32_t v : values) out += MakeFixed32Field(field_number, v);
+    return out;
+}
+
+// Single packed repeated fixed32.
+static std::string MakePackedFixed32Repeated(int field_number, const std::vector<uint32_t>& values)
+{
+    std::string payload;
+    {
+        google::protobuf::io::StringOutputStream sos(&payload);
+        google::protobuf::io::CodedOutputStream cos(&sos);
+        for (uint32_t v : values) cos.WriteLittleEndian32(v);
+    }
+    return MakeLenDelimField(field_number, payload);
+}
+
+// N separate fixed64 tags — unpacked repeated fixed64.
+static std::string MakeUnpackedFixed64Repeated(int field_number, const std::vector<uint64_t>& values)
+{
+    std::string out;
+    for (uint64_t v : values) out += MakeFixed64Field(field_number, v);
+    return out;
+}
+
+// Single packed repeated fixed64.
+static std::string MakePackedFixed64Repeated(int field_number, const std::vector<uint64_t>& values)
+{
+    std::string payload;
+    {
+        google::protobuf::io::StringOutputStream sos(&payload);
+        google::protobuf::io::CodedOutputStream cos(&sos);
+        for (uint64_t v : values) cos.WriteLittleEndian64(v);
+    }
+    return MakeLenDelimField(field_number, payload);
+}
+
+class PackedUnpackedTest : public ::testing::Test {};
+
+// ---- Unpacked: all 14 scalar types ----
+
+TEST_F(PackedUnpackedTest, Unpacked_Int32)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int32Value, true);
+    std::string wire = MakeUnpackedVarintRepeated(1, {10, 20, 30});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], 10);
+    EXPECT_EQ(vals[1], 20);
+    EXPECT_EQ(vals[2], 30);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_Int64)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int64Value, true);
+    std::string wire = MakeUnpackedVarintRepeated(1, {
+        static_cast<uint64_t>(1000000000000LL),
+        static_cast<uint64_t>(2000000000000LL)});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int64_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 2u);
+    EXPECT_EQ(vals[0], 1000000000000LL);
+    EXPECT_EQ(vals[1], 2000000000000LL);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_UInt32)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::UInt32Value, true);
+    std::string wire = MakeUnpackedVarintRepeated(1, {100u, 200u, 300u});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<uint32_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], 100u);
+    EXPECT_EQ(vals[1], 200u);
+    EXPECT_EQ(vals[2], 300u);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_UInt64)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::UInt64Value, true);
+    std::string wire = MakeUnpackedVarintRepeated(1, {1000u, 2000u, 3000u});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<uint64_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], 1000ULL);
+    EXPECT_EQ(vals[1], 2000ULL);
+    EXPECT_EQ(vals[2], 3000ULL);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_Bool)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::BoolValue, true);
+    std::string wire = MakeUnpackedVarintRepeated(1, {1, 0, 1}); // true, false, true
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<bool>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], true);
+    EXPECT_EQ(vals[1], false);
+    EXPECT_EQ(vals[2], true);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_Enum)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::EnumValue, true);
+    std::string wire = MakeUnpackedVarintRepeated(1, {0, 1, 2});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], 0);
+    EXPECT_EQ(vals[1], 1);
+    EXPECT_EQ(vals[2], 2);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_SInt32)
+{
+    using WFL = google::protobuf::internal::WireFormatLite;
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SInt32Value, true);
+    // Zigzag-encode the values before putting them on the wire.
+    std::string wire = MakeUnpackedVarintRepeated(1, {
+        WFL::ZigZagEncode32(-1),
+        WFL::ZigZagEncode32(1),
+        WFL::ZigZagEncode32(-100)});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int32_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], -1);
+    EXPECT_EQ(vals[1], 1);
+    EXPECT_EQ(vals[2], -100);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_SInt64)
+{
+    using WFL = google::protobuf::internal::WireFormatLite;
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SInt64Value, true);
+    std::string wire = MakeUnpackedVarintRepeated(1, {
+        WFL::ZigZagEncode64(-1LL),
+        WFL::ZigZagEncode64(1LL),
+        WFL::ZigZagEncode64(-1000000000000LL)});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int64_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], -1LL);
+    EXPECT_EQ(vals[1], 1LL);
+    EXPECT_EQ(vals[2], -1000000000000LL);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_Float)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::FloatValue, true);
+    float f0 = 1.5f, f1 = -2.5f, f2 = 0.0f;
+    uint32_t u0, u1, u2;
+    memcpy(&u0, &f0, 4); memcpy(&u1, &f1, 4); memcpy(&u2, &f2, 4);
+    std::string wire = MakeUnpackedFixed32Repeated(1, {u0, u1, u2});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<float>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_FLOAT_EQ(vals[0], 1.5f);
+    EXPECT_FLOAT_EQ(vals[1], -2.5f);
+    EXPECT_FLOAT_EQ(vals[2], 0.0f);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_Double)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::DoubleValue, true);
+    double d0 = 3.14, d1 = -2.718;
+    uint64_t u0, u1;
+    memcpy(&u0, &d0, 8); memcpy(&u1, &d1, 8);
+    std::string wire = MakeUnpackedFixed64Repeated(1, {u0, u1});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<double>(msg, 1);
+    ASSERT_EQ(vals.size(), 2u);
+    EXPECT_DOUBLE_EQ(vals[0], 3.14);
+    EXPECT_DOUBLE_EQ(vals[1], -2.718);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_Fixed32)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Fixed32Value, true);
+    std::string wire = MakeUnpackedFixed32Repeated(1, {0xDEADBEEFu, 42u, 0u});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<uint32_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], 0xDEADBEEFu);
+    EXPECT_EQ(vals[1], 42u);
+    EXPECT_EQ(vals[2], 0u);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_Fixed64)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Fixed64Value, true);
+    std::string wire = MakeUnpackedFixed64Repeated(1, {0xDEADBEEFCAFEBABEULL, 0ULL});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<uint64_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 2u);
+    EXPECT_EQ(vals[0], 0xDEADBEEFCAFEBABEULL);
+    EXPECT_EQ(vals[1], 0ULL);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_SFixed32)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SFixed32Value, true);
+    int32_t v0 = -12345, v1 = 67890;
+    std::string wire = MakeUnpackedFixed32Repeated(1, {
+        static_cast<uint32_t>(v0), static_cast<uint32_t>(v1)});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int32_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 2u);
+    EXPECT_EQ(vals[0], -12345);
+    EXPECT_EQ(vals[1], 67890);
+}
+
+TEST_F(PackedUnpackedTest, Unpacked_SFixed64)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SFixed64Value, true);
+    int64_t v0 = -9876543210LL, v1 = 1234567890LL;
+    std::string wire = MakeUnpackedFixed64Repeated(1, {
+        static_cast<uint64_t>(v0), static_cast<uint64_t>(v1)});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int64_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 2u);
+    EXPECT_EQ(vals[0], -9876543210LL);
+    EXPECT_EQ(vals[1], 1234567890LL);
+}
+
+// ---- Mixed: packed batch first, then individual unpacked elements ----
+// The protobuf spec allows mixing both encodings for the same repeated field.
+// The packed path creates the entry; the unpacked path finds and appends to it.
+
+TEST_F(PackedUnpackedTest, Mixed_PackedThenUnpacked_Int32)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int32Value, true);
+    // Packed batch [1, 2, 3], then two unpacked elements 4 and 5.
+    std::string wire = MakePackedVarintRepeated(1, {1, 2, 3})
+                     + MakeUnpackedVarintRepeated(1, {4, 5});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int>(msg, 1);
+    ASSERT_EQ(vals.size(), 5u);
+    EXPECT_EQ(vals[0], 1);
+    EXPECT_EQ(vals[1], 2);
+    EXPECT_EQ(vals[2], 3);
+    EXPECT_EQ(vals[3], 4);
+    EXPECT_EQ(vals[4], 5);
+}
+
+TEST_F(PackedUnpackedTest, Mixed_PackedThenUnpacked_Float)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::FloatValue, true);
+    float f0 = 1.0f, f1 = 2.0f, f2 = 3.0f;
+    uint32_t u0, u1, u2;
+    memcpy(&u0, &f0, 4); memcpy(&u1, &f1, 4); memcpy(&u2, &f2, 4);
+    // Packed [1.0, 2.0], then unpacked 3.0.
+    std::string wire = MakePackedFixed32Repeated(1, {u0, u1})
+                     + MakeUnpackedFixed32Repeated(1, {u2});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<float>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_FLOAT_EQ(vals[0], 1.0f);
+    EXPECT_FLOAT_EQ(vals[1], 2.0f);
+    EXPECT_FLOAT_EQ(vals[2], 3.0f);
+}
+
+TEST_F(PackedUnpackedTest, Mixed_PackedThenUnpacked_Double)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::DoubleValue, true);
+    double d0 = 1.0, d1 = 2.0, d2 = 3.0;
+    uint64_t u0, u1, u2;
+    memcpy(&u0, &d0, 8); memcpy(&u1, &d1, 8); memcpy(&u2, &d2, 8);
+    std::string wire = MakePackedFixed64Repeated(1, {u0, u1})
+                     + MakeUnpackedFixed64Repeated(1, {u2});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<double>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_DOUBLE_EQ(vals[0], 1.0);
+    EXPECT_DOUBLE_EQ(vals[1], 2.0);
+    EXPECT_DOUBLE_EQ(vals[2], 3.0);
+}
+
+TEST_F(PackedUnpackedTest, Mixed_PackedThenUnpacked_SInt32)
+{
+    using WFL = google::protobuf::internal::WireFormatLite;
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SInt32Value, true);
+    // Packed batch [-1, 0], then unpacked 1.
+    std::string wire = MakePackedVarintRepeated(1, {WFL::ZigZagEncode32(-1), WFL::ZigZagEncode32(0)})
+                     + MakeUnpackedVarintRepeated(1, {WFL::ZigZagEncode32(1)});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int32_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], -1);
+    EXPECT_EQ(vals[1], 0);
+    EXPECT_EQ(vals[2], 1);
+}
+
+// =====================================================================
 // main
 // =====================================================================
 
