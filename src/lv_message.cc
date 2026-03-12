@@ -16,7 +16,7 @@ namespace {
 
     // Read a field and optionally store it in an UnknownFieldSet.
     // Pass nullptr for unknownFields to just skip (used for nested groups).
-    bool HandleField(google::protobuf::io::CodedInputStream* input, uint32_t tag,
+    bool HandleUnknownField(google::protobuf::io::CodedInputStream* input, uint32_t tag,
                      google::protobuf::UnknownFieldSet* unknownFields) {
         uint32_t field_number = WFL::GetTagFieldNumber(tag);
         WFL::WireType wire_type = WFL::GetTagWireType(tag);
@@ -52,7 +52,7 @@ namespace {
                     uint32_t inner_tag = input->ReadTag();
                     if (inner_tag == 0) return false;
                     if (inner_tag == end_tag) return true;
-                    if (!HandleField(input, inner_tag, unknownFields)) return false;
+                    if (!HandleUnknownField(input, inner_tag, unknownFields)) return false;
                 }
                 return false; // unreachable; guards against future refactoring
             }
@@ -70,7 +70,7 @@ namespace {
     }
 
     inline bool SkipField(google::protobuf::io::CodedInputStream* input, uint32_t tag) {
-        return HandleField(input, tag, nullptr);
+        return HandleUnknownField(input, tag, nullptr);
     }
 
 }
@@ -105,7 +105,6 @@ namespace grpc_labview
             buf.append(reinterpret_cast<const char *>(s->begin()), s->size());
         }
 
-        // Use public CodedInputStream API (handles empty and non-empty data uniformly)
         return ParseFromString(buf);
     }
     
@@ -117,6 +116,7 @@ namespace grpc_labview
         using namespace google::protobuf::io;
         
         ArrayInputStream ais(data.data(), static_cast<int>(data.size()));
+        // Use public CodedInputStream API (handles empty and non-empty data uniformly)
         CodedInputStream cis(&ais);
         cis.SetRecursionLimit(100);
         
@@ -140,8 +140,8 @@ namespace grpc_labview
             
             if (_metadata == nullptr)
             {
-                // No schema - store everything as unknown for UnpackedFields use
-                if (!HandleField(input, tag, &_unknownFields)) {
+                // No schema - store everything as unknown for UnknownFields use
+                if (!HandleUnknownField(input, tag, &_unknownFields)) {
                     return false;
                 }
             }
@@ -156,7 +156,7 @@ namespace grpc_labview
                     {
                         // Protobuf "last value wins" semantics for oneof: if a different member of
                         // this oneof was already parsed, evict its stale entry from _values so it
-                        // is not re-serialised, then update the selected-index to this field.
+                        // is not re-serialized, then update the selected-index to this field.
                         auto existing = _oneofContainerToSelectedIndexMap.find(fieldInfo->oneofContainerName);
                         if (existing != _oneofContainerToSelectedIndexMap.end())
                         {
@@ -177,7 +177,7 @@ namespace grpc_labview
                 else
                 {
                     // Unknown field - store for potential later inspection
-                    if (!HandleField(input, tag, &_unknownFields)) {
+                    if (!HandleUnknownField(input, tag, &_unknownFields)) {
                         return false;
                     }
                 }

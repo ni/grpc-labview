@@ -56,7 +56,7 @@ namespace grpc_labview
                     vals.push_back(static_cast<int32_t>(raw));
                 }
                 input->PopLimit(limit);
-                CopyVectorToLVArray(vals, lv_ptr);
+                AppendVectorToLVArray(vals, lv_ptr);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -89,7 +89,7 @@ namespace grpc_labview
                     vals.push_back(v);
                 }
                 input->PopLimit(limit);
-                CopyVectorToLVArray(vals, lv_ptr);
+                AppendVectorToLVArray(vals, lv_ptr);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -121,7 +121,7 @@ namespace grpc_labview
                     vals.push_back(static_cast<int64_t>(raw));
                 }
                 input->PopLimit(limit);
-                CopyVectorToLVArray(vals, lv_ptr);
+                AppendVectorToLVArray(vals, lv_ptr);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -154,7 +154,7 @@ namespace grpc_labview
                     vals.push_back(v);
                 }
                 input->PopLimit(limit);
-                CopyVectorToLVArray(vals, lv_ptr);
+                AppendVectorToLVArray(vals, lv_ptr);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -234,7 +234,7 @@ namespace grpc_labview
                     vals.push_back(f);
                 }
                 input->PopLimit(limit);
-                CopyVectorToLVArray(vals, lv_ptr);
+                AppendVectorToLVArray(vals, lv_ptr);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -269,7 +269,7 @@ namespace grpc_labview
                     vals.push_back(d);
                 }
                 input->PopLimit(limit);
-                CopyVectorToLVArray(vals, lv_ptr);
+                AppendVectorToLVArray(vals, lv_ptr);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -303,7 +303,7 @@ namespace grpc_labview
                     vals.push_back(ZigZagDecode32(raw));
                 }
                 input->PopLimit(limit);
-                CopyVectorToLVArray(vals, lv_ptr);
+                AppendVectorToLVArray(vals, lv_ptr);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -336,7 +336,7 @@ namespace grpc_labview
                     vals.push_back(ZigZagDecode64(raw));
                 }
                 input->PopLimit(limit);
-                CopyVectorToLVArray(vals, lv_ptr);
+                AppendVectorToLVArray(vals, lv_ptr);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -369,7 +369,7 @@ namespace grpc_labview
                     vals.push_back(v);
                 }
                 input->PopLimit(limit);
-                CopyVectorToLVArray(vals, lv_ptr);
+                AppendVectorToLVArray(vals, lv_ptr);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -401,7 +401,7 @@ namespace grpc_labview
                     vals.push_back(v);
                 }
                 input->PopLimit(limit);
-                CopyVectorToLVArray(vals, lv_ptr);
+                AppendVectorToLVArray(vals, lv_ptr);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -433,7 +433,7 @@ namespace grpc_labview
                     vals.push_back(static_cast<int32_t>(raw));
                 }
                 input->PopLimit(limit);
-                CopyVectorToLVArray(vals, lv_ptr);
+                AppendVectorToLVArray(vals, lv_ptr);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -466,7 +466,7 @@ namespace grpc_labview
                     vals.push_back(static_cast<int64_t>(raw));
                 }
                 input->PopLimit(limit);
-                CopyVectorToLVArray(vals, lv_ptr);
+                AppendVectorToLVArray(vals, lv_ptr);
             }
             else // unpacked: single element per tag occurrence
             {
