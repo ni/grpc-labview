@@ -12,46 +12,29 @@
 #include <google/protobuf/wire_format_lite.h>
 
 namespace {
-    // Wire type constants
-    enum WireType {
-        WIRETYPE_VARINT = 0,
-        WIRETYPE_FIXED64 = 1,
-        WIRETYPE_LENGTH_DELIMITED = 2,
-        WIRETYPE_START_GROUP = 3,
-        WIRETYPE_END_GROUP = 4,
-        WIRETYPE_FIXED32 = 5
-    };
-    
-    // Tag parsing helpers (public API alternative to WireFormatLite)
-    inline uint32_t GetTagFieldNumber(uint32_t tag) {
-        return tag >> 3;
-    }
-    
-    inline uint32_t GetTagWireType(uint32_t tag) {
-        return tag & 7;
-    }
-    
+    using WFL = google::protobuf::internal::WireFormatLite;
+
     // Read a field and optionally store it in an UnknownFieldSet.
     // Pass nullptr for unknownFields to just skip (used for nested groups).
     bool HandleField(google::protobuf::io::CodedInputStream* input, uint32_t tag,
                      google::protobuf::UnknownFieldSet* unknownFields) {
-        uint32_t field_number = GetTagFieldNumber(tag);
-        uint32_t wire_type = GetTagWireType(tag);
+        uint32_t field_number = WFL::GetTagFieldNumber(tag);
+        WFL::WireType wire_type = WFL::GetTagWireType(tag);
 
         switch (wire_type) {
-            case WIRETYPE_VARINT: {
+            case WFL::WIRETYPE_VARINT: {
                 uint64_t value;
                 if (!input->ReadVarint64(&value)) return false;
                 if (unknownFields) unknownFields->AddVarint(field_number, value);
                 return true;
             }
-            case WIRETYPE_FIXED64: {
+            case WFL::WIRETYPE_FIXED64: {
                 uint64_t value;
                 if (!input->ReadLittleEndian64(&value)) return false;
                 if (unknownFields) unknownFields->AddFixed64(field_number, value);
                 return true;
             }
-            case WIRETYPE_LENGTH_DELIMITED: {
+            case WFL::WIRETYPE_LENGTH_DELIMITED: {
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 if (length > static_cast<uint32_t>(INT_MAX)) return false;
@@ -60,11 +43,11 @@ namespace {
                 if (unknownFields) unknownFields->AddLengthDelimited(field_number, value);
                 return true;
             }
-            case WIRETYPE_START_GROUP: {
+            case WFL::WIRETYPE_START_GROUP: {
                 // Groups are deprecated but must be skipped correctly.
                 // Inner fields are forwarded to unknownFields so nested group
                 // content is preserved when the caller wants unknown-field storage.
-                uint32_t end_tag = (field_number << 3) | WIRETYPE_END_GROUP;
+                uint32_t end_tag = WFL::MakeTag(field_number, WFL::WIRETYPE_END_GROUP);
                 while (true) {
                     uint32_t inner_tag = input->ReadTag();
                     if (inner_tag == 0) return false;
@@ -73,9 +56,9 @@ namespace {
                 }
                 return false; // unreachable; guards against future refactoring
             }
-            case WIRETYPE_END_GROUP:
+            case WFL::WIRETYPE_END_GROUP:
                 return false;
-            case WIRETYPE_FIXED32: {
+            case WFL::WIRETYPE_FIXED32: {
                 uint32_t value;
                 if (!input->ReadLittleEndian32(&value)) return false;
                 if (unknownFields) unknownFields->AddFixed32(field_number, value);
@@ -161,7 +144,7 @@ namespace grpc_labview
         
         while ((tag = input->ReadTag()) != 0)
         {
-            uint32_t field_number = GetTagFieldNumber(tag);
+            uint32_t field_number = WFL::GetTagFieldNumber(tag);
             
             if (_metadata == nullptr)
             {
@@ -222,7 +205,7 @@ namespace grpc_labview
         uint32_t field_number,
         const MessageElementMetadata& fieldInfo)
     {
-        uint32_t wire_type = tag & 0x7;
+        uint32_t wire_type = static_cast<uint32_t>(WFL::GetTagWireType(tag));
         switch (fieldInfo.type)
         {
         case LVMessageMetadataType::Int32Value:
@@ -274,7 +257,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedMessageValue<int>>(field_number);
                 uint32_t length;
@@ -324,7 +307,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(field_number);
                 uint32_t length;
@@ -374,7 +357,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedMessageValue<uint32_t>>(field_number);
                 uint32_t length;
@@ -424,7 +407,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedMessageValue<uint64_t>>(field_number);
                 uint32_t length;
@@ -474,7 +457,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedMessageValue<float>>(field_number);
                 uint32_t length;
@@ -530,7 +513,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedMessageValue<double>>(field_number);
                 uint32_t length;
@@ -586,7 +569,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedMessageValue<bool>>(field_number);
                 uint32_t length;
@@ -778,7 +761,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedEnumMessageValue>(field_number);
                 uint32_t length;
@@ -828,7 +811,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedSInt32MessageValue>(field_number);
                 uint32_t length;
@@ -878,7 +861,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedSInt64MessageValue>(field_number);
                 uint32_t length;
@@ -928,7 +911,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedFixed32MessageValue>(field_number);
                 uint32_t length;
@@ -978,7 +961,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedFixed64MessageValue>(field_number);
                 uint32_t length;
@@ -1028,7 +1011,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(field_number);
                 uint32_t length;
@@ -1078,7 +1061,7 @@ namespace grpc_labview
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(field_number);
                 uint32_t length;

@@ -6,10 +6,10 @@
 //---------------------------------------------------------------------
 #include <message_value.h>
 #include <message_metadata.h>
+// Note: google/protobuf/message.h kept for RepeatedPtrField<google::protobuf::Message> used in RepeatedMessageValue
 #include <google/protobuf/message.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <lv_message.h>
-// Note: google/protobuf/message.h kept for RepeatedPtrField<google::protobuf::Message> used in RepeatedMessageValue
 #include <well_known_messages.h>
 
 namespace grpc_labview
