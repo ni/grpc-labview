@@ -43,7 +43,6 @@ namespace grpc_labview
         bool SerializeToString(std::string* output) const;
         void SerializeToCodedStream(google::protobuf::io::CodedOutputStream* output) const;
 
-    public:
         std::map<int, std::shared_ptr<LVMessageValue>> _values;
         std::shared_ptr<MessageMetadata> _metadata;
         std::map<std::string, int> _oneofContainerToSelectedIndexMap;
