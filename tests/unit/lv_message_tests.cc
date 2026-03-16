@@ -2258,6 +2258,296 @@ TEST_F(PackedUnpackedTest, Mixed_PackedThenUnpacked_SInt32)
 }
 
 // =====================================================================
+// Multiple packed chunks for the same repeated field.
+//
+// The protobuf spec explicitly permits a single repeated field to appear
+// as several independent packed length-delimited segments within one
+// message.  Each segment must be appended to the existing container, not
+// treated as a replacement.  This exercises the fix to ParseNumericField
+// where the packed path previously called values.emplace() (a no-op when
+// the key already exists) rather than finding the existing container and
+// appending to it.
+// =====================================================================
+
+class MultiplePackedChunksTest : public ::testing::Test {};
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_Int32)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int32Value, true);
+    // Two separate packed segments for field 1.
+    std::string wire = MakePackedVarintRepeated(1, {1, 2, 3})
+                     + MakePackedVarintRepeated(1, {4, 5});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int>(msg, 1);
+    ASSERT_EQ(vals.size(), 5u) << "Both packed chunks must be merged";
+    EXPECT_EQ(vals[0], 1);
+    EXPECT_EQ(vals[1], 2);
+    EXPECT_EQ(vals[2], 3);
+    EXPECT_EQ(vals[3], 4);
+    EXPECT_EQ(vals[4], 5);
+}
+
+TEST_F(MultiplePackedChunksTest, ThreePackedChunks_Int32)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int32Value, true);
+    std::string wire = MakePackedVarintRepeated(1, {10})
+                     + MakePackedVarintRepeated(1, {20, 30})
+                     + MakePackedVarintRepeated(1, {40, 50, 60});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int>(msg, 1);
+    ASSERT_EQ(vals.size(), 6u) << "All three packed chunks must merge";
+    EXPECT_EQ(vals[0], 10);
+    EXPECT_EQ(vals[5], 60);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_Int64)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int64Value, true);
+    std::string wire = MakePackedVarintRepeated(1, {
+                           static_cast<uint64_t>(1000000000000LL),
+                           static_cast<uint64_t>(2000000000000LL)})
+                     + MakePackedVarintRepeated(1, {
+                           static_cast<uint64_t>(3000000000000LL)});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int64_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], 1000000000000LL);
+    EXPECT_EQ(vals[1], 2000000000000LL);
+    EXPECT_EQ(vals[2], 3000000000000LL);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_UInt32)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::UInt32Value, true);
+    std::string wire = MakePackedVarintRepeated(1, {100u, 200u})
+                     + MakePackedVarintRepeated(1, {300u, 400u, 500u});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<uint32_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 5u);
+    EXPECT_EQ(vals[0], 100u);
+    EXPECT_EQ(vals[4], 500u);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_UInt64)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::UInt64Value, true);
+    std::string wire = MakePackedVarintRepeated(1, {1ULL, 2ULL})
+                     + MakePackedVarintRepeated(1, {3ULL, 4ULL});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<uint64_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 4u);
+    EXPECT_EQ(vals[2], 3ULL);
+    EXPECT_EQ(vals[3], 4ULL);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_Bool)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::BoolValue, true);
+    std::string wire = MakePackedVarintRepeated(1, {1, 0})   // true, false
+                     + MakePackedVarintRepeated(1, {1, 1});  // true, true
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<bool>(msg, 1);
+    ASSERT_EQ(vals.size(), 4u);
+    EXPECT_EQ(vals[0], true);
+    EXPECT_EQ(vals[1], false);
+    EXPECT_EQ(vals[2], true);
+    EXPECT_EQ(vals[3], true);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_Enum)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::EnumValue, true);
+    std::string wire = MakePackedVarintRepeated(1, {0, 1})
+                     + MakePackedVarintRepeated(1, {2, 3});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int>(msg, 1);
+    ASSERT_EQ(vals.size(), 4u);
+    EXPECT_EQ(vals[0], 0);
+    EXPECT_EQ(vals[1], 1);
+    EXPECT_EQ(vals[2], 2);
+    EXPECT_EQ(vals[3], 3);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_SInt32)
+{
+    using WFL = google::protobuf::internal::WireFormatLite;
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SInt32Value, true);
+    std::string wire = MakePackedVarintRepeated(1, {WFL::ZigZagEncode32(-10), WFL::ZigZagEncode32(10)})
+                     + MakePackedVarintRepeated(1, {WFL::ZigZagEncode32(-20), WFL::ZigZagEncode32(20)});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int32_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 4u);
+    EXPECT_EQ(vals[0], -10);
+    EXPECT_EQ(vals[1],  10);
+    EXPECT_EQ(vals[2], -20);
+    EXPECT_EQ(vals[3],  20);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_SInt64)
+{
+    using WFL = google::protobuf::internal::WireFormatLite;
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SInt64Value, true);
+    std::string wire = MakePackedVarintRepeated(1, {WFL::ZigZagEncode64(-1000000000000LL), WFL::ZigZagEncode64(1LL)})
+                     + MakePackedVarintRepeated(1, {WFL::ZigZagEncode64(-1LL)});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int64_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], -1000000000000LL);
+    EXPECT_EQ(vals[1],  1LL);
+    EXPECT_EQ(vals[2], -1LL);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_Float)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::FloatValue, true);
+    float f0 = 1.0f, f1 = 2.0f, f2 = 3.0f, f3 = 4.0f;
+    uint32_t u0, u1, u2, u3;
+    memcpy(&u0, &f0, 4); memcpy(&u1, &f1, 4);
+    memcpy(&u2, &f2, 4); memcpy(&u3, &f3, 4);
+    std::string wire = MakePackedFixed32Repeated(1, {u0, u1})
+                     + MakePackedFixed32Repeated(1, {u2, u3});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<float>(msg, 1);
+    ASSERT_EQ(vals.size(), 4u);
+    EXPECT_FLOAT_EQ(vals[0], 1.0f);
+    EXPECT_FLOAT_EQ(vals[1], 2.0f);
+    EXPECT_FLOAT_EQ(vals[2], 3.0f);
+    EXPECT_FLOAT_EQ(vals[3], 4.0f);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_Double)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::DoubleValue, true);
+    double d0 = 1.1, d1 = 2.2, d2 = 3.3;
+    uint64_t u0, u1, u2;
+    memcpy(&u0, &d0, 8); memcpy(&u1, &d1, 8); memcpy(&u2, &d2, 8);
+    std::string wire = MakePackedFixed64Repeated(1, {u0, u1})
+                     + MakePackedFixed64Repeated(1, {u2});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<double>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_DOUBLE_EQ(vals[0], 1.1);
+    EXPECT_DOUBLE_EQ(vals[1], 2.2);
+    EXPECT_DOUBLE_EQ(vals[2], 3.3);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_Fixed32)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Fixed32Value, true);
+    std::string wire = MakePackedFixed32Repeated(1, {0xAABBCCDDu, 0x11223344u})
+                     + MakePackedFixed32Repeated(1, {0xDEADBEEFu});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<uint32_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], 0xAABBCCDDu);
+    EXPECT_EQ(vals[1], 0x11223344u);
+    EXPECT_EQ(vals[2], 0xDEADBEEFu);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_Fixed64)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Fixed64Value, true);
+    std::string wire = MakePackedFixed64Repeated(1, {0xAAAAAAAABBBBBBBBULL})
+                     + MakePackedFixed64Repeated(1, {0xCCCCCCCCDDDDDDDDULL, 0ULL});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<uint64_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], 0xAAAAAAAABBBBBBBBULL);
+    EXPECT_EQ(vals[1], 0xCCCCCCCCDDDDDDDDULL);
+    EXPECT_EQ(vals[2], 0ULL);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_SFixed32)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SFixed32Value, true);
+    int32_t a = -100, b = 200, c = -300;
+    std::string wire = MakePackedFixed32Repeated(1, {static_cast<uint32_t>(a), static_cast<uint32_t>(b)})
+                     + MakePackedFixed32Repeated(1, {static_cast<uint32_t>(c)});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int32_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 3u);
+    EXPECT_EQ(vals[0], -100);
+    EXPECT_EQ(vals[1],  200);
+    EXPECT_EQ(vals[2], -300);
+}
+
+TEST_F(MultiplePackedChunksTest, TwoPackedChunks_SFixed64)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SFixed64Value, true);
+    int64_t a = -9876543210LL, b = 9876543210LL;
+    std::string wire = MakePackedFixed64Repeated(1, {static_cast<uint64_t>(a)})
+                     + MakePackedFixed64Repeated(1, {static_cast<uint64_t>(b)});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int64_t>(msg, 1);
+    ASSERT_EQ(vals.size(), 2u);
+    EXPECT_EQ(vals[0], -9876543210LL);
+    EXPECT_EQ(vals[1],  9876543210LL);
+}
+
+// Multiple packed chunks interleaved with unpacked elements.
+TEST_F(MultiplePackedChunksTest, PackedPackedUnpacked_Int32)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int32Value, true);
+    // chunk1(packed) + chunk2(packed) + element3(unpacked)
+    std::string wire = MakePackedVarintRepeated(1, {1, 2})
+                     + MakePackedVarintRepeated(1, {3, 4})
+                     + MakeUnpackedVarintRepeated(1, {5});
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+    auto vals = GetRepeatedValue<int>(msg, 1);
+    ASSERT_EQ(vals.size(), 5u);
+    for (int i = 0; i < 5; i++)
+        EXPECT_EQ(vals[i], i + 1) << "Element " << i;
+}
+
+// =====================================================================
 // main
 // =====================================================================
 

@@ -376,10 +376,20 @@ namespace grpc_labview
             {
                 if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
                 {
-                    auto v = std::make_shared<typename Traits::RepeatedType>(fieldNumber);
                     uint32_t length;
                     if (!input->ReadVarint32(&length)) return false;
                     auto limit = input->PushLimit(length);
+                    auto it = values.find(fieldNumber);
+                    std::shared_ptr<typename Traits::RepeatedType> v;
+                    if (it == values.end())
+                    {
+                        v = std::make_shared<typename Traits::RepeatedType>(fieldNumber);
+                        values.emplace(fieldNumber, v);
+                    }
+                    else
+                    {
+                        v = std::static_pointer_cast<typename Traits::RepeatedType>(it->second);
+                    }
                     while (input->BytesUntilLimit() > 0)
                     {
                         typename Traits::RawType raw;
@@ -387,7 +397,6 @@ namespace grpc_labview
                         v->_value.Add(Traits::Transform(raw));
                     }
                     input->PopLimit(limit);
-                    values.emplace(fieldNumber, v);
                 }
                 else // unpacked: single element per tag occurrence
                 {
