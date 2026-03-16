@@ -17,19 +17,6 @@ namespace {
 namespace grpc_labview
 {
     template<typename T>
-    static void CopyVectorToLVArray(const std::vector<T>& vals, int8_t* lv_ptr)
-    {
-        auto cnt = vals.size();
-        if (cnt > 0)
-        {
-            NumericArrayResize(GetTypeCodeForSize(sizeof(T)), 1, reinterpret_cast<void*>(lv_ptr), cnt);
-            auto arr = *(LV1DArrayHandle*)lv_ptr;
-            (*arr)->cnt = static_cast<int32_t>(cnt);
-            std::memcpy((*arr)->bytes<T>(), vals.data(), cnt * sizeof(T));
-        }
-    }
-
-    template<typename T>
     static void AppendToLVArray(T val, int8_t* lv_ptr)
     {
         auto arr = *(LV1DArrayHandle*)lv_ptr;
