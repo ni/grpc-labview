@@ -40,446 +40,232 @@ namespace grpc_labview
         std::memcpy((*arr)->bytes<T>() + existing, vals.data(), vals.size() * sizeof(T));
     }
     //---------------------------------------------------------------------
+    // Traits-based generic numeric field parser.
+    //
+    // Each traits struct defines:
+    //   RawType    – type read from the wire by Read()
+    //   StoredType – type written into the LV cluster (may differ from RawType)
+    //   Read()     – reads one RawType from a CodedInputStream
+    //   Transform()– converts RawType to the StoredType stored in the cluster
+    //
+    // ParseNumericField<Traits> captures the shared packed/unpacked/scalar
+    // branching logic. Each template instantiation compiles to the same
+    // machine code as the equivalent hand-written method would produce.
+    // BoolTraits uses uint8_t as StoredType to avoid std::vector<bool> issues.
+    //---------------------------------------------------------------------
+    namespace
+    {
+        struct Int32Traits {
+            using RawType = uint32_t;
+            using StoredType = int32_t;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint32(&out); }
+            static StoredType Transform(RawType v) { return static_cast<int32_t>(v); }
+        };
+        struct UInt32Traits {
+            using RawType = uint32_t;
+            using StoredType = uint32_t;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint32(&out); }
+            static StoredType Transform(RawType v) { return v; }
+        };
+        struct Int64Traits {
+            using RawType = uint64_t;
+            using StoredType = int64_t;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint64(&out); }
+            static StoredType Transform(RawType v) { return static_cast<int64_t>(v); }
+        };
+        struct UInt64Traits {
+            using RawType = uint64_t;
+            using StoredType = uint64_t;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint64(&out); }
+            static StoredType Transform(RawType v) { return v; }
+        };
+        struct BoolTraits {
+            using RawType = uint64_t;
+            using StoredType = uint8_t;  // uint8_t avoids std::vector<bool> specialisation
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint64(&out); }
+            static StoredType Transform(RawType v) { return static_cast<uint8_t>(v != 0); }
+        };
+        struct FloatTraits {
+            using RawType = uint32_t;
+            using StoredType = float;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadLittleEndian32(&out); }
+            static StoredType Transform(RawType v) { float f; memcpy(&f, &v, sizeof(f)); return f; }
+        };
+        struct DoubleTraits {
+            using RawType = uint64_t;
+            using StoredType = double;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadLittleEndian64(&out); }
+            static StoredType Transform(RawType v) { double d; memcpy(&d, &v, sizeof(d)); return d; }
+        };
+        struct SInt32Traits {
+            using RawType = uint32_t;
+            using StoredType = int32_t;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint32(&out); }
+            static StoredType Transform(RawType v) { return ZigZagDecode32(v); }
+        };
+        struct SInt64Traits {
+            using RawType = uint64_t;
+            using StoredType = int64_t;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint64(&out); }
+            static StoredType Transform(RawType v) { return ZigZagDecode64(v); }
+        };
+        struct Fixed32Traits {
+            using RawType = uint32_t;
+            using StoredType = uint32_t;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadLittleEndian32(&out); }
+            static StoredType Transform(RawType v) { return v; }
+        };
+        struct Fixed64Traits {
+            using RawType = uint64_t;
+            using StoredType = uint64_t;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadLittleEndian64(&out); }
+            static StoredType Transform(RawType v) { return v; }
+        };
+        struct SFixed32Traits {
+            using RawType = uint32_t;
+            using StoredType = int32_t;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadLittleEndian32(&out); }
+            static StoredType Transform(RawType v) { return static_cast<int32_t>(v); }
+        };
+        struct SFixed64Traits {
+            using RawType = uint64_t;
+            using StoredType = int64_t;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadLittleEndian64(&out); }
+            static StoredType Transform(RawType v) { return static_cast<int64_t>(v); }
+        };
+
+        template<typename Traits>
+        bool ParseNumericField(
+            google::protobuf::io::CodedInputStream* input,
+            const MessageElementMetadata& fieldInfo,
+            uint32_t wireType,
+            int8_t* lv_ptr)
+        {
+            using RawType = typename Traits::RawType;
+            using StoredType = typename Traits::StoredType;
+            if (fieldInfo.isRepeated)
+            {
+                if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
+                {
+                    uint32_t length;
+                    if (!input->ReadVarint32(&length)) return false;
+                    auto limit = input->PushLimit(static_cast<int>(length));
+                    std::vector<StoredType> vals;
+                    while (input->BytesUntilLimit() > 0)
+                    {
+                        RawType raw;
+                        if (!Traits::Read(input, raw)) { input->PopLimit(limit); return false; }
+                        vals.push_back(Traits::Transform(raw));
+                    }
+                    input->PopLimit(limit);
+                    AppendVectorToLVArray(vals, lv_ptr);
+                }
+                else // unpacked: single element per tag occurrence
+                {
+                    RawType raw;
+                    if (!Traits::Read(input, raw)) return false;
+                    AppendToLVArray(Traits::Transform(raw), lv_ptr);
+                }
+            }
+            else
+            {
+                RawType raw;
+                if (!Traits::Read(input, raw)) return false;
+                *reinterpret_cast<StoredType*>(lv_ptr) = Traits::Transform(raw);
+            }
+            return true;
+        }
+    } // anonymous namespace
+
+    //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<int32_t> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint32_t raw; if (!input->ReadVarint32(&raw)) { input->PopLimit(limit); return false; }
-                    vals.push_back(static_cast<int32_t>(raw));
-                }
-                input->PopLimit(limit);
-                AppendVectorToLVArray(vals, lv_ptr);
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint32_t raw; if (!input->ReadVarint32(&raw)) return false;
-                AppendToLVArray(static_cast<int32_t>(raw), lv_ptr);
-            }
-        }
-        else
-        {
-            uint32_t raw; if (!input->ReadVarint32(&raw)) return false;
-            *reinterpret_cast<int32_t*>(lv_ptr) = static_cast<int32_t>(raw);
-        }
-        return true;
+        return ParseNumericField<Int32Traits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseUInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<uint32_t> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint32_t v; if (!input->ReadVarint32(&v)) { input->PopLimit(limit); return false; }
-                    vals.push_back(v);
-                }
-                input->PopLimit(limit);
-                AppendVectorToLVArray(vals, lv_ptr);
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint32_t v; if (!input->ReadVarint32(&v)) return false;
-                AppendToLVArray(v, lv_ptr);
-            }
-        }
-        else
-        {
-            if (!input->ReadVarint32(reinterpret_cast<uint32_t*>(lv_ptr))) return false;
-        }
-        return true;
+        return ParseNumericField<UInt32Traits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<int64_t> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint64_t raw; if (!input->ReadVarint64(&raw)) { input->PopLimit(limit); return false; }
-                    vals.push_back(static_cast<int64_t>(raw));
-                }
-                input->PopLimit(limit);
-                AppendVectorToLVArray(vals, lv_ptr);
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint64_t raw; if (!input->ReadVarint64(&raw)) return false;
-                AppendToLVArray(static_cast<int64_t>(raw), lv_ptr);
-            }
-        }
-        else
-        {
-            uint64_t raw; if (!input->ReadVarint64(&raw)) return false;
-            *reinterpret_cast<int64_t*>(lv_ptr) = static_cast<int64_t>(raw);
-        }
-        return true;
+        return ParseNumericField<Int64Traits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseUInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<uint64_t> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint64_t v; if (!input->ReadVarint64(&v)) { input->PopLimit(limit); return false; }
-                    vals.push_back(v);
-                }
-                input->PopLimit(limit);
-                AppendVectorToLVArray(vals, lv_ptr);
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint64_t v; if (!input->ReadVarint64(&v)) return false;
-                AppendToLVArray(v, lv_ptr);
-            }
-        }
-        else
-        {
-            if (!input->ReadVarint64(reinterpret_cast<uint64_t*>(lv_ptr))) return false;
-        }
-        return true;
+        return ParseNumericField<UInt64Traits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseBoolField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<bool> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint64_t raw; if (!input->ReadVarint64(&raw)) { input->PopLimit(limit); return false; }
-                    vals.push_back(raw != 0);
-                }
-                input->PopLimit(limit);
-                auto cnt = vals.size();
-                if (cnt > 0) {
-                    NumericArrayResize(GetTypeCodeForSize(sizeof(bool)), 1, reinterpret_cast<void*>(lv_ptr), cnt);
-                    auto arr = *(LV1DArrayHandle*)lv_ptr;
-                    (*arr)->cnt = static_cast<int32_t>(cnt);
-                    for (size_t i = 0; i < cnt; ++i) {
-                        (*arr)->bytes<bool>()[i] = vals[i];
-                    }
-                }
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint64_t raw; if (!input->ReadVarint64(&raw)) return false;
-                bool val = (raw != 0);
-                auto arr = *(LV1DArrayHandle*)lv_ptr;
-                int32_t cnt = (arr != nullptr) ? (*arr)->cnt : 0;
-                NumericArrayResize(GetTypeCodeForSize(sizeof(bool)), 1, reinterpret_cast<void*>(lv_ptr), static_cast<size_t>(cnt) + 1);
-                arr = *(LV1DArrayHandle*)lv_ptr;
-                (*arr)->cnt = cnt + 1;
-                (*arr)->bytes<bool>()[cnt] = val;
-            }
-        }
-        else
-        {
-            uint64_t raw; if (!input->ReadVarint64(&raw)) return false;
-            *reinterpret_cast<bool*>(lv_ptr) = (raw != 0);
-        }
-        return true;
+        return ParseNumericField<BoolTraits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseFloatField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<float> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint32_t raw; if (!input->ReadLittleEndian32(&raw)) { input->PopLimit(limit); return false; }
-                    float f; memcpy(&f, &raw, sizeof(float));
-                    vals.push_back(f);
-                }
-                input->PopLimit(limit);
-                AppendVectorToLVArray(vals, lv_ptr);
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint32_t raw; if (!input->ReadLittleEndian32(&raw)) return false;
-                float f; memcpy(&f, &raw, sizeof(float));
-                AppendToLVArray(f, lv_ptr);
-            }
-        }
-        else
-        {
-            uint32_t raw; if (!input->ReadLittleEndian32(&raw)) return false;
-            memcpy(lv_ptr, &raw, sizeof(float));
-        }
-        return true;
+        return ParseNumericField<FloatTraits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseDoubleField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<double> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint64_t raw; if (!input->ReadLittleEndian64(&raw)) { input->PopLimit(limit); return false; }
-                    double d; memcpy(&d, &raw, sizeof(double));
-                    vals.push_back(d);
-                }
-                input->PopLimit(limit);
-                AppendVectorToLVArray(vals, lv_ptr);
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint64_t raw; if (!input->ReadLittleEndian64(&raw)) return false;
-                double d; memcpy(&d, &raw, sizeof(double));
-                AppendToLVArray(d, lv_ptr);
-            }
-        }
-        else
-        {
-            uint64_t raw; if (!input->ReadLittleEndian64(&raw)) return false;
-            memcpy(lv_ptr, &raw, sizeof(double));
-        }
-        return true;
+        return ParseNumericField<DoubleTraits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseSInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<int32_t> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint32_t raw; if (!input->ReadVarint32(&raw)) { input->PopLimit(limit); return false; }
-                    vals.push_back(ZigZagDecode32(raw));
-                }
-                input->PopLimit(limit);
-                AppendVectorToLVArray(vals, lv_ptr);
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint32_t raw; if (!input->ReadVarint32(&raw)) return false;
-                AppendToLVArray(ZigZagDecode32(raw), lv_ptr);
-            }
-        }
-        else
-        {
-            uint32_t raw; if (!input->ReadVarint32(&raw)) return false;
-            *reinterpret_cast<int32_t*>(lv_ptr) = ZigZagDecode32(raw);
-        }
-        return true;
+        return ParseNumericField<SInt32Traits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseSInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<int64_t> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint64_t raw; if (!input->ReadVarint64(&raw)) { input->PopLimit(limit); return false; }
-                    vals.push_back(ZigZagDecode64(raw));
-                }
-                input->PopLimit(limit);
-                AppendVectorToLVArray(vals, lv_ptr);
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint64_t raw; if (!input->ReadVarint64(&raw)) return false;
-                AppendToLVArray(ZigZagDecode64(raw), lv_ptr);
-            }
-        }
-        else
-        {
-            uint64_t raw; if (!input->ReadVarint64(&raw)) return false;
-            *reinterpret_cast<int64_t*>(lv_ptr) = ZigZagDecode64(raw);
-        }
-        return true;
+        return ParseNumericField<SInt64Traits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<uint32_t> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint32_t v; if (!input->ReadLittleEndian32(&v)) { input->PopLimit(limit); return false; }
-                    vals.push_back(v);
-                }
-                input->PopLimit(limit);
-                AppendVectorToLVArray(vals, lv_ptr);
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint32_t v; if (!input->ReadLittleEndian32(&v)) return false;
-                AppendToLVArray(v, lv_ptr);
-            }
-        }
-        else
-        {
-            if (!input->ReadLittleEndian32(reinterpret_cast<uint32_t*>(lv_ptr))) return false;
-        }
-        return true;
+        return ParseNumericField<Fixed32Traits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<uint64_t> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint64_t v; if (!input->ReadLittleEndian64(&v)) { input->PopLimit(limit); return false; }
-                    vals.push_back(v);
-                }
-                input->PopLimit(limit);
-                AppendVectorToLVArray(vals, lv_ptr);
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint64_t v; if (!input->ReadLittleEndian64(&v)) return false;
-                AppendToLVArray(v, lv_ptr);
-            }
-        }
-        else
-        {
-            if (!input->ReadLittleEndian64(reinterpret_cast<uint64_t*>(lv_ptr))) return false;
-        }
-        return true;
+        return ParseNumericField<Fixed64Traits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseSFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<int32_t> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint32_t raw; if (!input->ReadLittleEndian32(&raw)) { input->PopLimit(limit); return false; }
-                    vals.push_back(static_cast<int32_t>(raw));
-                }
-                input->PopLimit(limit);
-                AppendVectorToLVArray(vals, lv_ptr);
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint32_t raw; if (!input->ReadLittleEndian32(&raw)) return false;
-                AppendToLVArray(static_cast<int32_t>(raw), lv_ptr);
-            }
-        }
-        else
-        {
-            uint32_t raw; if (!input->ReadLittleEndian32(&raw)) return false;
-            *reinterpret_cast<int32_t*>(lv_ptr) = static_cast<int32_t>(raw);
-        }
-        return true;
+        return ParseNumericField<SFixed32Traits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool LVMessageEfficient::ParseSFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
-        auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
-        if (fieldInfo.isRepeated)
-        {
-            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
-            {
-                uint32_t length; if (!input->ReadVarint32(&length)) return false;
-                auto limit = input->PushLimit(static_cast<int>(length));
-                std::vector<int64_t> vals;
-                while (input->BytesUntilLimit() > 0) {
-                    uint64_t raw; if (!input->ReadLittleEndian64(&raw)) { input->PopLimit(limit); return false; }
-                    vals.push_back(static_cast<int64_t>(raw));
-                }
-                input->PopLimit(limit);
-                AppendVectorToLVArray(vals, lv_ptr);
-            }
-            else // unpacked: single element per tag occurrence
-            {
-                uint64_t raw; if (!input->ReadLittleEndian64(&raw)) return false;
-                AppendToLVArray(static_cast<int64_t>(raw), lv_ptr);
-            }
-        }
-        else
-        {
-            uint64_t raw; if (!input->ReadLittleEndian64(&raw)) return false;
-            *reinterpret_cast<int64_t*>(lv_ptr) = static_cast<int64_t>(raw);
-        }
-        return true;
+        return ParseNumericField<SFixed64Traits>(input, fieldInfo, wireType, _LVClusterHandle + fieldInfo.clusterOffset);
     }
 
     //---------------------------------------------------------------------
