@@ -11,30 +11,36 @@
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/wire_format_lite.h>
 
-namespace {
+namespace
+{
     using WFL = google::protobuf::internal::WireFormatLite;
 
     // Read a field and optionally store it in an UnknownFieldSet.
     // Pass nullptr for unknownFields to just skip (used for nested groups).
     bool HandleUnknownField(google::protobuf::io::CodedInputStream* input, uint32_t tag,
-                     google::protobuf::UnknownFieldSet* unknownFields) {
+                     google::protobuf::UnknownFieldSet* unknownFields)
+    {
         uint32_t field_number = WFL::GetTagFieldNumber(tag);
         WFL::WireType wire_type = WFL::GetTagWireType(tag);
 
-        switch (wire_type) {
-            case WFL::WIRETYPE_VARINT: {
+        switch (wire_type)
+        {
+            case WFL::WIRETYPE_VARINT:
+            {
                 uint64_t value;
                 if (!input->ReadVarint64(&value)) return false;
                 if (unknownFields) unknownFields->AddVarint(field_number, value);
                 return true;
             }
-            case WFL::WIRETYPE_FIXED64: {
+            case WFL::WIRETYPE_FIXED64:
+            {
                 uint64_t value;
                 if (!input->ReadLittleEndian64(&value)) return false;
                 if (unknownFields) unknownFields->AddFixed64(field_number, value);
                 return true;
             }
-            case WFL::WIRETYPE_LENGTH_DELIMITED: {
+            case WFL::WIRETYPE_LENGTH_DELIMITED:
+            {
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 if (length > static_cast<uint32_t>(INT_MAX)) return false;
@@ -43,12 +49,14 @@ namespace {
                 if (unknownFields) unknownFields->AddLengthDelimited(field_number, value);
                 return true;
             }
-            case WFL::WIRETYPE_START_GROUP: {
+            case WFL::WIRETYPE_START_GROUP:
+            {
                 // Groups are deprecated but must be skipped correctly.
                 // Inner fields are forwarded to unknownFields so nested group
                 // content is preserved when the caller wants unknown-field storage.
                 uint32_t end_tag = WFL::MakeTag(field_number, WFL::WIRETYPE_END_GROUP);
-                while (true) {
+                while (true)
+                {
                     uint32_t inner_tag = input->ReadTag();
                     if (inner_tag == 0) return false;
                     if (inner_tag == end_tag) return true;
@@ -58,7 +66,8 @@ namespace {
             }
             case WFL::WIRETYPE_END_GROUP:
                 return false;
-            case WFL::WIRETYPE_FIXED32: {
+            case WFL::WIRETYPE_FIXED32:
+            {
                 uint32_t value;
                 if (!input->ReadLittleEndian32(&value)) return false;
                 if (unknownFields) unknownFields->AddFixed32(field_number, value);
@@ -69,7 +78,8 @@ namespace {
         }
     }
 
-    inline bool SkipField(google::protobuf::io::CodedInputStream* input, uint32_t tag) {
+    inline bool SkipField(google::protobuf::io::CodedInputStream* input, uint32_t tag)
+    {
         return HandleUnknownField(input, tag, nullptr);
     }
 
@@ -1101,17 +1111,10 @@ namespace grpc_labview
     std::unique_ptr<grpc::ByteBuffer> LVMessage::SerializeToByteBuffer() const
     {
         std::string buf;
+        if (!SerializeToString(&buf) || buf.empty())
         {
-            google::protobuf::io::StringOutputStream sos(&buf);
-            google::protobuf::io::CodedOutputStream cos(&sos);
-            for (auto& e : _values)
-                e.second->Serialize(&cos);
-        }  // CodedOutputStream flushes on destruction
-
-        if (buf.empty()) {
             return std::make_unique<grpc::ByteBuffer>();
         }
-
         grpc::Slice slice(buf);
         return std::make_unique<grpc::ByteBuffer>(&slice, 1);
     }
