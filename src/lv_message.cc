@@ -7,6 +7,7 @@
 #include <feature_toggles.h>
 #include <string_utils.h>
 #include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/wire_format_lite.h>
@@ -83,6 +84,83 @@ namespace
         return HandleUnknownField(input, tag, nullptr);
     }
 
+    // ZeroCopyInputStream over a sequence of grpc::Slices.
+    // Allows parsing directly from a multi-slice ByteBuffer with no data copy:
+    // grpc::ByteBuffer::Dump() only increments slice refcounts, so the parser
+    // reads straight from the original gRPC transport buffers.
+    class MultiSliceInputStream final : public google::protobuf::io::ZeroCopyInputStream
+    {
+    public:
+        explicit MultiSliceInputStream(std::vector<grpc::Slice> slices)
+            : _slices(std::move(slices)), _sliceIndex(0), _offsetInSlice(0), _byteCount(0)
+        {
+        }
+
+        bool Next(const void** data, int* size) override
+        {
+            while (_sliceIndex < _slices.size())
+            {
+                const grpc::Slice& s = _slices[_sliceIndex];
+                size_t remaining = s.size() - _offsetInSlice;
+                if (remaining > 0)
+                {
+                    *data = s.begin() + _offsetInSlice;
+                    *size = static_cast<int>(remaining);
+                    _byteCount += static_cast<int64_t>(remaining);
+                    _sliceIndex++;
+                    _offsetInSlice = 0;
+                    return true;
+                }
+                // Empty slice - skip it.
+                _sliceIndex++;
+                _offsetInSlice = 0;
+            }
+            return false;
+        }
+
+        // count <= size returned by the preceding Next() call (ZeroCopyInputStream contract).
+        void BackUp(int count) override
+        {
+            _byteCount -= count;
+            _sliceIndex--;
+            _offsetInSlice = _slices[_sliceIndex].size() - static_cast<size_t>(count);
+        }
+
+        bool Skip(int count) override
+        {
+            while (count > 0 && _sliceIndex < _slices.size())
+            {
+                const grpc::Slice& s = _slices[_sliceIndex];
+                size_t remaining = s.size() - _offsetInSlice;
+                if (static_cast<size_t>(count) < remaining)
+                {
+                    _offsetInSlice += static_cast<size_t>(count);
+                    _byteCount += count;
+                    count = 0;
+                }
+                else
+                {
+                    _byteCount += static_cast<int64_t>(remaining);
+                    count -= static_cast<int>(remaining);
+                    _sliceIndex++;
+                    _offsetInSlice = 0;
+                }
+            }
+            return count == 0;
+        }
+
+        int64_t ByteCount() const override
+        {
+            return _byteCount;
+        }
+
+    private:
+        std::vector<grpc::Slice> _slices;
+        size_t _sliceIndex;
+        size_t _offsetInSlice;
+        int64_t _byteCount;
+    };
+
 }
 
 namespace grpc_labview
@@ -105,17 +183,30 @@ namespace grpc_labview
     {
         Clear();
 
-        // Extract bytes from ByteBuffer
-        std::vector<grpc::Slice> slices;
-        buffer.Dump(&slices);
-        std::string buf;
-        buf.reserve(buffer.Length());
-        for (auto s = slices.begin(); s != slices.end(); s++)
+        using namespace google::protobuf::io;
+
+        // Fast path: if the ByteBuffer is already backed by a single contiguous
+        // slice we can parse directly from its memory with no copy or allocation.
+        grpc::Slice singleSlice;
+        if (buffer.TrySingleSlice(&singleSlice).ok())
         {
-            buf.append(reinterpret_cast<const char *>(s->begin()), s->size());
+            ArrayInputStream ais(singleSlice.begin(), static_cast<int>(singleSlice.size()));
+            CodedInputStream cis(&ais);
+            cis.SetRecursionLimit(100);
+            return ParseFromCodedStream(&cis) && cis.ConsumedEntireMessage();
         }
 
-        return ParseFromString(buf);
+        // Slow path: multiple slices - iterate over them without coalescing.
+        // Dump() only increments slice refcounts; no byte data is copied.
+        std::vector<grpc::Slice> slices;
+        if (!buffer.Dump(&slices).ok())
+        {
+            return false;
+        }
+        MultiSliceInputStream msis(std::move(slices));
+        CodedInputStream cis(&msis);
+        cis.SetRecursionLimit(100);
+        return ParseFromCodedStream(&cis) && cis.ConsumedEntireMessage();
     }
     
     //---------------------------------------------------------------------
