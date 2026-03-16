@@ -39,14 +39,27 @@ namespace grpc_labview
         (*arr)->cnt = cnt + 1;
         (*arr)->bytes<T>()[cnt] = val;
     }
+
+    template<typename T>
+    static void AppendVectorToLVArray(const std::vector<T>& vals, int8_t* lv_ptr)
+    {
+        if (vals.empty()) return;
+        auto arr = *(LV1DArrayHandle*)lv_ptr;
+        int32_t existing = (arr != nullptr) ? (*arr)->cnt : 0;
+        size_t newCount = static_cast<size_t>(existing) + vals.size();
+        NumericArrayResize(GetTypeCodeForSize(sizeof(T)), 1, reinterpret_cast<void*>(lv_ptr), newCount);
+        arr = *(LV1DArrayHandle*)lv_ptr;
+        (*arr)->cnt = static_cast<int32_t>(newCount);
+        std::memcpy((*arr)->bytes<T>() + existing, vals.data(), vals.size() * sizeof(T));
+    }
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -74,12 +87,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseUInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseUInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -106,12 +119,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -139,12 +152,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseUInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseUInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -171,12 +184,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseBoolField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseBoolField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -218,12 +231,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseFloatField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseFloatField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -253,12 +266,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseDoubleField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseDoubleField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -288,12 +301,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseSInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseSInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -321,12 +334,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseSInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseSInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -354,12 +367,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -386,12 +399,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -418,12 +431,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseSFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseSFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -451,12 +464,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseSFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseSFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -484,14 +497,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseEnumField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, uint32_t wire_type)
+    bool LVMessageEfficient::ParseEnumField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType)
     {
         std::shared_ptr<EnumMetadata> enumMetadata = fieldInfo._owner->FindEnumMetadata(fieldInfo.embeddedMessageName);
         auto lv_ptr = _LVClusterHandle + fieldInfo.clusterOffset;
 
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WIRETYPE_LENGTH_DELIMITED) // packed
             {
                 uint32_t length; if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(static_cast<int>(length));
@@ -533,7 +546,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseStringField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseStringField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo)
     {
         uint32_t length;
         if (!input->ReadVarint32(&length)) return false;
@@ -564,7 +577,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseBytesField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseBytesField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo)
     {
         uint32_t length;
         if (!input->ReadVarint32(&length)) return false;
@@ -613,14 +626,14 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseMessageField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseMessageField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo)
     {
         switch (fieldInfo.wellKnownType)
         {
         case wellknown::Types::Double2DArray:
-            return ParseDouble2DArrayField(input, field_number, fieldInfo);
+            return ParseDouble2DArrayField(input, fieldNumber, fieldInfo);
         case wellknown::Types::String2DArray:
-            return ParseString2DArrayField(input, field_number, fieldInfo);
+            return ParseString2DArrayField(input, fieldNumber, fieldInfo);
         }
 
         uint32_t length;
@@ -681,7 +694,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::Parse2DArrayField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo, wellknown::I2DArray& array)
+    bool LVMessageEfficient::Parse2DArrayField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, wellknown::I2DArray& array)
     {
         uint32_t length;
         if (!input->ReadVarint32(&length)) return false;
@@ -697,23 +710,23 @@ namespace grpc_labview
         input->PopLimit(limit);
 
         auto nestedClusterPtr = _LVClusterHandle + fieldInfo.clusterOffset;
-        auto nestedMessageValue = std::make_shared<LVNestedMessageMessageValue>(field_number, nestedMessage);
+        auto nestedMessageValue = std::make_shared<LVNestedMessageMessageValue>(fieldNumber, nestedMessage);
         array.CopyFromMessageToCluster(fieldInfo, nestedMessageValue, nestedClusterPtr);
         return true;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseDouble2DArrayField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseDouble2DArrayField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo)
     {
-        return Parse2DArrayField(input, field_number, fieldInfo, wellknown::Double2DArray::GetInstance());
+        return Parse2DArrayField(input, fieldNumber, fieldInfo, wellknown::Double2DArray::GetInstance());
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessageEfficient::ParseString2DArrayField(google::protobuf::io::CodedInputStream* input, uint32_t field_number, const MessageElementMetadata& fieldInfo)
+    bool LVMessageEfficient::ParseString2DArrayField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo)
     {
-        return Parse2DArrayField(input, field_number, fieldInfo, wellknown::String2DArray::GetInstance());
+        return Parse2DArrayField(input, fieldNumber, fieldInfo, wellknown::String2DArray::GetInstance());
     }
 
     //---------------------------------------------------------------------

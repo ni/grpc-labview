@@ -20,24 +20,24 @@ namespace {
 
     inline uint32_t ZigZagEncode32(int32_t n) { return google::protobuf::internal::WireFormatLite::ZigZagEncode32(n); }
     inline uint64_t ZigZagEncode64(int64_t n) { return google::protobuf::internal::WireFormatLite::ZigZagEncode64(n); }
-    inline uint32_t MakeTag(int field_number, int wire_type) {
-        return static_cast<uint32_t>((field_number << 3) | wire_type);
+    inline uint32_t MakeTag(int fieldNumber, int wireType) {
+        return static_cast<uint32_t>((fieldNumber << 3) | wireType);
     }
-    inline size_t TagSize(int field_number, int wire_type) {
-        return COS::VarintSize32(MakeTag(field_number, wire_type));
+    inline size_t TagSize(int fieldNumber, int wireType) {
+        return COS::VarintSize32(MakeTag(fieldNumber, wireType));
     }
-    inline void WriteTag(COS* out, int field_number, int wire_type) {
-        out->WriteTag(MakeTag(field_number, wire_type));
+    inline void WriteTag(COS* out, int fieldNumber, int wireType) {
+        out->WriteTag(MakeTag(fieldNumber, wireType));
     }
     // Writes tag + length prefix + raw bytes
-    inline void WriteLenDelim(COS* out, int field_number, const void* data, size_t len) {
-        WriteTag(out, field_number, WT_LEN);
+    inline void WriteLenDelim(COS* out, int fieldNumber, const void* data, size_t len) {
+        WriteTag(out, fieldNumber, WT_LEN);
         out->WriteVarint32(static_cast<uint32_t>(len));
         out->WriteRaw(data, static_cast<int>(len));
     }
     // Size of a length-delimited field (tag + varint length + payload)
-    inline size_t LenDelimSize(int field_number, size_t payloadLen) {
-        return TagSize(field_number, WT_LEN)
+    inline size_t LenDelimSize(int fieldNumber, size_t payloadLen) {
+        return TagSize(fieldNumber, WT_LEN)
                + COS::VarintSize32(static_cast<uint32_t>(payloadLen))
                + payloadLen;
     }

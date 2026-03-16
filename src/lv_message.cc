@@ -20,23 +20,23 @@ namespace
     bool HandleUnknownField(google::protobuf::io::CodedInputStream* input, uint32_t tag,
                      google::protobuf::UnknownFieldSet* unknownFields)
     {
-        uint32_t field_number = WFL::GetTagFieldNumber(tag);
-        WFL::WireType wire_type = WFL::GetTagWireType(tag);
+        uint32_t fieldNumber = WFL::GetTagFieldNumber(tag);
+        WFL::WireType wireType = WFL::GetTagWireType(tag);
 
-        switch (wire_type)
+        switch (wireType)
         {
             case WFL::WIRETYPE_VARINT:
             {
                 uint64_t value;
                 if (!input->ReadVarint64(&value)) return false;
-                if (unknownFields) unknownFields->AddVarint(field_number, value);
+                if (unknownFields) unknownFields->AddVarint(fieldNumber, value);
                 return true;
             }
             case WFL::WIRETYPE_FIXED64:
             {
                 uint64_t value;
                 if (!input->ReadLittleEndian64(&value)) return false;
-                if (unknownFields) unknownFields->AddFixed64(field_number, value);
+                if (unknownFields) unknownFields->AddFixed64(fieldNumber, value);
                 return true;
             }
             case WFL::WIRETYPE_LENGTH_DELIMITED:
@@ -46,7 +46,7 @@ namespace
                 if (length > static_cast<uint32_t>(INT_MAX)) return false;
                 std::string value;
                 if (!input->ReadString(&value, static_cast<int>(length))) return false;
-                if (unknownFields) unknownFields->AddLengthDelimited(field_number, value);
+                if (unknownFields) unknownFields->AddLengthDelimited(fieldNumber, value);
                 return true;
             }
             case WFL::WIRETYPE_START_GROUP:
@@ -54,7 +54,7 @@ namespace
                 // Groups are deprecated but must be skipped correctly.
                 // Inner fields are forwarded to unknownFields so nested group
                 // content is preserved when the caller wants unknown-field storage.
-                uint32_t end_tag = WFL::MakeTag(field_number, WFL::WIRETYPE_END_GROUP);
+                uint32_t end_tag = WFL::MakeTag(fieldNumber, WFL::WIRETYPE_END_GROUP);
                 while (true)
                 {
                     uint32_t inner_tag = input->ReadTag();
@@ -70,7 +70,7 @@ namespace
             {
                 uint32_t value;
                 if (!input->ReadLittleEndian32(&value)) return false;
-                if (unknownFields) unknownFields->AddFixed32(field_number, value);
+                if (unknownFields) unknownFields->AddFixed32(fieldNumber, value);
                 return true;
             }
             default:
@@ -146,7 +146,7 @@ namespace grpc_labview
         
         while ((tag = input->ReadTag()) != 0)
         {
-            uint32_t field_number = WFL::GetTagFieldNumber(tag);
+            uint32_t fieldNumber = WFL::GetTagFieldNumber(tag);
             
             if (_metadata == nullptr)
             {
@@ -157,7 +157,7 @@ namespace grpc_labview
             }
             else
             {
-                auto fieldIt = _metadata->_mappedElements.find(field_number);
+                auto fieldIt = _metadata->_mappedElements.find(fieldNumber);
                 if (fieldIt != _metadata->_mappedElements.end())
                 {
                     auto& fieldInfo = (*fieldIt).second;
@@ -180,7 +180,7 @@ namespace grpc_labview
                     }
 
                     // Parse field based on type using CodedInputStream
-                    if (!ParseFieldFromCodedStream(input, tag, field_number, *fieldInfo)) {
+                    if (!ParseFieldFromCodedStream(input, tag, fieldNumber, *fieldInfo)) {
                         return false;
                     }
                 }
@@ -204,46 +204,46 @@ namespace grpc_labview
     bool LVMessage::ParseFieldFromCodedStream(
         google::protobuf::io::CodedInputStream* input,
         uint32_t tag,
-        uint32_t field_number,
+        uint32_t fieldNumber,
         const MessageElementMetadata& fieldInfo)
     {
-        uint32_t wire_type = static_cast<uint32_t>(WFL::GetTagWireType(tag));
+        uint32_t wireType = static_cast<uint32_t>(WFL::GetTagWireType(tag));
         switch (fieldInfo.type)
         {
         case LVMessageMetadataType::Int32Value:
-            return ParseInt32Field(input, field_number, fieldInfo, wire_type);
+            return ParseInt32Field(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::Int64Value:
-            return ParseInt64Field(input, field_number, fieldInfo, wire_type);
+            return ParseInt64Field(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::UInt32Value:
-            return ParseUInt32Field(input, field_number, fieldInfo, wire_type);
+            return ParseUInt32Field(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::UInt64Value:
-            return ParseUInt64Field(input, field_number, fieldInfo, wire_type);
+            return ParseUInt64Field(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::SInt32Value:
-            return ParseSInt32Field(input, field_number, fieldInfo, wire_type);
+            return ParseSInt32Field(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::SInt64Value:
-            return ParseSInt64Field(input, field_number, fieldInfo, wire_type);
+            return ParseSInt64Field(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::Fixed32Value:
-            return ParseFixed32Field(input, field_number, fieldInfo, wire_type);
+            return ParseFixed32Field(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::Fixed64Value:
-            return ParseFixed64Field(input, field_number, fieldInfo, wire_type);
+            return ParseFixed64Field(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::SFixed32Value:
-            return ParseSFixed32Field(input, field_number, fieldInfo, wire_type);
+            return ParseSFixed32Field(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::SFixed64Value:
-            return ParseSFixed64Field(input, field_number, fieldInfo, wire_type);
+            return ParseSFixed64Field(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::FloatValue:
-            return ParseFloatField(input, field_number, fieldInfo, wire_type);
+            return ParseFloatField(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::DoubleValue:
-            return ParseDoubleField(input, field_number, fieldInfo, wire_type);
+            return ParseDoubleField(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::BoolValue:
-            return ParseBoolField(input, field_number, fieldInfo, wire_type);
+            return ParseBoolField(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::EnumValue:
-            return ParseEnumField(input, field_number, fieldInfo, wire_type);
+            return ParseEnumField(input, fieldNumber, fieldInfo, wireType);
         case LVMessageMetadataType::StringValue:
-            return ParseStringField(input, field_number, fieldInfo);
+            return ParseStringField(input, fieldNumber, fieldInfo);
         case LVMessageMetadataType::BytesValue:
-            return ParseBytesField(input, field_number, fieldInfo);
+            return ParseBytesField(input, fieldNumber, fieldInfo);
         case LVMessageMetadataType::MessageValue:
-            return ParseMessageField(input, field_number, fieldInfo);
+            return ParseMessageField(input, fieldNumber, fieldInfo);
         default:
             return false;
         }
@@ -253,15 +253,15 @@ namespace grpc_labview
     // Helper methods to parse specific field types from CodedInputStream
     //---------------------------------------------------------------------
     bool LVMessage::ParseInt32Field(google::protobuf::io::CodedInputStream* input, 
-                                     uint32_t field_number, 
+                                     uint32_t fieldNumber, 
                                      const MessageElementMetadata& fieldInfo,
-                                     uint32_t wire_type)
+                                     uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedMessageValue<int>>(field_number);
+                auto v = std::make_shared<LVRepeatedMessageValue<int>>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -272,18 +272,18 @@ namespace grpc_labview
                     v->_value.Add(static_cast<int32_t>(value));
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
                 uint32_t value;
                 if (!input->ReadVarint32(&value)) return false;
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedMessageValue<int>>(field_number);
+                    auto v = std::make_shared<LVRepeatedMessageValue<int>>(fieldNumber);
                     v->_value.Add(static_cast<int32_t>(value));
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -296,22 +296,22 @@ namespace grpc_labview
         {
             uint32_t value;
             if (!input->ReadVarint32(&value)) return false;
-            auto v = std::make_shared<LVVariableMessageValue<int>>(field_number, static_cast<int32_t>(value));
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVVariableMessageValue<int>>(fieldNumber, static_cast<int32_t>(value));
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseInt64Field(google::protobuf::io::CodedInputStream* input,
-                                     uint32_t field_number,
+                                     uint32_t fieldNumber,
                                      const MessageElementMetadata& fieldInfo,
-                                     uint32_t wire_type)
+                                     uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(field_number);
+                auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -322,18 +322,18 @@ namespace grpc_labview
                     v->_value.Add(static_cast<int64_t>(value));
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
                 uint64_t value;
                 if (!input->ReadVarint64(&value)) return false;
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(field_number);
+                    auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(fieldNumber);
                     v->_value.Add(static_cast<int64_t>(value));
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -346,22 +346,22 @@ namespace grpc_labview
         {
             uint64_t value;
             if (!input->ReadVarint64(&value)) return false;
-            auto v = std::make_shared<LVVariableMessageValue<int64_t>>(field_number, static_cast<int64_t>(value));
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVVariableMessageValue<int64_t>>(fieldNumber, static_cast<int64_t>(value));
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseUInt32Field(google::protobuf::io::CodedInputStream* input,
-                                      uint32_t field_number,
+                                      uint32_t fieldNumber,
                                       const MessageElementMetadata& fieldInfo,
-                                      uint32_t wire_type)
+                                      uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedMessageValue<uint32_t>>(field_number);
+                auto v = std::make_shared<LVRepeatedMessageValue<uint32_t>>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -372,18 +372,18 @@ namespace grpc_labview
                     v->_value.Add(value);
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
                 uint32_t value;
                 if (!input->ReadVarint32(&value)) return false;
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedMessageValue<uint32_t>>(field_number);
+                    auto v = std::make_shared<LVRepeatedMessageValue<uint32_t>>(fieldNumber);
                     v->_value.Add(value);
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -396,22 +396,22 @@ namespace grpc_labview
         {
             uint32_t value;
             if (!input->ReadVarint32(&value)) return false;
-            auto v = std::make_shared<LVVariableMessageValue<uint32_t>>(field_number, value);
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVVariableMessageValue<uint32_t>>(fieldNumber, value);
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseUInt64Field(google::protobuf::io::CodedInputStream* input,
-                                      uint32_t field_number,
+                                      uint32_t fieldNumber,
                                       const MessageElementMetadata& fieldInfo,
-                                      uint32_t wire_type)
+                                      uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedMessageValue<uint64_t>>(field_number);
+                auto v = std::make_shared<LVRepeatedMessageValue<uint64_t>>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -422,18 +422,18 @@ namespace grpc_labview
                     v->_value.Add(value);
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
                 uint64_t value;
                 if (!input->ReadVarint64(&value)) return false;
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedMessageValue<uint64_t>>(field_number);
+                    auto v = std::make_shared<LVRepeatedMessageValue<uint64_t>>(fieldNumber);
                     v->_value.Add(value);
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -446,22 +446,22 @@ namespace grpc_labview
         {
             uint64_t value;
             if (!input->ReadVarint64(&value)) return false;
-            auto v = std::make_shared<LVVariableMessageValue<uint64_t>>(field_number, value);
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVVariableMessageValue<uint64_t>>(fieldNumber, value);
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseFloatField(google::protobuf::io::CodedInputStream* input,
-                                     uint32_t field_number,
+                                     uint32_t fieldNumber,
                                      const MessageElementMetadata& fieldInfo,
-                                     uint32_t wire_type)
+                                     uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedMessageValue<float>>(field_number);
+                auto v = std::make_shared<LVRepeatedMessageValue<float>>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -474,7 +474,7 @@ namespace grpc_labview
                     v->_value.Add(f);
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -482,12 +482,12 @@ namespace grpc_labview
                 if (!input->ReadLittleEndian32(&value)) return false;
                 float f;
                 memcpy(&f, &value, sizeof(float));
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedMessageValue<float>>(field_number);
+                    auto v = std::make_shared<LVRepeatedMessageValue<float>>(fieldNumber);
                     v->_value.Add(f);
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -502,22 +502,22 @@ namespace grpc_labview
             if (!input->ReadLittleEndian32(&value)) return false;
             float f;
             memcpy(&f, &value, sizeof(float));
-            auto v = std::make_shared<LVVariableMessageValue<float>>(field_number, f);
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVVariableMessageValue<float>>(fieldNumber, f);
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseDoubleField(google::protobuf::io::CodedInputStream* input,
-                                      uint32_t field_number,
+                                      uint32_t fieldNumber,
                                       const MessageElementMetadata& fieldInfo,
-                                      uint32_t wire_type)
+                                      uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedMessageValue<double>>(field_number);
+                auto v = std::make_shared<LVRepeatedMessageValue<double>>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -530,7 +530,7 @@ namespace grpc_labview
                     v->_value.Add(d);
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
@@ -538,12 +538,12 @@ namespace grpc_labview
                 if (!input->ReadLittleEndian64(&value)) return false;
                 double d;
                 memcpy(&d, &value, sizeof(double));
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedMessageValue<double>>(field_number);
+                    auto v = std::make_shared<LVRepeatedMessageValue<double>>(fieldNumber);
                     v->_value.Add(d);
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -558,22 +558,22 @@ namespace grpc_labview
             if (!input->ReadLittleEndian64(&value)) return false;
             double d;
             memcpy(&d, &value, sizeof(double));
-            auto v = std::make_shared<LVVariableMessageValue<double>>(field_number, d);
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVVariableMessageValue<double>>(fieldNumber, d);
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseBoolField(google::protobuf::io::CodedInputStream* input,
-                                    uint32_t field_number,
+                                    uint32_t fieldNumber,
                                     const MessageElementMetadata& fieldInfo,
-                                    uint32_t wire_type)
+                                    uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedMessageValue<bool>>(field_number);
+                auto v = std::make_shared<LVRepeatedMessageValue<bool>>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -584,18 +584,18 @@ namespace grpc_labview
                     v->_value.Add(value != 0);
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
                 uint64_t value;
                 if (!input->ReadVarint64(&value)) return false;
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedMessageValue<bool>>(field_number);
+                    auto v = std::make_shared<LVRepeatedMessageValue<bool>>(fieldNumber);
                     v->_value.Add(value != 0);
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -608,14 +608,14 @@ namespace grpc_labview
         {
             uint64_t value;
             if (!input->ReadVarint64(&value)) return false;
-            auto v = std::make_shared<LVVariableMessageValue<bool>>(field_number, value != 0);
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVVariableMessageValue<bool>>(fieldNumber, value != 0);
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseStringField(google::protobuf::io::CodedInputStream* input,
-                                      uint32_t field_number,
+                                      uint32_t fieldNumber,
                                       const MessageElementMetadata& fieldInfo)
     {
         uint32_t length;
@@ -631,12 +631,12 @@ namespace grpc_labview
         if (fieldInfo.isRepeated)
         {
             // For repeated strings, use RepeatedPtrField
-            auto it = _values.find(field_number);
+            auto it = _values.find(fieldNumber);
             if (it == _values.end())
             {
-                auto v = std::make_shared<LVRepeatedStringMessageValue>(field_number);
+                auto v = std::make_shared<LVRepeatedStringMessageValue>(fieldNumber);
                 *v->_value.Add() = value;
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else
             {
@@ -646,14 +646,14 @@ namespace grpc_labview
         }
         else
         {
-            auto v = std::make_shared<LVStringMessageValue>(field_number, value);
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVStringMessageValue>(fieldNumber, value);
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseBytesField(google::protobuf::io::CodedInputStream* input,
-                                     uint32_t field_number,
+                                     uint32_t fieldNumber,
                                      const MessageElementMetadata& fieldInfo)
     {
         uint32_t length;
@@ -668,12 +668,12 @@ namespace grpc_labview
             // can delegate to CopyStringToCluster (matching LVMessageEfficient behaviour).
             if (fieldInfo.isRepeated)
             {
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedStringMessageValue>(field_number);
+                    auto v = std::make_shared<LVRepeatedStringMessageValue>(fieldNumber);
                     *v->_value.Add() = value;
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -683,20 +683,20 @@ namespace grpc_labview
             }
             else
             {
-                auto v = std::make_shared<LVStringMessageValue>(field_number, value);
-                _values.emplace(field_number, v);
+                auto v = std::make_shared<LVStringMessageValue>(fieldNumber, value);
+                _values.emplace(fieldNumber, v);
             }
         }
         else
         {
             if (fieldInfo.isRepeated)
             {
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedBytesMessageValue>(field_number);
+                    auto v = std::make_shared<LVRepeatedBytesMessageValue>(fieldNumber);
                     *v->_value.Add() = value;
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -706,15 +706,15 @@ namespace grpc_labview
             }
             else
             {
-                auto v = std::make_shared<LVBytesMessageValue>(field_number, value);
-                _values.emplace(field_number, v);
+                auto v = std::make_shared<LVBytesMessageValue>(fieldNumber, value);
+                _values.emplace(fieldNumber, v);
             }
         }
         return true;
     }
     
     bool LVMessage::ParseMessageField(google::protobuf::io::CodedInputStream* input,
-                                       uint32_t field_number,
+                                       uint32_t fieldNumber,
                                        const MessageElementMetadata& fieldInfo)
     {
         uint32_t length;
@@ -735,12 +735,12 @@ namespace grpc_labview
         
         if (fieldInfo.isRepeated)
         {
-            auto it = _values.find(field_number);
+            auto it = _values.find(fieldNumber);
             if (it == _values.end())
             {
-                auto v = std::make_shared<LVRepeatedNestedMessageMessageValue>(field_number);
+                auto v = std::make_shared<LVRepeatedNestedMessageMessageValue>(fieldNumber);
                 v->_value.push_back(nestedMessage);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else
             {
@@ -750,22 +750,22 @@ namespace grpc_labview
         }
         else
         {
-            auto v = std::make_shared<LVNestedMessageMessageValue>(field_number, nestedMessage);
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVNestedMessageMessageValue>(fieldNumber, nestedMessage);
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseEnumField(google::protobuf::io::CodedInputStream* input,
-                                    uint32_t field_number,
+                                    uint32_t fieldNumber,
                                     const MessageElementMetadata& fieldInfo,
-                                    uint32_t wire_type)
+                                    uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedEnumMessageValue>(field_number);
+                auto v = std::make_shared<LVRepeatedEnumMessageValue>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -776,18 +776,18 @@ namespace grpc_labview
                     v->_value.Add(static_cast<int32_t>(value));
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
                 uint32_t value;
                 if (!input->ReadVarint32(&value)) return false;
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedEnumMessageValue>(field_number);
+                    auto v = std::make_shared<LVRepeatedEnumMessageValue>(fieldNumber);
                     v->_value.Add(static_cast<int32_t>(value));
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -800,22 +800,22 @@ namespace grpc_labview
         {
             uint32_t value;
             if (!input->ReadVarint32(&value)) return false;
-            auto v = std::make_shared<LVEnumMessageValue>(field_number, static_cast<int32_t>(value));
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVEnumMessageValue>(fieldNumber, static_cast<int32_t>(value));
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseSInt32Field(google::protobuf::io::CodedInputStream* input,
-                                      uint32_t field_number,
+                                      uint32_t fieldNumber,
                                       const MessageElementMetadata& fieldInfo,
-                                      uint32_t wire_type)
+                                      uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedSInt32MessageValue>(field_number);
+                auto v = std::make_shared<LVRepeatedSInt32MessageValue>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -826,18 +826,18 @@ namespace grpc_labview
                     v->_value.Add(WFL::ZigZagDecode32(value));
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
                 uint32_t value;
                 if (!input->ReadVarint32(&value)) return false;
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedSInt32MessageValue>(field_number);
+                    auto v = std::make_shared<LVRepeatedSInt32MessageValue>(fieldNumber);
                     v->_value.Add(WFL::ZigZagDecode32(value));
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -850,22 +850,22 @@ namespace grpc_labview
         {
             uint32_t value;
             if (!input->ReadVarint32(&value)) return false;
-            auto v = std::make_shared<LVSInt32MessageValue>(field_number, WFL::ZigZagDecode32(value));
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVSInt32MessageValue>(fieldNumber, WFL::ZigZagDecode32(value));
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseSInt64Field(google::protobuf::io::CodedInputStream* input,
-                                      uint32_t field_number,
+                                      uint32_t fieldNumber,
                                       const MessageElementMetadata& fieldInfo,
-                                      uint32_t wire_type)
+                                      uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedSInt64MessageValue>(field_number);
+                auto v = std::make_shared<LVRepeatedSInt64MessageValue>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -876,18 +876,18 @@ namespace grpc_labview
                     v->_value.Add(WFL::ZigZagDecode64(value));
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
                 uint64_t value;
                 if (!input->ReadVarint64(&value)) return false;
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedSInt64MessageValue>(field_number);
+                    auto v = std::make_shared<LVRepeatedSInt64MessageValue>(fieldNumber);
                     v->_value.Add(WFL::ZigZagDecode64(value));
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -900,22 +900,22 @@ namespace grpc_labview
         {
             uint64_t value;
             if (!input->ReadVarint64(&value)) return false;
-            auto v = std::make_shared<LVSInt64MessageValue>(field_number, WFL::ZigZagDecode64(value));
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVSInt64MessageValue>(fieldNumber, WFL::ZigZagDecode64(value));
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseFixed32Field(google::protobuf::io::CodedInputStream* input,
-                                       uint32_t field_number,
+                                       uint32_t fieldNumber,
                                        const MessageElementMetadata& fieldInfo,
-                                       uint32_t wire_type)
+                                       uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedFixed32MessageValue>(field_number);
+                auto v = std::make_shared<LVRepeatedFixed32MessageValue>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -926,18 +926,18 @@ namespace grpc_labview
                     v->_value.Add(value);
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
                 uint32_t value;
                 if (!input->ReadLittleEndian32(&value)) return false;
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedFixed32MessageValue>(field_number);
+                    auto v = std::make_shared<LVRepeatedFixed32MessageValue>(fieldNumber);
                     v->_value.Add(value);
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -950,22 +950,22 @@ namespace grpc_labview
         {
             uint32_t value;
             if (!input->ReadLittleEndian32(&value)) return false;
-            auto v = std::make_shared<LVFixed32MessageValue>(field_number, value);
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVFixed32MessageValue>(fieldNumber, value);
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseFixed64Field(google::protobuf::io::CodedInputStream* input,
-                                       uint32_t field_number,
+                                       uint32_t fieldNumber,
                                        const MessageElementMetadata& fieldInfo,
-                                       uint32_t wire_type)
+                                       uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedFixed64MessageValue>(field_number);
+                auto v = std::make_shared<LVRepeatedFixed64MessageValue>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -976,18 +976,18 @@ namespace grpc_labview
                     v->_value.Add(value);
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
                 uint64_t value;
                 if (!input->ReadLittleEndian64(&value)) return false;
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedFixed64MessageValue>(field_number);
+                    auto v = std::make_shared<LVRepeatedFixed64MessageValue>(fieldNumber);
                     v->_value.Add(value);
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -1000,22 +1000,22 @@ namespace grpc_labview
         {
             uint64_t value;
             if (!input->ReadLittleEndian64(&value)) return false;
-            auto v = std::make_shared<LVFixed64MessageValue>(field_number, value);
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVFixed64MessageValue>(fieldNumber, value);
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseSFixed32Field(google::protobuf::io::CodedInputStream* input,
-                                        uint32_t field_number,
+                                        uint32_t fieldNumber,
                                         const MessageElementMetadata& fieldInfo,
-                                        uint32_t wire_type)
+                                        uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(field_number);
+                auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -1026,18 +1026,18 @@ namespace grpc_labview
                     v->_value.Add(static_cast<int32_t>(value));
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
                 uint32_t value;
                 if (!input->ReadLittleEndian32(&value)) return false;
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(field_number);
+                    auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(fieldNumber);
                     v->_value.Add(static_cast<int32_t>(value));
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -1050,22 +1050,22 @@ namespace grpc_labview
         {
             uint32_t value;
             if (!input->ReadLittleEndian32(&value)) return false;
-            auto v = std::make_shared<LVSFixed32MessageValue>(field_number, static_cast<int32_t>(value));
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVSFixed32MessageValue>(fieldNumber, static_cast<int32_t>(value));
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
     
     bool LVMessage::ParseSFixed64Field(google::protobuf::io::CodedInputStream* input,
-                                        uint32_t field_number,
+                                        uint32_t fieldNumber,
                                         const MessageElementMetadata& fieldInfo,
-                                        uint32_t wire_type)
+                                        uint32_t wireType)
     {
         if (fieldInfo.isRepeated)
         {
-            if (wire_type == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+            if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
             {
-                auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(field_number);
+                auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(fieldNumber);
                 uint32_t length;
                 if (!input->ReadVarint32(&length)) return false;
                 auto limit = input->PushLimit(length);
@@ -1076,18 +1076,18 @@ namespace grpc_labview
                     v->_value.Add(static_cast<int64_t>(value));
                 }
                 input->PopLimit(limit);
-                _values.emplace(field_number, v);
+                _values.emplace(fieldNumber, v);
             }
             else // unpacked: single element per tag occurrence
             {
                 uint64_t value;
                 if (!input->ReadLittleEndian64(&value)) return false;
-                auto it = _values.find(field_number);
+                auto it = _values.find(fieldNumber);
                 if (it == _values.end())
                 {
-                    auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(field_number);
+                    auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(fieldNumber);
                     v->_value.Add(static_cast<int64_t>(value));
-                    _values.emplace(field_number, v);
+                    _values.emplace(fieldNumber, v);
                 }
                 else
                 {
@@ -1100,8 +1100,8 @@ namespace grpc_labview
         {
             uint64_t value;
             if (!input->ReadLittleEndian64(&value)) return false;
-            auto v = std::make_shared<LVSFixed64MessageValue>(field_number, static_cast<int64_t>(value));
-            _values.emplace(field_number, v);
+            auto v = std::make_shared<LVSFixed64MessageValue>(fieldNumber, static_cast<int64_t>(value));
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
