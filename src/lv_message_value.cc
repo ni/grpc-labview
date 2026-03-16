@@ -418,6 +418,17 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+    // ByteSizeLong() always recomputes and stores the packed payload size in
+    // _cachedDataSize, which Serialize() can then read directly without a second
+    // pass over the elements.  The normal call sequence is ByteSizeLong() then
+    // Serialize() (gRPC's serialization pipeline always calls them in that
+    // order), so the cache will almost always be warm when Serialize() runs.
+    // Serialize() includes a sentinel-check fallback for the rare case where it
+    // is called without a preceding ByteSizeLong() — e.g. directly via
+    // SerializeToCodedStream() in tests.  No explicit cache invalidation is
+    // necessary: LVMessage::Clear() destroys the entire _values map (and
+    // therefore these value objects) before a streaming message is reused, so
+    // stale cache values can never be observed.
     template <>
     size_t LVRepeatedMessageValue<int>::ByteSizeLong()
     {
@@ -438,7 +449,7 @@ namespace grpc_labview
     {
         if (_value.size() == 0) return;
         size_t dataSize = _cachedDataSize;
-        if (dataSize == static_cast<size_t>(-1))
+        if (dataSize == static_cast<size_t>(-1)) // fallback: ByteSizeLong() not called first
         {
             dataSize = 0;
             for (int i = 0, n = _value.size(); i < n; i++)

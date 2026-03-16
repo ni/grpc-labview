@@ -63,6 +63,19 @@ namespace grpc_labview
         }
 
         google::protobuf::RepeatedField<T> _value;
+
+        // Cache for the packed payload byte count (sum of encoded element sizes,
+        // NOT including the outer tag or length-prefix varint).
+        // Sentinel value -1 means "not yet computed"; ByteSizeLong() always
+        // refreshes it, and Serialize() reads it to avoid recomputing the
+        // per-element sizes a second time.  No explicit invalidation is needed:
+        // LVMessage values are effectively write-once — they are built during
+        // parsing and then serialized.  For streaming calls where the same
+        // LVMessage object is reused across writes, LVMessage::Clear() destroys
+        // every LVMessageValue in _values entirely, so stale caches in the old
+        // value objects cannot be observed.  New LVMessageValue objects created
+        // for the next write start with the sentinel, so ByteSizeLong() will
+        // always recompute before Serialize() is called.
         mutable size_t _cachedDataSize = static_cast<size_t>(-1);
 
         void* RawValue() override { return &_value; };
@@ -245,7 +258,7 @@ namespace grpc_labview
 
     public:
         google::protobuf::RepeatedField<int32_t> _value;
-        mutable size_t _cachedDataSize = static_cast<size_t>(-1);
+        mutable size_t _cachedDataSize = static_cast<size_t>(-1); // see LVRepeatedMessageValue<T> for caching contract
 
     public:
         void* RawValue() override { return &_value; };
@@ -279,7 +292,7 @@ namespace grpc_labview
 
     public:
         google::protobuf::RepeatedField<int64_t> _value;
-        mutable size_t _cachedDataSize = static_cast<size_t>(-1);
+        mutable size_t _cachedDataSize = static_cast<size_t>(-1); // see LVRepeatedMessageValue<T> for caching contract
 
     public:
         void* RawValue() override { return &_value; };

@@ -716,6 +716,13 @@ namespace grpc_labview
     }
 
     //---------------------------------------------------------------------
+    // Clear() destroys every LVMessageValue object in _values, which is
+    // sufficient to reset all per-value byte-size caches (_cachedDataSize,
+    // _cachedNestedByteSize, etc.).  New LVMessageValue objects created during
+    // the next parse start with the sentinel value (-1), guaranteeing that
+    // ByteSizeLong() recomputes before Serialize() is called for the new write.
+    // There is therefore no need to iterate over _values to invalidate caches
+    // individually.
     //---------------------------------------------------------------------
     void LVMessage::Clear()
     {
