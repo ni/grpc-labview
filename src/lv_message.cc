@@ -687,13 +687,31 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     std::unique_ptr<grpc::ByteBuffer> LVMessage::SerializeToByteBuffer() const
     {
-        std::string buf;
-        if (!SerializeToString(&buf) || buf.empty())
+        auto size = ByteSizeLong();
+        if (size == 0)
         {
-            return std::make_unique<grpc::ByteBuffer>();
+            // gRPC does not accept a default-constructed ByteBuffer (null internal
+            // buffer); send a valid empty ByteBuffer instead.
+            grpc::Slice buf(0);
+            return std::make_unique<grpc::ByteBuffer>(&buf, 1);
         }
-        grpc::Slice slice(buf);
-        return std::make_unique<grpc::ByteBuffer>(&slice, 1);
+
+        if (size > static_cast<size_t>(INT_MAX))
+        {
+            return nullptr;
+        }
+
+        grpc::Slice buf(size);
+        {
+            google::protobuf::io::ArrayOutputStream aos(const_cast<uint8_t*>(buf.begin()), static_cast<int>(size));
+            google::protobuf::io::CodedOutputStream cos(&aos);
+            for (auto& e : _values)
+            {
+                e.second->Serialize(&cos);
+            }
+        } // CodedOutputStream flushes on destruction
+
+        return std::make_unique<grpc::ByteBuffer>(&buf, 1);
     }
 
     //---------------------------------------------------------------------
