@@ -2548,6 +2548,127 @@ TEST_F(MultiplePackedChunksTest, PackedPackedUnpacked_Int32)
 }
 
 // =====================================================================
+// Multiple wire occurrences of the same repeated string/bytes/message field.
+//
+// Strings, bytes, and messages are always length-delimited and never packed:
+// each repeated element arrives as a separate (tag, length, data) tuple.
+// The find-or-create pattern in ParseStringField / ParseBytesField /
+// ParseMessageField must append each element to the existing container
+// rather than discarding it.  These tests build raw wire bytes manually
+// and verify that all elements are accumulated correctly, directly
+// exercising those code paths.
+// =====================================================================
+
+class RepeatedLenDelimMergingTest : public ::testing::Test {};
+
+TEST_F(RepeatedLenDelimMergingTest, RepeatedString_MultipleOccurrences)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::StringValue, true);
+
+    // Three separate (tag, length, data) tuples for the same field 1.
+    std::string wire = MakeLenDelimField(1, "alpha")
+                     + MakeLenDelimField(1, "beta")
+                     + MakeLenDelimField(1, "gamma");
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+
+    auto it = msg._values.find(1);
+    ASSERT_NE(it, msg._values.end());
+    auto* rv = dynamic_cast<LVRepeatedStringMessageValue*>(it->second.get());
+    ASSERT_NE(rv, nullptr);
+    ASSERT_EQ(rv->_value.size(), 3);
+    EXPECT_EQ(rv->_value[0], "alpha");
+    EXPECT_EQ(rv->_value[1], "beta");
+    EXPECT_EQ(rv->_value[2], "gamma");
+}
+
+TEST_F(RepeatedLenDelimMergingTest, RepeatedString_EmptyAndNonEmpty)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::StringValue, true);
+
+    // Empty string followed by non-empty strings.
+    std::string wire = MakeLenDelimField(1, "")
+                     + MakeLenDelimField(1, "hello")
+                     + MakeLenDelimField(1, "");
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+
+    auto it = msg._values.find(1);
+    ASSERT_NE(it, msg._values.end());
+    auto* rv = dynamic_cast<LVRepeatedStringMessageValue*>(it->second.get());
+    ASSERT_NE(rv, nullptr);
+    ASSERT_EQ(rv->_value.size(), 3);
+    EXPECT_EQ(rv->_value[0], "");
+    EXPECT_EQ(rv->_value[1], "hello");
+    EXPECT_EQ(rv->_value[2], "");
+}
+
+TEST_F(RepeatedLenDelimMergingTest, RepeatedBytes_MultipleOccurrences)
+{
+    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::BytesValue, true);
+
+    std::string b0 = std::string("\x00\x01\x02", 3);
+    std::string b1 = std::string("\xff\xfe", 2);
+    std::string b2 = std::string("\xde\xad\xbe\xef", 4);
+    std::string wire = MakeLenDelimField(1, b0)
+                     + MakeLenDelimField(1, b1)
+                     + MakeLenDelimField(1, b2);
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+
+    auto it = msg._values.find(1);
+    ASSERT_NE(it, msg._values.end());
+    auto* rv = dynamic_cast<LVRepeatedBytesMessageValue*>(it->second.get());
+    ASSERT_NE(rv, nullptr);
+    ASSERT_EQ(rv->_value.size(), 3);
+    EXPECT_EQ(rv->_value[0], b0);
+    EXPECT_EQ(rv->_value[1], b1);
+    EXPECT_EQ(rv->_value[2], b2);
+}
+
+TEST_F(RepeatedLenDelimMergingTest, RepeatedString_InterleavedWithOtherField)
+{
+    // Interleaved: field1=string, field2=int32, field1=string, field2=int32, field1=string.
+    // All three field1 strings must be merged despite other fields in between.
+    auto meta = MakeMultiFieldMetadata({
+        {1, LVMessageMetadataType::StringValue, true},
+        {2, LVMessageMetadataType::Int32Value,  false},
+    });
+
+    std::string wire = MakeLenDelimField(1, "first")
+                     + MakeVarintField(2, 42)
+                     + MakeLenDelimField(1, "second")
+                     + MakeVarintField(2, 99)
+                     + MakeLenDelimField(1, "third");
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+
+    LVMessage msg(meta);
+    ASSERT_TRUE(msg.ParseFromString(wire));
+
+    auto it1 = msg._values.find(1);
+    ASSERT_NE(it1, msg._values.end());
+    auto* rv = dynamic_cast<LVRepeatedStringMessageValue*>(it1->second.get());
+    ASSERT_NE(rv, nullptr);
+    ASSERT_EQ(rv->_value.size(), 3);
+    EXPECT_EQ(rv->_value[0], "first");
+    EXPECT_EQ(rv->_value[1], "second");
+    EXPECT_EQ(rv->_value[2], "third");
+
+    // NOTE: LVMessage uses std::map::emplace for singular fields, which keeps
+    // the FIRST occurrence rather than the last.  The protobuf spec says the
+    // last value should win for singular fields, but LVMessage currently does
+    // not implement that behaviour.  The expectation below documents the actual
+    // (first-wins) semantics so the test reflects what the code does today.
+    EXPECT_EQ(GetScalarValue<int>(msg, 2), 42);
+}
+
+// =====================================================================
 // main
 // =====================================================================
 
