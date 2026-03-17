@@ -4,7 +4,6 @@
 #include <exceptions.h>
 #include <lv_interop.h>
 #include <sstream>
-#include <fstream>
 #include <list>
 
 //---------------------------------------------------------------------
@@ -64,7 +63,7 @@ namespace grpc_labview
     void ErrorCollector::AddError(const std::string& filename, int line, int column, const std::string& message)
     {
         std::string errorMessage = filename + ": " + std::to_string(line) + " - " + message;
-        _errors.emplace_back(errorMessage);
+        _errors.emplace_back(std::move(errorMessage));
     }
 
     //---------------------------------------------------------------------
@@ -73,7 +72,7 @@ namespace grpc_labview
     {
         // For now, treat warnings as errors
         std::string warningMessage = filename + ": " + std::to_string(line) + " - Warning: " + message;
-        _errors.emplace_back(warningMessage);
+        _errors.emplace_back(std::move(warningMessage));
     }
 
     //---------------------------------------------------------------------

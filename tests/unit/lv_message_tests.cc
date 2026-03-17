@@ -1222,6 +1222,70 @@ TEST_F(ByteBufferTest, DeserializeNullMessage)
     EXPECT_FALSE(status.ok());
 }
 
+TEST_F(ByteBufferTest, ParseFromMultiSliceByteBuffer)
+{
+    // Build and serialize a message with an int32 and a string field.
+    auto meta = MakeMultiFieldMetadata({
+        {1, LVMessageMetadataType::Int32Value,  false},
+        {2, LVMessageMetadataType::StringValue, false},
+    });
+    LVMessage src(meta);
+    src._values.emplace(1, std::make_shared<LVVariableMessageValue<int>>(1, 123));
+    std::string s = "multiSlice";
+    src._values.emplace(2, std::make_shared<LVStringMessageValue>(2, s));
+
+    std::string wire;
+    ASSERT_TRUE(src.SerializeToString(&wire));
+    ASSERT_GT(wire.size(), 1u);
+
+    // Split the wire bytes across two slices at an arbitrary mid-point to force
+    // ParseFromByteBuffer to take the MultiSliceInputStream slow path.
+    size_t split = wire.size() / 2;
+    grpc::Slice slices[2] = {
+        grpc::Slice(wire.data(),         split),
+        grpc::Slice(wire.data() + split, wire.size() - split),
+    };
+    grpc::ByteBuffer bb(slices, 2);
+
+    LVMessage dst(meta);
+    ASSERT_TRUE(dst.ParseFromByteBuffer(bb));
+    EXPECT_EQ(GetScalarValue<int>(dst, 1), 123);
+    EXPECT_EQ(GetStringValue(dst, 2), "multiSlice");
+}
+
+TEST_F(ByteBufferTest, ParseFromMultiSliceByteBuffer_FieldSplitAcrossSlices)
+{
+    // Same idea but the split point lands inside the string payload bytes,
+    // so a field value is split across the two slices.
+    auto meta = MakeMultiFieldMetadata({
+        {1, LVMessageMetadataType::Int32Value,  false},
+        {2, LVMessageMetadataType::StringValue, false},
+    });
+    LVMessage src(meta);
+    src._values.emplace(1, std::make_shared<LVVariableMessageValue<int>>(1, 7));
+    std::string s = "splitHere";
+    src._values.emplace(2, std::make_shared<LVStringMessageValue>(2, s));
+
+    std::string wire;
+    ASSERT_TRUE(src.SerializeToString(&wire));
+
+    // Try every possible split point to ensure correctness regardless of where
+    // the boundary falls.
+    for (size_t split = 1; split < wire.size(); ++split)
+    {
+        grpc::Slice slices[2] = {
+            grpc::Slice(wire.data(),         split),
+            grpc::Slice(wire.data() + split, wire.size() - split),
+        };
+        grpc::ByteBuffer bb(slices, 2);
+
+        LVMessage dst(meta);
+        ASSERT_TRUE(dst.ParseFromByteBuffer(bb)) << "split at byte " << split;
+        EXPECT_EQ(GetScalarValue<int>(dst, 1), 7)           << "split at byte " << split;
+        EXPECT_EQ(GetStringValue(dst, 2), "splitHere")      << "split at byte " << split;
+    }
+}
+
 // =====================================================================
 // Edge cases and error handling
 // =====================================================================

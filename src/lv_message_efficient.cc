@@ -80,9 +80,9 @@ namespace grpc_labview
             static StoredType Transform(RawType v) { return v; }
         };
         struct BoolTraits {
-            using RawType = uint64_t;
+            using RawType = uint32_t;
             using StoredType = uint8_t;  // uint8_t avoids std::vector<bool> specialisation
-            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint64(&out); }
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint32(&out); }
             static StoredType Transform(RawType v) { return static_cast<uint8_t>(v != 0); }
         };
         struct FloatTraits {

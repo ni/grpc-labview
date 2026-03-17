@@ -79,11 +79,6 @@ namespace
         }
     }
 
-    inline bool SkipField(google::protobuf::io::CodedInputStream* input, uint32_t tag)
-    {
-        return HandleUnknownField(input, tag, nullptr);
-    }
-
     // ZeroCopyInputStream over a sequence of grpc::Slices.
     // Allows parsing directly from a multi-slice ByteBuffer with no data copy:
     // grpc::ByteBuffer::Dump() only increments slice refcounts, so the parser
@@ -399,10 +394,10 @@ namespace grpc_labview
             static double Transform(RawType v) { double d; memcpy(&d, &v, sizeof(d)); return d; }
         };
         struct BoolTraits {
-            using RawType = uint64_t;
+            using RawType = uint32_t;
             using ScalarType = LVVariableMessageValue<bool>;
             using RepeatedType = LVRepeatedMessageValue<bool>;
-            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint64(&out); }
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint32(&out); }
             static bool Transform(RawType v) { return v != 0; }
         };
         struct EnumTraits {
@@ -819,8 +814,7 @@ namespace grpc_labview
         output->clear();
         google::protobuf::io::StringOutputStream sos(output);
         google::protobuf::io::CodedOutputStream cos(&sos);
-        for (auto& e : _values)
-            e.second->Serialize(&cos);
+        SerializeToCodedStream(&cos);
         return !cos.HadError();
     }
 
