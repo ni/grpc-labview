@@ -23,7 +23,6 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     LabVIEWgRPCServer::LabVIEWgRPCServer() :
-        _shutdown(false),
         _genericMethodEvent(0)
     {
     }
@@ -239,7 +238,6 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void LabVIEWgRPCServer::StopServer()
     {
-        _shutdown = true;
         if (_server != nullptr)
         {
             // We need shutdown passing a deadline so that any RPC calls in progress are terminated as well.

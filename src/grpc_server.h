@@ -91,7 +91,6 @@ namespace grpc_labview
         LVUserEventRef _genericMethodEvent;
         std::unique_ptr<grpc::AsyncGenericService> _rpcService;
         std::unique_ptr<std::thread> _runThread;
-        bool _shutdown;
         int _listeningPort;
 
     private:
@@ -158,7 +157,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class CallFinishedTag : CallDataBase
+    class CallFinishedTag : public CallDataBase
     {
     public:
         CallFinishedTag(std::shared_ptr<CallData> callData);
@@ -190,7 +189,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class ReadNextTag : CallDataBase
+    class ReadNextTag : public CallDataBase
     {
     public:
         ReadNextTag(std::shared_ptr<CallData> callData);
@@ -205,7 +204,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class WriteNextTag : CallDataBase
+    class WriteNextTag : public CallDataBase
     {
     public:
         WriteNextTag(std::shared_ptr<CallData> callData);
