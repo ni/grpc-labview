@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
+#include <grpc_interop.h>
 #include <grpc_server.h>
 #include <cluster_copier.h>
 #include <lv_interop.h>
@@ -145,10 +146,10 @@ LIBRARY_EXPORT int32_t LVCreateServer(grpc_labview::gRPCid** id)
 {
     try {
         grpc_labview::InitCallbacks();
-        auto server = new grpc_labview::LabVIEWgRPCServer();
+        auto server = std::make_shared<grpc_labview::LabVIEWgRPCServer>();
         grpc_labview::gPointerManager.RegisterPointer(server);
-        *id = server;
-        grpc_labview::RegisterCleanupProc(ServerCleanupProc, server);
+        *id = server.get();
+        grpc_labview::RegisterCleanupProc(ServerCleanupProc, *id);
         return 0;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
@@ -360,30 +361,36 @@ LIBRARY_EXPORT int32_t RegisterGenericMethodServerEvent(grpc_labview::gRPCid** i
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t GetRequestData(grpc_labview::gRPCid** id, int8_t* lvRequest)
+int32_t GetErrorCodeForFailedReadWrite(const std::shared_ptr<grpc_labview::CallData>& callData)
+{
+    auto statusCode = callData->GetCallStatusCode();
+    if (statusCode != grpc::StatusCode::OK)
+    {
+        return -(1000 + statusCode);
+    }
+    if (callData->IsCancelled())
+    {
+        return -(1000 + grpc::StatusCode::CANCELLED);
+    }
+    return -2;
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t GetRequestData(grpc_labview::gRPCid** id, int8_t* cluster)
 {
     try {
-        auto data = (*id)->CastTo<grpc_labview::GenericMethodData>();
-        if (data == nullptr)
+        auto callData = (*id)->CastTo<grpc_labview::CallData>();
+        if (callData == nullptr)
         {
             return -1;
         }
-        if (data->_call->IsCancelled())
+
+        if (callData->ReadNext(cluster))
         {
-            return -(1000 + grpc::StatusCode::CANCELLED);
-        }
-        if (data->_call->IsActive() && data->_call->ReadNext())
-        {
-            grpc_labview::ClusterDataCopier::CopyToCluster(*data->_request, lvRequest);
             return 0;
         }
-        // Check if a custom error status was set via SetCallStatus
-        auto statusCode = data->_call->GetCallStatusCode();
-        if (statusCode != grpc::StatusCode::OK)
-        {
-            return -(1000 + statusCode);
-        }
-        return -2;
+        return GetErrorCodeForFailedReadWrite(callData);
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
     }
@@ -391,32 +398,20 @@ LIBRARY_EXPORT int32_t GetRequestData(grpc_labview::gRPCid** id, int8_t* lvReque
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-LIBRARY_EXPORT int32_t SetResponseData(grpc_labview::gRPCid** id, int8_t* lvRequest)
+LIBRARY_EXPORT int32_t SetResponseData(grpc_labview::gRPCid** id, int8_t* cluster)
 {
     try {
-        auto data = (*id)->CastTo<grpc_labview::GenericMethodData>();
-        if (data == nullptr)
+        auto callData = (*id)->CastTo<grpc_labview::CallData>();
+        if (callData == nullptr)
         {
             return -1;
         }
 
-        if (data->_call->IsCancelled())
+        if (callData->Write(cluster))
         {
-            return -(1000 + grpc::StatusCode::CANCELLED);
+            return 0;
         }
-
-        grpc_labview::ClusterDataCopier::CopyFromCluster(*data->_response, lvRequest);
-
-        if (!data->_call->IsActive() || !data->_call->Write())
-        {
-            auto statusCode = data->_call->GetCallStatusCode();
-            if (statusCode != grpc::StatusCode::OK)
-            {
-                return -(1000 + statusCode);
-            }
-            return -2;
-        }
-        return 0;
+        return GetErrorCodeForFailedReadWrite(callData);
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
     }
@@ -427,23 +422,26 @@ LIBRARY_EXPORT int32_t SetResponseData(grpc_labview::gRPCid** id, int8_t* lvRequ
 LIBRARY_EXPORT int32_t CloseServerEvent(grpc_labview::gRPCid** id)
 {
     try {
-        auto data = (*id)->CastTo<grpc_labview::GenericMethodData>();
-        if (data == nullptr)
+        auto callData = (*id)->CastTo<grpc_labview::CallData>();
+        if (callData == nullptr)
         {
             return -1;
         }
 
-        if (data->_call->IsCancelled())
-        {
-            return -(1000 + grpc::StatusCode::CANCELLED);
-        }
-
-        data->NotifyComplete();
-        data->_call->Finish();
+        callData->FinishFromLabVIEW();
+        grpc_labview::DeregisterCleanupProc(grpc_labview::CloseServerEventCleanupProc, *id);
         grpc_labview::gPointerManager.UnregisterPointer(*id);
         return 0;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
+    }
+}
+
+namespace grpc_labview
+{
+    int32_t CloseServerEventCleanupProc(grpc_labview::gRPCid* id)
+    {
+        return ::CloseServerEvent(&id);
     }
 }
 
@@ -452,12 +450,12 @@ LIBRARY_EXPORT int32_t CloseServerEvent(grpc_labview::gRPCid** id)
 LIBRARY_EXPORT int32_t SetCallStatus(grpc_labview::gRPCid** id, int grpcErrorCode, const char* errorMessage)
 {
     try {
-        auto data = (*id)->CastTo<grpc_labview::GenericMethodData>();
-        if (data == nullptr)
+        auto callData = (*id)->CastTo<grpc_labview::CallData>();
+        if (callData == nullptr)
         {
             return -1;
         }
-        data->_call->SetCallStatusError((grpc::StatusCode)grpcErrorCode, errorMessage);
+        callData->SetCallStatusError((grpc::StatusCode)grpcErrorCode, errorMessage);
         return 0;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
@@ -469,12 +467,12 @@ LIBRARY_EXPORT int32_t SetCallStatus(grpc_labview::gRPCid** id, int grpcErrorCod
 LIBRARY_EXPORT int32_t IsCancelled(grpc_labview::gRPCid** id)
 {
     try {
-        auto data = (*id)->CastTo<grpc_labview::GenericMethodData>();
-        if (data == nullptr)
+        auto callData = (*id)->CastTo<grpc_labview::CallData>();
+        if (callData == nullptr)
         {
             return -1;
         }
-        return data->_call->IsCancelled();
+        return callData->IsCancelled();
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
     }

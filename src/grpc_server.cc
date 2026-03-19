@@ -77,6 +77,8 @@ namespace grpc_labview
         return false;
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     bool LabVIEWgRPCServer::HasRegisteredServerMethod(std::string methodName)
     {
         return _registeredServerMethods.find(methodName) != _registeredServerMethods.end();
@@ -137,23 +139,19 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void LabVIEWgRPCServer::HandleRpcs(grpc::ServerCompletionQueue *cq)
+    void LabVIEWgRPCServer::HandleRpcs()
     {
         // Spawn a new CallData instance to serve new clients.
-        new CallData(this, _rpcService.get(), cq);
+        CallData::Create(shared_from_this(), _rpcService.get(), _cq.get());
         void *tag; // uniquely identifies a request.
         bool ok;
-        while (true)
-        {
-            if (_shutdown)
-            {
-                break;
-            }
 
-            // Block waiting to read the next event from the completion queue. The
-            // event is uniquely identified by its tag, which in this case is the
-            // memory address of a CallData instance.
-            cq->Next(&tag, &ok);
+        // Block waiting to read the next event from the completion queue until the
+        // server is shutdown and all events have been drained. The event is uniquely
+        // identified by its tag, which in this case is the memory address of a tag
+        // wrapper around the CallData instance.
+        while (_cq->Next(&tag, &ok))
+        {
             static_cast<CallDataBase*>(tag)->Proceed(ok);
         }
     }
@@ -227,7 +225,7 @@ namespace grpc_labview
             std::cout << "Server listening on " << server_address << std::endl;
             serverStarted->NotifyComplete();
 
-            HandleRpcs(_cq.get());
+            HandleRpcs();
             _server->Wait();
         }
         else
@@ -257,15 +255,6 @@ namespace grpc_labview
             if (_runThread->joinable())
             {
                 _runThread->join();
-            }
-
-            // Drain the complete queue before deleting the server.
-            // Otherwise, server might fail on the assertion that the completion queue must be empty.
-            if (_cq != nullptr)
-            {
-                void *tag;
-                bool ok;
-                while (_cq->Next(&tag, &ok)) {}
             }
 
             _server = nullptr;
