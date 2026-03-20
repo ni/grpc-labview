@@ -361,7 +361,7 @@ LIBRARY_EXPORT int32_t RegisterGenericMethodServerEvent(grpc_labview::gRPCid** i
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-int32_t GetErrorCodeForFailedReadWrite(const std::shared_ptr<grpc_labview::CallData>& callData)
+static int32_t GetErrorCodeForFailedReadWrite(const std::shared_ptr<grpc_labview::CallData>& callData)
 {
     auto statusCode = callData->GetCallStatusCode();
     if (statusCode != grpc::StatusCode::OK)
