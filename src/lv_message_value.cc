@@ -672,7 +672,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     LVRepeatedSInt32MessageValue::LVRepeatedSInt32MessageValue(int protobufId) :
-        LVMessageValue(protobufId)
+        LVRepeatedMessageValue<int32_t>(protobufId)
     {
     }
 
@@ -729,7 +729,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     LVRepeatedSInt64MessageValue::LVRepeatedSInt64MessageValue(int protobufId) :
-        LVMessageValue(protobufId)
+        LVRepeatedMessageValue<int64_t>(protobufId)
     {
     }
 

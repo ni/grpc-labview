@@ -239,17 +239,11 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class LVRepeatedSInt32MessageValue : public LVMessageValue
+    class LVRepeatedSInt32MessageValue : public LVRepeatedMessageValue<int32_t>
     {
     public:
         LVRepeatedSInt32MessageValue(int protobufId);
 
-    public:
-        google::protobuf::RepeatedField<int32_t> _value;
-        mutable size_t _cachedDataSize = static_cast<size_t>(-1); // see LVRepeatedMessageValue<T> for caching contract
-
-    public:
-        void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
         void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
@@ -273,17 +267,11 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class LVRepeatedSInt64MessageValue : public LVMessageValue
+    class LVRepeatedSInt64MessageValue : public LVRepeatedMessageValue<int64_t>
     {
     public:
         LVRepeatedSInt64MessageValue(int protobufId);
 
-    public:
-        google::protobuf::RepeatedField<int64_t> _value;
-        mutable size_t _cachedDataSize = static_cast<size_t>(-1); // see LVRepeatedMessageValue<T> for caching contract
-
-    public:
-        void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
         void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
