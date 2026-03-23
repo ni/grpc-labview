@@ -26,7 +26,6 @@ namespace grpc_labview
         ~LVMessage();
 
         void Clear();
-        bool IsInitialized() const;
         size_t ByteSizeLong() const;
         virtual void PostInteralParseAction() {};
 

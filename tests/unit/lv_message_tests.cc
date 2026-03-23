@@ -274,358 +274,379 @@ std::vector<T> GetRepeatedValue(const LVMessage& msg, int field_number)
 // Scalar field round-trip tests (serialize → parse → verify)
 // =====================================================================
 
-class ScalarRoundTripTest : public ::testing::Test {};
+class Int32ScalarRoundTripTest : public ::testing::TestWithParam<int32_t> {};
 
-TEST_F(ScalarRoundTripTest, Int32_Positive)
+TEST_P(Int32ScalarRoundTripTest, RoundTrip)
 {
+    int32_t v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int32Value);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<int>>(1, 42));
-
+    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<int>>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int>(*msg2, 1), 42);
+    EXPECT_EQ(GetScalarValue<int>(*msg2, 1), v);
 }
 
-TEST_F(ScalarRoundTripTest, Int32_Negative)
-{
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int32Value);
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<int>>(1, -1));
-
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int>(*msg2, 1), -1);
-}
-
-TEST_F(ScalarRoundTripTest, Int32_Zero)
-{
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int32Value);
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<int>>(1, 0));
-
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int>(*msg2, 1), 0);
-}
-
-TEST_F(ScalarRoundTripTest, Int32_MinMax)
-{
-    auto meta = MakeMultiFieldMetadata({
-        {1, LVMessageMetadataType::Int32Value, false},
-        {2, LVMessageMetadataType::Int32Value, false},
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, Int32ScalarRoundTripTest,
+    ::testing::Values(
+        int32_t(42),
+        int32_t(-1),
+        int32_t(0),
+        std::numeric_limits<int32_t>::min(),
+        std::numeric_limits<int32_t>::max()),
+    [](const ::testing::TestParamInfo<int32_t>& info) -> std::string {
+        int32_t v = info.param;
+        if (v == 42)  return "Positive";
+        if (v == -1)  return "Negative";
+        if (v == 0)   return "Zero";
+        if (v == std::numeric_limits<int32_t>::min()) return "Min";
+        return "Max";
     });
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<int>>(1, std::numeric_limits<int32_t>::min()));
-    msg._values.emplace(2, std::make_shared<LVVariableMessageValue<int>>(2, std::numeric_limits<int32_t>::max()));
 
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int>(*msg2, 1), std::numeric_limits<int32_t>::min());
-    EXPECT_EQ(GetScalarValue<int>(*msg2, 2), std::numeric_limits<int32_t>::max());
-}
+class Int64ScalarRoundTripTest : public ::testing::TestWithParam<int64_t> {};
 
-TEST_F(ScalarRoundTripTest, Int64)
+TEST_P(Int64ScalarRoundTripTest, RoundTrip)
 {
+    int64_t v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int64Value);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<int64_t>>(1, -9223372036854775807LL));
-
+    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<int64_t>>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int64_t>(*msg2, 1), -9223372036854775807LL);
+    EXPECT_EQ(GetScalarValue<int64_t>(*msg2, 1), v);
 }
 
-TEST_F(ScalarRoundTripTest, Int64_Max)
-{
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int64Value);
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<int64_t>>(1, std::numeric_limits<int64_t>::max()));
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, Int64ScalarRoundTripTest,
+    ::testing::Values(
+        int64_t(-9223372036854775807LL),
+        std::numeric_limits<int64_t>::max()),
+    [](const ::testing::TestParamInfo<int64_t>& info) -> std::string {
+        return info.param < 0 ? "Min" : "Max";
+    });
 
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int64_t>(*msg2, 1), std::numeric_limits<int64_t>::max());
-}
+class UInt32ScalarRoundTripTest : public ::testing::TestWithParam<uint32_t> {};
 
-TEST_F(ScalarRoundTripTest, UInt32)
+TEST_P(UInt32ScalarRoundTripTest, RoundTrip)
 {
+    uint32_t v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::UInt32Value);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<uint32_t>>(1, 4294967295U));
-
+    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<uint32_t>>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<uint32_t>(*msg2, 1), 4294967295U);
+    EXPECT_EQ(GetScalarValue<uint32_t>(*msg2, 1), v);
 }
 
-TEST_F(ScalarRoundTripTest, UInt64)
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, UInt32ScalarRoundTripTest,
+    ::testing::Values(uint32_t(0), uint32_t(1), std::numeric_limits<uint32_t>::max()),
+    [](const ::testing::TestParamInfo<uint32_t>& info) -> std::string {
+        if (info.param == 0) return "Zero";
+        if (info.param == 1) return "One";
+        return "Max";
+    });
+
+class UInt64ScalarRoundTripTest : public ::testing::TestWithParam<uint64_t> {};
+
+TEST_P(UInt64ScalarRoundTripTest, RoundTrip)
 {
+    uint64_t v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::UInt64Value);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<uint64_t>>(1, 18446744073709551615ULL));
-
+    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<uint64_t>>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<uint64_t>(*msg2, 1), 18446744073709551615ULL);
+    EXPECT_EQ(GetScalarValue<uint64_t>(*msg2, 1), v);
 }
 
-TEST_F(ScalarRoundTripTest, Float)
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, UInt64ScalarRoundTripTest,
+    ::testing::Values(uint64_t(0), uint64_t(1), std::numeric_limits<uint64_t>::max()),
+    [](const ::testing::TestParamInfo<uint64_t>& info) -> std::string {
+        if (info.param == 0) return "Zero";
+        if (info.param == 1) return "One";
+        return "Max";
+    });
+
+class FloatScalarRoundTripTest : public ::testing::TestWithParam<float> {};
+
+TEST_P(FloatScalarRoundTripTest, RoundTrip)
 {
+    float v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::FloatValue);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<float>>(1, 3.14f));
-
+    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<float>>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_FLOAT_EQ(GetScalarValue<float>(*msg2, 1), 3.14f);
+    float got = GetScalarValue<float>(*msg2, 1);
+    if (std::isnan(v)) {
+        EXPECT_TRUE(std::isnan(got));
+    } else if (v == 0.0f && std::signbit(v)) {
+        EXPECT_TRUE(std::signbit(got));
+        EXPECT_FLOAT_EQ(got, -0.0f);
+    } else {
+        EXPECT_FLOAT_EQ(got, v);
+    }
 }
 
-TEST_F(ScalarRoundTripTest, Float_NegativeZero)
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, FloatScalarRoundTripTest,
+    ::testing::Values(
+        3.14f,
+        -0.0f,
+        std::numeric_limits<float>::infinity(),
+        std::numeric_limits<float>::quiet_NaN()),
+    [](const ::testing::TestParamInfo<float>& info) -> std::string {
+        float v = info.param;
+        if (std::isnan(v))        return "NaN";
+        if (v == 0.0f)            return "NegativeZero";
+        if (std::isinf(v))        return "Infinity";
+        return "Pi";
+    });
+
+class DoubleScalarRoundTripTest : public ::testing::TestWithParam<double> {};
+
+TEST_P(DoubleScalarRoundTripTest, RoundTrip)
 {
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::FloatValue);
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<float>>(1, -0.0f));
-
-    auto msg2 = RoundTrip(msg, meta);
-    float v = GetScalarValue<float>(*msg2, 1);
-    EXPECT_EQ(std::signbit(v), true);
-    EXPECT_FLOAT_EQ(v, -0.0f);
-}
-
-TEST_F(ScalarRoundTripTest, Float_Infinity)
-{
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::FloatValue);
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<float>>(1, std::numeric_limits<float>::infinity()));
-
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<float>(*msg2, 1), std::numeric_limits<float>::infinity());
-}
-
-TEST_F(ScalarRoundTripTest, Float_NaN)
-{
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::FloatValue);
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<float>>(1, std::numeric_limits<float>::quiet_NaN()));
-
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_TRUE(std::isnan(GetScalarValue<float>(*msg2, 1)));
-}
-
-TEST_F(ScalarRoundTripTest, Double)
-{
+    double v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::DoubleValue);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<double>>(1, 2.718281828459045));
-
+    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<double>>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_DOUBLE_EQ(GetScalarValue<double>(*msg2, 1), 2.718281828459045);
+    EXPECT_DOUBLE_EQ(GetScalarValue<double>(*msg2, 1), v);
 }
 
-TEST_F(ScalarRoundTripTest, Double_Infinity)
-{
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::DoubleValue);
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<double>>(1, -std::numeric_limits<double>::infinity()));
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, DoubleScalarRoundTripTest,
+    ::testing::Values(
+        2.718281828459045,
+        -std::numeric_limits<double>::infinity()),
+    [](const ::testing::TestParamInfo<double>& info) -> std::string {
+        return std::isinf(info.param) ? "NegInfinity" : "E";
+    });
 
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<double>(*msg2, 1), -std::numeric_limits<double>::infinity());
-}
+class BoolScalarRoundTripTest : public ::testing::TestWithParam<bool> {};
 
-TEST_F(ScalarRoundTripTest, Bool_True)
+TEST_P(BoolScalarRoundTripTest, RoundTrip)
 {
+    bool v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::BoolValue);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<bool>>(1, true));
-
+    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<bool>>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<bool>(*msg2, 1), true);
+    EXPECT_EQ(GetScalarValue<bool>(*msg2, 1), v);
 }
 
-TEST_F(ScalarRoundTripTest, Bool_False)
-{
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::BoolValue);
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<bool>>(1, false));
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, BoolScalarRoundTripTest,
+    ::testing::Values(true, false),
+    [](const ::testing::TestParamInfo<bool>& info) -> std::string {
+        return info.param ? "True" : "False";
+    });
 
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<bool>(*msg2, 1), false);
-}
+class EnumScalarRoundTripTest : public ::testing::TestWithParam<int32_t> {};
 
-TEST_F(ScalarRoundTripTest, Enum)
+TEST_P(EnumScalarRoundTripTest, RoundTrip)
 {
+    int32_t v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::EnumValue);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVEnumMessageValue>(1, 2));
-
+    msg._values.emplace(1, std::make_shared<LVEnumMessageValue>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int>(*msg2, 1), 2);
+    // Proto3 enums use int32 encoding; negative values are allowed.
+    EXPECT_EQ(GetScalarValue<int>(*msg2, 1), v);
 }
 
-TEST_F(ScalarRoundTripTest, Enum_Negative)
-{
-    // Proto3 enums use int32 encoding, negative values are allowed
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::EnumValue);
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVEnumMessageValue>(1, -1));
-
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int>(*msg2, 1), -1);
-}
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, EnumScalarRoundTripTest,
+    ::testing::Values(int32_t(2), int32_t(-1)),
+    [](const ::testing::TestParamInfo<int32_t>& info) -> std::string {
+        return info.param >= 0 ? "Positive" : "Negative";
+    });
 
 // =====================================================================
 // ZigZag-encoded types: sint32, sint64
 // =====================================================================
 
-TEST_F(ScalarRoundTripTest, SInt32_Positive)
+class SInt32ScalarRoundTripTest : public ::testing::TestWithParam<int32_t> {};
+
+TEST_P(SInt32ScalarRoundTripTest, RoundTrip)
 {
+    int32_t v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SInt32Value);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVSInt32MessageValue>(1, 100));
-
+    msg._values.emplace(1, std::make_shared<LVSInt32MessageValue>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int32_t>(*msg2, 1), 100);
+    EXPECT_EQ(GetScalarValue<int32_t>(*msg2, 1), v);
 }
 
-TEST_F(ScalarRoundTripTest, SInt32_Negative)
-{
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SInt32Value);
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVSInt32MessageValue>(1, -100));
-
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int32_t>(*msg2, 1), -100);
-}
-
-TEST_F(ScalarRoundTripTest, SInt32_MinMax)
-{
-    auto meta = MakeMultiFieldMetadata({
-        {1, LVMessageMetadataType::SInt32Value, false},
-        {2, LVMessageMetadataType::SInt32Value, false},
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, SInt32ScalarRoundTripTest,
+    ::testing::Values(
+        int32_t(100),
+        int32_t(-100),
+        std::numeric_limits<int32_t>::min(),
+        std::numeric_limits<int32_t>::max()),
+    [](const ::testing::TestParamInfo<int32_t>& info) -> std::string {
+        int32_t v = info.param;
+        if (v == 100)  return "Positive";
+        if (v == -100) return "Negative";
+        if (v == std::numeric_limits<int32_t>::min()) return "Min";
+        return "Max";
     });
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVSInt32MessageValue>(1, std::numeric_limits<int32_t>::min()));
-    msg._values.emplace(2, std::make_shared<LVSInt32MessageValue>(2, std::numeric_limits<int32_t>::max()));
 
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int32_t>(*msg2, 1), std::numeric_limits<int32_t>::min());
-    EXPECT_EQ(GetScalarValue<int32_t>(*msg2, 2), std::numeric_limits<int32_t>::max());
-}
+class SInt64ScalarRoundTripTest : public ::testing::TestWithParam<int64_t> {};
 
-TEST_F(ScalarRoundTripTest, SInt64_Positive)
+TEST_P(SInt64ScalarRoundTripTest, RoundTrip)
 {
+    int64_t v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SInt64Value);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVSInt64MessageValue>(1, 999999999999LL));
-
+    msg._values.emplace(1, std::make_shared<LVSInt64MessageValue>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int64_t>(*msg2, 1), 999999999999LL);
+    EXPECT_EQ(GetScalarValue<int64_t>(*msg2, 1), v);
 }
 
-TEST_F(ScalarRoundTripTest, SInt64_Negative)
-{
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SInt64Value);
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVSInt64MessageValue>(1, -999999999999LL));
-
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int64_t>(*msg2, 1), -999999999999LL);
-}
-
-TEST_F(ScalarRoundTripTest, SInt64_MinMax)
-{
-    auto meta = MakeMultiFieldMetadata({
-        {1, LVMessageMetadataType::SInt64Value, false},
-        {2, LVMessageMetadataType::SInt64Value, false},
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, SInt64ScalarRoundTripTest,
+    ::testing::Values(
+        int64_t(999999999999LL),
+        int64_t(-999999999999LL),
+        std::numeric_limits<int64_t>::min(),
+        std::numeric_limits<int64_t>::max()),
+    [](const ::testing::TestParamInfo<int64_t>& info) -> std::string {
+        int64_t v = info.param;
+        if (v == 999999999999LL)  return "Positive";
+        if (v == -999999999999LL) return "Negative";
+        if (v == std::numeric_limits<int64_t>::min()) return "Min";
+        return "Max";
     });
-    LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVSInt64MessageValue>(1, std::numeric_limits<int64_t>::min()));
-    msg._values.emplace(2, std::make_shared<LVSInt64MessageValue>(2, std::numeric_limits<int64_t>::max()));
-
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int64_t>(*msg2, 1), std::numeric_limits<int64_t>::min());
-    EXPECT_EQ(GetScalarValue<int64_t>(*msg2, 2), std::numeric_limits<int64_t>::max());
-}
 
 // =====================================================================
 // Fixed-width types: fixed32, fixed64, sfixed32, sfixed64
 // =====================================================================
 
-TEST_F(ScalarRoundTripTest, Fixed32)
+class Fixed32ScalarRoundTripTest : public ::testing::TestWithParam<uint32_t> {};
+
+TEST_P(Fixed32ScalarRoundTripTest, RoundTrip)
 {
+    uint32_t v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Fixed32Value);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVFixed32MessageValue>(1, 0xDEADBEEF));
-
+    msg._values.emplace(1, std::make_shared<LVFixed32MessageValue>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<uint32_t>(*msg2, 1), 0xDEADBEEFU);
+    EXPECT_EQ(GetScalarValue<uint32_t>(*msg2, 1), v);
 }
 
-TEST_F(ScalarRoundTripTest, Fixed64)
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, Fixed32ScalarRoundTripTest,
+    ::testing::Values(uint32_t(0), uint32_t(0xDEADBEEFU), std::numeric_limits<uint32_t>::max()),
+    [](const ::testing::TestParamInfo<uint32_t>& info) -> std::string {
+        if (info.param == 0)           return "Zero";
+        if (info.param == 0xDEADBEEFU) return "PatternValue";
+        return "Max";
+    });
+
+class Fixed64ScalarRoundTripTest : public ::testing::TestWithParam<uint64_t> {};
+
+TEST_P(Fixed64ScalarRoundTripTest, RoundTrip)
 {
+    uint64_t v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Fixed64Value);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVFixed64MessageValue>(1, 0xDEADBEEFCAFEBABEULL));
-
+    msg._values.emplace(1, std::make_shared<LVFixed64MessageValue>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<uint64_t>(*msg2, 1), 0xDEADBEEFCAFEBABEULL);
+    EXPECT_EQ(GetScalarValue<uint64_t>(*msg2, 1), v);
 }
 
-TEST_F(ScalarRoundTripTest, SFixed32)
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, Fixed64ScalarRoundTripTest,
+    ::testing::Values(uint64_t(0), uint64_t(0xDEADBEEFCAFEBABEULL), std::numeric_limits<uint64_t>::max()),
+    [](const ::testing::TestParamInfo<uint64_t>& info) -> std::string {
+        if (info.param == 0)                    return "Zero";
+        if (info.param == 0xDEADBEEFCAFEBABEULL) return "PatternValue";
+        return "Max";
+    });
+
+class SFixed32ScalarRoundTripTest : public ::testing::TestWithParam<int32_t> {};
+
+TEST_P(SFixed32ScalarRoundTripTest, RoundTrip)
 {
+    int32_t v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SFixed32Value);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVSFixed32MessageValue>(1, -12345));
-
+    msg._values.emplace(1, std::make_shared<LVSFixed32MessageValue>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int32_t>(*msg2, 1), -12345);
+    EXPECT_EQ(GetScalarValue<int32_t>(*msg2, 1), v);
 }
 
-TEST_F(ScalarRoundTripTest, SFixed64)
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, SFixed32ScalarRoundTripTest,
+    ::testing::Values(int32_t(0), int32_t(-12345), std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max()),
+    [](const ::testing::TestParamInfo<int32_t>& info) -> std::string {
+        int32_t v = info.param;
+        if (v == 0)      return "Zero";
+        if (v == -12345) return "Negative";
+        if (v == std::numeric_limits<int32_t>::min()) return "Min";
+        return "Max";
+    });
+
+class SFixed64ScalarRoundTripTest : public ::testing::TestWithParam<int64_t> {};
+
+TEST_P(SFixed64ScalarRoundTripTest, RoundTrip)
 {
+    int64_t v = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SFixed64Value);
     LVMessage msg(meta);
-    msg._values.emplace(1, std::make_shared<LVSFixed64MessageValue>(1, -123456789012345LL));
-
+    msg._values.emplace(1, std::make_shared<LVSFixed64MessageValue>(1, v));
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetScalarValue<int64_t>(*msg2, 1), -123456789012345LL);
+    EXPECT_EQ(GetScalarValue<int64_t>(*msg2, 1), v);
 }
+
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, SFixed64ScalarRoundTripTest,
+    ::testing::Values(int64_t(0), int64_t(-123456789012345LL), std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max()),
+    [](const ::testing::TestParamInfo<int64_t>& info) -> std::string {
+        int64_t v = info.param;
+        if (v == 0)                  return "Zero";
+        if (v == -123456789012345LL) return "Negative";
+        if (v == std::numeric_limits<int64_t>::min()) return "Min";
+        return "Max";
+    });
 
 // =====================================================================
 // String and Bytes
 // =====================================================================
 
-TEST_F(ScalarRoundTripTest, String_Simple)
+class StringScalarRoundTripTest : public ::testing::TestWithParam<std::string> {};
+
+TEST_P(StringScalarRoundTripTest, RoundTrip)
 {
+    std::string s = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::StringValue);
     LVMessage msg(meta);
-    std::string s = "hello world";
     msg._values.emplace(1, std::make_shared<LVStringMessageValue>(1, s));
-
     auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetStringValue(*msg2, 1), "hello world");
+    EXPECT_EQ(GetStringValue(*msg2, 1), s);
 }
 
-TEST_F(ScalarRoundTripTest, String_Empty)
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, StringScalarRoundTripTest,
+    ::testing::Values(
+        std::string("hello world"),
+        std::string(""),
+        std::string("日本語テスト 🎉")),
+    [](const ::testing::TestParamInfo<std::string>& info) -> std::string {
+        if (info.param.empty()) return "Empty";
+        if (info.param.find("hello") != std::string::npos) return "Simple";
+        return "UTF8";
+    });
+
+class BytesScalarRoundTripTest : public ::testing::TestWithParam<std::string> {};
+
+TEST_P(BytesScalarRoundTripTest, RoundTrip)
 {
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::StringValue);
-    LVMessage msg(meta);
-    std::string s = "";
-    msg._values.emplace(1, std::make_shared<LVStringMessageValue>(1, s));
-
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetStringValue(*msg2, 1), "");
-}
-
-TEST_F(ScalarRoundTripTest, String_UTF8)
-{
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::StringValue);
-    LVMessage msg(meta);
-    std::string s = "日本語テスト 🎉";
-    msg._values.emplace(1, std::make_shared<LVStringMessageValue>(1, s));
-
-    auto msg2 = RoundTrip(msg, meta);
-    EXPECT_EQ(GetStringValue(*msg2, 1), "日本語テスト 🎉");
-}
-
-TEST_F(ScalarRoundTripTest, Bytes_BinaryData)
-{
+    std::string binary = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::BytesValue);
     LVMessage msg(meta);
-    std::string binary = std::string("\x00\x01\x02\xff\xfe", 5);
     msg._values.emplace(1, std::make_shared<LVBytesMessageValue>(1, binary));
-
     auto msg2 = RoundTrip(msg, meta);
     auto it = msg2->_values.find(1);
     ASSERT_NE(it, msg2->_values.end());
@@ -633,6 +654,18 @@ TEST_F(ScalarRoundTripTest, Bytes_BinaryData)
     ASSERT_NE(sv, nullptr);
     EXPECT_EQ(sv->_value, binary);
 }
+
+INSTANTIATE_TEST_SUITE_P(
+    ScalarRoundTrip, BytesScalarRoundTripTest,
+    ::testing::Values(
+        std::string(""),
+        std::string("\xff\xfe", 2),
+        std::string("\x00\x01\x02\xff\xfe", 5)),
+    [](const ::testing::TestParamInfo<std::string>& info) -> std::string {
+        if (info.param.empty())      return "Empty";
+        if (info.param.size() == 2)  return "BinaryTwoBytes";
+        return "BinaryFiveBytes";
+    });
 
 // =====================================================================
 // Repeated field round-trip tests
@@ -1350,13 +1383,6 @@ TEST_F(EdgeCaseTest, ClearResetsMessage)
     EXPECT_EQ(msg.ByteSizeLong(), 0u);
 }
 
-TEST_F(EdgeCaseTest, IsInitializedAlwaysTrue)
-{
-    auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int32Value);
-    LVMessage msg(meta);
-    EXPECT_TRUE(msg.IsInitialized());
-}
-
 TEST_F(EdgeCaseTest, ParseWithNullMetadata)
 {
     // When metadata is null, everything goes to unknown fields
@@ -1479,7 +1505,7 @@ TEST_F(FeatureToggleTest, VerifyStringDisabledSkipsValidation)
 
 class WireFormatTest : public ::testing::Test {};
 
-TEST_F(WireFormatTest, Int32_Value1_KnownBytes)
+TEST_F(WireFormatTest, SingleByteValue)
 {
     // field 1, wire type 0 (varint), value 1 => tag=0x08, value=0x01
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int32Value);
@@ -1494,7 +1520,7 @@ TEST_F(WireFormatTest, Int32_Value1_KnownBytes)
     EXPECT_EQ(static_cast<uint8_t>(wire[1]), 0x01u); // value: 1
 }
 
-TEST_F(WireFormatTest, Int32_Value150_KnownBytes)
+TEST_F(WireFormatTest, MultipleBytesValue)
 {
     // value 150 = 0x96 0x01 in varint
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::Int32Value);
@@ -1564,80 +1590,65 @@ TEST_F(WireFormatTest, Fixed64_KnownBytes)
     }
 }
 
-TEST_F(WireFormatTest, SInt32_ZigZagEncoding)
+// ZigZag encoding: 0 → 0, -1 → 1, 1 → 2, -2 → 3
+struct SInt32ZigZagCase { int32_t input; uint8_t expected; };
+class SInt32ZigZagWireFormatTest : public ::testing::TestWithParam<SInt32ZigZagCase> {};
+
+TEST_P(SInt32ZigZagWireFormatTest, ZigZagEncoding)
 {
-    // ZigZag: 0 → 0, -1 → 1, 1 → 2, -2 → 3
+    const auto& p = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::SInt32Value);
-
-    // Value 0: zigzag → 0 → varint 0x00
-    {
-        LVMessage msg(meta);
-        msg._values.emplace(1, std::make_shared<LVSInt32MessageValue>(1, 0));
-        std::cout << "  [input] sint32 field=1, value=0 (zigzag→0)\n";
-        std::string wire = SerializeToString(msg);
-        std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
-        ASSERT_EQ(wire.size(), 2u);
-        EXPECT_EQ(static_cast<uint8_t>(wire[1]), 0x00u);
-    }
-    // Value -1: zigzag → 1 → varint 0x01
-    {
-        LVMessage msg(meta);
-        msg._values.emplace(1, std::make_shared<LVSInt32MessageValue>(1, -1));
-        std::cout << "  [input] sint32 field=1, value=-1 (zigzag→1)\n";
-        std::string wire = SerializeToString(msg);
-        std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
-        ASSERT_EQ(wire.size(), 2u);
-        EXPECT_EQ(static_cast<uint8_t>(wire[1]), 0x01u);
-    }
-    // Value 1: zigzag → 2 → varint 0x02
-    {
-        LVMessage msg(meta);
-        msg._values.emplace(1, std::make_shared<LVSInt32MessageValue>(1, 1));
-        std::cout << "  [input] sint32 field=1, value=1 (zigzag→2)\n";
-        std::string wire = SerializeToString(msg);
-        std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
-        ASSERT_EQ(wire.size(), 2u);
-        EXPECT_EQ(static_cast<uint8_t>(wire[1]), 0x02u);
-    }
-    // Value -2: zigzag → 3 → varint 0x03
-    {
-        LVMessage msg(meta);
-        msg._values.emplace(1, std::make_shared<LVSInt32MessageValue>(1, -2));
-        std::cout << "  [input] sint32 field=1, value=-2 (zigzag→3)\n";
-        std::string wire = SerializeToString(msg);
-        std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
-        ASSERT_EQ(wire.size(), 2u);
-        EXPECT_EQ(static_cast<uint8_t>(wire[1]), 0x03u);
-    }
+    LVMessage msg(meta);
+    msg._values.emplace(1, std::make_shared<LVSInt32MessageValue>(1, p.input));
+    std::cout << "  [input] sint32 field=1, value=" << p.input << "\n";
+    std::string wire = SerializeToString(msg);
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+    ASSERT_EQ(wire.size(), 2u);
+    EXPECT_EQ(static_cast<uint8_t>(wire[1]), p.expected);
 }
 
-TEST_F(WireFormatTest, Bool_WireEncoding)
+INSTANTIATE_TEST_SUITE_P(
+    WireFormat, SInt32ZigZagWireFormatTest,
+    ::testing::Values(
+        SInt32ZigZagCase{  0, 0x00},
+        SInt32ZigZagCase{ -1, 0x01},
+        SInt32ZigZagCase{  1, 0x02},
+        SInt32ZigZagCase{ -2, 0x03}),
+    [](const ::testing::TestParamInfo<SInt32ZigZagCase>& info) -> std::string {
+        switch (info.param.input) {
+            case  0: return "Zero";
+            case -1: return "NegOne";
+            case  1: return "PosOne";
+            case -2: return "NegTwo";
+            default: return "Unknown";
+        }
+    });
+
+struct BoolWireCase { bool input; uint8_t expected; };
+class BoolWireFormatTest : public ::testing::TestWithParam<BoolWireCase> {};
+
+TEST_P(BoolWireFormatTest, BoolEncoding)
 {
+    const auto& p = GetParam();
     auto meta = MakeSingleFieldMetadata(1, LVMessageMetadataType::BoolValue);
-
-    // true → varint 1
-    {
-        LVMessage msg(meta);
-        msg._values.emplace(1, std::make_shared<LVVariableMessageValue<bool>>(1, true));
-        std::cout << "  [input] bool field=1, value=true\n";
-        std::string wire = SerializeToString(msg);
-        std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
-        ASSERT_EQ(wire.size(), 2u);
-        EXPECT_EQ(static_cast<uint8_t>(wire[0]), 0x08u);
-        EXPECT_EQ(static_cast<uint8_t>(wire[1]), 0x01u);
-    }
-    // false → varint 0
-    {
-        LVMessage msg(meta);
-        msg._values.emplace(1, std::make_shared<LVVariableMessageValue<bool>>(1, false));
-        std::cout << "  [input] bool field=1, value=false\n";
-        std::string wire = SerializeToString(msg);
-        std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
-        ASSERT_EQ(wire.size(), 2u);
-        EXPECT_EQ(static_cast<uint8_t>(wire[0]), 0x08u);
-        EXPECT_EQ(static_cast<uint8_t>(wire[1]), 0x00u);
-    }
+    LVMessage msg(meta);
+    msg._values.emplace(1, std::make_shared<LVVariableMessageValue<bool>>(1, p.input));
+    std::cout << "  [input] bool field=1, value=" << (p.input ? "true" : "false") << "\n";
+    std::string wire = SerializeToString(msg);
+    std::cout << "  [wire]  " << wire.size() << " byte(s):\n" << HexDump(wire);
+    ASSERT_EQ(wire.size(), 2u);
+    EXPECT_EQ(static_cast<uint8_t>(wire[0]), 0x08u); // tag: field 1, varint
+    EXPECT_EQ(static_cast<uint8_t>(wire[1]), p.expected);
 }
+
+INSTANTIATE_TEST_SUITE_P(
+    WireFormat, BoolWireFormatTest,
+    ::testing::Values(
+        BoolWireCase{true,  0x01},
+        BoolWireCase{false, 0x00}),
+    [](const ::testing::TestParamInfo<BoolWireCase>& info) -> std::string {
+        return info.param.input ? "True" : "False";
+    });
 
 // =====================================================================
 // Unknown fields — comprehensive coverage

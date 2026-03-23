@@ -587,7 +587,8 @@ namespace grpc_labview
 
         if (fieldInfo.isRepeated)
         {
-            // For repeated strings, use RepeatedPtrField
+            // String fields are never packed (wire type is always LENGTH_DELIMITED,
+            // one element per tag occurrence), so each call appends exactly one value.
             auto it = _values.find(fieldNumber);
             if (it == _values.end())
             {
@@ -613,59 +614,40 @@ namespace grpc_labview
                                      uint32_t fieldNumber,
                                      const MessageElementMetadata& fieldInfo)
     {
+        if (!FeatureConfig::getInstance().AreUtf8StringsEnabled())
+        {
+            // Legacy mode: bytes fields are stored as strings so CopyBytesToCluster
+            // can delegate to CopyStringToCluster (matching LVMessageEfficient behaviour).
+            return ParseStringField(input, fieldNumber, fieldInfo);
+        }
+
         uint32_t length;
         if (!input->ReadVarint32(&length)) return false;
         if (length > static_cast<uint32_t>(INT_MAX)) return false;
         std::string value;
         if (!input->ReadString(&value, static_cast<int>(length))) return false;
 
-        if (!FeatureConfig::getInstance().AreUtf8StringsEnabled())
+        if (fieldInfo.isRepeated)
         {
-            // Legacy mode: bytes fields are stored as strings so CopyBytesToCluster
-            // can delegate to CopyStringToCluster (matching LVMessageEfficient behaviour).
-            if (fieldInfo.isRepeated)
+            // Bytes fields are never packed (wire type is always LENGTH_DELIMITED,
+            // one element per tag occurrence), so each call appends exactly one value.
+            auto it = _values.find(fieldNumber);
+            if (it == _values.end())
             {
-                auto it = _values.find(fieldNumber);
-                if (it == _values.end())
-                {
-                    auto v = std::make_shared<LVRepeatedStringMessageValue>(fieldNumber);
-                    *v->_value.Add() = value;
-                    _values.emplace(fieldNumber, v);
-                }
-                else
-                {
-                    auto v = std::static_pointer_cast<LVRepeatedStringMessageValue>(it->second);
-                    *v->_value.Add() = value;
-                }
+                auto v = std::make_shared<LVRepeatedBytesMessageValue>(fieldNumber);
+                *v->_value.Add() = value;
+                _values.emplace(fieldNumber, v);
             }
             else
             {
-                auto v = std::make_shared<LVStringMessageValue>(fieldNumber, value);
-                _values.emplace(fieldNumber, v);
+                auto v = std::static_pointer_cast<LVRepeatedBytesMessageValue>(it->second);
+                *v->_value.Add() = value;
             }
         }
         else
         {
-            if (fieldInfo.isRepeated)
-            {
-                auto it = _values.find(fieldNumber);
-                if (it == _values.end())
-                {
-                    auto v = std::make_shared<LVRepeatedBytesMessageValue>(fieldNumber);
-                    *v->_value.Add() = value;
-                    _values.emplace(fieldNumber, v);
-                }
-                else
-                {
-                    auto v = std::static_pointer_cast<LVRepeatedBytesMessageValue>(it->second);
-                    *v->_value.Add() = value;
-                }
-            }
-            else
-            {
-                auto v = std::make_shared<LVBytesMessageValue>(fieldNumber, value);
-                _values.emplace(fieldNumber, v);
-            }
+            auto v = std::make_shared<LVBytesMessageValue>(fieldNumber, value);
+            _values.emplace(fieldNumber, v);
         }
         return true;
     }
@@ -791,12 +773,8 @@ namespace grpc_labview
         {
             google::protobuf::io::ArrayOutputStream aos(const_cast<uint8_t*>(buf.begin()), static_cast<int>(size));
             google::protobuf::io::CodedOutputStream cos(&aos);
-            for (auto& e : _values)
-            {
-                e.second->Serialize(&cos);
-            }
-        } // CodedOutputStream flushes on destruction
-
+            SerializeToCodedStream(&cos);
+        }
         return std::make_unique<grpc::ByteBuffer>(&buf, 1);
     }
 
@@ -856,12 +834,7 @@ namespace grpc_labview
         return totalSize;
     }
 
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    bool LVMessage::IsInitialized() const
-    {
-        return true;
-    }
+
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------

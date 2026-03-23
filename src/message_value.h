@@ -40,6 +40,7 @@ namespace grpc_labview
     {
     public:
         LVMessageValue(int protobufId);
+        virtual ~LVMessageValue() = default;
 
     public:
         int _protobufId;
@@ -204,17 +205,10 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class LVEnumMessageValue : public LVMessageValue
+    class LVEnumMessageValue : public LVVariableMessageValue<int>
     {
     public:
-        LVEnumMessageValue(int protobufId, int _value);
-
-    public:
-        int _value;
-
-        void* RawValue() override { return &_value; };
-        size_t ByteSizeLong() override;
-        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
+        LVEnumMessageValue(int protobufId, int value);
     };
 
 
@@ -222,14 +216,8 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     class LVRepeatedEnumMessageValue : public LVRepeatedMessageValue<int>
     {
-        public:
-            LVRepeatedEnumMessageValue(int protobufId);
-
-            google::protobuf::RepeatedField<int> _value;
-
-            void* RawValue() override { return &_value; };
-            size_t ByteSizeLong() override;
-            void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
+    public:
+        LVRepeatedEnumMessageValue(int protobufId);
     };
 
     //---------------------------------------------------------------------
