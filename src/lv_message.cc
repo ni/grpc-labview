@@ -2,13 +2,161 @@
 //---------------------------------------------------------------------
 #include <grpc_server.h>
 #include <lv_message.h>
+#include <climits>
 #include <sstream>
 #include <feature_toggles.h>
 #include <string_utils.h>
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
+#include <google/protobuf/unknown_field_set.h>
+#include <google/protobuf/wire_format_lite.h>
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-using namespace google::protobuf::internal;
+namespace
+{
+    using WFL = google::protobuf::internal::WireFormatLite;
+
+    // Read a field and optionally store it in an UnknownFieldSet.
+    // Pass nullptr for unknownFields to just skip (used for nested groups).
+    bool HandleUnknownField(google::protobuf::io::CodedInputStream* input, uint32_t tag,
+                     google::protobuf::UnknownFieldSet* unknownFields)
+    {
+        uint32_t fieldNumber = WFL::GetTagFieldNumber(tag);
+        WFL::WireType wireType = WFL::GetTagWireType(tag);
+
+        switch (wireType)
+        {
+            case WFL::WIRETYPE_VARINT:
+            {
+                uint64_t value;
+                if (!input->ReadVarint64(&value)) return false;
+                if (unknownFields) unknownFields->AddVarint(fieldNumber, value);
+                return true;
+            }
+            case WFL::WIRETYPE_FIXED64:
+            {
+                uint64_t value;
+                if (!input->ReadLittleEndian64(&value)) return false;
+                if (unknownFields) unknownFields->AddFixed64(fieldNumber, value);
+                return true;
+            }
+            case WFL::WIRETYPE_LENGTH_DELIMITED:
+            {
+                uint32_t length;
+                if (!input->ReadVarint32(&length)) return false;
+                if (length > static_cast<uint32_t>(INT_MAX)) return false;
+                std::string value;
+                if (!input->ReadString(&value, static_cast<int>(length))) return false;
+                if (unknownFields) unknownFields->AddLengthDelimited(fieldNumber, value);
+                return true;
+            }
+            case WFL::WIRETYPE_START_GROUP:
+            {
+                // Groups are deprecated but must be skipped correctly.
+                // Inner fields are forwarded to unknownFields so nested group
+                // content is preserved when the caller wants unknown-field storage.
+                uint32_t end_tag = WFL::MakeTag(fieldNumber, WFL::WIRETYPE_END_GROUP);
+                while (true)
+                {
+                    uint32_t inner_tag = input->ReadTag();
+                    if (inner_tag == 0) return false;
+                    if (inner_tag == end_tag) return true;
+                    if (!HandleUnknownField(input, inner_tag, unknownFields)) return false;
+                }
+                return false; // unreachable; guards against future refactoring
+            }
+            case WFL::WIRETYPE_END_GROUP:
+                return false;
+            case WFL::WIRETYPE_FIXED32:
+            {
+                uint32_t value;
+                if (!input->ReadLittleEndian32(&value)) return false;
+                if (unknownFields) unknownFields->AddFixed32(fieldNumber, value);
+                return true;
+            }
+            default:
+                return false;
+        }
+    }
+
+    // ZeroCopyInputStream over a sequence of grpc::Slices.
+    // Allows parsing directly from a multi-slice ByteBuffer with no data copy:
+    // grpc::ByteBuffer::Dump() only increments slice refcounts, so the parser
+    // reads straight from the original gRPC transport buffers.
+    class MultiSliceInputStream final : public google::protobuf::io::ZeroCopyInputStream
+    {
+    public:
+        explicit MultiSliceInputStream(std::vector<grpc::Slice> slices)
+            : _slices(std::move(slices)), _sliceIndex(0), _offsetInSlice(0), _byteCount(0)
+        {
+        }
+
+        bool Next(const void** data, int* size) override
+        {
+            while (_sliceIndex < _slices.size())
+            {
+                const grpc::Slice& s = _slices[_sliceIndex];
+                size_t remaining = s.size() - _offsetInSlice;
+                if (remaining > 0)
+                {
+                    *data = s.begin() + _offsetInSlice;
+                    *size = static_cast<int>(remaining);
+                    _byteCount += static_cast<int64_t>(remaining);
+                    _sliceIndex++;
+                    _offsetInSlice = 0;
+                    return true;
+                }
+                // Empty slice - skip it.
+                _sliceIndex++;
+                _offsetInSlice = 0;
+            }
+            return false;
+        }
+
+        // count <= size returned by the preceding Next() call (ZeroCopyInputStream contract).
+        void BackUp(int count) override
+        {
+            _byteCount -= count;
+            _sliceIndex--;
+            _offsetInSlice = _slices[_sliceIndex].size() - static_cast<size_t>(count);
+        }
+
+        bool Skip(int count) override
+        {
+            while (count > 0 && _sliceIndex < _slices.size())
+            {
+                const grpc::Slice& s = _slices[_sliceIndex];
+                size_t remaining = s.size() - _offsetInSlice;
+                if (static_cast<size_t>(count) < remaining)
+                {
+                    _offsetInSlice += static_cast<size_t>(count);
+                    _byteCount += count;
+                    count = 0;
+                }
+                else
+                {
+                    _byteCount += static_cast<int64_t>(remaining);
+                    count -= static_cast<int>(remaining);
+                    _sliceIndex++;
+                    _offsetInSlice = 0;
+                }
+            }
+            return count == 0;
+        }
+
+        int64_t ByteCount() const override
+        {
+            return _byteCount;
+        }
+
+    private:
+        std::vector<grpc::Slice> _slices;
+        size_t _sliceIndex;
+        size_t _offsetInSlice;
+        int64_t _byteCount;
+    };
+
+}
 
 namespace grpc_labview
 {
@@ -26,621 +174,652 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    google::protobuf::UnknownFieldSet &LVMessage::UnknownFields()
+    bool LVMessage::ParseFromByteBuffer(const grpc::ByteBuffer &buffer)
+    {
+        Clear();
+
+        using namespace google::protobuf::io;
+
+        // Fast path: if the ByteBuffer is already backed by a single contiguous
+        // slice we can parse directly from its memory with no copy or allocation.
+        grpc::Slice singleSlice;
+        if (buffer.TrySingleSlice(&singleSlice).ok())
+        {
+            ArrayInputStream ais(singleSlice.begin(), static_cast<int>(singleSlice.size()));
+            CodedInputStream cis(&ais);
+            cis.SetRecursionLimit(100);
+            return ParseFromCodedStream(&cis) && cis.ConsumedEntireMessage();
+        }
+
+        // Slow path: multiple slices - iterate over them without coalescing.
+        // Dump() only increments slice refcounts; no byte data is copied.
+        std::vector<grpc::Slice> slices;
+        if (!buffer.Dump(&slices).ok())
+        {
+            return false;
+        }
+        MultiSliceInputStream msis(std::move(slices));
+        CodedInputStream cis(&msis);
+        cis.SetRecursionLimit(100);
+        return ParseFromCodedStream(&cis) && cis.ConsumedEntireMessage();
+    }
+    
+    //---------------------------------------------------------------------
+    // Parse from string using only public protobuf APIs
+    //---------------------------------------------------------------------
+    bool LVMessage::ParseFromString(const std::string& data)
+    {
+        using namespace google::protobuf::io;
+        
+        ArrayInputStream ais(data.data(), static_cast<int>(data.size()));
+        // Use public CodedInputStream API (handles empty and non-empty data uniformly)
+        CodedInputStream cis(&ais);
+        cis.SetRecursionLimit(100);
+        
+        if (!ParseFromCodedStream(&cis)) {
+            return false;
+        }
+        
+        return cis.ConsumedEntireMessage();
+    }
+    
+    //---------------------------------------------------------------------
+    // Parse from CodedInputStream - uses only public APIs
+    //---------------------------------------------------------------------
+    bool LVMessage::ParseFromCodedStream(google::protobuf::io::CodedInputStream* input)
+    {
+        uint32_t tag;
+        
+        while ((tag = input->ReadTag()) != 0)
+        {
+            uint32_t fieldNumber = WFL::GetTagFieldNumber(tag);
+            
+            if (_metadata == nullptr)
+            {
+                // No schema - store everything as unknown for UnknownFields use
+                if (!HandleUnknownField(input, tag, &_unknownFields)) {
+                    return false;
+                }
+            }
+            else
+            {
+                auto fieldIt = _metadata->_mappedElements.find(fieldNumber);
+                if (fieldIt != _metadata->_mappedElements.end())
+                {
+                    auto& fieldInfo = (*fieldIt).second;
+
+                    if (fieldInfo->isInOneof)
+                    {
+                        // Protobuf "last value wins" semantics for oneof: if a different member of
+                        // this oneof was already parsed, evict its stale entry from _values so it
+                        // is not re-serialized, then update the selected-index to this field.
+                        auto existing = _oneofContainerToSelectedIndexMap.find(fieldInfo->oneofContainerName);
+                        if (existing != _oneofContainerToSelectedIndexMap.end())
+                        {
+                            _values.erase(existing->second);
+                            existing->second = fieldInfo->protobufIndex;
+                        }
+                        else
+                        {
+                            _oneofContainerToSelectedIndexMap.emplace(fieldInfo->oneofContainerName, fieldInfo->protobufIndex);
+                        }
+                    }
+
+                    // Parse field based on type using CodedInputStream
+                    if (!ParseFieldFromCodedStream(input, tag, fieldNumber, *fieldInfo)) {
+                        return false;
+                    }
+                }
+                else
+                {
+                    // Unknown field - store for potential later inspection
+                    if (!HandleUnknownField(input, tag, &_unknownFields)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        PostInteralParseAction();
+        return true;
+    }
+    
+    //---------------------------------------------------------------------
+    // Parse a single field from CodedInputStream
+    //---------------------------------------------------------------------
+    bool LVMessage::ParseFieldFromCodedStream(
+        google::protobuf::io::CodedInputStream* input,
+        uint32_t tag,
+        uint32_t fieldNumber,
+        const MessageElementMetadata& fieldInfo)
+    {
+        uint32_t wireType = static_cast<uint32_t>(WFL::GetTagWireType(tag));
+        switch (fieldInfo.type)
+        {
+        case LVMessageMetadataType::Int32Value:
+            return ParseInt32Field(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::Int64Value:
+            return ParseInt64Field(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::UInt32Value:
+            return ParseUInt32Field(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::UInt64Value:
+            return ParseUInt64Field(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::SInt32Value:
+            return ParseSInt32Field(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::SInt64Value:
+            return ParseSInt64Field(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::Fixed32Value:
+            return ParseFixed32Field(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::Fixed64Value:
+            return ParseFixed64Field(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::SFixed32Value:
+            return ParseSFixed32Field(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::SFixed64Value:
+            return ParseSFixed64Field(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::FloatValue:
+            return ParseFloatField(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::DoubleValue:
+            return ParseDoubleField(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::BoolValue:
+            return ParseBoolField(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::EnumValue:
+            return ParseEnumField(input, fieldNumber, fieldInfo, wireType);
+        case LVMessageMetadataType::StringValue:
+            return ParseStringField(input, fieldNumber, fieldInfo);
+        case LVMessageMetadataType::BytesValue:
+            return ParseBytesField(input, fieldNumber, fieldInfo);
+        case LVMessageMetadataType::MessageValue:
+            return ParseMessageField(input, fieldNumber, fieldInfo);
+        default:
+            return false;
+        }
+    }
+    
+    //---------------------------------------------------------------------
+    // Traits-based generic numeric field parser.
+    //
+    // Each traits struct defines:
+    //   RawType      – type read from the wire by Read()
+    //   ScalarType   – LVMessageValue subclass for a scalar field
+    //   RepeatedType – LVMessageValue subclass for a repeated field
+    //   Read()       – reads one RawType from a CodedInputStream
+    //   Transform()  – converts RawType to the value stored in the LV container
+    //
+    // ParseNumericField<Traits> captures the shared packed/unpacked/scalar
+    // branching logic. Each template instantiation compiles to the same
+    // machine code as the equivalent hand-written method would produce.
+    //---------------------------------------------------------------------
+    namespace
+    {
+        struct Int32Traits {
+            using RawType = uint32_t;
+            using ScalarType = LVVariableMessageValue<int>;
+            using RepeatedType = LVRepeatedMessageValue<int>;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint32(&out); }
+            static int Transform(RawType v) { return static_cast<int>(v); }
+        };
+        struct Int64Traits {
+            using RawType = uint64_t;
+            using ScalarType = LVVariableMessageValue<int64_t>;
+            using RepeatedType = LVRepeatedMessageValue<int64_t>;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint64(&out); }
+            static int64_t Transform(RawType v) { return static_cast<int64_t>(v); }
+        };
+        struct UInt32Traits {
+            using RawType = uint32_t;
+            using ScalarType = LVVariableMessageValue<uint32_t>;
+            using RepeatedType = LVRepeatedMessageValue<uint32_t>;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint32(&out); }
+            static uint32_t Transform(RawType v) { return v; }
+        };
+        struct UInt64Traits {
+            using RawType = uint64_t;
+            using ScalarType = LVVariableMessageValue<uint64_t>;
+            using RepeatedType = LVRepeatedMessageValue<uint64_t>;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint64(&out); }
+            static uint64_t Transform(RawType v) { return v; }
+        };
+        struct FloatTraits {
+            using RawType = uint32_t;
+            using ScalarType = LVVariableMessageValue<float>;
+            using RepeatedType = LVRepeatedMessageValue<float>;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadLittleEndian32(&out); }
+            static float Transform(RawType v) { float f; memcpy(&f, &v, sizeof(f)); return f; }
+        };
+        struct DoubleTraits {
+            using RawType = uint64_t;
+            using ScalarType = LVVariableMessageValue<double>;
+            using RepeatedType = LVRepeatedMessageValue<double>;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadLittleEndian64(&out); }
+            static double Transform(RawType v) { double d; memcpy(&d, &v, sizeof(d)); return d; }
+        };
+        struct BoolTraits {
+            using RawType = uint32_t;
+            using ScalarType = LVVariableMessageValue<bool>;
+            using RepeatedType = LVRepeatedMessageValue<bool>;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint32(&out); }
+            static bool Transform(RawType v) { return v != 0; }
+        };
+        struct EnumTraits {
+            using RawType = uint32_t;
+            using ScalarType = LVEnumMessageValue;
+            using RepeatedType = LVRepeatedEnumMessageValue;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint32(&out); }
+            static int Transform(RawType v) { return static_cast<int>(v); }
+        };
+        struct SInt32Traits {
+            using RawType = uint32_t;
+            using ScalarType = LVSInt32MessageValue;
+            using RepeatedType = LVRepeatedSInt32MessageValue;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint32(&out); }
+            static int32_t Transform(RawType v) { return WFL::ZigZagDecode32(v); }
+        };
+        struct SInt64Traits {
+            using RawType = uint64_t;
+            using ScalarType = LVSInt64MessageValue;
+            using RepeatedType = LVRepeatedSInt64MessageValue;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadVarint64(&out); }
+            static int64_t Transform(RawType v) { return WFL::ZigZagDecode64(v); }
+        };
+        struct Fixed32Traits {
+            using RawType = uint32_t;
+            using ScalarType = LVFixed32MessageValue;
+            using RepeatedType = LVRepeatedFixed32MessageValue;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadLittleEndian32(&out); }
+            static uint32_t Transform(RawType v) { return v; }
+        };
+        struct Fixed64Traits {
+            using RawType = uint64_t;
+            using ScalarType = LVFixed64MessageValue;
+            using RepeatedType = LVRepeatedFixed64MessageValue;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadLittleEndian64(&out); }
+            static uint64_t Transform(RawType v) { return v; }
+        };
+        struct SFixed32Traits {
+            using RawType = uint32_t;
+            using ScalarType = LVSFixed32MessageValue;
+            using RepeatedType = LVRepeatedSFixed32MessageValue;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadLittleEndian32(&out); }
+            static int32_t Transform(RawType v) { return static_cast<int32_t>(v); }
+        };
+        struct SFixed64Traits {
+            using RawType = uint64_t;
+            using ScalarType = LVSFixed64MessageValue;
+            using RepeatedType = LVRepeatedSFixed64MessageValue;
+            static bool Read(google::protobuf::io::CodedInputStream* s, RawType& out) { return s->ReadLittleEndian64(&out); }
+            static int64_t Transform(RawType v) { return static_cast<int64_t>(v); }
+        };
+
+        template<typename Traits>
+        bool ParseNumericField(
+            google::protobuf::io::CodedInputStream* input,
+            uint32_t fieldNumber,
+            const MessageElementMetadata& fieldInfo,
+            uint32_t wireType,
+            std::map<int, std::shared_ptr<LVMessageValue>>& values)
+        {
+            if (fieldInfo.isRepeated)
+            {
+                if (wireType == WFL::WIRETYPE_LENGTH_DELIMITED) // packed
+                {
+                    uint32_t length;
+                    if (!input->ReadVarint32(&length)) return false;
+                    auto limit = input->PushLimit(length);
+                    auto it = values.find(fieldNumber);
+                    std::shared_ptr<typename Traits::RepeatedType> v;
+                    if (it == values.end())
+                    {
+                        v = std::make_shared<typename Traits::RepeatedType>(fieldNumber);
+                        values.emplace(fieldNumber, v);
+                    }
+                    else
+                    {
+                        v = std::static_pointer_cast<typename Traits::RepeatedType>(it->second);
+                    }
+                    while (input->BytesUntilLimit() > 0)
+                    {
+                        typename Traits::RawType raw;
+                        if (!Traits::Read(input, raw)) return false;
+                        v->_value.Add(Traits::Transform(raw));
+                    }
+                    input->PopLimit(limit);
+                }
+                else // unpacked: single element per tag occurrence
+                {
+                    typename Traits::RawType raw;
+                    if (!Traits::Read(input, raw)) return false;
+                    auto it = values.find(fieldNumber);
+                    if (it == values.end())
+                    {
+                        auto v = std::make_shared<typename Traits::RepeatedType>(fieldNumber);
+                        v->_value.Add(Traits::Transform(raw));
+                        values.emplace(fieldNumber, v);
+                    }
+                    else
+                    {
+                        auto v = std::static_pointer_cast<typename Traits::RepeatedType>(it->second);
+                        v->_value.Add(Traits::Transform(raw));
+                    }
+                }
+            }
+            else
+            {
+                typename Traits::RawType raw;
+                if (!Traits::Read(input, raw)) return false;
+                values.emplace(fieldNumber, std::make_shared<typename Traits::ScalarType>(fieldNumber, Traits::Transform(raw)));
+            }
+            return true;
+        }
+    } // anonymous namespace
+
+    //---------------------------------------------------------------------
+    // Helper methods to parse specific field types from CodedInputStream
+    //---------------------------------------------------------------------
+    bool LVMessage::ParseInt32Field(google::protobuf::io::CodedInputStream* input,
+                                     uint32_t fieldNumber,
+                                     const MessageElementMetadata& fieldInfo,
+                                     uint32_t wireType)
+    {
+        return ParseNumericField<Int32Traits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseInt64Field(google::protobuf::io::CodedInputStream* input,
+                                     uint32_t fieldNumber,
+                                     const MessageElementMetadata& fieldInfo,
+                                     uint32_t wireType)
+    {
+        return ParseNumericField<Int64Traits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseUInt32Field(google::protobuf::io::CodedInputStream* input,
+                                      uint32_t fieldNumber,
+                                      const MessageElementMetadata& fieldInfo,
+                                      uint32_t wireType)
+    {
+        return ParseNumericField<UInt32Traits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseUInt64Field(google::protobuf::io::CodedInputStream* input,
+                                      uint32_t fieldNumber,
+                                      const MessageElementMetadata& fieldInfo,
+                                      uint32_t wireType)
+    {
+        return ParseNumericField<UInt64Traits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseFloatField(google::protobuf::io::CodedInputStream* input,
+                                     uint32_t fieldNumber,
+                                     const MessageElementMetadata& fieldInfo,
+                                     uint32_t wireType)
+    {
+        return ParseNumericField<FloatTraits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseDoubleField(google::protobuf::io::CodedInputStream* input,
+                                      uint32_t fieldNumber,
+                                      const MessageElementMetadata& fieldInfo,
+                                      uint32_t wireType)
+    {
+        return ParseNumericField<DoubleTraits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseBoolField(google::protobuf::io::CodedInputStream* input,
+                                    uint32_t fieldNumber,
+                                    const MessageElementMetadata& fieldInfo,
+                                    uint32_t wireType)
+    {
+        return ParseNumericField<BoolTraits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseStringField(google::protobuf::io::CodedInputStream* input,
+                                      uint32_t fieldNumber,
+                                      const MessageElementMetadata& fieldInfo)
+    {
+        uint32_t length;
+        if (!input->ReadVarint32(&length)) return false;
+        if (length > static_cast<uint32_t>(INT_MAX)) return false;
+        std::string value;
+        if (!input->ReadString(&value, static_cast<int>(length))) return false;
+
+        if (!VerifyUtf8String(value, fieldInfo.fieldName.c_str())) {
+            throw std::runtime_error("String contains invalid UTF-8 data.");
+        }
+
+        if (fieldInfo.isRepeated)
+        {
+            // String fields are never packed (wire type is always LENGTH_DELIMITED,
+            // one element per tag occurrence), so each call appends exactly one value.
+            auto it = _values.find(fieldNumber);
+            if (it == _values.end())
+            {
+                auto v = std::make_shared<LVRepeatedStringMessageValue>(fieldNumber);
+                *v->_value.Add() = value;
+                _values.emplace(fieldNumber, v);
+            }
+            else
+            {
+                auto v = std::static_pointer_cast<LVRepeatedStringMessageValue>(it->second);
+                *v->_value.Add() = value;
+            }
+        }
+        else
+        {
+            auto v = std::make_shared<LVStringMessageValue>(fieldNumber, value);
+            _values.emplace(fieldNumber, v);
+        }
+        return true;
+    }
+    
+    bool LVMessage::ParseBytesField(google::protobuf::io::CodedInputStream* input,
+                                     uint32_t fieldNumber,
+                                     const MessageElementMetadata& fieldInfo)
+    {
+        if (!FeatureConfig::getInstance().AreUtf8StringsEnabled())
+        {
+            // Legacy mode: bytes fields are stored as strings so CopyBytesToCluster
+            // can delegate to CopyStringToCluster (matching LVMessageEfficient behaviour).
+            return ParseStringField(input, fieldNumber, fieldInfo);
+        }
+
+        uint32_t length;
+        if (!input->ReadVarint32(&length)) return false;
+        if (length > static_cast<uint32_t>(INT_MAX)) return false;
+        std::string value;
+        if (!input->ReadString(&value, static_cast<int>(length))) return false;
+
+        if (fieldInfo.isRepeated)
+        {
+            // Bytes fields are never packed (wire type is always LENGTH_DELIMITED,
+            // one element per tag occurrence), so each call appends exactly one value.
+            auto it = _values.find(fieldNumber);
+            if (it == _values.end())
+            {
+                auto v = std::make_shared<LVRepeatedBytesMessageValue>(fieldNumber);
+                *v->_value.Add() = value;
+                _values.emplace(fieldNumber, v);
+            }
+            else
+            {
+                auto v = std::static_pointer_cast<LVRepeatedBytesMessageValue>(it->second);
+                *v->_value.Add() = value;
+            }
+        }
+        else
+        {
+            auto v = std::make_shared<LVBytesMessageValue>(fieldNumber, value);
+            _values.emplace(fieldNumber, v);
+        }
+        return true;
+    }
+    
+    bool LVMessage::ParseMessageField(google::protobuf::io::CodedInputStream* input,
+                                       uint32_t fieldNumber,
+                                       const MessageElementMetadata& fieldInfo)
+    {
+        uint32_t length;
+        if (!input->ReadVarint32(&length)) return false;
+        
+        auto limit = input->PushLimit(length);
+        
+        // Get metadata for nested message
+        auto nestedMetadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
+        auto nestedMessage = std::make_shared<LVMessage>(nestedMetadata);
+        
+        if (!nestedMessage->ParseFromCodedStream(input)) {
+            input->PopLimit(limit);
+            return false;
+        }
+        
+        input->PopLimit(limit);
+        
+        if (fieldInfo.isRepeated)
+        {
+            auto it = _values.find(fieldNumber);
+            if (it == _values.end())
+            {
+                auto v = std::make_shared<LVRepeatedNestedMessageMessageValue>(fieldNumber);
+                v->_value.push_back(nestedMessage);
+                _values.emplace(fieldNumber, v);
+            }
+            else
+            {
+                auto v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>(it->second);
+                v->_value.push_back(nestedMessage);
+            }
+        }
+        else
+        {
+            auto v = std::make_shared<LVNestedMessageMessageValue>(fieldNumber, nestedMessage);
+            _values.emplace(fieldNumber, v);
+        }
+        return true;
+    }
+    
+    bool LVMessage::ParseEnumField(google::protobuf::io::CodedInputStream* input,
+                                    uint32_t fieldNumber,
+                                    const MessageElementMetadata& fieldInfo,
+                                    uint32_t wireType)
+    {
+        return ParseNumericField<EnumTraits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseSInt32Field(google::protobuf::io::CodedInputStream* input,
+                                      uint32_t fieldNumber,
+                                      const MessageElementMetadata& fieldInfo,
+                                      uint32_t wireType)
+    {
+        return ParseNumericField<SInt32Traits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseSInt64Field(google::protobuf::io::CodedInputStream* input,
+                                      uint32_t fieldNumber,
+                                      const MessageElementMetadata& fieldInfo,
+                                      uint32_t wireType)
+    {
+        return ParseNumericField<SInt64Traits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseFixed32Field(google::protobuf::io::CodedInputStream* input,
+                                       uint32_t fieldNumber,
+                                       const MessageElementMetadata& fieldInfo,
+                                       uint32_t wireType)
+    {
+        return ParseNumericField<Fixed32Traits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseFixed64Field(google::protobuf::io::CodedInputStream* input,
+                                       uint32_t fieldNumber,
+                                       const MessageElementMetadata& fieldInfo,
+                                       uint32_t wireType)
+    {
+        return ParseNumericField<Fixed64Traits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseSFixed32Field(google::protobuf::io::CodedInputStream* input,
+                                        uint32_t fieldNumber,
+                                        const MessageElementMetadata& fieldInfo,
+                                        uint32_t wireType)
+    {
+        return ParseNumericField<SFixed32Traits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+    
+    bool LVMessage::ParseSFixed64Field(google::protobuf::io::CodedInputStream* input,
+                                        uint32_t fieldNumber,
+                                        const MessageElementMetadata& fieldInfo,
+                                        uint32_t wireType)
+    {
+        return ParseNumericField<SFixed64Traits>(input, fieldNumber, fieldInfo, wireType, _values);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    std::unique_ptr<grpc::ByteBuffer> LVMessage::SerializeToByteBuffer() const
+    {
+        auto size = ByteSizeLong();
+        if (size == 0)
+        {
+            // gRPC does not accept a default-constructed ByteBuffer (null internal
+            // buffer); send a valid empty ByteBuffer instead.
+            grpc::Slice buf(0);
+            return std::make_unique<grpc::ByteBuffer>(&buf, 1);
+        }
+
+        if (size > static_cast<size_t>(INT_MAX))
+        {
+            return nullptr;
+        }
+
+        grpc::Slice buf(size);
+        {
+            google::protobuf::io::ArrayOutputStream aos(const_cast<uint8_t*>(buf.begin()), static_cast<int>(size));
+            google::protobuf::io::CodedOutputStream cos(&aos);
+            SerializeToCodedStream(&cos);
+        }
+        return std::make_unique<grpc::ByteBuffer>(&buf, 1);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    google::protobuf::UnknownFieldSet& LVMessage::UnknownFields()
     {
         return _unknownFields;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LVMessage::ParseFromByteBuffer(const grpc::ByteBuffer &buffer)
+    bool LVMessage::SerializeToString(std::string* output) const
     {
-        Clear();
-
-        std::vector<grpc::Slice> slices;
-        buffer.Dump(&slices);
-        std::string buf;
-        buf.reserve(buffer.Length());
-        for (auto s = slices.begin(); s != slices.end(); s++)
-        {
-            buf.append(reinterpret_cast<const char *>(s->begin()), s->size());
-        }
-        return ParseFromString(buf);
+        output->clear();
+        google::protobuf::io::StringOutputStream sos(output);
+        google::protobuf::io::CodedOutputStream cos(&sos);
+        SerializeToCodedStream(&cos);
+        return !cos.HadError();
     }
 
     //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    std::unique_ptr<grpc::ByteBuffer> LVMessage::SerializeToByteBuffer()
-    {
-        std::string buf;
-        SerializeToString(&buf);
-        grpc::Slice slice(buf);
-        return std::unique_ptr<grpc::ByteBuffer>(new grpc::ByteBuffer(&slice, 1));
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    google::protobuf::Message *LVMessage::New(google::protobuf::Arena *arena) const
-    {
-        assert(false); // not expected to be called
-        return nullptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void LVMessage::SetCachedSize(int size) const
-    {
-        _cached_size_.Set(size);
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    int LVMessage::GetCachedSize(void) const
-    {
-        return _cached_size_.Get();
-    }
-
-    //---------------------------------------------------------------------
+    // Clear() destroys every LVMessageValue object in _values, which is
+    // sufficient to reset all per-value byte-size caches (_cachedDataSize,
+    // _cachedNestedByteSize, etc.).  New LVMessageValue objects created during
+    // the next parse start with the sentinel value (-1), guaranteeing that
+    // ByteSizeLong() recomputes before Serialize() is called for the new write.
+    // There is therefore no need to iterate over _values to invalidate caches
+    // individually.
     //---------------------------------------------------------------------
     void LVMessage::Clear()
     {
         _values.clear();
         _oneofContainerToSelectedIndexMap.clear();
+        _unknownFields.Clear();
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    const char *LVMessage::_InternalParse(const char *ptr, ParseContext *ctx)
+    void LVMessage::SerializeToCodedStream(google::protobuf::io::CodedOutputStream* output) const
     {
-        assert(ptr != nullptr);
-        while (!ctx->Done(&ptr))
+        for (auto& e : _values)
         {
-            google::protobuf::uint32 tag;
-            ptr = ReadTag(ptr, &tag);
-            auto index = (tag >> 3);
-            if (_metadata == nullptr)
-            {
-                ptr = UnknownFieldParse(tag, &_unknownFields, ptr, ctx);
-                assert(ptr != nullptr);
-            }
-            else
-            {
-                auto fieldIt = _metadata->_mappedElements.find(index);
-                if (fieldIt != _metadata->_mappedElements.end())
-                {
-                    auto& fieldInfo = (*fieldIt).second;
-                    LVMessageMetadataType dataType = fieldInfo->type;
-
-                    if (fieldInfo->isInOneof)
-                    {
-                        // set the map of the selected index for the "oneofContainer" to this protobuf Index
-                        assert(_oneofContainerToSelectedIndexMap.find(fieldInfo->oneofContainerName) == _oneofContainerToSelectedIndexMap.end());
-                        _oneofContainerToSelectedIndexMap.insert({ fieldInfo->oneofContainerName, fieldInfo->protobufIndex });
-                    }
-
-                    switch (dataType)
-                    {
-                    case LVMessageMetadataType::Int32Value:
-                        ptr = ParseInt32(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::FloatValue:
-                        ptr = ParseFloat(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::DoubleValue:
-                        ptr = ParseDouble(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::BoolValue:
-                        ptr = ParseBoolean(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::StringValue:
-                        ptr = ParseString(tag, *fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::BytesValue:
-                        ptr = ParseBytes(tag, *fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::MessageValue:
-                        ptr = ParseNestedMessage(tag, *fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::Int64Value:
-                        ptr = ParseInt64(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::UInt32Value:
-                        ptr = ParseUInt32(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::UInt64Value:
-                        ptr = ParseUInt64(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::EnumValue:
-                        ptr = ParseEnum(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::SInt32Value:
-                        ptr = ParseSInt32(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::SInt64Value:
-                        ptr = ParseSInt64(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::Fixed32Value:
-                        ptr = ParseFixed32(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::Fixed64Value:
-                        ptr = ParseFixed64(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::SFixed32Value:
-                        ptr = ParseSFixed32(*fieldInfo, index, ptr, ctx);
-                        break;
-                    case LVMessageMetadataType::SFixed64Value:
-                        ptr = ParseSFixed64(*fieldInfo, index, ptr, ctx);
-                        break;
-                    }
-                    assert(ptr != nullptr);
-                }
-                else
-                {
-                    if (tag == 0 || WireFormatLite::GetTagWireType(tag) == WireFormatLite::WIRETYPE_END_GROUP)
-                    {
-                        ctx->SetLastTag(tag);
-                        return ptr;
-                    }
-                    ptr = UnknownFieldParse(tag, &_unknownFields, ptr, ctx);
-                    assert(ptr != nullptr);
-                }
-            }
+            e.second->Serialize(output);
         }
-        PostInteralParseAction();
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseBoolean(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedMessageValue<bool>>(index);
-            ptr = PackedBoolParser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            bool result;
-            ptr = ReadBOOL(ptr, &result);
-            auto v = std::make_shared<LVVariableMessageValue<bool>>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseInt32(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedMessageValue<int>>(index);
-            ptr = PackedInt32Parser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            int32_t result;
-            ptr = ReadINT32(ptr, &result);
-            auto v = std::make_shared<LVVariableMessageValue<int>>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseUInt32(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedMessageValue<uint32_t>>(index);
-            ptr = PackedUInt32Parser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            uint32_t result;
-            ptr = ReadUINT32(ptr, &result);
-            auto v = std::make_shared<LVVariableMessageValue<uint32_t>>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseEnum(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedEnumMessageValue>(index);
-            ptr = PackedEnumParser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            int32_t result;
-            ptr = ReadENUM(ptr, &result);
-            auto v = std::make_shared<LVEnumMessageValue>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseInt64(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedMessageValue<int64_t>>(index);
-            ptr = PackedInt64Parser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            int64_t result;
-            ptr = ReadINT64(ptr, &result);
-            auto v = std::make_shared<LVVariableMessageValue<int64_t>>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseUInt64(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedMessageValue<uint64_t>>(index);
-            ptr = PackedUInt64Parser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            uint64_t result;
-            ptr = ReadUINT64(ptr, &result);
-            auto v = std::make_shared<LVVariableMessageValue<uint64_t>>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseFloat(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedMessageValue<float>>(index);
-            ptr = PackedFloatParser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            float result;
-            ptr = ReadFLOAT(ptr, &result);
-            auto v = std::make_shared<LVVariableMessageValue<float>>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseDouble(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedMessageValue<double>>(index);
-            ptr = PackedDoubleParser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            double result;
-            ptr = ReadDOUBLE(ptr, &result);
-            auto v = std::make_shared<LVVariableMessageValue<double>>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseString(google::protobuf::uint32 tag, const MessageElementMetadata &fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
-    {
-        auto featureConfig = grpc_labview::FeatureConfig::getInstance();
-        if (fieldInfo.isRepeated)
-        {
-            std::shared_ptr<LVRepeatedStringMessageValue> v;
-            auto it = _values.find(index);
-            if (it == _values.end())
-            {
-                v = std::make_shared<LVRepeatedStringMessageValue>(index);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                v = std::static_pointer_cast<LVRepeatedStringMessageValue>((*it).second);
-            }
-
-            auto tagSize = CalculateTagWireSize(tag);
-            protobuf_ptr -= tagSize;
-            do
-            {
-                protobuf_ptr += tagSize;
-                auto str = v->_value.Add();
-                protobuf_ptr = InlineGreedyStringParser(str, protobuf_ptr, ctx);
-                if (!VerifyUtf8String(*str, WireFormatLite::PARSE, fieldInfo.fieldName.c_str())) {
-                    throw std::runtime_error("String contains invalid UTF-8 data.");
-                }
-                if (!ctx->DataAvailable(protobuf_ptr))
-                {
-                    break;
-                }
-            } while (ExpectTag(tag, protobuf_ptr));
-        }
-        else
-        {
-            auto str = std::string();
-            protobuf_ptr = InlineGreedyStringParser(&str, protobuf_ptr, ctx);
-            if (!VerifyUtf8String(str, WireFormatLite::PARSE, fieldInfo.fieldName.c_str())) {
-                throw std::runtime_error("String contains invalid UTF-8 data.");
-            }
-            auto v = std::make_shared<LVStringMessageValue>(index, str);
-            _values.emplace(index, v);
-        }
-        return protobuf_ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseBytes(google::protobuf::uint32 tag, const MessageElementMetadata &fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
-    {
-        if (!FeatureConfig::getInstance().AreUtf8StringsEnabled()) {
-            return ParseString(tag, fieldInfo, index, protobuf_ptr, ctx);
-        }
-
-        if (fieldInfo.isRepeated)
-        {
-            std::shared_ptr<LVRepeatedBytesMessageValue> v;
-            auto it = _values.find(index);
-            if (it == _values.end())
-            {
-                v = std::make_shared<LVRepeatedBytesMessageValue>(index);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                v = std::static_pointer_cast<LVRepeatedBytesMessageValue>((*it).second);
-            }
-
-            auto tagSize = CalculateTagWireSize(tag);
-            protobuf_ptr -= tagSize;
-            do
-            {
-                protobuf_ptr += tagSize;
-                auto bytes = v->_value.Add();
-                protobuf_ptr = InlineGreedyStringParser(bytes, protobuf_ptr, ctx);
-                if (!ctx->DataAvailable(protobuf_ptr))
-                {
-                    break;
-                }
-            } while (ExpectTag(tag, protobuf_ptr));
-        }
-        else
-        {
-            auto bytes = std::string();
-            protobuf_ptr = InlineGreedyStringParser(&bytes, protobuf_ptr, ctx);
-            auto v = std::make_shared<LVBytesMessageValue>(index, bytes);
-            _values.emplace(index, v);
-        }
-        return protobuf_ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    bool LVMessage::ExpectTag(google::protobuf::uint32 tag, const char *ptr)
-    {
-        if (tag < 128)
-        {
-            return *ptr == tag;
-        }
-        else
-        {
-            char buf[2] = {static_cast<char>(tag | 0x80), static_cast<char>(tag >> 7)};
-            return std::memcmp(ptr, buf, 2) == 0;
-        }
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    int LVMessage::CalculateTagWireSize(google::protobuf::uint32 tag)
-    {
-        return (tag < (1 << 7)) ? 1
-            : (tag < (1 << 14)) ? 2
-            : (tag < (1 << 21)) ? 3
-            : (tag < (1 << 28)) ? 4
-            : 5;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseSInt32(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedSInt32MessageValue>(index);
-            ptr = PackedSInt32Parser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            int32_t result;
-            ptr = ReadSINT32(ptr, &result);
-            auto v = std::make_shared<LVSInt32MessageValue>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseSInt64(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedSInt64MessageValue>(index);
-            ptr = PackedSInt64Parser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            int64_t result;
-            ptr = ReadSINT64(ptr, &result);
-            auto v = std::make_shared<LVSInt64MessageValue>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseFixed32(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedFixed32MessageValue>(index);
-            ptr = PackedFixed32Parser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            uint32_t result;
-            ptr = ReadFIXED32(ptr, &result);
-            auto v = std::make_shared<LVFixed32MessageValue>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseFixed64(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedFixed64MessageValue>(index);
-            ptr = PackedFixed64Parser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            uint64_t result;
-            ptr = ReadFIXED64(ptr, &result);
-            auto v = std::make_shared<LVFixed64MessageValue>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseSFixed32(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedSFixed32MessageValue>(index);
-            ptr = PackedSFixed32Parser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            int32_t result;
-            ptr = ReadSFIXED32(ptr, &result);
-            auto v = std::make_shared<LVSFixed32MessageValue>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseSFixed64(const MessageElementMetadata &fieldInfo, uint32_t index, const char *ptr, ParseContext *ctx)
-    {
-        if (fieldInfo.isRepeated)
-        {
-            auto v = std::make_shared<LVRepeatedSFixed64MessageValue>(index);
-            ptr = PackedSFixed64Parser(&(v->_value), ptr, ctx);
-            _values.emplace(index, v);
-        }
-        else
-        {
-            int64_t result;
-            ptr = ReadSFIXED64(ptr, &result);
-            auto v = std::make_shared<LVSFixed64MessageValue>(index, result);
-            _values.emplace(index, v);
-        }
-        return ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    const char *LVMessage::ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata &fieldInfo, uint32_t index, const char *protobuf_ptr, ParseContext *ctx)
-    {
-        auto metadata = fieldInfo._owner->FindMetadata(fieldInfo.embeddedMessageName);
-        if (fieldInfo.isRepeated)
-        {
-            std::shared_ptr<LVRepeatedNestedMessageMessageValue> v;
-            auto it = _values.find(index);
-            if (it == _values.end())
-            {
-                v = std::make_shared<LVRepeatedNestedMessageMessageValue>(index);
-                _values.emplace(index, v);
-            }
-            else
-            {
-                v = std::static_pointer_cast<LVRepeatedNestedMessageMessageValue>((*it).second);
-            }
-
-            auto tagSize = CalculateTagWireSize(tag);
-            protobuf_ptr -= tagSize;
-            do
-            {
-                protobuf_ptr += tagSize;
-                auto nestedMessage = std::make_shared<LVMessage>(metadata);
-                protobuf_ptr = ctx->ParseMessage(nestedMessage.get(), protobuf_ptr);
-                v->_value.push_back(nestedMessage);
-                if (!ctx->DataAvailable(protobuf_ptr))
-                {
-                    break;
-                }
-            } while (ExpectTag(tag, protobuf_ptr));
-        }
-        else
-        {
-            auto nestedMessage = std::make_shared<LVMessage>(metadata);
-            protobuf_ptr = ctx->ParseMessage(nestedMessage.get(), protobuf_ptr);
-            auto v = std::make_shared<LVNestedMessageMessageValue>(index, nestedMessage);
-            _values.emplace(index, v);
-        }
-        return protobuf_ptr;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    google::protobuf::uint8 *LVMessage::_InternalSerialize(google::protobuf::uint8 *target, google::protobuf::io::EpsCopyOutputStream *stream) const
-    {
-        for (auto e : _values)
-        {
-            target = e.second->Serialize(target, stream);
-        }
-        return target;
     }
 
     //---------------------------------------------------------------------
@@ -648,78 +827,14 @@ namespace grpc_labview
     size_t LVMessage::ByteSizeLong() const
     {
         size_t totalSize = 0;
-
-        for (auto e : _values)
+        for (auto& e : _values)
         {
             totalSize += e.second->ByteSizeLong();
         }
-        int cachedSize = ToCachedSize(totalSize);
-        SetCachedSize(cachedSize);
         return totalSize;
     }
 
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    bool LVMessage::IsInitialized() const
-    {
-        return true;
-    }
 
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void LVMessage::SharedCtor()
-    {
-        assert(false); // not expected to be called
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void LVMessage::SharedDtor()
-    {
-        assert(false); // not expected to be called
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void LVMessage::ArenaDtor(void *object)
-    {
-        assert(false); // not expected to be called
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void LVMessage::RegisterArenaDtor(google::protobuf::Arena *)
-    {
-        assert(false); // not expected to be called
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void LVMessage::MergeFrom(const google::protobuf::Message &from)
-    {
-        assert(false); // not expected to be called
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void LVMessage::MergeFrom(const LVMessage &from)
-    {
-        assert(false); // not expected to be called
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void LVMessage::CopyFrom(const google::protobuf::Message &from)
-    {
-        assert(false); // not expected to be called
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void LVMessage::CopyFrom(const LVMessage &from)
-    {
-        assert(false); // not expected to be called
-    }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -744,20 +859,5 @@ namespace grpc_labview
                 }
             }
         }
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void LVMessage::InternalSwap(LVMessage *other)
-    {
-        assert(false); // not expected to be called
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    google::protobuf::Metadata LVMessage::GetMetadata() const
-    {
-        assert(false); // not expected to be called
-        return google::protobuf::Metadata();
     }
 }

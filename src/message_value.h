@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 #include <grpc_server.h>
+#include <google/protobuf/io/coded_stream.h>
 
 namespace grpc_labview
 {
@@ -39,6 +40,7 @@ namespace grpc_labview
     {
     public:
         LVMessageValue(int protobufId);
+        virtual ~LVMessageValue() = default;
 
     public:
         int _protobufId;
@@ -46,7 +48,7 @@ namespace grpc_labview
     public:
         virtual void* RawValue() = 0;
         virtual size_t ByteSizeLong() = 0;
-        virtual google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const = 0;
+        virtual void Serialize(google::protobuf::io::CodedOutputStream* output) const = 0;
     };
 
 
@@ -63,12 +65,23 @@ namespace grpc_labview
 
         google::protobuf::RepeatedField<T> _value;
 
+        // Cache for the packed payload byte count (sum of encoded element sizes,
+        // NOT including the outer tag or length-prefix varint).
+        // Sentinel value -1 means "not yet computed"; ByteSizeLong() always
+        // refreshes it, and Serialize() reads it to avoid recomputing the
+        // per-element sizes a second time.  No explicit invalidation is needed:
+        // LVMessage values are effectively write-once — they are built during
+        // parsing and then serialized.  For streaming calls where the same
+        // LVMessage object is reused across writes, LVMessage::Clear() destroys
+        // every LVMessageValue in _values entirely, so stale caches in the old
+        // value objects cannot be observed.  New LVMessageValue objects created
+        // for the next write start with the sentinel, so ByteSizeLong() will
+        // always recompute before Serialize() is called.
+        mutable size_t _cachedDataSize = static_cast<size_t>(-1);
+
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
-
-    protected:
-        int _cachedSize;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     template <typename T>
@@ -86,7 +99,7 @@ namespace grpc_labview
 
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     //---------------------------------------------------------------------
@@ -102,7 +115,10 @@ namespace grpc_labview
     public:
         void* RawValue() override { return (void*)(_value.get()); };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
+
+    private:
+        mutable size_t _cachedNestedByteSize = static_cast<size_t>(-1);
     };
 
     
@@ -119,7 +135,10 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
+
+    private:
+        mutable std::vector<size_t> _cachedNestedByteSizes;
     };
 
     //---------------------------------------------------------------------
@@ -135,7 +154,7 @@ namespace grpc_labview
     public:
         void* RawValue() override { return (void*)(_value.c_str()); };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     class LVRepeatedStringMessageValue : public LVMessageValue
@@ -149,7 +168,7 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
 
@@ -166,7 +185,7 @@ namespace grpc_labview
     public:
         void* RawValue() override { return (void*)(_value.c_str()); };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     class LVRepeatedBytesMessageValue : public LVMessageValue
@@ -180,23 +199,16 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class LVEnumMessageValue : public LVMessageValue
+    class LVEnumMessageValue : public LVVariableMessageValue<int>
     {
     public:
-        LVEnumMessageValue(int protobufId, int _value);
-
-    public:
-        int _value;
-
-        void* RawValue() override { return &_value; };
-        size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        LVEnumMessageValue(int protobufId, int value);
     };
 
 
@@ -204,14 +216,8 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     class LVRepeatedEnumMessageValue : public LVRepeatedMessageValue<int>
     {
-        public:
-            LVRepeatedEnumMessageValue(int protobufId);
-
-            google::protobuf::RepeatedField<int> _value;
-
-            void* RawValue() override { return &_value; };
-            size_t ByteSizeLong() override;
-            google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+    public:
+        LVRepeatedEnumMessageValue(int protobufId);
     };
 
     //---------------------------------------------------------------------
@@ -227,27 +233,19 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class LVRepeatedSInt32MessageValue : public LVMessageValue
+    class LVRepeatedSInt32MessageValue : public LVRepeatedMessageValue<int32_t>
     {
     public:
         LVRepeatedSInt32MessageValue(int protobufId);
 
-    public:
-        google::protobuf::RepeatedField<int32_t> _value;
-
-    public:
-        void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
-
-    private:
-        int _cachedSize;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
 
@@ -264,26 +262,18 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class LVRepeatedSInt64MessageValue : public LVMessageValue
+    class LVRepeatedSInt64MessageValue : public LVRepeatedMessageValue<int64_t>
     {
     public:
         LVRepeatedSInt64MessageValue(int protobufId);
 
-    public:
-        google::protobuf::RepeatedField<int64_t> _value;
-
-    public:
-        void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
-
-    private:
-        int _cachedSize;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     //---------------------------------------------------------------------
@@ -299,7 +289,7 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     //---------------------------------------------------------------------
@@ -315,7 +305,7 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     //---------------------------------------------------------------------
@@ -331,7 +321,7 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     //---------------------------------------------------------------------
@@ -347,7 +337,7 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     //---------------------------------------------------------------------
@@ -363,7 +353,7 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     //---------------------------------------------------------------------
@@ -379,7 +369,7 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     //---------------------------------------------------------------------
@@ -395,7 +385,7 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 
     //---------------------------------------------------------------------
@@ -411,6 +401,6 @@ namespace grpc_labview
     public:
         void* RawValue() override { return &_value; };
         size_t ByteSizeLong() override;
-        google::protobuf::uint8* Serialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override;
+        void Serialize(google::protobuf::io::CodedOutputStream* output) const override;
     };
 }

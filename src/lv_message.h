@@ -6,75 +6,67 @@
 //---------------------------------------------------------------------
 #include <message_value.h>
 #include <message_metadata.h>
-#include <google/protobuf/message.h>
-
-using namespace google::protobuf::internal;
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/unknown_field_set.h>
+#include <grpcpp/support/byte_buffer.h>
 
 namespace grpc_labview
 {
     //---------------------------------------------------------------------
+    // LVMessage - Custom message class for LabVIEW gRPC integration
+    // 
+    // This class does NOT inherit from google::protobuf::Message.
+    // gRPC integration is provided via grpc::SerializationTraits
+    // specialization in lv_serialization_traits.h.
     //---------------------------------------------------------------------
-    class LVMessage : public google::protobuf::Message, public gRPCid
+    class LVMessage : public gRPCid
     {
     public:
         LVMessage(std::shared_ptr<MessageMetadata> metadata);
         ~LVMessage();
 
-        google::protobuf::UnknownFieldSet& UnknownFields();
-
-        Message* New(google::protobuf::Arena* arena) const override;
-        void SharedCtor();
-        void SharedDtor();
-        void ArenaDtor(void* object);
-        void RegisterArenaDtor(google::protobuf::Arena*);
-
-        void Clear()  final;
-        bool IsInitialized() const final;
-
-        const char* _InternalParse(const char* ptr, google::protobuf::internal::ParseContext* ctx)  override final;
-        google::protobuf::uint8* _InternalSerialize(google::protobuf::uint8* target, google::protobuf::io::EpsCopyOutputStream* stream) const override final;
-        void SetCachedSize(int size) const ;
-        int GetCachedSize(void) const ;
-        size_t ByteSizeLong() const final;
+        void Clear();
+        size_t ByteSizeLong() const;
         virtual void PostInteralParseAction() {};
 
-        void MergeFrom(const google::protobuf::Message &from) final;
-        void MergeFrom(const LVMessage &from);
-        void CopyFrom(const google::protobuf::Message &from) ;
-        void CopyFrom(const LVMessage &from);
+        google::protobuf::UnknownFieldSet& UnknownFields();
         void CopyOneofIndicesToCluster(int8_t* cluster) const;
-        void InternalSwap(LVMessage *other);
-        google::protobuf::Metadata GetMetadata() const final;
 
+        //---------------------------------------------------------------------
+        // ByteBuffer serialization methods - used by SerializationTraits
+        //---------------------------------------------------------------------
         bool ParseFromByteBuffer(const grpc::ByteBuffer& buffer);
-        std::unique_ptr<grpc::ByteBuffer> SerializeToByteBuffer();
+        bool ParseFromString(const std::string& data);
+        bool ParseFromCodedStream(google::protobuf::io::CodedInputStream* input);
+        std::unique_ptr<grpc::ByteBuffer> SerializeToByteBuffer() const;
+        bool SerializeToString(std::string* output) const;
+        void SerializeToCodedStream(google::protobuf::io::CodedOutputStream* output) const;
 
         std::map<int, std::shared_ptr<LVMessageValue>> _values;
         std::shared_ptr<MessageMetadata> _metadata;
         std::map<std::string, int> _oneofContainerToSelectedIndexMap;
 
     protected:
-        mutable google::protobuf::internal::CachedSize _cached_size_;
         google::protobuf::UnknownFieldSet _unknownFields;
 
-        virtual const char *ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        virtual const char *ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        virtual const char *ParseUInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        virtual const char *ParseEnum(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        virtual const char *ParseInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        virtual const char *ParseUInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        virtual const char *ParseFloat(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        virtual const char *ParseDouble(const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        virtual const char* ParseSInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        virtual const char* ParseSInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        virtual const char* ParseFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        virtual const char* ParseFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        virtual const char* ParseSFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        virtual const char* ParseSFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        virtual const char *ParseString(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        virtual const char *ParseBytes(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        virtual const char *ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char *ptr, google::protobuf::internal::ParseContext *ctx);
-        bool ExpectTag(google::protobuf::uint32 tag, const char* ptr);
-        int CalculateTagWireSize(google::protobuf::uint32 tag);
+        // Field parse helpers - virtual so LVMessageEfficient can override for direct-to-cluster writes
+        virtual bool ParseFieldFromCodedStream(google::protobuf::io::CodedInputStream* input, uint32_t tag, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo);
+        virtual bool ParseInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseUInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseUInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseSInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseSInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseSFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseSFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseFloatField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseDoubleField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseBoolField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseEnumField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType);
+        virtual bool ParseStringField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo);
+        virtual bool ParseBytesField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo);
+        virtual bool ParseMessageField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo);
     };
 }

@@ -40,7 +40,7 @@ namespace grpc_labview
             {
                 grpc_labview::NumericArrayResize(typeCode, 1, destArray, count);
                 (**destArray)->cnt = count;
-                memcpy((**destArray)->bytes<double_t>(), value.c_str(), value.size());
+                memcpy((**destArray)->bytes<double_t>(), value.data(), value.size());
             }
         }
         else
@@ -60,7 +60,7 @@ namespace grpc_labview
             auto count = value.size() / sizeof(uint32_t);
             grpc_labview::NumericArrayResize(typeCode, 1, destArray, count);
             (**destArray)->cnt = count;
-            memcpy((**destArray)->bytes<uint32_t>(), value.c_str(), value.size());
+            memcpy((**destArray)->bytes<uint32_t>(), value.data(), value.size());
         }
         else
         {

@@ -25,7 +25,7 @@ namespace grpc_labview
     class PointerManager
     {
     public:
-        PointerManager<T>();
+        PointerManager();
 
         /// Register a pointer. This creates a std::shared_ptr for that pointer and stuffs it into a std::set.
         /// The pointer will be alive until that shared_ptr and all its copies (created via GetPointer) are out of scope.

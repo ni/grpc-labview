@@ -6,11 +6,11 @@
 //---------------------------------------------------------------------
 #include <message_value.h>
 #include <message_metadata.h>
+// Note: google/protobuf/message.h kept for RepeatedPtrField<google::protobuf::Message> used in RepeatedMessageValue
 #include <google/protobuf/message.h>
+#include <google/protobuf/io/coded_stream.h>
 #include <lv_message.h>
 #include <well_known_messages.h>
-
-using namespace google::protobuf::internal;
 
 namespace grpc_labview
 {
@@ -22,7 +22,6 @@ namespace grpc_labview
         LVMessageEfficient(std::shared_ptr<MessageMetadata> metadata, int8_t* cluster) : LVMessage(metadata), _LVClusterHandle(cluster) {}
         ~LVMessageEfficient() {}
 
-        Message* New(google::protobuf::Arena* arena) const override;
         void PostInteralParseAction() override;
         int8_t* GetLVClusterHandle() { return _LVClusterHandle; };
 
@@ -60,80 +59,28 @@ namespace grpc_labview
     protected:
         int8_t* _LVClusterHandle;
 
-        const char* ParseBoolean(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseUInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseEnum(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseUInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseFloat(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseDouble(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseSInt32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseSInt64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseSFixed32(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseSFixed64(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseString(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseBytes(unsigned int tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseNestedMessage(google::protobuf::uint32 tag, const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx) override;
-        const char* ParseDouble2DArrayMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
-        const char* ParseString2DArrayMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char* ptr, google::protobuf::internal::ParseContext* ctx);
+        // Override ParseXxxField methods to write directly to LV cluster memory
+        bool ParseInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseUInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseUInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseBoolField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseFloatField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseDoubleField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseSInt32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseSInt64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseSFixed32Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseSFixed64Field(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseEnumField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, uint32_t wireType) override;
+        bool ParseStringField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo) override;
+        bool ParseBytesField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo) override;
+        bool ParseMessageField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo) override;
 
     private:
-        const char* Parse2DArrayMessage(const MessageElementMetadata& fieldInfo, uint32_t index, const char* protobuf_ptr, ParseContext* ctx, wellknown::I2DArray& array);
-    };
-
-    template <typename MessageType, const char* (*ReadFunc)(const char*, MessageType*), const char* (*PackedFunc)(void*, const char*, google::protobuf::internal::ParseContext*)>
-    class SinglePassMessageParser {
-    private:
-        LVMessageEfficient& _message;
-        int8_t* _lv_ptr;
-    public:
-        // Constructor and other necessary member functions
-        SinglePassMessageParser(LVMessageEfficient& message, const MessageElementMetadata& fieldInfo) : _message(message) {
-            _lv_ptr = _message.GetLVClusterHandle() + fieldInfo.clusterOffset;
-        }
-
-        // Parse and copy message in a single pass.
-        template<typename RepeatedMessageValuePointer>
-        const char* ParseAndCopyRepeatedMessage(const char* ptr, ParseContext* ctx, RepeatedMessageValuePointer v) {
-
-            uint64_t numElements;
-            ptr = PackedMessageType(ptr, ctx, reinterpret_cast<google::protobuf::RepeatedPtrField<MessageType>*>(&(v->_value)));
-            numElements = v->_value.size();
-            // get the LVClusterHandle
-
-            // ContinueIndex is not required here as the _value vector created is of the corresponding type, and is not being used a buffer.
-            // PackedMessageType will just be able to push_back or add the later parsed data to the type vector.
-
-            // copy into LVCluster
-            if (numElements != 0)
-            {
-                auto messageTypeSize = sizeof(MessageType);
-                NumericArrayResize(GetTypeCodeForSize(messageTypeSize), 1, _lv_ptr, numElements);
-                auto array = *(LV1DArrayHandle*)_lv_ptr;
-                (*array)->cnt = numElements;
-                auto byteCount = numElements * messageTypeSize;
-                std::memcpy((*array)->bytes<MessageType>(), v->_value.data(), byteCount);
-            }
-
-            return ptr;
-        }
-
-        const char* PackedMessageType(const char* ptr, ParseContext* ctx, google::protobuf::RepeatedPtrField<MessageType>* value)
-        {
-            return PackedFunc(value, ptr, ctx);
-        }
-
-        const char* ParseAndCopyMessage(const char* ptr) {
-            ptr = ReadMessageType(ptr, reinterpret_cast<MessageType*>(_lv_ptr));
-            return ptr;
-        }
-
-        const char* ReadMessageType(const char* ptr, MessageType* lv_ptr)
-        {
-            return ReadFunc(ptr, lv_ptr);
-        }
+        bool ParseDouble2DArrayField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo);
+        bool ParseString2DArrayField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo);
+        bool Parse2DArrayField(google::protobuf::io::CodedInputStream* input, uint32_t fieldNumber, const MessageElementMetadata& fieldInfo, wellknown::I2DArray& array);
     };
 }
