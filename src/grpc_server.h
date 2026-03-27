@@ -7,11 +7,15 @@
 //---------------------------------------------------------------------
 #ifdef __WIN32__
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <windows.h>
 #endif
 
 //---------------------------------------------------------------------
+// IMPORTANT: lv_serialization_traits.h MUST be included BEFORE grpc headers
+// This registers our custom SerializationTraits<LVMessage> specialization
 //---------------------------------------------------------------------
+#include <lv_serialization_traits.h>
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/impl/codegen/async_generic_service.h>
 #include <grpcpp/impl/codegen/completion_queue.h>
@@ -27,7 +31,7 @@
 #include <map>
 #include <event_data.h>
 #include <metadata_owner.h>
-#include <semaphore.h>
+#include <lv_semaphore.h>
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------

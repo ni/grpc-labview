@@ -1,9 +1,13 @@
 //---------------------------------------------------------------------
+// lv_semaphore.h — lightweight counting semaphore for grpc-labview.
+//
+// Renamed from "semaphore.h" to avoid shadowing the POSIX <semaphore.h>
+// system header on Linux (GCC's <condition_variable> transitively
+// includes <bits/semaphore_base.h> which needs <semaphore.h>).
 //---------------------------------------------------------------------
 #pragma once
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
+#include <condition_variable>
 #include <mutex>
 
 namespace grpc_labview 

@@ -46,7 +46,12 @@ namespace grpc_labview
     class ErrorCollector : public MultiFileErrorCollector
     {
     public:
-        void AddError(const std::string& filename, int line, int column, const std::string& message) override;
+        // Non-virtual helpers called directly (e.g. by AddFieldError)
+        void AddError(const std::string& filename, int line, int column, const std::string& message);
+        void AddWarning(const std::string& filename, int line, int column, const std::string& message);
+        // Overrides of MultiFileErrorCollector virtuals
+        void RecordError(absl::string_view filename, int line, int column, absl::string_view message) override;
+        void RecordWarning(absl::string_view filename, int line, int column, absl::string_view message) override;
         std::string GetLVErrorMessage();
 
     private:
@@ -58,7 +63,30 @@ namespace grpc_labview
     void ErrorCollector::AddError(const std::string& filename, int line, int column, const std::string& message)
     {
         std::string errorMessage = filename + ": " + std::to_string(line) + " - " + message;
-        _errors.emplace_back(errorMessage);
+        _errors.emplace_back(std::move(errorMessage));
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ErrorCollector::AddWarning(const std::string& filename, int line, int column, const std::string& message)
+    {
+        // For now, treat warnings as errors
+        std::string warningMessage = filename + ": " + std::to_string(line) + " - Warning: " + message;
+        _errors.emplace_back(std::move(warningMessage));
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ErrorCollector::RecordError(absl::string_view filename, int line, int column, absl::string_view message)
+    {
+        AddError(std::string(filename), line, column, std::string(message));
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ErrorCollector::RecordWarning(absl::string_view filename, int line, int column, absl::string_view message)
+    {
+        AddWarning(std::string(filename), line, column, std::string(message));
     }
 
     //---------------------------------------------------------------------
@@ -132,9 +160,9 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    std::string TransformMessageName(const std::string& messageName)
+    std::string TransformMessageName(std::string_view messageName)
     {
-        std::string result = messageName;
+        std::string result(messageName);
         std::replace(result.begin(), result.end(), '.', '_');
         return result;
     }
@@ -803,7 +831,7 @@ std::string GetEnumNames(google::protobuf::EnumDescriptor* enumDescriptor)
 
     for (int i = 0; i < enumValueCount; i++)
     {
-        std::string enumVal = enumDescriptor->value(i)->name() + "=" + std::to_string(enumDescriptor->value(i)->number());
+        std::string enumVal = std::string(enumDescriptor->value(i)->name()) + "=" + std::to_string(enumDescriptor->value(i)->number());
         enumNames += enumVal + ((i < enumValueCount - 1) ? ";" : "");
     }
 
