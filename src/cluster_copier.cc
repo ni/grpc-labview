@@ -170,6 +170,7 @@ namespace grpc_labview {
                 break;
             case LVMessageMetadataType::Fixed32Value:
                 CopyFixed32FromCluster(fieldMetadata, start, message);
+                break;
             case LVMessageMetadataType::Fixed64Value:
                 CopyFixed64FromCluster(fieldMetadata, start, message);
                 break;

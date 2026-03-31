@@ -46,6 +46,7 @@ namespace grpc_labview
     class LabVIEWgRPCServer;
     class LVMessage;
     class CallData;
+    class CallFinishedTag;
     class MessageElementMetadata;
     struct MessageMetadata;
 
@@ -60,24 +61,6 @@ namespace grpc_labview
         int serverStartStatus;
     };
 
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    class GenericMethodData : public EventData, public IMessageElementMetadataOwner
-    {
-    public:
-        GenericMethodData(CallData* call, ServerContext* context, std::shared_ptr<LVMessage> request, std::shared_ptr<LVMessage> response);
-        virtual std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
-        std::shared_ptr<EnumMetadata> FindEnumMetadata(const std::string& name) {
-            return nullptr;
-        };
-
-    public:
-        CallData* _call;
-        std::shared_ptr<LVMessage> _request;
-        std::shared_ptr<LVMessage> _response;
-    };
-
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     struct LVEventData
@@ -89,7 +72,7 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class LabVIEWgRPCServer : public MessageElementMetadataOwner, public gRPCid
+    class LabVIEWgRPCServer : public MessageElementMetadataOwner, public gRPCid, public std::enable_shared_from_this<LabVIEWgRPCServer>
     {
     public:
         LabVIEWgRPCServer();
@@ -112,12 +95,11 @@ namespace grpc_labview
         LVUserEventRef _genericMethodEvent;
         std::unique_ptr<grpc::AsyncGenericService> _rpcService;
         std::unique_ptr<std::thread> _runThread;
-        bool _shutdown;
         int _listeningPort;
 
     private:
         void RunServer(std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
-        void HandleRpcs(grpc::ServerCompletionQueue *cq);
+        void HandleRpcs();
 
     private:
         static void StaticRunServer(LabVIEWgRPCServer* server, std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
@@ -133,74 +115,109 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class CallFinishedData : CallDataBase
+    class CallData : public CallDataBase, public gRPCid, public std::enable_shared_from_this<CallData>
     {
     public:
-        CallFinishedData(CallData* callData);
-        void Proceed(bool ok) override;
+        static std::shared_ptr<CallData> Create(std::shared_ptr<LabVIEWgRPCServer>server, grpc::AsyncGenericService* service, grpc::ServerCompletionQueue* cq);
 
-    private:
-        CallData* _call;
-    };
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    class CallData : public CallDataBase, public IMessageElementMetadataOwner
-    {
-    public:
-        CallData(LabVIEWgRPCServer* server, grpc::AsyncGenericService* service, grpc::ServerCompletionQueue* cq);
-        std::shared_ptr<MessageMetadata> FindMetadata(const std::string& name) override;
-        std::shared_ptr<EnumMetadata> FindEnumMetadata(const std::string& name) {
-            return nullptr;
-        }
         void Proceed(bool ok) override;
-        bool Write();
-        void Finish();
+        bool Write(int8_t* cluster);
+        void FinishFromLabVIEW();
+        void FinishFromCompletionQueue();
         bool IsCancelled();
         bool IsActive();
-        bool ReadNext();
+        bool ReadNext(int8_t* cluster);
         void SetCallStatusError(std::string errorMessage);
         void SetCallStatusError(grpc::StatusCode statusCode, std::string errorMessage);
         grpc::StatusCode GetCallStatusCode();
 
     private:
-        LabVIEWgRPCServer* _server;
+        CallData(std::shared_ptr<LabVIEWgRPCServer> server, grpc::AsyncGenericService* service, grpc::ServerCompletionQueue* cq);
+
+        std::shared_ptr<LabVIEWgRPCServer> _server;
         grpc::AsyncGenericService* _service;
         grpc::ServerCompletionQueue* _cq;
         grpc::GenericServerContext _ctx;
         grpc::GenericServerAsyncReaderWriter _stream;
         grpc::ByteBuffer _rb;
         grpc::Status _callStatus;
+        CallFinishedTag* _callFinishedTag;
 
-        Semaphore _writeSemaphore;
-        std::shared_ptr<GenericMethodData> _methodData;
         std::shared_ptr<LVMessage> _request;
         std::shared_ptr<LVMessage> _response;
+        std::mutex _readMutex;
+        std::mutex _writeMutex;
+        std::mutex _stateMutex; // Protects state transitions
 
         enum class CallStatus
         {
-            Create,
             WaitingForConnection,
-            WritingResponse,
             Connected,
-            PendingFinish,
-            Finish
+            Finishing,
+            Finished
         };
         CallStatus _status;
     };
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class ReadNextTag : CallDataBase
+    class CallFinishedTag : public CallDataBase
     {
     public:
-        ReadNextTag(CallData* callData);
+        CallFinishedTag(std::shared_ptr<CallData> callData);
+        void Proceed(bool ok) override;
+
+    private:
+        std::shared_ptr<CallData> _callData;
+    };
+
+    //---------------------------------------------------------------------
+    // Completion queue tag that keeps CallData alive
+    //---------------------------------------------------------------------
+    class CompletionQueueTag : public CallDataBase
+    {
+    public:
+        CompletionQueueTag(std::shared_ptr<CallData> callData)
+            : _callData(callData) {
+        }
+
+        void Proceed(bool ok) override
+        {
+            _callData->Proceed(ok);
+            delete this;
+        }
+
+    private:
+        std::shared_ptr<CallData> _callData;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class ReadNextTag : public CallDataBase
+    {
+    public:
+        ReadNextTag(std::shared_ptr<CallData> callData);
         void Proceed(bool ok) override;
         bool Wait();
 
     private:
         Semaphore _readCompleteSemaphore;
-        CallData* _callData;
+        std::shared_ptr<CallData> _callData;
+        bool _success;
+    };
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    class WriteNextTag : public CallDataBase
+    {
+    public:
+        WriteNextTag(std::shared_ptr<CallData> callData);
+        void Proceed(bool ok) override;
+        bool Wait();
+
+    private:
+        Semaphore _writeCompleteSemaphore;
+        std::shared_ptr<CallData> _callData;
         bool _success;
     };
 
