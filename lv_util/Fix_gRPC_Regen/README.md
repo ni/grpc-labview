@@ -2,7 +2,7 @@
 `CopyServerCode.vi` is a utility to hack around a problem in the LabVIEW gRPC generation - one cannot change a .proto file and then successfully change an existing server. This utility copies user code from an older set of server code into a newer set of server code, allowing the user to generate new functionality while maintaining old code.
 
 # Version 
-LabVIEW 2025Q1
+LabVIEW 2019
 
 # Prerequisites
 The code assumes several things. These are:
@@ -20,10 +20,15 @@ Follow these steps to add/subtract functions to an existing server:
 3. Save and close the project.
 4. Open the `CopyServerCode.vi`.
 5. Fill out the project path with the full path to the project containing the old and new servers.
-6. Fill out the target name with the project target the servers are under. This is usually `My Computer`, but can be an embedded target, as well.
+5. Due to a current bug in the utility, if your target is not `My Computer`, move the server folder to `My Computer`.
+6. Fill out the target name with the project target the servers are under - `My Computer` for now.
 7. Enter the full name of the old (source) and new (destination) server names. This is the full name of the folder containing the servers. The library in the folder must be the same name (with .lvlib appended) for this to work.
 8. Run the utility. It will make a backup in the `<temp directory>\ServerBackups\Backup_*n*` directory in case something goes wrong. In Windows, '<temp directory>' is 'C:\Users\<username>\AppData\Local\Temp'.
-9. Open the project and fill in the functionality in the new event structure frames, if any. Add new data converters as needed.
+8. Open the project.
+8. If your original target was not `My Computer`, move the server code back to the original target. 
+9. Open the Asynch and/or Synch subVIs and fill in the functionality in the new event structure frames, if any. Add new data converters as needed.
 
-# Contact
-damien.gray@3dsystems.com
+# Known Bugs
+1. Copied code with gRPC ID wired to something other than a VI will result in missing wire.
+2. If there is code in the project which is dependent on the gRPC code, this process will fail.
+3. The server code must be under `My Computer` to run this utility.
