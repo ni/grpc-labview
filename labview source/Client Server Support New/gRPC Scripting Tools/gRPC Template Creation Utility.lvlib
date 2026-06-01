@@ -132,6 +132,7 @@
 		<Item Name="Create Oneof Message Converters (Flat to Rich).vi" Type="VI" URL="../Oneof API/Create Oneof Message Converters (Flat to Rich).vi"/>
 		<Item Name="Create Oneof Message Converters (Rich to Flat).vi" Type="VI" URL="../Oneof API/Create Oneof Message Converters (Rich to Flat).vi"/>
 		<Item Name="Create Oneof Protobuf To Field Name.vi" Type="VI" URL="../Oneof API/Create Oneof Protobuf To Field Name.vi"/>
+		<Item Name="Create or Replace VI From Template.vi" Type="VI" URL="../Oneof API/Create or Replace VI From Template.vi"/>
 		<Item Name="Create Selected Index Numeric In Cluster.vi" Type="VI" URL="../Oneof API/Create Selected Index Numeric In Cluster.vi"/>
 		<Item Name="Delete Oneof Template Files.vi" Type="VI" URL="../Oneof API/Delete Oneof Template Files.vi"/>
 		<Item Name="Drop Oneof Constant into Case Structure Default.vi" Type="VI" URL="../Oneof API/Drop Oneof Constant into Case Structure Default.vi"/>
