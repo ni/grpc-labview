@@ -243,9 +243,7 @@ def copy_tree(source_dir, dest_dir):
     source_dir: source directory file path
     dest_dir: destination directory file path
     '''
-    if os.path.exists(dest_dir):
-        su.rmtree(dest_dir)
-    su.copytree(source_dir, dest_dir)
+    su.copytree(source_dir, dest_dir, dirs_exist_ok=True)
     return
 
 
