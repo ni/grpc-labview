@@ -103,6 +103,7 @@
 		<Item Name="Get Library Item Path.vi" Type="VI" URL="../Library API/Get Library Item Path.vi"/>
 		<Item Name="Get VIRef from Library.vi" Type="VI" URL="../Library API/Get VIRef from Library.vi"/>
 		<Item Name="Open Library.vi" Type="VI" URL="../Library API/Open Library.vi"/>
+		<Item Name="Open VIRef in Library App Context.vi" Type="VI" URL="../Library API/Open VIRef in Library App Context.vi"/>
 		<Item Name="Ref To Library.vi" Type="VI" URL="../Library API/Ref To Library.vi"/>
 		<Item Name="Save Library.vi" Type="VI" URL="../Library API/Save Library.vi"/>
 	</Item>
