@@ -166,7 +166,8 @@ def main():
                 program_files_w_bitness += ' (x86)'
             test_config['lv_folder'] = pathlib.Path(program_files_w_bitness + f'\\National Instruments\\LabVIEW {labview_version}')
             test_config['labview_path'] = test_config['lv_folder'] / 'labview.exe'
-            test_config['lvcli_path'] = test_config['lv_folder'].parent.absolute() / 'Shared' / 'LabVIEW CLI' / 'LabVIEWCLI.exe'
+            # LabVIEW CLI is always installed in Program Files (x86) regardless of the LabVIEW bitness
+            test_config['lvcli_path'] = pathlib.Path('C:\\Program Files (x86)\\National Instruments\\Shared\\LabVIEW CLI\\LabVIEWCLI.exe')
             test_config['test_suite_pylib_folder'] = pathlib.Path(__file__).parent.absolute()
             test_config['test_suite_folder'] = test_config['test_suite_pylib_folder'].parent.absolute()
             test_config['tests_folder'] = test_config['test_suite_folder'] / 'Tests'

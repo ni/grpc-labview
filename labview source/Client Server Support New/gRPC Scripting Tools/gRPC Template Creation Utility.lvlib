@@ -103,6 +103,7 @@
 		<Item Name="Get Library Item Path.vi" Type="VI" URL="../Library API/Get Library Item Path.vi"/>
 		<Item Name="Get VIRef from Library.vi" Type="VI" URL="../Library API/Get VIRef from Library.vi"/>
 		<Item Name="Open Library.vi" Type="VI" URL="../Library API/Open Library.vi"/>
+		<Item Name="Open VIRef in Library App Context.vi" Type="VI" URL="../Library API/Open VIRef in Library App Context.vi"/>
 		<Item Name="Ref To Library.vi" Type="VI" URL="../Library API/Ref To Library.vi"/>
 		<Item Name="Save Library.vi" Type="VI" URL="../Library API/Save Library.vi"/>
 	</Item>
@@ -132,6 +133,7 @@
 		<Item Name="Create Oneof Message Converters (Flat to Rich).vi" Type="VI" URL="../Oneof API/Create Oneof Message Converters (Flat to Rich).vi"/>
 		<Item Name="Create Oneof Message Converters (Rich to Flat).vi" Type="VI" URL="../Oneof API/Create Oneof Message Converters (Rich to Flat).vi"/>
 		<Item Name="Create Oneof Protobuf To Field Name.vi" Type="VI" URL="../Oneof API/Create Oneof Protobuf To Field Name.vi"/>
+		<Item Name="Create or Replace VI From Template.vi" Type="VI" URL="../Oneof API/Create or Replace VI From Template.vi"/>
 		<Item Name="Create Selected Index Numeric In Cluster.vi" Type="VI" URL="../Oneof API/Create Selected Index Numeric In Cluster.vi"/>
 		<Item Name="Delete Oneof Template Files.vi" Type="VI" URL="../Oneof API/Delete Oneof Template Files.vi"/>
 		<Item Name="Drop Oneof Constant into Case Structure Default.vi" Type="VI" URL="../Oneof API/Drop Oneof Constant into Case Structure Default.vi"/>
