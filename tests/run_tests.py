@@ -27,9 +27,10 @@ def run_all_tests():
             run_result = run_test(test_runner_vi, os.path.join(test_directory, test))
             # run_result will be None for PASSED tests
             if(run_result != None):
-                failed_test_results += run_result 
+                failed_test_results += run_result
         if (failed_test_results != ""):
-            _logger.exception(failed_test_results)
+            _logger.error(failed_test_results)
+            sys.exit(1)
 
 def run_test(WrapperVI, testVI):
     if os.path.exists(testVI):
@@ -39,7 +40,7 @@ def run_test(WrapperVI, testVI):
                             stderr=subprocess.PIPE,
                             shell=False)
 
-        
+
         try:
             out, err = testResult.communicate(timeout=60) # TODO: find if this timeout can be eliminated
         except subprocess.TimeoutExpired:
