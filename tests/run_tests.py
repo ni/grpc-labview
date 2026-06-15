@@ -52,8 +52,18 @@ def run_test(WrapperVI, testVI):
             _logger.debug(f"[PASSED] {testVI}")
             return
         else:
-            _logger.error(f"[FAILED] {testVI} has failed \n {err.decode()}")
-            return (err.decode() + "\n")
+            stdout_output = out.decode(errors="replace")
+            stderr_output = err.decode(errors="replace")
+            failed_test_output = f"[FAILED] {testVI} has failed\n"
+
+            if stdout_output.strip() != "":
+                failed_test_output += f"stdout:\n{stdout_output}\n"
+
+            if stderr_output.strip() != "":
+                failed_test_output += f"stderr:\n{stderr_output}\n"
+
+            _logger.error(failed_test_output)
+            return failed_test_output
     else:
         _logger.error(f"[FAILED] {testVI} \n {testVI} doesnot exist.")
         return testVI + " doesnot exist. \n"
