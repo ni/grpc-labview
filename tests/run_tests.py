@@ -20,16 +20,16 @@ def run_all_tests():
     _logger.debug(f"Running tests in {test_directory}...")
     test_runner_vi = os.path.join(test_directory, "gRPC_ATS\\gRPC_ATS.vi")
     test_file = os.path.join(test_directory , "Tests.lst")
-    failed_test_results = ""
+    failed_test_results = 0
     with open(test_file, 'r') as file:
         all_tests = file.read().splitlines()
         for test in all_tests:
             run_result = run_test(test_runner_vi, os.path.join(test_directory, test))
             # run_result will be None for PASSED tests
             if(run_result != None):
-                failed_test_results += run_result
-        if (failed_test_results != ""):
-            _logger.error(failed_test_results)
+                failed_test_results += 1
+        if (failed_test_results != 0):
+            _logger.error(f"{failed_test_results} tests failed")
             sys.exit(1)
 
 def run_test(WrapperVI, testVI):
