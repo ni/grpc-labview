@@ -1,7 +1,5 @@
 import argparse
-import distutils
-import distutils.dir_util
-import distutils.file_util
+import shutil as su
 import os
 import subprocess
 
@@ -72,7 +70,7 @@ class LVgRPCBuilder:
     def cpp_build(self, args):
         cpp_build_directory = os.path.join(self.root_directory, "build")
         if os.path.exists(cpp_build_directory):
-            distutils.dir_util.remove_tree(cpp_build_directory)
+            su.rmtree(cpp_build_directory, ignore_errors=True)
         os.makedirs(cpp_build_directory)
         os.chdir(cpp_build_directory)
 
@@ -81,13 +79,11 @@ class LVgRPCBuilder:
 
     def copy_binaries_all_targets(self, args):
         server_dll_source = os.path.join(args.pathToBinaries, "LabVIEW gRPC Server")
-        distutils.dir_util.copy_tree(server_dll_source, self.server_binary_destination)
+        copy_tree(server_dll_source, self.server_binary_destination)
         generator_dll_source = os.path.join(
             args.pathToBinaries, "LabVIEW gRPC Generator"
         )
-        distutils.dir_util.copy_tree(
-            generator_dll_source, self.generator_binary_destination
-        )
+        copy_tree(generator_dll_source, self.generator_binary_destination)
 
     def copy_binaries_for_target(self, args):
         server_dll_source = os.path.join(
@@ -98,7 +94,7 @@ class LVgRPCBuilder:
         )
         if not os.path.exists(server_dll_destination):
             os.makedirs(server_dll_destination)
-        distutils.file_util.copy_file(server_dll_source, server_dll_destination)
+        su.copy2(server_dll_source, server_dll_destination)
 
         generator_dll_source = os.path.join(
             self.root_directory, "build", "Release", "labview_grpc_generator.dll"
@@ -108,7 +104,7 @@ class LVgRPCBuilder:
         )
         if not os.path.exists(generator_dll_destination):
             os.makedirs(generator_dll_destination)
-        distutils.file_util.copy_file(generator_dll_source, generator_dll_destination)
+        su.copy2(generator_dll_source, generator_dll_destination)
 
     def copy_built_binaries(self, args):
         if args.target == "All":
@@ -182,7 +178,7 @@ class LVgRPCBuilder:
 
         # Before building vipkgs, ensure the output directory is empty
         if os.path.exists(build_output_path):
-            distutils.dir_util.remove_tree(build_output_path)
+            su.rmtree(build_output_path, ignore_errors=True)
         os.makedirs(build_output_path)
 
         # Build the packages using LabVIEWCLI
@@ -239,6 +235,16 @@ def read_version_from_file(version_file_path):
             if line.startswith("version="):
                 return line.split("=", 1)[1]
     raise Exception("version= key not found in VERSION file")
+
+def copy_tree(source_dir, dest_dir):
+    '''
+    Recursively copy one directory to another, maintaining file attributes
+
+    source_dir: source directory file path
+    dest_dir: destination directory file path
+    '''
+    su.copytree(source_dir, dest_dir, dirs_exist_ok=True)
+    return
 
 
 def main():
