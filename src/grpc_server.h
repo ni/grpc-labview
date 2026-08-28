@@ -46,7 +46,6 @@ namespace grpc_labview
     class LabVIEWgRPCServer;
     class LVMessage;
     class CallData;
-    class CallFinishedTag;
     class MessageElementMetadata;
     struct MessageMetadata;
 
@@ -123,7 +122,6 @@ namespace grpc_labview
         void Proceed(bool ok) override;
         bool Write(int8_t* cluster);
         void FinishFromLabVIEW();
-        void FinishFromCompletionQueue();
         bool IsCancelled();
         bool IsActive();
         bool ReadNext(int8_t* cluster);
@@ -141,7 +139,6 @@ namespace grpc_labview
         grpc::GenericServerAsyncReaderWriter _stream;
         grpc::ByteBuffer _rb;
         grpc::Status _callStatus;
-        CallFinishedTag* _callFinishedTag;
 
         std::shared_ptr<LVMessage> _request;
         std::shared_ptr<LVMessage> _response;
@@ -157,18 +154,6 @@ namespace grpc_labview
             Finished
         };
         CallStatus _status;
-    };
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    class CallFinishedTag : public CallDataBase
-    {
-    public:
-        CallFinishedTag(std::shared_ptr<CallData> callData);
-        void Proceed(bool ok) override;
-
-    private:
-        std::shared_ptr<CallData> _callData;
     };
 
     //---------------------------------------------------------------------

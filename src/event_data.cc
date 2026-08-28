@@ -16,9 +16,12 @@ namespace grpc_labview
     {
         auto callData = std::shared_ptr<CallData>(new CallData(server, service, cq));
 
-        auto finishedTag = new CallFinishedTag(callData);
-        callData->_callFinishedTag = finishedTag;
-        callData->_ctx.AsyncNotifyWhenDone(finishedTag);
+        // Do not call AsyncNotifyWhenDone. Holding CallData on that CQ tag
+        // leaked one object per RPC because the tag is not reliably delivered
+        // for AsyncGenericService. Free CallData when Finish completes on the
+        // CQ instead (gRPC async example pattern). IsCancelled() therefore
+        // cannot use ServerContext::IsCancelled(); client cancel is a failed
+        // Read/Write.
 
         // Start the state machine which waits for a new call to arrive.
         auto tag = new CompletionQueueTag(callData);
@@ -68,14 +71,16 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     bool CallData::IsCancelled()
     {
-        return _ctx.IsCancelled();
+        // Unsafe to call _ctx.IsCancelled() without a completed
+        // AsyncNotifyWhenDone tag. See CallData::Create.
+        return false;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     bool CallData::IsActive()
     {
-        return _status != CallStatus::Finished && _status != CallStatus::Finishing && !IsCancelled();
+        return _status != CallStatus::Finished && _status != CallStatus::Finishing;
     }
 
     //---------------------------------------------------------------------
@@ -134,18 +139,8 @@ namespace grpc_labview
 
         if (!ok && _status != CallStatus::Finished)
         {
-            if (_status == CallStatus::WaitingForConnection)
-            {
-                // Ugh. When using the grpc async APIs, you are required to call AsyncNotifyWhenDone if you want to call IsCancelled
-                // on the ServerContext. However, the tag registered with AsyncNotifyWhenDone is only notified if a RPC call actually
-                // starts, and you must call AsyncNotifyWhenDone before the call starts or tag will not be notified either. Generally,
-                // it is acceptable to just leak this one tag on server shutdown. However, because we maintain a shared pointer to the
-                // server, we will end up leaking everything if we don't clean up this tag. As a work around, we delete the tag here.
-                // This leaves a dangling tag pointer in the completion queue, but it never does anything with the tag. It only delivers
-                // the tag from the Next call which we know will never be triggered so this should be safe.
-                delete _callFinishedTag;
-                _callFinishedTag = nullptr;
-            }
+            // RequestCall ok=false means the call never started (typically
+            // CQ shutdown). Finish completing with ok=false is handled below.
             _status = CallStatus::Finishing;
         }
 
@@ -209,41 +204,6 @@ namespace grpc_labview
 
         _status = CallStatus::Finishing;
         _stream.Finish(_callStatus, new CompletionQueueTag(shared_from_this()));
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void CallData::FinishFromCompletionQueue()
-    {
-        std::lock_guard<std::mutex> lock(_stateMutex);
-
-        _callFinishedTag = nullptr;
-
-        // The call was completed normally from LV code.
-        if (_status == CallStatus::Finishing || _status == CallStatus::Finished)
-        {
-            return;
-        }
-
-        // If FinishFromCompletionQueue is called and we are not already finishing because the user completed
-        // the call from LV, then it means either the server is shutting down or the call was cancelled. In either
-        // case there is no point in calling Finish on the stream so just mark the call as finished.
-        _status = CallStatus::Finished;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    CallFinishedTag::CallFinishedTag(std::shared_ptr<CallData> callData)
-    {
-        _callData = callData;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    void CallFinishedTag::Proceed(bool ok)
-    {
-        _callData->FinishFromCompletionQueue();
-        delete this;
     }
 
     //---------------------------------------------------------------------
