@@ -18,9 +18,9 @@ namespace grpc_labview
 
         // Do not call AsyncNotifyWhenDone. Holding CallData on that CQ tag
         // leaked one object per RPC because the tag is not reliably delivered
-        // for AsyncGenericService. Free CallData when Finish completes on the
-        // CQ instead (gRPC async example pattern). IsCancelled() therefore
-        // cannot use ServerContext::IsCancelled(); client cancel is a failed
+        // for AsyncGenericService. Instead, rely on the existing CompletionQueueTag
+        // to keep CallData alive only until stream.Finish() is delivered on the CQ
+        // (after LabVIEW has unregistered the CallData pointer via CloseServerEvent).
         // Read/Write.
 
         // Start the state machine which waits for a new call to arrive.
