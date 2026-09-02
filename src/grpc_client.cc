@@ -15,6 +15,28 @@
 #include <asio/ip/address.hpp>
 #include <regex>
 
+namespace
+{
+    // RAII cleanup that runs on scope exit (normal OR exception) unless dismissed.
+    // The client completers dismiss it on the normal path, so it only fires when an
+    // exception (e.g. from response copying) would otherwise skip removing the call
+    // from ActiveClientCalls / the pointer manager -- which would leave a dangling
+    // raw pointer in ActiveClientCalls or leak the ClientCall. Never throws.
+    template <typename F>
+    class ScopeGuard
+    {
+    public:
+        explicit ScopeGuard(F fn) : _fn(std::move(fn)) {}
+        ~ScopeGuard() { if (_active) { try { _fn(); } catch (...) {} } }
+        void dismiss() { _active = false; }
+        ScopeGuard(const ScopeGuard&) = delete;
+        ScopeGuard& operator=(const ScopeGuard&) = delete;
+    private:
+        F _fn;
+        bool _active = true;
+    };
+}
+
 namespace grpc_labview
 {
     //---------------------------------------------------------------------
@@ -444,6 +466,16 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
             return -1;
         }
 
+        // Ensure the call is reaped even if response processing below throws.
+        ScopeGuard reap([&]{
+            {
+                std::unique_lock<std::mutex> lock(clientCall->_client->clientLock);
+                auto it = clientCall->_client->ActiveClientCalls.find(clientCall.get());
+                if (it != clientCall->_client->ActiveClientCalls.end())
+                    clientCall->_client->ActiveClientCalls.erase(it);
+            }
+            grpc_labview::gPointerManager.UnregisterPointer(callId);
+        });
 
         grpc_labview::gPointerManager.UnregisterPointer(callId);
 
@@ -458,6 +490,14 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
         }
         else
         {
+            // On a failed/timed-out call, cancel the context so gRPC tears down the
+            // HTTP/2 stream (RST_STREAM) instead of leaving it to drain. Otherwise the
+            // event engine keeps reading and buffering the late-arriving response for a
+            // call nobody consumes -- a per-timeout leak in the gRPC-core receive path
+            // (MaybeMakeReadSlices / ProcessDataAfterMetadata). Cancel is a no-op if the
+            // stream already closed.
+            clientCall->Cancel();
+
             result = -(1000 + clientCall->_status.error_code());
             if (errorMessage != nullptr)
             {
@@ -474,6 +514,7 @@ LIBRARY_EXPORT int32_t CompleteClientUnaryCall2(
             clientCall->_client->ActiveClientCalls.erase(call);
         }
         lock.unlock();
+        reap.dismiss();
         return result;
     } catch (const std::exception& e) {
         grpc_labview::SetErrorMessage(errorMessage, e.what());
@@ -787,6 +828,18 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
         {
             return -1;
         }
+
+        // Ensure the call is reaped even if response processing below throws.
+        ScopeGuard reap([&]{
+            {
+                std::unique_lock<std::mutex> lock(call->_client->clientLock);
+                auto it = call->_client->ActiveClientCalls.find(call.get());
+                if (it != call->_client->ActiveClientCalls.end())
+                    call->_client->ActiveClientCalls.erase(it);
+            }
+            grpc_labview::gPointerManager.UnregisterPointer(callId);
+        });
+
         int32_t result = 0;
         if (call->_status.ok())
         {
@@ -795,6 +848,11 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
         }
         else
         {
+            // Cancel on failure/timeout so gRPC tears down the stream and frees the
+            // event-engine receive buffers instead of leaving them to drain (same
+            // mechanism as the unary path). No-op if the stream already closed.
+            call->Cancel();
+
             result = -(1000 + call->_status.error_code());
             if (errorMessage != nullptr)
             {
@@ -812,6 +870,7 @@ LIBRARY_EXPORT int32_t FinishClientCompleteClientStreamingCall(
         }
         lock.unlock();
         grpc_labview::gPointerManager.UnregisterPointer(callId);
+        reap.dismiss();
         return result;
     } catch (const std::exception& e) {
         grpc_labview::SetErrorMessage(errorMessage, e.what());
@@ -867,6 +926,17 @@ LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(
             return -1;
         }
 
+        // Ensure the call is reaped even if Finish()/response processing below throws.
+        ScopeGuard reap([&]{
+            {
+                std::unique_lock<std::mutex> lock(call->_client->clientLock);
+                auto it = call->_client->ActiveClientCalls.find(call.get());
+                if (it != call->_client->ActiveClientCalls.end())
+                    call->_client->ActiveClientCalls.erase(it);
+            }
+            grpc_labview::gPointerManager.UnregisterPointer(callId);
+        });
+
         // We've already got a shared_ptr for this token, so calling DestroyToken now
         // will just prevent any other API calls from grabbing the pointer.
         grpc_labview::gPointerManager.UnregisterPointer(callId);
@@ -875,6 +945,11 @@ LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(
         int32_t result = 0;
         if (!call->_status.ok())
         {
+            // Cancel on failure/timeout so gRPC tears down the stream and frees the
+            // event-engine receive buffers instead of leaving them to drain (same
+            // mechanism as the unary path). No-op if the stream already closed.
+            call->Cancel();
+
             result = -(1000 + call->_status.error_code());
             if (errorMessage != nullptr)
             {
@@ -891,6 +966,7 @@ LIBRARY_EXPORT int32_t ClientCompleteStreamingCall(
             call->_client->ActiveClientCalls.erase(client_call);
         }
         lock.unlock();
+        reap.dismiss();
         return result;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
