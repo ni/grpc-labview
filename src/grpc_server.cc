@@ -2,6 +2,7 @@
 //---------------------------------------------------------------------
 #include <grpc_server.h>
 #include <grpcpp/ext/proto_server_reflection_plugin.h>
+#include <cassert>
 #include <thread>
 #include <sstream>
 #include <fstream>
@@ -31,7 +32,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void LabVIEWgRPCServer::RegisterEvent(std::string name, LVUserEventRef item, std::string requestMetadata, std::string responseMetadata)
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        std::lock_guard<std::mutex> lock(_eventMutex);
 
         LVEventData data = { item, requestMetadata, responseMetadata };
         _registeredServerMethods.insert(std::pair<std::string, LVEventData>(name, data));
@@ -41,31 +42,38 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void LabVIEWgRPCServer::RegisterGenericMethodEvent(LVUserEventRef item)
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        std::lock_guard<std::mutex> lock(_eventMutex);
         _genericMethodEvent = item;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void LabVIEWgRPCServer::SendEvent(std::string name, gRPCid* data)
+    int LabVIEWgRPCServer::SendEvent(std::string name, gRPCid* data)
     {
-        if (HasGenericMethodEvent())
+        std::lock_guard<std::mutex> lock(_eventMutex);
+        LVEventData eventData;
+        if (_genericMethodEvent != 0)
         {
-            OccurServerEvent(_genericMethodEvent, data, name);
+            return OccurServerEvent(_genericMethodEvent, data, name);
         }
-        else
+        else if (FindEventDataLocked(name, eventData))
         {
-            auto eventData = _registeredServerMethods.find(name);
-            if (eventData != _registeredServerMethods.end())
-            {
-                OccurServerEvent(eventData->second.event, data);
-            }
+            return OccurServerEvent(eventData.event, data);
         }
+        return -1;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LabVIEWgRPCServer::FindEventData(std::string name, LVEventData& data)
+    bool LabVIEWgRPCServer::FindEventData(const std::string& name, LVEventData& data)
+    {
+        std::lock_guard<std::mutex> lock(_eventMutex);
+        return FindEventDataLocked(name, data);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    bool LabVIEWgRPCServer::FindEventDataLocked(const std::string& name, LVEventData& data)
     {
         auto eventData = _registeredServerMethods.find(name);
         if (eventData != _registeredServerMethods.end())
@@ -78,29 +86,21 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    bool LabVIEWgRPCServer::HasRegisteredServerMethod(std::string methodName)
-    {
-        return _registeredServerMethods.find(methodName) != _registeredServerMethods.end();
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    bool LabVIEWgRPCServer::HasGenericMethodEvent()
-    {
-        return _genericMethodEvent != 0;
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    int LabVIEWgRPCServer::ListeningPort()
+    int LabVIEWgRPCServer::GetListeningPort()
     {
         return _listeningPort;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    int LabVIEWgRPCServer::Run(std::string address, std::string serverCertificatePath, std::string serverKeyPath)
+    int LabVIEWgRPCServer::Start(std::string address, std::string serverCertificatePath, std::string serverKeyPath)
     {
+        std::lock_guard<std::mutex> lock(_lifeCycleMutex);
+        if (_server != nullptr)
+        {
+            return 0;
+        }
+
         FinalizeMetadata();
 
         auto serverStarted = new ServerStartEventData;
@@ -116,6 +116,10 @@ namespace grpc_labview
             {
                 _runThread->join();
             }
+
+            _runThread.reset();
+            _cq.reset();
+            _rpcService.reset();
         }
         return result;
     }
@@ -152,6 +156,28 @@ namespace grpc_labview
         while (_cq->Next(&tag, &ok))
         {
             static_cast<CallDataBase*>(tag)->Proceed(ok);
+        }
+
+        delete _undeliveredCallDoneNotificationTag;
+        _undeliveredCallDoneNotificationTag = nullptr;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void LabVIEWgRPCServer::RetainUndeliveredCallDoneNotificationTag(CallDoneNotificationTag* tag)
+    {
+        assert(tag != nullptr);
+        assert(_undeliveredCallDoneNotificationTag == nullptr);
+        _undeliveredCallDoneNotificationTag = tag;
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void LabVIEWgRPCServer::ReleaseUndeliveredCallDoneNotificationTag(CallDoneNotificationTag* tag)
+    {
+        if (_undeliveredCallDoneNotificationTag == tag)
+        {
+            _undeliveredCallDoneNotificationTag = nullptr;
         }
     }
 
@@ -236,27 +262,35 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void LabVIEWgRPCServer::StopServer()
+    void LabVIEWgRPCServer::Stop()
     {
-        if (_server != nullptr)
+        std::lock_guard<std::mutex> lock(_lifeCycleMutex);
+
+        if (_server == nullptr)
         {
-            // We need shutdown passing a deadline so that any RPC calls in progress are terminated as well.
-            _server->Shutdown(std::chrono::system_clock::now());
-            _server->Wait();
-
-            // Always shutdown the completion queue after the server.
-            if (_cq != nullptr)
-            {
-                _cq->Shutdown();
-            }
-
-            if (_runThread->joinable())
-            {
-                _runThread->join();
-            }
-
-            _server = nullptr;
+            return;
         }
+
+        // We need shutdown passing a deadline so that any RPC calls in progress are terminated as well.
+        _server->Shutdown(std::chrono::system_clock::now());
+        _server->Wait();
+
+        // Always shutdown the completion queue after the server.
+        if (_cq != nullptr)
+        {
+            _cq->Shutdown();
+        }
+
+        if (_runThread->joinable())
+        {
+            _runThread->join();
+        }
+
+        _runThread.reset();
+        _server.reset();
+        _cq.reset();
+        _rpcService.reset();
+
         grpc_labview::ProtoDescriptorString::getInstance()->deleteInstance();
     }
 
@@ -289,7 +323,7 @@ namespace grpc_labview
         m_descriptor = str;
     }
 
-    // Delete the instaance based on the refcount
+    // Delete the instance based on the refcount
     void ProtoDescriptorString::deleteInstance() {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (!--m_refcount) {

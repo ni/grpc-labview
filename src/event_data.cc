@@ -16,12 +16,12 @@ namespace grpc_labview
     {
         auto callData = std::shared_ptr<CallData>(new CallData(server, service, cq));
 
-        auto finishedTag = new CallFinishedTag(callData);
-        callData->_callFinishedTag = finishedTag;
-        callData->_ctx.AsyncNotifyWhenDone(finishedTag);
+        auto doneTag = new CallDoneNotificationTag(callData, server);
+        callData->_callDoneNotificationTag = doneTag;
+        callData->_ctx.AsyncNotifyWhenDone(doneTag);
 
         // Start the state machine which waits for a new call to arrive.
-        auto tag = new CompletionQueueTag(callData);
+        auto tag = CompletionQueueTag::ForRequestCall(callData);
         callData->_service->RequestCall(
             &callData->_ctx,
             &callData->_stream,
@@ -38,7 +38,10 @@ namespace grpc_labview
         _service(service),
         _cq(cq),
         _stream(&_ctx),
-        _status(CallStatus::WaitingForConnection),
+        _callState(CallState::WaitingForConnection),
+        _callDoneNotificationTag(nullptr),
+        _cancelled(false),
+        _finishedFromLabVIEW(false),
         _callStatus(grpc::Status::OK)
     {
     }
@@ -47,13 +50,14 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     void CallData::SetCallStatusError(std::string errorMessage)
     {
-        _callStatus = grpc::Status(grpc::StatusCode::INTERNAL, errorMessage);
+        SetCallStatusError(grpc::StatusCode::INTERNAL, errorMessage);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void CallData::SetCallStatusError(grpc::StatusCode statusCode, std::string errorMessage)
     {
+        std::lock_guard<std::mutex> lock(_stateMutex);
         _callStatus = grpc::Status(statusCode, errorMessage);
     }
 
@@ -61,6 +65,7 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     grpc::StatusCode CallData::GetCallStatusCode()
     {
+        std::lock_guard<std::mutex> lock(_stateMutex);
         return _callStatus.error_code();
     }
 
@@ -68,14 +73,8 @@ namespace grpc_labview
     //---------------------------------------------------------------------
     bool CallData::IsCancelled()
     {
-        return _ctx.IsCancelled();
-    }
-
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    bool CallData::IsActive()
-    {
-        return _status != CallStatus::Finished && _status != CallStatus::Finishing && !IsCancelled();
+        std::lock_guard<std::mutex> lock(_stateMutex);
+        return _cancelled;
     }
 
     //---------------------------------------------------------------------
@@ -85,14 +84,17 @@ namespace grpc_labview
         // GenericServerAsyncReaderWriter only supports one read at a time. Also,
         // trying to read concurrently from the same request message would produce
         // undefined results.
-        std::lock_guard<std::mutex> lock(_readMutex);
-        if (!IsActive())
+        std::lock_guard<std::mutex> readLock(_readMutex);
+        std::unique_ptr<ReadNextTag> tag(new ReadNextTag(shared_from_this()));
         {
-            return false;
+            std::lock_guard<std::mutex> stateLock(_stateMutex);
+            if (_callState != CallState::Connected)
+            {
+                return false;
+            }
+            _stream.Read(&_rb, tag.get());
         }
 
-        std::unique_ptr<ReadNextTag> tag(new ReadNextTag(shared_from_this()));
-        _stream.Read(&_rb, tag.get());
         if (!tag->Wait())
         {
             return false;
@@ -109,16 +111,22 @@ namespace grpc_labview
         // GenericServerAsyncReaderWriter only supports one write at a time. Also,
         // trying to write concurrently to the same response message would produce
         // undefined results.
-        std::lock_guard<std::mutex> lock(_writeMutex);
-        if (!IsActive())
+        std::lock_guard<std::mutex> writeLock(_outboundOperationMutex);
+        std::unique_ptr<WriteNextTag> tag;
+        std::unique_ptr<grpc::ByteBuffer> wb;
         {
-            return false;
+            std::lock_guard<std::mutex> stateLock(_stateMutex);
+            if (_callState != CallState::Connected)
+            {
+                return false;
+            }
+
+            grpc_labview::ClusterDataCopier::CopyFromCluster(*_response, cluster);
+            wb = _response->SerializeToByteBuffer();
+            tag = std::make_unique<WriteNextTag>(shared_from_this());
+            _stream.Write(*wb, tag.get());
         }
 
-        grpc_labview::ClusterDataCopier::CopyFromCluster(*_response, cluster);
-        auto wb = _response->SerializeToByteBuffer();
-        std::unique_ptr<WriteNextTag> tag(new WriteNextTag(shared_from_this()));
-        _stream.Write(*wb, tag.get());
         if (!tag->Wait())
         {
             return false;
@@ -132,117 +140,174 @@ namespace grpc_labview
     {
         std::lock_guard<std::mutex> lock(_stateMutex);
 
-        if (!ok && _status != CallStatus::Finished)
+        if (!ok)
         {
-            if (_status == CallStatus::WaitingForConnection)
+            if (_callState == CallState::WaitingForConnection)
             {
-                // Ugh. When using the grpc async APIs, you are required to call AsyncNotifyWhenDone if you want to call IsCancelled
-                // on the ServerContext. However, the tag registered with AsyncNotifyWhenDone is only notified if a RPC call actually
-                // starts, and you must call AsyncNotifyWhenDone before the call starts or tag will not be notified either. Generally,
-                // it is acceptable to just leak this one tag on server shutdown. However, because we maintain a shared pointer to the
-                // server, we will end up leaking everything if we don't clean up this tag. As a work around, we delete the tag here.
-                // This leaves a dangling tag pointer in the completion queue, but it never does anything with the tag. It only delivers
-                // the tag from the Next call which we know will never be triggered so this should be safe.
-                delete _callFinishedTag;
-                _callFinishedTag = nullptr;
+                // AsyncNotifyWhenDone is not delivered when a pending RequestCall never starts. Keep its
+                // weak notification tag alive until the completion queue has been fully drained.
+                auto server = _server.lock();
+                if (server != nullptr)
+                {
+                    server->RetainUndeliveredCallDoneNotificationTag(_callDoneNotificationTag);
+                }
+                else
+                {
+                    delete _callDoneNotificationTag;
+                }
+                _callDoneNotificationTag = nullptr;
             }
-            _status = CallStatus::Finishing;
+            _callState = CallState::Finished;
+            return;
         }
 
-        if (_status == CallStatus::WaitingForConnection)
+        if (_callDoneNotificationTag != nullptr)
         {
-            // Spawn a new CallData instance to serve new clients while we process
-            // the one for this CallData. The new call object is kept alive and
-            // referenced by the completion queue until a connection from a new
-            // client is established for the call.
-            CallData::Create(_server, _service, _cq);
-
-            auto& name = _ctx.method();
-            LVEventData eventData;
-            if ((_server->HasRegisteredServerMethod(name) && _server->FindEventData(name, eventData)) || _server->HasGenericMethodEvent())
-            {
-                auto requestMetadata = _server->FindMetadata(eventData.requestMetadataName);
-                auto responseMetadata = _server->FindMetadata(eventData.responseMetadataName);
-                _request = std::make_shared<LVMessage>(requestMetadata);
-                _response = std::make_shared<LVMessage>(responseMetadata);
-
-                gPointerManager.RegisterPointer(shared_from_this());
-                grpc_labview::RegisterCleanupProc(grpc_labview::CloseServerEventCleanupProc, this);
-                _server->SendEvent(name, static_cast<gRPCid*>(this));
-                _status = CallStatus::Connected;
-            }
-            else
-            {
-                _status = CallStatus::Finishing;
-                _stream.Finish(grpc::Status(grpc::StatusCode::UNIMPLEMENTED, ""), new CompletionQueueTag(shared_from_this()));
-            }
+            _callDoneNotificationTag->SetCallAccepted();
         }
-        else if (_status == CallStatus::Connected)
+
+        auto server = _server.lock();
+        if (server == nullptr)
         {
-            // Once connected, we expect reads of request messages to be triggered by calls to ReadNext via API calls from
-            // the user's implementation of the RPC in the server. We do not expect any events to be received for this RPC
-            // in this state.
-            assert(false);
+            FinishWithStatusLocked(grpc::Status(grpc::StatusCode::UNAVAILABLE, "Server is no longer available"));
+            return;
         }
-        else if (_status == CallStatus::Finishing)
+
+        // Spawn a new CallData instance to serve new clients while we process
+        // the one for this CallData. The new call object is kept alive and
+        // referenced by the completion queue until a connection from a new
+        // client is established for the call.
+        CallData::Create(server, _service, _cq);
+
+        if (_callState == CallState::Finished)
         {
-            _status = CallStatus::Finished;
+            return;
+        }
+
+        auto& name = _ctx.method();
+        LVEventData eventData;
+        if (server->FindEventData(name, eventData))
+        {
+            auto requestMetadata = server->FindMetadata(eventData.requestMetadataName);
+            auto responseMetadata = server->FindMetadata(eventData.responseMetadataName);
+            _request = std::make_shared<LVMessage>(requestMetadata);
+            _response = std::make_shared<LVMessage>(responseMetadata);
+
+            grpc_labview::gPointerManager.RegisterPointer(shared_from_this());
+            grpc_labview::RegisterCleanupProc(grpc_labview::CloseServerEventCleanupProc, this);
+            _callState = CallState::Connected;
+            if (server->SendEvent(name, static_cast<gRPCid*>(this)) != 0)
+            {
+                grpc_labview::DeregisterCleanupProc(grpc_labview::CloseServerEventCleanupProc, this);
+                grpc_labview::gPointerManager.UnregisterPointer(this);
+                FinishWithStatusLocked(grpc::Status(grpc::StatusCode::INTERNAL, "Failed to send LV event for RPC"));
+            }
         }
         else
         {
-            assert(_status == CallStatus::Finished);
+            FinishWithStatusLocked(grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "RPC is not implemented or no metadata was registered"));
         }
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void CallData::FinishWithStatusLocked(grpc::Status status)
+    {
+        _callState = CallState::Finishing;
+        _stream.Finish(status, CompletionQueueTag::ForFinish(shared_from_this()));
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void CallData::FinishFromLabVIEW()
     {
-        std::lock_guard<std::mutex> lock(_stateMutex);
+        std::lock_guard<std::mutex> writeLock(_outboundOperationMutex);
+        std::lock_guard<std::mutex> stateLock(_stateMutex);
+
+        if (_finishedFromLabVIEW)
+        {
+            return;
+        }
+
+        _finishedFromLabVIEW = true;
+        grpc_labview::DeregisterCleanupProc(grpc_labview::CloseServerEventCleanupProc, this);
+        grpc_labview::gPointerManager.UnregisterPointer(this);
 
         // Helps guard against LV code completing a grpc call after shutdown
         // has been called on the server or LV completing the call multiple times.
-        if (_status == CallStatus::Finishing || _status == CallStatus::Finished)
+        if (_callState == CallState::Finishing || _callState == CallState::Finished)
         {
             return;
         }
 
-        _status = CallStatus::Finishing;
-        _stream.Finish(_callStatus, new CompletionQueueTag(shared_from_this()));
+        FinishWithStatusLocked(_callStatus);
+        return;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void CallData::FinishFromCompletionQueue()
+    void CallData::FinishOperationCompleted(bool ok)
     {
         std::lock_guard<std::mutex> lock(_stateMutex);
+        _callState = CallState::Finished;
+    }
 
-        _callFinishedTag = nullptr;
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void CallData::OnCallDone()
+    {
+        auto cancelled = _ctx.IsCancelled();
+        std::lock_guard<std::mutex> lock(_stateMutex);
+
+        _callDoneNotificationTag = nullptr;
+        _cancelled = cancelled;
 
         // The call was completed normally from LV code.
-        if (_status == CallStatus::Finishing || _status == CallStatus::Finished)
+        if (_callState == CallState::Finishing || _callState == CallState::Finished)
         {
             return;
         }
 
-        // If FinishFromCompletionQueue is called and we are not already finishing because the user completed
-        // the call from LV, then it means either the server is shutting down or the call was cancelled. In either
+        // If OnCallDone is called and we are not already finishing because the user completed the call
+        // from LV, then it means either the server is shutting down or the call was cancelled. In either
         // case there is no point in calling Finish on the stream so just mark the call as finished.
-        _status = CallStatus::Finished;
+        _callState = CallState::Finished;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    CallFinishedTag::CallFinishedTag(std::shared_ptr<CallData> callData)
+    CallDoneNotificationTag::CallDoneNotificationTag(std::shared_ptr<CallData> callData, std::shared_ptr<LabVIEWgRPCServer> server) :
+        _callData(callData),
+        _server(server)
     {
-        _callData = callData;
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void CallFinishedTag::Proceed(bool ok)
+    void CallDoneNotificationTag::SetCallAccepted()
     {
-        _callData->FinishFromCompletionQueue();
+        _acceptedCallData = _callData.lock();
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void CallDoneNotificationTag::Proceed(bool ok)
+    {
+        auto server = _server.lock();
+        if (server != nullptr)
+        {
+            server->ReleaseUndeliveredCallDoneNotificationTag(this);
+        }
+
+        auto callData = _acceptedCallData;
+        if (callData == nullptr)
+        {
+            callData = _callData.lock();
+        }
+        if (callData != nullptr)
+        {
+            callData->OnCallDone();
+        }
         delete this;
     }
 

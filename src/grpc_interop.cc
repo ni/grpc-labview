@@ -17,24 +17,23 @@ namespace grpc_labview
 {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void OccurServerEvent(LVUserEventRef event, gRPCid* data)
+    int OccurServerEvent(LVUserEventRef event, gRPCid* data)
     {
-        auto error = PostUserEvent(event, &data);
+        return PostUserEvent(event, &data);
     }
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void OccurServerEvent(LVUserEventRef event, gRPCid* data, std::string eventMethodName)
+    int OccurServerEvent(LVUserEventRef event, gRPCid* data, std::string eventMethodName)
     {
         GeneralMethodEventData eventData;
         eventData.methodData = data;
         eventData.methodName = nullptr;
 
         SetLVAsciiString(&eventData.methodName, eventMethodName);
-
         auto error = PostUserEvent(event, &eventData);
-
         DSDisposeHandle(eventData.methodName);
+        return error;
     }
 
     //---------------------------------------------------------------------
@@ -166,7 +165,7 @@ LIBRARY_EXPORT int32_t LVStartServer(char* address, char* serverCertificatePath,
         {
             return -1;
         }
-        return server->Run(address, serverCertificatePath, serverKeyPath);
+        return server->Start(address, serverCertificatePath, serverKeyPath);
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
     }
@@ -182,7 +181,7 @@ LIBRARY_EXPORT int32_t LVGetServerListeningPort(grpc_labview::gRPCid** id, int* 
         {
             return -1;
         }
-        *listeningPort = server->ListeningPort();
+        *listeningPort = server->GetListeningPort();
         return 0;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
@@ -199,7 +198,7 @@ LIBRARY_EXPORT int32_t LVStopServer(grpc_labview::gRPCid** id)
         {
             return -1;
         }
-        server->StopServer();
+        server->Stop();
 
         grpc_labview::DeregisterCleanupProc(ServerCleanupProc, *id);
         grpc_labview::gPointerManager.UnregisterPointer(server.get());
@@ -368,6 +367,14 @@ static int32_t GetErrorCodeForFailedReadWrite(const std::shared_ptr<grpc_labview
     {
         return -(1000 + statusCode);
     }
+
+    // There is a bit of a race here where the done notification from a cancellation may not have been delivered
+    // by the time a failed read/write is detected. That means we may end up returning -2 even though the call
+    // will shortly be notified it was cancelled. There isn't really a good way around this with the async grpc APIs.
+    // From the server side, cancelled is already a bit ambiguous as it could mean cancelled, deadline exceeded,
+    // server shutting down, or some other network connection problem. Similarly, a failed read/write is ambiguous
+    // as it could mean any of the above or a half close from the client. Perhaps the LV APIs should be modified
+    // at some point to better avoid these ambiguities.
     if (callData->IsCancelled())
     {
         return -(1000 + grpc::StatusCode::CANCELLED);
@@ -429,8 +436,6 @@ LIBRARY_EXPORT int32_t CloseServerEvent(grpc_labview::gRPCid** id)
         }
 
         callData->FinishFromLabVIEW();
-        grpc_labview::DeregisterCleanupProc(grpc_labview::CloseServerEventCleanupProc, *id);
-        grpc_labview::gPointerManager.UnregisterPointer(*id);
         return 0;
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
