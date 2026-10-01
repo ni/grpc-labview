@@ -46,7 +46,7 @@ namespace grpc_labview
     class LabVIEWgRPCServer;
     class LVMessage;
     class CallData;
-    class CallFinishedTag;
+    class CallDoneNotificationTag;
     class MessageElementMetadata;
     struct MessageMetadata;
 
@@ -76,30 +76,36 @@ namespace grpc_labview
     {
     public:
         LabVIEWgRPCServer();
-        int Run(std::string address, std::string serverCertificatePath, std::string serverKeyPath);
-        int ListeningPort();
-        void StopServer();
+        int Start(std::string address, std::string serverCertificatePath, std::string serverKeyPath);
+        void Stop();
+        int GetListeningPort();
         void RegisterEvent(std::string eventName, LVUserEventRef reference, std::string requestMessageName, std::string responseMessageName);
         void RegisterGenericMethodEvent(LVUserEventRef item);
-        void SendEvent(std::string name, gRPCid* data);
+        int SendEvent(std::string name, gRPCid* data);
 
-        bool FindEventData(std::string name, LVEventData& data);
-        bool HasGenericMethodEvent();
-        bool HasRegisteredServerMethod(std::string methodName);
+        bool FindEventData(const std::string& name, LVEventData& data);
 
     private:
-        std::mutex _mutex;
+        std::mutex _eventMutex;
+        std::mutex _lifeCycleMutex;
         std::unique_ptr<Server> _server;
         std::unique_ptr<grpc::ServerCompletionQueue> _cq;
         std::map<std::string, LVEventData> _registeredServerMethods;
         LVUserEventRef _genericMethodEvent;
         std::unique_ptr<grpc::AsyncGenericService> _rpcService;
         std::unique_ptr<std::thread> _runThread;
+        CallDoneNotificationTag* _undeliveredCallDoneNotificationTag = nullptr;
         int _listeningPort;
 
     private:
         void RunServer(std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
         void HandleRpcs();
+        void RetainUndeliveredCallDoneNotificationTag(CallDoneNotificationTag* tag);
+        void ReleaseUndeliveredCallDoneNotificationTag(CallDoneNotificationTag* tag);
+        bool FindEventDataLocked(const std::string& name, LVEventData& data);
+
+        friend class CallData;
+        friend class CallDoneNotificationTag;
 
     private:
         static void StaticRunServer(LabVIEWgRPCServer* server, std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
@@ -123,9 +129,9 @@ namespace grpc_labview
         void Proceed(bool ok) override;
         bool Write(int8_t* cluster);
         void FinishFromLabVIEW();
-        void FinishFromCompletionQueue();
+        void FinishOperationCompleted(bool ok);
+        void OnCallDone();
         bool IsCancelled();
-        bool IsActive();
         bool ReadNext(int8_t* cluster);
         void SetCallStatusError(std::string errorMessage);
         void SetCallStatusError(grpc::StatusCode statusCode, std::string errorMessage);
@@ -133,42 +139,52 @@ namespace grpc_labview
 
     private:
         CallData(std::shared_ptr<LabVIEWgRPCServer> server, grpc::AsyncGenericService* service, grpc::ServerCompletionQueue* cq);
+        void FinishWithStatusLocked(grpc::Status status);
 
-        std::shared_ptr<LabVIEWgRPCServer> _server;
+    private:
+        std::weak_ptr<LabVIEWgRPCServer> _server;
         grpc::AsyncGenericService* _service;
         grpc::ServerCompletionQueue* _cq;
         grpc::GenericServerContext _ctx;
         grpc::GenericServerAsyncReaderWriter _stream;
         grpc::ByteBuffer _rb;
         grpc::Status _callStatus;
-        CallFinishedTag* _callFinishedTag;
+        CallDoneNotificationTag* _callDoneNotificationTag;
+        bool _cancelled;
+        bool _finishedFromLabVIEW;
 
         std::shared_ptr<LVMessage> _request;
         std::shared_ptr<LVMessage> _response;
+
+        // Lock order: read/outbound operation mutex first, then state mutex.
+        // Never wait for completion while holding _stateMutex.
         std::mutex _readMutex;
-        std::mutex _writeMutex;
+        std::mutex _outboundOperationMutex;
         std::mutex _stateMutex; // Protects state transitions
 
-        enum class CallStatus
+        enum class CallState
         {
             WaitingForConnection,
             Connected,
             Finishing,
             Finished
         };
-        CallStatus _status;
+        CallState _callState;
     };
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    class CallFinishedTag : public CallDataBase
+    class CallDoneNotificationTag : public CallDataBase
     {
     public:
-        CallFinishedTag(std::shared_ptr<CallData> callData);
+        CallDoneNotificationTag(std::shared_ptr<CallData> callData, std::shared_ptr<LabVIEWgRPCServer> server);
+        void SetCallAccepted();
         void Proceed(bool ok) override;
 
     private:
-        std::shared_ptr<CallData> _callData;
+        std::weak_ptr<CallData> _callData;
+        std::shared_ptr<CallData> _acceptedCallData;
+        std::weak_ptr<LabVIEWgRPCServer> _server;
     };
 
     //---------------------------------------------------------------------
@@ -177,18 +193,35 @@ namespace grpc_labview
     class CompletionQueueTag : public CallDataBase
     {
     public:
-        CompletionQueueTag(std::shared_ptr<CallData> callData)
-            : _callData(callData) {
+        static CompletionQueueTag* ForRequestCall(std::shared_ptr<CallData> callData)
+        {
+            return new CompletionQueueTag(callData, true);
+        }
+
+        static CompletionQueueTag* ForFinish(std::shared_ptr<CallData> callData)
+        {
+            return new CompletionQueueTag(callData, false);
         }
 
         void Proceed(bool ok) override
         {
-            _callData->Proceed(ok);
+            if (_isRequest)
+            {
+                _callData->Proceed(ok);
+            }
+            else
+            {
+                _callData->FinishOperationCompleted(ok);
+            }
             delete this;
         }
 
     private:
+        CompletionQueueTag(std::shared_ptr<CallData> callData, bool isRequest)
+            : _callData(callData), _isRequest(isRequest) {}
+
         std::shared_ptr<CallData> _callData;
+        bool _isRequest;
     };
 
     //---------------------------------------------------------------------
@@ -253,8 +286,8 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    void OccurServerEvent(LVUserEventRef event, gRPCid* data);
-    void OccurServerEvent(LVUserEventRef event, gRPCid* data, std::string eventMethodName);
+    int OccurServerEvent(LVUserEventRef event, gRPCid* data);
+    int OccurServerEvent(LVUserEventRef event, gRPCid* data, std::string eventMethodName);
     std::string read_keycert(const std::string &filename);
 
     //---------------------------------------------------------------------
