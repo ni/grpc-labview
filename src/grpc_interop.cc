@@ -162,14 +162,31 @@ LIBRARY_EXPORT int32_t LVStartServer(char* address, char* serverCertificatePath,
 {
     try {
         auto server = (*id)->CastTo<grpc_labview::LabVIEWgRPCServer>();
+        auto clientCertificatePath = std::string();
         if (server == nullptr)
         {
             return -1;
         }
-        return server->Run(address, serverCertificatePath, serverKeyPath);
+        return server->Run(address, serverCertificatePath, serverKeyPath, clientCertificatePath);
     } catch (const std::exception&) {
         return grpc_labview::TranslateException();
     }
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+LIBRARY_EXPORT int32_t LVStartServerWithClientCertificate(char* address, char* serverCertificatePath, char* serverKeyPath, char* clientCertificatePath, grpc_labview::gRPCid** id)
+{
+   try {
+      auto server = (*id)->CastTo<grpc_labview::LabVIEWgRPCServer>();
+      if (server == nullptr)
+      {
+         return -1;
+      }
+      return server->Run(address, serverCertificatePath, serverKeyPath, clientCertificatePath);
+   } catch (const std::exception&) {
+      return grpc_labview::TranslateException();
+   }
 }
 
 //---------------------------------------------------------------------

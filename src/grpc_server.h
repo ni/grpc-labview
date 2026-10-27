@@ -98,11 +98,11 @@ namespace grpc_labview
         int _listeningPort;
 
     private:
-        void RunServer(std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
+        void RunServer(std::string address, std::string serverCertificatePath, std::string serverKeyPath, std::string clientCertificatePath, ServerStartEventData* serverStarted);
         void HandleRpcs();
 
     private:
-        static void StaticRunServer(LabVIEWgRPCServer* server, std::string address, std::string serverCertificatePath, std::string serverKeyPath, ServerStartEventData* serverStarted);
+        static void StaticRunServer(LabVIEWgRPCServer* server, std::string address, std::string serverCertificatePath, std::string serverKeyPath, std::string clientCertificatePath, ServerStartEventData* serverStarted);
     };
 
     //---------------------------------------------------------------------

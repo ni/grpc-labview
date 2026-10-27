@@ -99,12 +99,12 @@ namespace grpc_labview
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    int LabVIEWgRPCServer::Run(std::string address, std::string serverCertificatePath, std::string serverKeyPath)
+    int LabVIEWgRPCServer::Run(std::string address, std::string serverCertificatePath, std::string serverKeyPath, std::string clientCertificatePath)
     {
         FinalizeMetadata();
 
         auto serverStarted = new ServerStartEventData;
-        _runThread = std::make_unique<std::thread>(StaticRunServer, this, address, serverCertificatePath, serverKeyPath, serverStarted);
+        _runThread = std::make_unique<std::thread>(StaticRunServer, this, address, serverCertificatePath, serverKeyPath, clientCertificatePath, serverStarted);
         serverStarted->WaitForComplete();
         auto result = serverStarted->serverStartStatus;
         delete serverStarted;
@@ -162,9 +162,10 @@ namespace grpc_labview
         std::string address,
         std::string serverCertificatePath,
         std::string serverKeyPath,
+        std::string clientCertificatePath,
         ServerStartEventData *serverStarted)
     {
-        server->RunServer(address, serverCertificatePath, serverKeyPath, serverStarted);
+        server->RunServer(address, serverCertificatePath, serverKeyPath, clientCertificatePath, serverStarted);
     }
 
     //---------------------------------------------------------------------
@@ -173,6 +174,7 @@ namespace grpc_labview
         std::string address,
         std::string serverCertificatePath,
         std::string serverKeyPath,
+        std::string clientCertificatePath,
         ServerStartEventData *serverStarted)
     {
         std::string server_address;
@@ -191,6 +193,7 @@ namespace grpc_labview
         ServerBuilder builder;
 
         std::shared_ptr<grpc::ServerCredentials> creds;
+        std::string clientcert = string.Empty;
         if (serverCertificatePath.length() > 1)
         {
             std::string servercert = read_keycert(serverCertificatePath);
@@ -200,8 +203,13 @@ namespace grpc_labview
             pkcp.private_key = serverkey;
             pkcp.cert_chain = servercert;
 
+            if (clientCertificatePath.length() > 1)
+            {
+                clientcert = read_keycert(clientCertificatePath);
+            }
+
             grpc::SslServerCredentialsOptions ssl_opts;
-            ssl_opts.pem_root_certs = "";
+            ssl_opts.pem_root_certs = clientcert;
             ssl_opts.pem_key_cert_pairs.push_back(pkcp);
 
             creds = grpc::SslServerCredentials(ssl_opts);
