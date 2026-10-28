@@ -193,7 +193,7 @@ namespace grpc_labview
         ServerBuilder builder;
 
         std::shared_ptr<grpc::ServerCredentials> creds;
-        std::string clientcert = string.Empty;
+        std::string clientcert = "";
         if (serverCertificatePath.length() > 1)
         {
             std::string servercert = read_keycert(serverCertificatePath);
