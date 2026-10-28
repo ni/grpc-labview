@@ -76,7 +76,7 @@ namespace grpc_labview
     {
     public:
         LabVIEWgRPCServer();
-        int Run(std::string address, std::string serverCertificatePath, std::string serverKeyPath);
+        int Run(std::string address, std::string serverCertificatePath, std::string serverKeyPath, std::string clientCertificatePath);
         int ListeningPort();
         void StopServer();
         void RegisterEvent(std::string eventName, LVUserEventRef reference, std::string requestMessageName, std::string responseMessageName);
